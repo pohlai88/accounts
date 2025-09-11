@@ -1,0 +1,24 @@
+{
+  "name": "@aibos/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "start": "node dist/index.js",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "inngest": "^3.22.0",
+    "zod": "^3.23.8",
+    "@aibos/contracts": "workspace:*",
+    "@aibos/db": "workspace:*",
+    "@aibos/accounting": "workspace:*",
+    "@aibos/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2",
+    "@types/node": "^20.16.5"
+  }
+}

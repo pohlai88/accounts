@@ -1,0 +1,30 @@
+# Supabase Configuration Template
+# Copy this to .env and replace with your actual credentials
+
+# Supabase Project URL (from your Supabase dashboard)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+
+# Supabase Anon/Public Key (from your Supabase dashboard > Settings > API)
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key
+
+# Supabase Service Role Key (from your Supabase dashboard > Settings > API)
+# WARNING: Keep this secret! Never expose in client-side code
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-service-role-key
+
+# Database Connection String (PostgreSQL format)
+# Format: postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:your-password@db.your-project-id.supabase.co:5432/postgres
+
+# Additional Configuration
+NODE_ENV=development
+
+# Email Configuration (Resend)
+RESEND_API_KEY=re_your-resend-api-key
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+
+# Axiom Telemetry (Optional)
+AXIOM_TOKEN=xaat-your-axiom-token
+AXIOM_ORG_ID=your-org-id
+
+# JWT Secret (for local development)
+JWT_SECRET=your-jwt-secret-key-for-local-dev

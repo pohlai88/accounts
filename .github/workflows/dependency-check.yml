@@ -1,0 +1,40 @@
+name: Dependency Drift Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check dependency consistency
+        run: pnpm deps:lint
+
+      - name: Verify workspace protocol usage
+        run: pnpm deps:list-workspace
+
+      - name: Check for duplicate dependencies
+        run: pnpm -w dedupe --check
+
+      - name: Security audit
+        run: pnpm deps:audit
+
+      - name: Verify build still works
+        run: pnpm build

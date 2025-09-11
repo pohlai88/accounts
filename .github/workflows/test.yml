@@ -1,0 +1,314 @@
+name: V1 Testing Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20.12.0'
+  PNPM_VERSION: '9.7.0'
+
+jobs:
+  # V1 Requirement: Unit Tests with 95% Coverage
+  unit-tests:
+    name: Unit Tests (95% Coverage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage
+        env:
+          NODE_ENV: test
+
+      - name: Check coverage thresholds
+        run: |
+          if [ ! -f coverage/coverage-summary.json ]; then
+            echo "❌ Coverage report not found"
+            exit 1
+          fi
+          
+          # Extract coverage percentages
+          LINES=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          FUNCTIONS=$(cat coverage/coverage-summary.json | jq '.total.functions.pct')
+          BRANCHES=$(cat coverage/coverage-summary.json | jq '.total.branches.pct')
+          STATEMENTS=$(cat coverage/coverage-summary.json | jq '.total.statements.pct')
+          
+          echo "📊 Coverage Results:"
+          echo "Lines: ${LINES}%"
+          echo "Functions: ${FUNCTIONS}%"
+          echo "Branches: ${BRANCHES}%"
+          echo "Statements: ${STATEMENTS}%"
+          
+          # V1 Requirement: 95% coverage
+          if (( $(echo "$LINES < 95" | bc -l) )); then
+            echo "❌ Line coverage ${LINES}% is below 95% threshold"
+            exit 1
+          fi
+          
+          if (( $(echo "$FUNCTIONS < 95" | bc -l) )); then
+            echo "❌ Function coverage ${FUNCTIONS}% is below 95% threshold"
+            exit 1
+          fi
+          
+          echo "✅ All coverage thresholds met!"
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: |
+            coverage/
+            test-results/
+          retention-days: 7
+
+  # V1 Requirement: E2E Tests with 80% Coverage
+  e2e-tests:
+    name: E2E Tests (80% Coverage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: unit-tests
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm playwright:install --with-deps
+
+      - name: Setup test database
+        run: |
+          # Create test database schema
+          PGPASSWORD=postgres psql -h localhost -U postgres -d test -f packages/db/supabase/01_setup.sql
+          PGPASSWORD=postgres psql -h localhost -U postgres -d test -f packages/db/supabase/02_production_hardening.sql
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+
+      - name: Start applications
+        run: |
+          pnpm --filter @aibos/web dev &
+          pnpm --filter @aibos/web-api dev &
+          sleep 30 # Wait for apps to start
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: test-key
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  # V1 Requirement: Performance Tests (p95 < 500ms)
+  performance-tests:
+    name: Performance Tests (p95 < 500ms)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [unit-tests, e2e-tests]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://localhost:5432/test_db' }}
+      API_KEY: ${{ secrets.TEST_API_KEY || 'test-api-key' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+
+      - name: Start API server
+        run: |
+          pnpm --filter @aibos/web-api dev &
+          sleep 30
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Run performance tests
+        run: pnpm test:performance
+        env:
+          BASE_URL: http://localhost:3001
+          API_KEY: ${{ env.API_KEY }}
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-test-results
+          path: |
+            test-results/
+          retention-days: 7
+
+  # V1 Requirement: Security and Quality Gates
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run type checking
+        run: pnpm typecheck
+
+      - name: Check dependency compliance
+        run: pnpm deps:check
+
+      - name: Security audit
+        run: pnpm deps:audit
+
+      - name: Check performance budgets
+        run: |
+          if [ -f perf.budgets.json ]; then
+            echo "✅ Performance budgets file exists"
+            cat perf.budgets.json
+          else
+            echo "❌ Performance budgets file missing"
+            exit 1
+          fi
+
+  # Summary job for PR status checks
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, e2e-tests, quality-gates]
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [[ "${{ needs.unit-tests.result }}" == "success" && 
+                "${{ needs.e2e-tests.result }}" == "success" && 
+                "${{ needs.quality-gates.result }}" == "success" ]]; then
+            echo "✅ All tests passed! V1 quality requirements met."
+          else
+            echo "❌ Some tests failed:"
+            echo "Unit tests: ${{ needs.unit-tests.result }}"
+            echo "E2E tests: ${{ needs.e2e-tests.result }}"
+            echo "Quality gates: ${{ needs.quality-gates.result }}"
+            exit 1
+          fi

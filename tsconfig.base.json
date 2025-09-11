@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    // "exactOptionalPropertyTypes": true, // TODO: Enable after fixing optional property handling
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@aibos/contracts/*": [
+        "packages/contracts/src/*"
+      ],
+      "@aibos/db/*": [
+        "packages/db/src/*"
+      ],
+      "@aibos/accounting/*": [
+        "packages/accounting/src/*"
+      ],
+      "@aibos/auth/*": [
+        "packages/auth/src/*"
+      ],
+      "@aibos/ui/*": [
+        "packages/ui/src/*"
+      ],
+      "@aibos/utils/*": [
+        "packages/utils/src/*"
+      ]
+    }
+  }
+}

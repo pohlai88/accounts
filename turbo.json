@@ -1,0 +1,60 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "pnpm-lock.yaml",
+    "package.json",
+    "tsconfig.base.json",
+    ".npmrc",
+    "syncpack.config.json",
+    ".cursorrules.json"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "dist/**",
+        "build/**"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "typecheck": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ]
+    },
+    "test:unit": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ]
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
+    "e2e": {
+      "dependsOn": ["build"],
+      "outputs": [
+        "test-results/**",
+        "playwright-report/**"
+      ]
+    }
+  }
+}

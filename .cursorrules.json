@@ -1,0 +1,39 @@
+{
+  "governance": {
+    "diffOnly": true,
+    "requirePassingTests": true,
+    "blockOnTypeErrors": true,
+    "blockOnEslintErrors": true
+  },
+  "allowedPatterns": [
+    "apps/**",
+    "services/**",
+    "packages/**",
+    "tests/**"
+  ],
+  "forbiddenPatterns": [
+    "**/*.css",
+    "apps/web/**/styles/**",
+    "**/*.any.ts",
+    "**/fetch-from-ui/**",
+    "apps/web/**/server-direct-db-access/**"
+  ],
+  "hardRules": [
+    "No inline styles or raw CSS; use tokens + shadcn.",
+    "No direct DB access from UI; typed hooks only.",
+    "All routes must parse req/res via Zod from packages/contracts.",
+    "All DB mutations must enforce RLS scope (tenant_id/company_id) and SoD checks.",
+    "Use Temporal for dates; forbid other date libs.",
+    "Logs must include requestId and tenantId.",
+    "Posting rules require unit tests before exposure."
+  ],
+  "reviewChecklists": {
+    "pullRequest": [
+      "Contracts versioned & referenced",
+      "Zod parse on req/res present",
+      "RLS & SoD enforced",
+      "Unit + E2E updated",
+      "Indexes added or N+1 avoided"
+    ]
+  }
+}
