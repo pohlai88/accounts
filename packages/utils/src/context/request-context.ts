@@ -19,6 +19,16 @@ export interface UserContext {
     userRole?: string;
     permissions?: string[];
     sessionId?: string;
+    // Enhanced context for admin configuration
+    roles?: string[];
+    memberPermissions?: {
+        roles?: string[];
+        allow?: string[];
+        deny?: string[];
+        overrides?: Record<string, unknown>;
+    };
+    featureFlags?: Record<string, boolean>;
+    policySettings?: Record<string, unknown>;
 }
 
 /**

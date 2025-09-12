@@ -37,19 +37,19 @@ export {
 export type { RequestContext as V1RequestContext, UserContext } from "./context/request-context";
 
 // Export functionality for V1 compliance - Complete implementation
-export { 
-  ExportFormat, 
-  ExportOptions, 
-  ExportResult, 
-  ReportExportRequest, 
+export {
+  ExportFormat,
+  ExportOptions,
+  ExportResult,
+  ReportExportRequest,
   ExportableData,
   ExcelCellStyle,
-  ChartConfig 
+  ChartConfig
 } from "./export/types";
-export { 
-  exportToCsv, 
-  exportToXlsx, 
-  exportToJsonl, 
+export {
+  exportToCsv,
+  exportToXlsx,
+  exportToJsonl,
   exportToCsvEnhanced,
   createExportService,
   ExportService
@@ -72,6 +72,10 @@ export {
 // Monitoring and performance tracking for V1 compliance
 export { performanceMonitor, PerformanceMetrics, APIMetrics, UIMetrics } from "./monitoring/performance-monitor";
 export { errorTracker, ErrorContext, ErrorEvent, ErrorSummary } from "./monitoring/error-tracker";
+
+// Enhanced Auth utilities for admin configuration
+export * from "./auth/enhanced-context";
+export * from "./auth/react-hooks";
 
 // Import functions for convenience exports
 import { makeLogger } from "./logger";

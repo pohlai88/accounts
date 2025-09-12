@@ -14,7 +14,10 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "@aibos/ui": "workspace:*",
-    "@aibos/contracts": "workspace:*"
+    "@aibos/utils": "workspace:*",
+    "@aibos/auth": "workspace:*",
+    "@aibos/contracts": "workspace:*",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "typescript": "^5.6.2",

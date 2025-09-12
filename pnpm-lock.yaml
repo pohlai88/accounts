@@ -79,12 +79,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@aibos/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@aibos/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
       '@aibos/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@aibos/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       next:
         specifier: 14.2.32
         version: 14.2.32(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -94,6 +100,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
     devDependencies:
       '@next/eslint-plugin-next':
         specifier: ^14.2.6
@@ -223,6 +232,12 @@ importers:
 
   packages/ui:
     dependencies:
+      '@aibos/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@aibos/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@radix-ui/react-slot':
         specifier: ^1.1.0
         version: 1.2.3(@types/react@18.3.24)(react@18.3.1)
@@ -248,6 +263,9 @@ importers:
 
   packages/utils:
     dependencies:
+      '@aibos/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@aibos/db':
         specifier: workspace:*
         version: link:../db
@@ -278,6 +296,9 @@ importers:
       puppeteer:
         specifier: ^22.13.1
         version: 22.15.0(typescript@5.9.2)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
       resend:
         specifier: ^3.1.0
         version: 3.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -297,6 +318,9 @@ importers:
       '@types/pg':
         specifier: ^8.15.5
         version: 8.15.5
+      '@types/react':
+        specifier: ^18.3.5
+        version: 18.3.24
       next:
         specifier: 14.2.32
         version: 14.2.32(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

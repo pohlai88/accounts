@@ -5,9 +5,19 @@ export const tenants = pgTable("tenants", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  featureFlags: jsonb("feature_flags").notNull().default({
+    attachments: true,
+    reports: true,
+    ar: true,
+    ap: false,
+    je: false,
+    regulated_mode: false
+  }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
-});
+}, (table) => ({
+  featureFlagsIdx: index("tenants_feature_flags_gin").on(table.featureFlags)
+}));
 
 export const companies = pgTable("companies", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -16,10 +26,17 @@ export const companies = pgTable("companies", {
   code: text("code").notNull(),
   baseCurrency: text("base_currency").notNull().default("MYR"),
   fiscalYearEnd: text("fiscal_year_end").notNull().default("12-31"),
+  policySettings: jsonb("policy_settings").notNull().default({
+    approval_threshold_rm: 50000,
+    export_requires_reason: false,
+    mfa_required_for_admin: true,
+    session_timeout_minutes: 480
+  }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
 }, (table) => ({
-  tenantCompanyIdx: index("companies_tenant_company_idx").on(table.tenantId, table.code)
+  tenantCompanyIdx: index("companies_tenant_company_idx").on(table.tenantId, table.code),
+  policySettingsIdx: index("companies_policy_settings_gin").on(table.policySettings)
 }));
 
 export const users = pgTable("users", {
@@ -40,7 +57,8 @@ export const memberships = pgTable("memberships", {
   permissions: jsonb("permissions"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 }, (table) => ({
-  userTenantIdx: index("memberships_user_tenant_idx").on(table.userId, table.tenantId)
+  userTenantIdx: index("memberships_user_tenant_idx").on(table.userId, table.tenantId),
+  permissionsIdx: index("memberships_permissions_gin").on(table.permissions)
 }));
 
 // Currency and FX
