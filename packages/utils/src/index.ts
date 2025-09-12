@@ -36,6 +36,43 @@ export {
 } from "./context/request-context";
 export type { RequestContext as V1RequestContext, UserContext } from "./context/request-context";
 
+// Export functionality for V1 compliance - Complete implementation
+export { 
+  ExportFormat, 
+  ExportOptions, 
+  ExportResult, 
+  ReportExportRequest, 
+  ExportableData,
+  ExcelCellStyle,
+  ChartConfig 
+} from "./export/types";
+export { 
+  exportToCsv, 
+  exportToXlsx, 
+  exportToJsonl, 
+  exportToCsvEnhanced,
+  createExportService,
+  ExportService
+} from "./export";
+export {
+  createExportManagerService,
+  ExportManagerService,
+  ExportHistory,
+  ExportStats,
+  cleanupExpiredExportsJob
+} from "./export/export-manager";
+export {
+  createExportScheduleService,
+  ExportScheduleService,
+  ScheduledExport,
+  ScheduleConfig,
+  processScheduledExports
+} from "./export/export-scheduler";
+
+// Monitoring and performance tracking for V1 compliance
+export { performanceMonitor, PerformanceMetrics, APIMetrics, UIMetrics } from "./monitoring/performance-monitor";
+export { errorTracker, ErrorContext, ErrorEvent, ErrorSummary } from "./monitoring/error-tracker";
+
 // Import functions for convenience exports
 import { makeLogger } from "./logger";
 import { emailAdapter } from "./email";

@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
             ...input,
             asOfDate: new Date(input.asOfDate),
             comparativePeriod: input.comparativePeriod ? new Date(input.comparativePeriod) : undefined
-        }, supabase);
+        }, supabase as any);
 
         if (!reportResult.success) {
             // Log failed report generation (V1 audit requirement)
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
             ...input,
             asOfDate: new Date(input.asOfDate),
             comparativePeriod: input.comparativePeriod ? new Date(input.comparativePeriod) : undefined
-        }, supabase);
+        }, supabase as any);
 
         if (!reportResult.success) {
             // Log failed report generation

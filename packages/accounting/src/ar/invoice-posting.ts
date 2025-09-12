@@ -1,5 +1,5 @@
 // D2 AR Invoice Posting Engine - Invoice to GL Integration
-import { validateJournalPosting, type JournalPostingInput, type PostingContext } from '../posting';
+import { validateJournalPosting, type JournalPostingInput } from '../posting';
 import { validateFxPolicy } from '../fx/policy';
 
 export interface InvoicePostingInput {
@@ -85,7 +85,7 @@ export async function validateInvoicePosting(
     // 2. Calculate totals from lines
     const totalRevenue = input.lines.reduce((sum, line) => sum + line.lineAmount, 0);
     const totalTax = input.lines.reduce((sum, line) => sum + (line.taxAmount || 0), 0) +
-                     (input.taxLines?.reduce((sum, tax) => sum + tax.taxAmount, 0) || 0);
+      (input.taxLines?.reduce((sum, tax) => sum + tax.taxAmount, 0) || 0);
     const totalAmount = totalRevenue + totalTax;
 
     // 3. Validate amounts are positive
@@ -189,7 +189,7 @@ export async function validateInvoicePosting(
     if (!journalValidation.validated) {
       return {
         validated: false,
-        error: `Journal validation failed: ${(journalValidation as any).error || 'Unknown validation error'}`,
+        error: `Journal validation failed: ${(journalValidation as { error?: string }).error || 'Unknown validation error'}`,
         code: 'BUSINESS_RULE_VIOLATION'
       };
     }
@@ -247,7 +247,7 @@ export function validateInvoiceLines(lines: InvoiceLineInput[]): {
     // Validate line amount calculation
     const expectedLineAmount = line.quantity * line.unitPrice;
     const actualLineAmount = line.lineAmount;
-    
+
     if (Math.abs(expectedLineAmount - actualLineAmount) > 0.01) {
       errors.push(`Line ${line.lineNumber}: Line amount ${actualLineAmount} does not match quantity × unit price ${expectedLineAmount}`);
     }
@@ -256,7 +256,7 @@ export function validateInvoiceLines(lines: InvoiceLineInput[]): {
     if (line.taxRate && line.taxRate > 0) {
       const expectedTaxAmount = line.lineAmount * line.taxRate;
       const actualTaxAmount = line.taxAmount || 0;
-      
+
       if (Math.abs(expectedTaxAmount - actualTaxAmount) > 0.01) {
         errors.push(`Line ${line.lineNumber}: Tax amount ${actualTaxAmount} does not match line amount × tax rate ${expectedTaxAmount}`);
       }

@@ -62,7 +62,7 @@ export interface TrialBalanceError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: Record<string, unknown>;
 }
 
 /**
@@ -71,7 +71,7 @@ export interface TrialBalanceError {
  */
 export async function generateTrialBalance(
     input: TrialBalanceInput,
-    dbClient: any // Database client (Supabase/Drizzle)
+    dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> } // Database client (Supabase/Drizzle)
 ): Promise<TrialBalanceResult | TrialBalanceError> {
     const startTime = Date.now();
 
@@ -83,7 +83,7 @@ export async function generateTrialBalance(
                 success: false,
                 error: `Input validation failed: ${validation.errors.join(', ')}`,
                 code: 'INVALID_INPUT',
-                details: validation.errors
+                details: { errors: validation.errors }
             };
         }
 
@@ -151,7 +151,7 @@ export async function generateTrialBalance(
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error occurred',
             code: 'TRIAL_BALANCE_ERROR',
-            details: error
+            details: error as Record<string, unknown>
         };
     }
 }
@@ -162,7 +162,7 @@ export async function generateTrialBalance(
 async function getChartOfAccountsHierarchy(
     tenantId: string,
     companyId: string,
-    dbClient: any,
+    dbClient: unknown,
     accountFilter?: TrialBalanceInput['accountFilter']
 ): Promise<Array<{
     id: string;
@@ -224,7 +224,7 @@ async function getChartOfAccountsHierarchy(
 
     query += ` ORDER BY account_number`;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', { query, params });
 
     if (error) {
@@ -241,8 +241,8 @@ async function calculateAccountBalances(
     tenantId: string,
     companyId: string,
     asOfDate: Date,
-    accounts: any[],
-    dbClient: any,
+    accounts: unknown[],
+    dbClient: unknown,
     includePeriodActivity: boolean = false
 ): Promise<{
     balances: Map<string, {
@@ -254,7 +254,7 @@ async function calculateAccountBalances(
     oldestTransaction?: Date;
     newestTransaction?: Date;
 }> {
-    const accountIds = accounts.map(a => a.id);
+    const accountIds = accounts.map(a => (a as any).id);
 
     // Get fiscal year start for opening balance calculation
     const fiscalYearStart = await getFiscalYearStart(tenantId, companyId, asOfDate, dbClient);
@@ -280,7 +280,7 @@ async function calculateAccountBalances(
     GROUP BY jl.account_id
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', {
             query,
             params: [tenantId, companyId, fiscalYearStart, asOfDate, accountIds]
@@ -296,27 +296,29 @@ async function calculateAccountBalances(
 
     // Process results and calculate balances
     for (const row of data || []) {
-        const account = accounts.find(a => a.id === row.account_id);
+        const rowData = row as any;
+        const account = accounts.find(a => (a as any).id === rowData.account_id);
         if (!account) continue;
 
-        const openingDebits = parseFloat(row.opening_debits || '0');
-        const openingCredits = parseFloat(row.opening_credits || '0');
-        const periodDebits = parseFloat(row.period_debits || '0');
-        const periodCredits = parseFloat(row.period_credits || '0');
+        const accountData = account as any;
+        const openingDebits = parseFloat(rowData.opening_debits || '0');
+        const openingCredits = parseFloat(rowData.opening_credits || '0');
+        const periodDebits = parseFloat(rowData.period_debits || '0');
+        const periodCredits = parseFloat(rowData.period_credits || '0');
 
         // Calculate opening balance based on normal balance
-        const openingBalance = account.normalBalance === 'DEBIT'
+        const openingBalance = accountData.normalBalance === 'DEBIT'
             ? openingDebits - openingCredits
             : openingCredits - openingDebits;
 
         // Calculate closing balance
         const totalDebits = openingDebits + periodDebits;
         const totalCredits = openingCredits + periodCredits;
-        const closingBalance = account.normalBalance === 'DEBIT'
+        const closingBalance = accountData.normalBalance === 'DEBIT'
             ? totalDebits - totalCredits
             : totalCredits - totalDebits;
 
-        balances.set(row.account_id, {
+        balances.set(rowData.account_id, {
             openingBalance,
             periodDebits: includePeriodActivity ? periodDebits : 0,
             periodCredits: includePeriodActivity ? periodCredits : 0,
@@ -324,15 +326,15 @@ async function calculateAccountBalances(
         });
 
         // Track transaction date range
-        if (row.oldest_transaction) {
-            const oldest = new Date(row.oldest_transaction);
+        if (rowData.oldest_transaction) {
+            const oldest = new Date(rowData.oldest_transaction);
             if (!oldestTransaction || oldest < oldestTransaction) {
                 oldestTransaction = oldest;
             }
         }
 
-        if (row.newest_transaction) {
-            const newest = new Date(row.newest_transaction);
+        if (rowData.newest_transaction) {
+            const newest = new Date(rowData.newest_transaction);
             if (!newestTransaction || newest > newestTransaction) {
                 newestTransaction = newest;
             }
@@ -341,8 +343,9 @@ async function calculateAccountBalances(
 
     // Add zero balances for accounts with no transactions
     for (const account of accounts) {
-        if (!balances.has(account.id)) {
-            balances.set(account.id, {
+        const accountData = account as any;
+        if (!balances.has(accountData.id)) {
+            balances.set(accountData.id, {
                 openingBalance: 0,
                 periodDebits: 0,
                 periodCredits: 0,
@@ -358,43 +361,45 @@ async function calculateAccountBalances(
  * Build trial balance accounts with calculated balances
  */
 function buildTrialBalanceAccounts(
-    chartOfAccounts: any[],
-    accountBalances: { balances: Map<string, any> },
+    chartOfAccounts: unknown[],
+    accountBalances: { balances: Map<string, unknown> },
     includeZeroBalances: boolean = false
 ): TrialBalanceAccount[] {
     const trialBalanceAccounts: TrialBalanceAccount[] = [];
 
     for (const account of chartOfAccounts) {
-        const balance = accountBalances.balances.get(account.id) || {
+        const accountData = account as any;
+        const balance = accountBalances.balances.get(accountData.id) || {
             openingBalance: 0,
             periodDebits: 0,
             periodCredits: 0,
             closingBalance: 0
         };
+        const balanceData = balance as any;
 
         // Skip zero balance accounts if not requested
         if (!includeZeroBalances &&
-            balance.openingBalance === 0 &&
-            balance.periodDebits === 0 &&
-            balance.periodCredits === 0 &&
-            balance.closingBalance === 0) {
+            balanceData.openingBalance === 0 &&
+            balanceData.periodDebits === 0 &&
+            balanceData.periodCredits === 0 &&
+            balanceData.closingBalance === 0) {
             continue;
         }
 
         trialBalanceAccounts.push({
-            accountId: account.id,
-            accountNumber: account.accountNumber,
-            accountName: account.accountName,
-            accountType: account.accountType,
-            accountCategory: account.accountCategory,
-            parentAccountId: account.parentAccountId,
-            level: account.level,
-            isHeader: account.isHeader,
-            openingBalance: balance.openingBalance,
-            periodDebits: balance.periodDebits,
-            periodCredits: balance.periodCredits,
-            closingBalance: balance.closingBalance,
-            normalBalance: account.normalBalance,
+            accountId: accountData.id,
+            accountNumber: accountData.accountNumber,
+            accountName: accountData.accountName,
+            accountType: accountData.accountType,
+            accountCategory: accountData.accountCategory,
+            parentAccountId: accountData.parentAccountId,
+            level: accountData.level,
+            isHeader: accountData.isHeader,
+            openingBalance: balanceData.openingBalance,
+            periodDebits: balanceData.periodDebits,
+            periodCredits: balanceData.periodCredits,
+            closingBalance: balanceData.closingBalance,
+            normalBalance: accountData.normalBalance,
             currency: 'MYR' // TODO: Multi-currency support
         });
     }
@@ -432,7 +437,7 @@ function calculateTrialBalanceTotals(accounts: TrialBalanceAccount[]): TrialBala
         }
 
         // Categorize by account type
-        const absBalance = Math.abs(account.closingBalance);
+        // const absBalance = Math.abs(account.closingBalance); // TODO: Use for balance validation
 
         switch (account.accountType.toUpperCase()) {
             case 'ASSET':
@@ -474,7 +479,7 @@ async function getFiscalYearStart(
     tenantId: string,
     companyId: string,
     asOfDate: Date,
-    dbClient: any
+    dbClient: unknown
 ): Promise<Date> {
     const query = `
     SELECT fc.fiscal_year_start
@@ -487,7 +492,7 @@ async function getFiscalYearStart(
     LIMIT 1
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', {
             query,
             params: [tenantId, companyId, asOfDate]
@@ -499,7 +504,7 @@ async function getFiscalYearStart(
         return new Date(year, 0, 1);
     }
 
-    return new Date(data[0].fiscal_year_start);
+    return new Date((data[0] as any).fiscal_year_start);
 }
 
 /**
@@ -593,7 +598,7 @@ function exportTrialBalanceToCSV(trialBalance: TrialBalanceResult): string {
 /**
  * Export trial balance to XLSX format (placeholder)
  */
-function exportTrialBalanceToXLSX(trialBalance: TrialBalanceResult): Buffer {
+function exportTrialBalanceToXLSX(_trialBalance: TrialBalanceResult): Buffer {
     // TODO: Implement XLSX export using a library like xlsx or exceljs
     throw new Error('XLSX export not yet implemented');
 }
@@ -601,7 +606,7 @@ function exportTrialBalanceToXLSX(trialBalance: TrialBalanceResult): Buffer {
 /**
  * Export trial balance to PDF format (placeholder)
  */
-function exportTrialBalanceToPDF(trialBalance: TrialBalanceResult): Buffer {
+function exportTrialBalanceToPDF(_trialBalance: TrialBalanceResult): Buffer {
     // TODO: Implement PDF export using the Puppeteer pool
     throw new Error('PDF export not yet implemented');
 }

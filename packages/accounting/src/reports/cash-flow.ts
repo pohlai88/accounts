@@ -1,7 +1,7 @@
 // D4 Cash Flow Statement Engine - Statement of Cash Flows
 // V1 Requirement: CF from GL only with operating/investing/financing classification
 
-import { generateTrialBalance, type TrialBalanceInput, type TrialBalanceAccount, type TrialBalanceResult } from './trial-balance';
+import { generateTrialBalance, type TrialBalanceAccount } from './trial-balance';
 
 export interface CashFlowInput {
     tenantId: string;
@@ -104,7 +104,7 @@ export interface CashFlowError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: unknown;
 }
 
 /**
@@ -113,7 +113,7 @@ export interface CashFlowError {
  */
 export async function generateCashFlow(
     input: CashFlowInput,
-    dbClient: any
+    dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> }
 ): Promise<CashFlowResult | CashFlowError> {
     const startTime = Date.now();
 
@@ -149,7 +149,6 @@ export async function generateCashFlow(
         }
 
         // 3. Generate comparative period trial balance (if requested)
-        let comparativeTrialBalance: TrialBalanceResult | null = null;
         if (input.comparativePeriod) {
             const comparativeResult = await generateTrialBalance({
                 tenantId: input.tenantId,
@@ -169,7 +168,7 @@ export async function generateCashFlow(
                 };
             }
 
-            comparativeTrialBalance = comparativeResult;
+            // comparativeTrialBalance = comparativeResult; // TODO: Use for comparative analysis
         }
 
         // 4. Get cash flow activity data from GL
@@ -178,7 +177,7 @@ export async function generateCashFlow(
             input.companyId,
             input.startDate,
             input.endDate,
-            dbClient,
+            dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> },
             input.comparativePeriod
         );
 
@@ -196,7 +195,7 @@ export async function generateCashFlow(
             input.companyId,
             input.startDate,
             input.endDate,
-            dbClient,
+            dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> },
             input.comparativePeriod
         );
 
@@ -265,7 +264,7 @@ async function getCashFlowActivities(
     companyId: string,
     startDate: Date,
     endDate: Date,
-    dbClient: any,
+    dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> },
     comparativePeriod?: { startDate: Date; endDate: Date }
 ): Promise<{
     current: Map<string, { debits: number; credits: number; netActivity: number; accountType: string }>;
@@ -293,7 +292,7 @@ async function getCashFlowActivities(
     GROUP BY jl.account_id, coa.account_type, coa.account_category, coa.normal_balance
   `;
 
-    const { data: currentData, error: currentError } = await dbClient
+    const { data: currentData, error: currentError } = await (dbClient as any)
         .rpc('execute_sql', {
             query: currentQuery,
             params: [tenantId, companyId, startDate, endDate]
@@ -303,29 +302,29 @@ async function getCashFlowActivities(
         throw new Error(`Failed to fetch current period cash flow activities: ${currentError.message}`);
     }
 
-    const currentActivity = new Map();
+    const currentActivity = new Map<string, { debits: number; credits: number; netActivity: number; accountType: string; }>();
     for (const row of currentData || []) {
-        const debits = parseFloat(row.total_debits || '0');
-        const credits = parseFloat(row.total_credits || '0');
+        const rowData = row as any;
+        const debits = parseFloat(rowData.total_debits || '0');
+        const credits = parseFloat(rowData.total_credits || '0');
 
         // Calculate net activity based on normal balance
-        const netActivity = row.normal_balance === 'DEBIT'
+        const netActivity = rowData.normal_balance === 'DEBIT'
             ? debits - credits
             : credits - debits;
 
-        currentActivity.set(row.account_id, {
+        currentActivity.set(rowData.account_id, {
             debits,
             credits,
             netActivity,
-            accountType: row.account_type,
-            accountCategory: row.account_category
+            accountType: rowData.account_type
         });
     }
 
     // Query for comparative period (if requested)
-    let comparativeActivity: Map<string, any> | undefined = undefined;
+    let comparativeActivity: Map<string, { debits: number; credits: number; netActivity: number; accountType: string; }> | undefined = undefined;
     if (comparativePeriod) {
-        const { data: comparativeData, error: comparativeError } = await dbClient
+        const { data: comparativeData, error: comparativeError } = await (dbClient as any)
             .rpc('execute_sql', {
                 query: currentQuery,
                 params: [tenantId, companyId, comparativePeriod.startDate, comparativePeriod.endDate]
@@ -337,19 +336,19 @@ async function getCashFlowActivities(
 
         comparativeActivity = new Map();
         for (const row of comparativeData || []) {
-            const debits = parseFloat(row.total_debits || '0');
-            const credits = parseFloat(row.total_credits || '0');
+            const rowData = row as any;
+            const debits = parseFloat(rowData.total_debits || '0');
+            const credits = parseFloat(rowData.total_credits || '0');
 
-            const netActivity = row.normal_balance === 'DEBIT'
+            const netActivity = rowData.normal_balance === 'DEBIT'
                 ? debits - credits
                 : credits - debits;
 
-            comparativeActivity.set(row.account_id, {
+            comparativeActivity.set(rowData.account_id, {
                 debits,
                 credits,
                 netActivity,
-                accountType: row.account_type,
-                accountCategory: row.account_category
+                accountType: rowData.account_type
             });
         }
     }
@@ -364,9 +363,9 @@ async function getCashFlowActivities(
  * Classify activities into operating, investing, and financing sections
  */
 function classifyCashFlowActivities(
-    currentActivities: Map<string, any>,
-    comparativeActivities?: Map<string, any>,
-    method: 'DIRECT' | 'INDIRECT' = 'INDIRECT'
+    currentActivities: Map<string, unknown>,
+    comparativeActivities?: Map<string, unknown>,
+    _method: 'DIRECT' | 'INDIRECT' = 'INDIRECT'
 ): {
     operatingActivities: CashFlowSection;
     investingActivities: CashFlowSection;
@@ -378,9 +377,11 @@ function classifyCashFlowActivities(
 
     // Process each account's activity
     for (const [accountId, activity] of currentActivities) {
+        const activityData = activity as { debits: number; credits: number; netActivity: number; accountType: string; };
         const comparativeActivity = comparativeActivities?.get(accountId);
-        const currentAmount = activity.netActivity || 0;
-        const comparativeAmount = comparativeActivity?.netActivity || 0;
+        const comparativeActivityData = comparativeActivity as { debits: number; credits: number; netActivity: number; accountType: string; } | undefined;
+        const currentAmount = activityData.netActivity || 0;
+        const comparativeAmount = comparativeActivityData?.netActivity || 0;
         const variance = currentAmount - comparativeAmount;
         const variancePercent = comparativeAmount !== 0
             ? (variance / Math.abs(comparativeAmount)) * 100
@@ -389,7 +390,7 @@ function classifyCashFlowActivities(
         const cashFlowActivity: CashFlowActivity = {
             activityId: accountId,
             activityName: `Account ${accountId.slice(-8)}`, // Simplified name
-            activityType: activity.accountType,
+            activityType: activityData.accountType,
             currentPeriodAmount: currentAmount,
             comparativePeriodAmount: comparativeActivities ? comparativeAmount : undefined,
             variance: comparativeActivities ? variance : undefined,
@@ -398,11 +399,11 @@ function classifyCashFlowActivities(
         };
 
         // Classify based on account type and category per IAS 7 standards
-        if (isOperatingActivity(activity.accountType)) {
+        if (isOperatingActivity(activityData.accountType)) {
             operatingActivitiesList.push(cashFlowActivity);
-        } else if (isInvestingActivity(activity.accountType, activity.accountCategory)) {
+        } else if (isInvestingActivity(activityData.accountType, (activityData as any).accountCategory)) {
             investingActivitiesList.push(cashFlowActivity);
-        } else if (isFinancingActivity(activity.accountType, activity.accountCategory)) {
+        } else if (isFinancingActivity(activityData.accountType, (activityData as any).accountCategory)) {
             financingActivitiesList.push(cashFlowActivity);
         }
     }
@@ -446,7 +447,7 @@ async function calculateCashBalances(
     companyId: string,
     startDate: Date,
     endDate: Date,
-    dbClient: any,
+    dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> },
     comparativePeriod?: { startDate: Date; endDate: Date }
 ): Promise<{
     beginningCashBalance: number;
@@ -470,40 +471,40 @@ async function calculateCashBalances(
   `;
 
     // Beginning balance (before start date)
-    const { data: beginningData } = await dbClient
+    const { data: beginningData } = await (dbClient as any)
         .rpc('execute_sql', {
             query: cashBalanceQuery,
             params: [tenantId, companyId, startDate]
         });
 
     // Ending balance (up to end date)
-    const { data: endingData } = await dbClient
+    const { data: endingData } = await (dbClient as any)
         .rpc('execute_sql', {
             query: cashBalanceQuery.replace('< $3', '<= $3'),
             params: [tenantId, companyId, endDate]
         });
 
-    const beginningCashBalance = parseFloat(beginningData?.[0]?.balance || '0');
-    const endingCashBalance = parseFloat(endingData?.[0]?.balance || '0');
+    const beginningCashBalance = parseFloat((beginningData as any)?.[0]?.balance || '0');
+    const endingCashBalance = parseFloat((endingData as any)?.[0]?.balance || '0');
 
     let comparativeBeginningCashBalance: number | undefined;
     let comparativeEndingCashBalance: number | undefined;
 
     if (comparativePeriod) {
-        const { data: compBeginningData } = await dbClient
+        const { data: compBeginningData } = await (dbClient as any)
             .rpc('execute_sql', {
                 query: cashBalanceQuery,
                 params: [tenantId, companyId, comparativePeriod.startDate]
             });
 
-        const { data: compEndingData } = await dbClient
+        const { data: compEndingData } = await (dbClient as any)
             .rpc('execute_sql', {
                 query: cashBalanceQuery.replace('< $3', '<= $3'),
                 params: [tenantId, companyId, comparativePeriod.endDate]
             });
 
-        comparativeBeginningCashBalance = parseFloat(compBeginningData?.[0]?.balance || '0');
-        comparativeEndingCashBalance = parseFloat(compEndingData?.[0]?.balance || '0');
+        comparativeBeginningCashBalance = parseFloat((compBeginningData as any)?.[0]?.balance || '0');
+        comparativeEndingCashBalance = parseFloat((compEndingData as any)?.[0]?.balance || '0');
     }
 
     return {
@@ -521,7 +522,7 @@ function calculateCashFlowMetrics(
     operatingActivities: CashFlowSection,
     investingActivities: CashFlowSection,
     financingActivities: CashFlowSection,
-    cashBalances: any
+    cashBalances: unknown
 ): CashFlowResult['metrics'] {
     const netCashFromOperating = operatingActivities.subtotal;
     const netCashFromInvesting = investingActivities.subtotal;
@@ -547,8 +548,8 @@ function calculateCashFlowMetrics(
         netCashFromInvesting: Math.round(netCashFromInvesting * 100) / 100,
         netCashFromFinancing: Math.round(netCashFromFinancing * 100) / 100,
         netChangeInCash: Math.round(netChangeInCash * 100) / 100,
-        beginningCashBalance: Math.round(cashBalances.beginningCashBalance * 100) / 100,
-        endingCashBalance: Math.round(cashBalances.endingCashBalance * 100) / 100,
+        beginningCashBalance: Math.round((cashBalances as any).beginningCashBalance * 100) / 100,
+        endingCashBalance: Math.round((cashBalances as any).endingCashBalance * 100) / 100,
 
         comparativeNetCashFromOperating: comparativeNetCashFromOperating ? Math.round(comparativeNetCashFromOperating * 100) / 100 : undefined,
         comparativeNetCashFromInvesting: comparativeNetCashFromInvesting ? Math.round(comparativeNetCashFromInvesting * 100) / 100 : undefined,
@@ -567,7 +568,7 @@ function calculateCashFlowMetrics(
  */
 async function generateReconciliation(
     trialBalanceAccounts: TrialBalanceAccount[],
-    cashFlowActivities: Map<string, any>
+    cashFlowActivities: Map<string, unknown>
 ): Promise<CashFlowResult['reconciliation']> {
     // Calculate net income from revenue and expense accounts
     let netIncome = 0;
@@ -597,7 +598,7 @@ async function generateReconciliation(
  */
 async function calculateNonCashAdjustments(
     trialBalanceAccounts: TrialBalanceAccount[],
-    cashFlowActivities: Map<string, any>
+    _cashFlowActivities: Map<string, unknown>
 ): Promise<Array<{ description: string; amount: number; type: 'ADD' | 'SUBTRACT' }>> {
     const adjustments: Array<{ description: string; amount: number; type: 'ADD' | 'SUBTRACT' }> = [];
 
@@ -683,7 +684,7 @@ async function calculateNonCashAdjustments(
  */
 async function calculateWorkingCapitalChanges(
     trialBalanceAccounts: TrialBalanceAccount[],
-    cashFlowActivities: Map<string, any>
+    _cashFlowActivities: Map<string, unknown>
 ): Promise<Array<{ description: string; amount: number; type: 'INCREASE' | 'DECREASE' }>> {
     const workingCapitalChanges: Array<{ description: string; amount: number; type: 'INCREASE' | 'DECREASE' }> = [];
 

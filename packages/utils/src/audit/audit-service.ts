@@ -1,5 +1,22 @@
 // Audit Service - V1 Compliance
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+interface AuditLogRow {
+    id: string;
+    event_type: string;
+    entity_type: string;
+    entity_id?: string;
+    action: string;
+    details: Record<string, unknown>;
+    context: Record<string, unknown>;
+    created_at: string;
+    user_id?: string;
+    tenant_id?: string;
+    company_id?: string;
+    session_id?: string;
+    ip_address?: string;
+    user_agent?: string;
+}
 
 export interface AuditContext {
     userId?: string;
@@ -23,7 +40,7 @@ export interface AuditEvent {
 }
 
 export class AuditService {
-    private supabase: any;
+    private supabase: SupabaseClient;
 
     constructor() {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -200,7 +217,7 @@ export class AuditService {
      * Log SoD compliance checks
      */
     async logSoDCompliance(
-        scope: any,
+        scope: { userId: string; tenantId: string; companyId: string; sessionId?: string; userRole?: string },
         operation: string,
         result: string,
         details?: string,
@@ -241,7 +258,7 @@ export class AuditService {
      * Log Chart of Accounts validation
      */
     async logCOAValidation(
-        scope: any,
+        scope: { userId: string; tenantId: string; companyId: string; sessionId?: string; userRole?: string },
         accountIds: string[],
         result: string,
         warnings?: string[],
@@ -275,6 +292,35 @@ export class AuditService {
             await this.storeAuditEvent(event);
         } catch (error) {
             console.error('Failed to log COA validation:', error);
+        }
+    }
+
+    /**
+     * Log general operation
+     */
+    async logOperation(
+        context: AuditContext,
+        operation: {
+            operation: string;
+            data?: Record<string, unknown>;
+            entityType?: string;
+            entityId?: string;
+        }
+    ): Promise<void> {
+        try {
+            const event: AuditEvent = {
+                eventType: 'OPERATION',
+                entityType: operation.entityType || 'SYSTEM',
+                entityId: operation.entityId,
+                action: operation.operation,
+                details: operation.data || {},
+                context,
+                createdAt: new Date()
+            };
+
+            await this.storeAuditEvent(event);
+        } catch (error) {
+            console.error('Failed to log operation:', error);
         }
     }
 
@@ -361,7 +407,7 @@ export class AuditService {
                 return [];
             }
 
-            return data.map((row: any) => ({
+            return data.map((row: AuditLogRow) => ({
                 id: row.id,
                 eventType: row.event_type,
                 entityType: row.entity_type,

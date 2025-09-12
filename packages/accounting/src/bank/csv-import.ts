@@ -10,7 +10,7 @@ export interface BankTransactionImport {
     creditAmount: number;
     balance?: number;
     transactionType?: string;
-    rawData: Record<string, any>; // Original CSV row data
+    rawData: Record<string, unknown>; // Original CSV row data
 }
 
 export interface ImportResult {
@@ -115,8 +115,8 @@ export const BANK_FORMATS: Record<string, BankFormat> = {
 export async function importBankTransactions(
     csvData: string,
     format: BankFormat,
-    bankAccountId: string,
-    importBatchId: string
+    _bankAccountId: string,
+    _importBatchId: string
 ): Promise<ImportResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -132,7 +132,7 @@ export async function importBankTransactions(
         const csvHeaders = lines[0]?.split(',').map(h => h.trim().replace(/"/g, '')) || [];
         const records = lines.slice(1).map(line => {
             const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-            const record: Record<string, any> = {};
+            const record: Record<string, string> = {};
             csvHeaders.forEach((header, index) => {
                 record[header] = values[index] || '';
             });
@@ -199,7 +199,7 @@ export async function importBankTransactions(
 /**
  * Parse a single transaction row
  */
-function parseTransactionRow(row: Record<string, any>, format: BankFormat, rowNumber: number): BankTransactionImport {
+function parseTransactionRow(row: Record<string, string>, format: BankFormat, _rowNumber: number): BankTransactionImport {
     // Parse date
     const dateStr = row[format.dateColumn];
     if (!dateStr) {
@@ -280,7 +280,7 @@ function parseDate(dateStr: string, format: string): Date | null {
     try {
         // Handle common Malaysian date formats
         if (format === 'DD/MM/YYYY' || format === 'DD-MM-YYYY') {
-            const parts = dateStr.split(/[\/\-]/);
+            const parts = dateStr.split(/[/-]/);
             if (parts.length === 3) {
                 const day = parseInt(parts[0] || '0');
                 const month = parseInt(parts[1] || '0') - 1; // Month is 0-indexed
@@ -321,7 +321,7 @@ function parseDate(dateStr: string, format: string): Date | null {
 /**
  * Parse amount string to number
  */
-function parseAmount(amountStr: any): number | null {
+function parseAmount(amountStr: string | null | undefined): number | null {
     if (amountStr === null || amountStr === undefined || amountStr === '') {
         return null;
     }
@@ -398,7 +398,7 @@ function findDuplicateTransactions(transactions: BankTransactionImport[]): numbe
         const transaction = transactions[i];
 
         // Create a hash key for duplicate detection
-        const key = `${transactions[i]?.transactionDate.toISOString().split('T')[0]}_${transactions[i]?.description}_${transactions[i]?.debitAmount}_${transactions[i]?.creditAmount}`;
+        const key = `${transaction?.transactionDate.toISOString().split('T')[0]}_${transaction?.description}_${transaction?.debitAmount}_${transaction?.creditAmount}`;
 
         if (seen.has(key)) {
             duplicateIndexes.push(i);

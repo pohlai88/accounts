@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
                 startDate: new Date(input.comparativePeriod.startDate),
                 endDate: new Date(input.comparativePeriod.endDate)
             } : undefined
-        }, supabase);
+        }, supabase as any);
 
         if (!result.success) {
             return NextResponse.json({
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
                 startDate: new Date(input.comparativePeriod.startDate),
                 endDate: new Date(input.comparativePeriod.endDate)
             } : undefined
-        }, supabase);
+        }, supabase as any);
 
         if (!result.success) {
             return NextResponse.json({

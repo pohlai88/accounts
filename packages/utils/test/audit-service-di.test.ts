@@ -1,12 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { 
-  AuditService, 
-  getAuditService, 
+import {
+  AuditService,
+  getAuditService,
   resetAuditService,
-  createAuditContext,
   type AuditEntry,
   type AuditContext,
-  type AuditDatabase 
+  type AuditDatabase
 } from "../src/audit/service";
 import type { Scope } from "@aibos/db";
 
@@ -27,19 +26,18 @@ describe("Audit Service - Dependency Injection Tests", () => {
   };
 
   let mockDatabase: AuditDatabase;
-  let mockInsert: any;
-  let mockValues: any;
-  let mockSelect: any;
-  let mockQuery: any;
+  let mockInsert: unknown;
+  let mockValues: unknown;
+  let mockSelect: unknown;
 
   beforeEach(() => {
     // Reset singleton before each test
     resetAuditService();
-    
+
     // Create mock database with proper chaining
     mockValues = vi.fn().mockResolvedValue(undefined);
     mockInsert = vi.fn().mockReturnValue({ values: mockValues });
-    
+
     const mockResults = [
       {
         id: "audit-1",
@@ -86,14 +84,14 @@ describe("Audit Service - Dependency Injection Tests", () => {
 
     it("should create audit service without database (uses environment)", () => {
       process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
-      
+
       // This will try to create a real connection, but we're just testing the constructor
       expect(() => new AuditService()).not.toThrow();
     });
 
     it("should throw error without DATABASE_URL and no injected database", () => {
       delete process.env.DATABASE_URL;
-      
+
       expect(() => new AuditService()).toThrow("DATABASE_URL environment variable is required");
     });
   });
@@ -102,7 +100,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
     it("should return same instance on multiple calls", () => {
       const service1 = getAuditService(mockDatabase);
       const service2 = getAuditService();
-      
+
       expect(service1).toBe(service2);
     });
 
@@ -110,7 +108,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
       const service1 = getAuditService(mockDatabase);
       resetAuditService();
       const service2 = getAuditService(mockDatabase);
-      
+
       expect(service1).not.toBe(service2);
     });
   });
@@ -184,8 +182,8 @@ describe("Audit Service - Dependency Injection Tests", () => {
 
     it("should handle database errors gracefully", async () => {
       mockValues.mockRejectedValue(new Error("Database error"));
-      
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
       const entry: AuditEntry = {
         scope: mockScope,
@@ -196,9 +194,9 @@ describe("Audit Service - Dependency Injection Tests", () => {
 
       // Should not throw
       await expect(auditService.logOperation(entry)).resolves.toBeUndefined();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Audit logging failed:', expect.any(Error));
-      
+
       consoleSpy.mockRestore();
     });
   });

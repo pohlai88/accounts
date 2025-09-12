@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, numeric, boolean, jsonb, index, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, numeric, boolean, jsonb, index } from "drizzle-orm/pg-core";
 
 // Core tenant structure
 export const tenants = pgTable("tenants", {
@@ -507,3 +507,6 @@ export const auditLogs = pgTable("audit_logs", {
   tenantEntityIdx: index("audit_logs_tenant_entity_idx").on(table.tenantId, table.entityType, table.entityId),
   createdAtIdx: index("audit_logs_created_at_idx").on(table.createdAt)
 }));
+
+// Re-export attachment schema for V1 compliance
+export * from './schema-attachments';

@@ -1,7 +1,7 @@
 // D3 Puppeteer Pool Management - Finance-Grade PDF Generation
 // V1 Requirement: Persistent browser pool with health checks, 3 retries, 45s timeout
 
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer, { Browser } from 'puppeteer';
 import { logger } from '@aibos/utils';
 
 export interface PdfGenerationOptions {
@@ -150,7 +150,7 @@ class PuppeteerPool {
     /**
      * Attempt single PDF generation
      */
-    private async attemptPdfGeneration(options: PdfGenerationOptions, retryCount: number): Promise<Buffer> {
+    private async attemptPdfGeneration(options: PdfGenerationOptions, _retryCount: number): Promise<Buffer> {
         const browser = await this.getBrowser();
         const page = await browser.browser.newPage();
 

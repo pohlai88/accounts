@@ -8,6 +8,7 @@
     "syncpack.config.json",
     ".cursorrules.json"
   ],
+  "ui": "stream",
   "tasks": {
     "build": {
       "dependsOn": [
@@ -17,44 +18,60 @@
         ".next/**",
         "dist/**",
         "build/**"
-      ]
+      ],
+      "outputLogs": "full"
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "outputLogs": "full"
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "outputLogs": "full"
     },
     "typecheck": {
-      "outputs": []
+      "outputs": [],
+      "outputLogs": "full"
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [
         "coverage/**",
         "test-results/**"
-      ]
+      ],
+      "outputLogs": "full"
     },
     "test:unit": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [
         "coverage/**",
         "test-results/**"
-      ]
+      ],
+      "outputLogs": "full"
     },
     "test:coverage": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [
         "coverage/**"
-      ]
+      ],
+      "outputLogs": "full"
     },
     "e2e": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "outputs": [
         "test-results/**",
         "playwright-report/**"
-      ]
+      ],
+      "outputLogs": "full"
     }
   }
 }

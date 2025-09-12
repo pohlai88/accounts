@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { checkSoDCompliance } from "@aibos/auth";
 import { validateCOAFlags, COAValidationError } from "./coa-validation";
-import { getAccountsInfo, getAllAccountsInfo, type AccountInfo, type Scope } from "@aibos/db";
+import { getAccountsInfo, getAllAccountsInfo } from "@aibos/db";
 
 export const JournalLine = z.object({
   accountId: z.string().uuid(),
@@ -41,7 +41,7 @@ export class PostingError extends Error {
 export function validateBalanced(lines: Array<z.infer<typeof JournalLine>>) {
   const debit = lines.reduce((s, l) => s + l.debit, 0);
   const credit = lines.reduce((s, l) => s + l.credit, 0);
-  
+
   if (Math.abs(debit - credit) > 0.01) {
     throw new PostingError(
       "Journal must be balanced: debits must equal credits",
@@ -82,7 +82,7 @@ export function validateJournalLines(lines: Array<z.infer<typeof JournalLine>>) 
 
 export function validateSoDCompliance(context: PostingContext) {
   const sodCheck = checkSoDCompliance('journal:post', context.userRole);
-  
+
   if (!sodCheck.allowed) {
     throw new PostingError(
       `User role '${context.userRole}' is not authorized to post journal entries`,
@@ -97,18 +97,18 @@ export function validateSoDCompliance(context: PostingContext) {
 export async function validateJournalPosting(input: JournalPostingInput) {
   // 1. Validate SoD compliance
   const sodCheck = validateSoDCompliance(input.context);
-  
+
   // 2. Validate journal lines structure
   validateJournalLines(input.lines);
-  
+
   // 3. Validate journal is balanced
   validateBalanced(input.lines);
-  
+
   // 4. Validate currency format
   if (!input.currency || input.currency.length !== 3) {
     throw new PostingError("Invalid currency code", "INVALID_CURRENCY", { currency: input.currency });
   }
-  
+
   // 5. Validate journal date is not in the future
   if (input.journalDate > new Date()) {
     throw new PostingError("Journal date cannot be in the future", "FUTURE_DATE", { journalDate: input.journalDate });
@@ -116,7 +116,7 @@ export async function validateJournalPosting(input: JournalPostingInput) {
 
   // 6. Validate COA flags and account rules
   const accountIds = input.lines.map(line => line.accountId);
-  
+
   try {
     // Fetch account information
     const [accountsMap, allAccounts] = await Promise.all([
@@ -157,7 +157,7 @@ export async function validateJournalPosting(input: JournalPostingInput) {
 export async function postJournal(input: JournalPostingInput) {
   // Validate all posting rules
   const validation = await validateJournalPosting(input);
-  
+
   // Return validation result for the caller to handle DB operations
   return {
     validated: validation.validated,

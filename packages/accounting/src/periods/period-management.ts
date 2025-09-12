@@ -64,7 +64,7 @@ export interface PeriodManagementError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: unknown;
 }
 
 /**
@@ -73,7 +73,7 @@ export interface PeriodManagementError {
  */
 export async function closeFiscalPeriod(
     input: PeriodCloseInput,
-    dbClient: any
+    dbClient: unknown
 ): Promise<PeriodCloseResult | PeriodManagementError> {
     try {
         // 1. Validate input parameters
@@ -127,7 +127,7 @@ export async function closeFiscalPeriod(
             input.tenantId,
             input.companyId,
             fiscalPeriod,
-            dbClient
+            dbClient as any
         );
 
         // 6. Check if force close is required
@@ -147,7 +147,7 @@ export async function closeFiscalPeriod(
                 input.tenantId,
                 input.companyId,
                 fiscalPeriod,
-                dbClient
+                dbClient as any
             );
         }
 
@@ -157,7 +157,7 @@ export async function closeFiscalPeriod(
             'CLOSED',
             input.closedBy,
             input.closeDate,
-            dbClient,
+            dbClient as any,
             input.closeReason
         );
 
@@ -201,7 +201,7 @@ export async function closeFiscalPeriod(
  */
 export async function openFiscalPeriod(
     input: PeriodOpenInput,
-    dbClient: any
+    dbClient: unknown
 ): Promise<PeriodCloseResult | PeriodManagementError> {
     try {
         // 1. Validate input
@@ -263,7 +263,7 @@ export async function openFiscalPeriod(
             'OPEN',
             input.openedBy,
             new Date(),
-            dbClient,
+            dbClient as any,
             input.openReason
         );
 
@@ -307,7 +307,7 @@ export async function openFiscalPeriod(
  */
 export async function createPeriodLock(
     input: PeriodLockInput,
-    dbClient: any
+    dbClient: unknown
 ): Promise<{ success: boolean; lockId?: string; error?: string }> {
     try {
         // Validate SoD compliance
@@ -334,7 +334,7 @@ export async function createPeriodLock(
       RETURNING id
     `;
 
-        const { data, error } = await dbClient
+        const { data, error } = await (dbClient as any)
             .rpc('execute_sql', {
                 query,
                 params: [
@@ -370,8 +370,8 @@ export async function createPeriodLock(
 async function validatePeriodClose(
     tenantId: string,
     companyId: string,
-    fiscalPeriod: any,
-    dbClient: any
+    fiscalPeriod: unknown,
+    dbClient: unknown
 ): Promise<PeriodCloseValidation> {
     const warnings: string[] = [];
     const errors: string[] = [];
@@ -380,9 +380,9 @@ async function validatePeriodClose(
     const unpostedJournals = await checkUnpostedJournals(
         tenantId,
         companyId,
-        fiscalPeriod.startDate,
-        fiscalPeriod.endDate,
-        dbClient
+        (fiscalPeriod as { startDate: Date }).startDate,
+        (fiscalPeriod as { endDate: Date }).endDate,
+        dbClient as any
     );
 
     const allJournalsPosted = unpostedJournals === 0;
@@ -394,8 +394,8 @@ async function validatePeriodClose(
     const trialBalanceCheck = await checkTrialBalanceBalanced(
         tenantId,
         companyId,
-        fiscalPeriod.endDate,
-        dbClient
+        (fiscalPeriod as { endDate: Date }).endDate,
+        dbClient as any
     );
 
     if (!trialBalanceCheck.balanced) {
@@ -406,8 +406,8 @@ async function validatePeriodClose(
     const unreconciledTransactions = await checkBankReconciliation(
         tenantId,
         companyId,
-        fiscalPeriod.endDate,
-        dbClient
+        (fiscalPeriod as { endDate: Date }).endDate,
+        dbClient as any
     );
 
     const noUnreconciledTransactions = unreconciledTransactions === 0;
@@ -447,8 +447,8 @@ async function validatePeriodClose(
 async function createReversingEntries(
     tenantId: string,
     companyId: string,
-    fiscalPeriod: any,
-    dbClient: any
+    fiscalPeriod: unknown,
+    dbClient: unknown
 ): Promise<number> {
     // Find journals marked for reversal in the period
     const query = `
@@ -465,10 +465,10 @@ async function createReversingEntries(
       )
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', {
             query,
-            params: [tenantId, companyId, fiscalPeriod.startDate, fiscalPeriod.endDate]
+            params: [tenantId, companyId, (fiscalPeriod as { startDate: Date }).startDate, (fiscalPeriod as { endDate: Date }).endDate]
         });
 
     if (error) {
@@ -492,7 +492,7 @@ async function createReversingEntries(
       ) VALUES ($1, $2, $3, $4, $5, 'PENDING')
     `;
 
-        await dbClient.rpc('execute_sql', {
+        await (dbClient as any).rpc('execute_sql', {
             query: insertQuery,
             params: [
                 tenantId,
@@ -512,13 +512,13 @@ async function createReversingEntries(
 /**
  * Helper functions for period management
  */
-async function getFiscalPeriod(fiscalPeriodId: string, dbClient: any) {
+async function getFiscalPeriod(fiscalPeriodId: string, dbClient: unknown) {
     const query = `
     SELECT * FROM fiscal_periods 
     WHERE id = $1
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', { query, params: [fiscalPeriodId] });
 
     if (error) {
@@ -528,7 +528,7 @@ async function getFiscalPeriod(fiscalPeriodId: string, dbClient: any) {
     return data?.[0];
 }
 
-async function getNextFiscalPeriod(currentPeriod: any, dbClient: any) {
+async function getNextFiscalPeriod(currentPeriod: unknown, dbClient: unknown) {
     const query = `
     SELECT * FROM fiscal_periods 
     WHERE fiscal_calendar_id = $1 
@@ -537,10 +537,10 @@ async function getNextFiscalPeriod(currentPeriod: any, dbClient: any) {
     LIMIT 1
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', {
             query,
-            params: [currentPeriod.fiscal_calendar_id, currentPeriod.period_number + 1]
+            params: [(currentPeriod as { fiscal_calendar_id: string }).fiscal_calendar_id, (currentPeriod as { period_number: number }).period_number + 1]
         });
 
     if (error) {
@@ -555,8 +555,8 @@ async function updateFiscalPeriodStatus(
     status: string,
     userId: string,
     date: Date,
-    dbClient: any,
-    reason?: string
+    dbClient: unknown,
+    _reason?: string
 ) {
     const query = `
     UPDATE fiscal_periods 
@@ -567,7 +567,7 @@ async function updateFiscalPeriodStatus(
     WHERE id = $4
   `;
 
-    const { error } = await dbClient
+    const { error } = await (dbClient as any)
         .rpc('execute_sql', {
             query,
             params: [status, date, userId, fiscalPeriodId]
@@ -578,14 +578,14 @@ async function updateFiscalPeriodStatus(
     }
 }
 
-async function removePeriodLocks(fiscalPeriodId: string, dbClient?: any) {
+async function removePeriodLocks(fiscalPeriodId: string, dbClient?: unknown) {
     const query = `
     UPDATE period_locks 
     SET is_active = false 
     WHERE fiscal_period_id = $1
   `;
 
-    const { error } = await dbClient
+    const { error } = await (dbClient as any)
         .rpc('execute_sql', { query, params: [fiscalPeriodId] });
 
     if (error) {
@@ -598,7 +598,7 @@ async function checkUnpostedJournals(
     companyId: string,
     startDate: Date,
     endDate: Date,
-    dbClient: any
+    dbClient: unknown
 ): Promise<number> {
     const query = `
     SELECT COUNT(*) as count
@@ -609,7 +609,7 @@ async function checkUnpostedJournals(
       AND status != 'posted'
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', { query, params: [tenantId, companyId, startDate, endDate] });
 
     if (error) {
@@ -623,7 +623,7 @@ async function checkTrialBalanceBalanced(
     tenantId: string,
     companyId: string,
     asOfDate: Date,
-    dbClient: any
+    dbClient: unknown
 ): Promise<{ balanced: boolean; difference: number }> {
     const query = `
     SELECT 
@@ -637,7 +637,7 @@ async function checkTrialBalanceBalanced(
       AND j.journal_date <= $3
   `;
 
-    const { data, error } = await dbClient
+    const { data, error } = await (dbClient as any)
         .rpc('execute_sql', { query, params: [tenantId, companyId, asOfDate] });
 
     if (error) {
@@ -653,10 +653,10 @@ async function checkTrialBalanceBalanced(
 }
 
 async function checkBankReconciliation(
-    tenantId: string,
-    companyId: string,
-    asOfDate: Date,
-    dbClient: any
+    _tenantId: string,
+    _companyId: string,
+    _asOfDate: Date,
+    _dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> }
 ): Promise<number> {
     // TODO: Implement bank reconciliation check
     // This would check for unreconciled bank transactions

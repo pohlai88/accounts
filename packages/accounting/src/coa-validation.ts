@@ -2,8 +2,8 @@ import { z } from "zod";
 import { type AccountInfo } from "@aibos/db";
 
 // Account Types as defined in the database schema
-export const AccountType = z.enum(['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE']);
-export type AccountType = z.infer<typeof AccountType>;
+export const AccountTypeSchema = z.enum(['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE']);
+export type AccountType = z.infer<typeof AccountTypeSchema>;
 
 // COA validation error class
 export class COAValidationError extends Error {
@@ -20,7 +20,7 @@ export class COAValidationError extends Error {
 // Normal balance rules for each account type
 const NORMAL_BALANCES: Record<string, 'debit' | 'credit'> = {
   ASSET: 'debit',
-  EXPENSE: 'debit', 
+  EXPENSE: 'debit',
   LIABILITY: 'credit',
   EQUITY: 'credit',
   REVENUE: 'credit'
@@ -30,7 +30,7 @@ const NORMAL_BALANCES: Record<string, 'debit' | 'credit'> = {
  * Validate that all accounts exist and are active
  */
 export function validateAccountsExist(
-  accountIds: string[], 
+  accountIds: string[],
   accounts: Map<string, AccountInfo>
 ): void {
   const missingAccounts: string[] = [];
@@ -38,7 +38,7 @@ export function validateAccountsExist(
 
   for (const accountId of accountIds) {
     const account = accounts.get(accountId);
-    
+
     if (!account) {
       missingAccounts.push(accountId);
     } else if (!account.isActive) {
@@ -89,7 +89,7 @@ export function validateCurrencyConsistency(
     throw new COAValidationError(
       `Currency mismatch: Journal currency is ${journalCurrency}, but some accounts have different currencies`,
       'CURRENCY_MISMATCH',
-      { 
+      {
         journalCurrency,
         mismatches: currencyMismatches
       }
@@ -156,7 +156,7 @@ export function validateControlAccounts(
 
     // Check if account is a control account (has children)
     const hasChildren = allAccounts.some(a => a.parentId === accountId);
-    
+
     if (hasChildren) {
       controlAccountViolations.push({
         accountId,

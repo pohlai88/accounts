@@ -6,7 +6,8 @@ import {
   createV1RequestContext,
   processIdempotencyKey,
   getV1AuditService,
-  createV1AuditContext
+  createV1AuditContext,
+  performanceMonitor
 } from "@aibos/utils";
 
 export const runtime = "nodejs";
@@ -31,6 +32,9 @@ function extractUserContext(req: NextRequest): Scope {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const auditService = getV1AuditService();
   let journalResult: any = null;
+
+  // Start performance monitoring
+  const perfTimer = performanceMonitor.createTimer('api.journals.post');
 
   try {
     // 1. Process idempotency key (V1 requirement)
@@ -234,6 +238,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       status: 500,
       headers: { 'X-Error-Type': 'INTERNAL_ERROR' }
     });
+  } finally {
+    // End performance monitoring
+    perfTimer.end();
   }
 }
 

@@ -48,7 +48,6 @@ export function extractUserContext(request: NextRequest): UserContext {
     // In a real implementation, this would decode JWT token
     // For now, we'll extract from headers for testing
 
-    const authHeader = request.headers.get('authorization');
     const tenantId = request.headers.get('x-tenant-id');
     const companyId = request.headers.get('x-company-id');
     const userId = request.headers.get('x-user-id');
@@ -142,8 +141,8 @@ export function validateContext(
 /**
  * Sanitize context for logging (remove sensitive data)
  */
-export function sanitizeContext(context: any): any {
-    const sanitized = { ...context };
+export function sanitizeContext(context: unknown): unknown {
+    const sanitized = { ...(context as Record<string, unknown>) };
 
     // Remove sensitive fields
     delete sanitized.password;

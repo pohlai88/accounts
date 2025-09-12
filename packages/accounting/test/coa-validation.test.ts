@@ -6,7 +6,7 @@ import {
   validateControlAccounts,
   validateCOAFlags,
   COAValidationError,
-  AccountType
+  AccountTypeSchema
 } from "../src/coa-validation";
 import type { AccountInfo } from "@aibos/db";
 
@@ -413,13 +413,13 @@ describe("COA Validation", () => {
 
   describe("AccountType Enum", () => {
     it("should validate account type enum values", () => {
-      expect(() => AccountType.parse("ASSET")).not.toThrow();
-      expect(() => AccountType.parse("LIABILITY")).not.toThrow();
-      expect(() => AccountType.parse("EQUITY")).not.toThrow();
-      expect(() => AccountType.parse("REVENUE")).not.toThrow();
-      expect(() => AccountType.parse("EXPENSE")).not.toThrow();
+      expect(() => AccountTypeSchema.parse("ASSET")).not.toThrow();
+      expect(() => AccountTypeSchema.parse("LIABILITY")).not.toThrow();
+      expect(() => AccountTypeSchema.parse("EQUITY")).not.toThrow();
+      expect(() => AccountTypeSchema.parse("REVENUE")).not.toThrow();
+      expect(() => AccountTypeSchema.parse("EXPENSE")).not.toThrow();
       
-      expect(() => AccountType.parse("INVALID")).toThrow();
+      expect(() => AccountTypeSchema.parse("INVALID")).toThrow();
     });
   });
 

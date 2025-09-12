@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export interface IdempotencyResult {
   cached: boolean;
-  response?: any;
+  response?: unknown;
   key?: string;
 }
 
@@ -80,7 +80,7 @@ export async function processIdempotencyKey(request: NextRequest): Promise<Idemp
  */
 export async function storeIdempotencyResponse(
   idempotencyKey: string,
-  response: any
+  response: unknown
 ): Promise<void> {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

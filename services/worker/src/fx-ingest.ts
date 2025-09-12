@@ -11,7 +11,7 @@ export const fxRateIngestJob = inngest.createFunction(
     retries: 3
   },
   { cron: '0 */4 * * *' }, // Every 4 hours
-  async ({ event, step }) => {
+  async ({ event: _event, step }) => {
 
     // Step 1: Check current FX rate staleness
     const stalenessCheck = await step.run('check-staleness', async () => {
@@ -205,7 +205,7 @@ export const fxRateStalnessAlert = inngest.createFunction(
     retries: 1
   },
   { cron: '0 9,17 * * *' }, // 9 AM and 5 PM daily
-  async ({ event, step }) => {
+  async ({ event: _event, step }) => {
 
     const stalenessCheck = await step.run('check-staleness', async () => {
       const staleness = await getFxRatesStaleness();

@@ -132,8 +132,7 @@ function findBestMatch(
     let bestMatch: (MatchResult & { candidate: MatchCandidate }) | null = null;
     let bestConfidence = 0;
 
-    // Determine transaction amount and type
-    const transactionAmount = transaction.debitAmount > 0 ? transaction.debitAmount : transaction.creditAmount;
+    // Determine transaction type
     const isOutgoing = transaction.debitAmount > 0;
 
     for (const candidate of candidates) {

@@ -1,7 +1,7 @@
 // D4 Profit & Loss Report Engine - Income Statement
 // V1 Requirement: P&L from GL only with proper revenue/expense classification
 
-import { generateTrialBalance, type TrialBalanceInput, type TrialBalanceAccount, type TrialBalanceResult } from './trial-balance';
+import { generateTrialBalance, type TrialBalanceAccount, type TrialBalanceResult } from './trial-balance';
 
 export interface ProfitLossInput {
     tenantId: string;
@@ -104,7 +104,7 @@ export interface ProfitLossError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: unknown;
 }
 
 /**
@@ -113,7 +113,7 @@ export interface ProfitLossError {
  */
 export async function generateProfitLoss(
     input: ProfitLossInput,
-    dbClient: any
+    dbClient: unknown
 ): Promise<ProfitLossResult | ProfitLossError> {
     const startTime = Date.now();
 
@@ -137,7 +137,7 @@ export async function generateProfitLoss(
             includePeriodActivity: true,
             includeZeroBalances: input.includeZeroBalances || false,
             currency: input.currency
-        }, dbClient);
+        }, dbClient as any);
 
         if (!currentTrialBalance.success) {
             return {
@@ -158,7 +158,7 @@ export async function generateProfitLoss(
                 includePeriodActivity: true,
                 includeZeroBalances: input.includeZeroBalances || false,
                 currency: input.currency
-            }, dbClient);
+            }, dbClient as any);
 
             if (!comparativeResult.success) {
                 return {
@@ -248,7 +248,7 @@ async function getPeriodActivity(
     companyId: string,
     startDate: Date,
     endDate: Date,
-    dbClient: any,
+    dbClient: unknown,
     comparativePeriod?: { startDate: Date; endDate: Date }
 ): Promise<{
     current: Map<string, { debits: number; credits: number; netActivity: number }>;
@@ -274,7 +274,7 @@ async function getPeriodActivity(
     GROUP BY jl.account_id, coa.account_type, coa.normal_balance
   `;
 
-    const { data: currentData, error: currentError } = await dbClient
+    const { data: currentData, error: currentError } = await (dbClient as any)
         .rpc('execute_sql', {
             query: currentQuery,
             params: [tenantId, companyId, startDate, endDate]
@@ -284,17 +284,18 @@ async function getPeriodActivity(
         throw new Error(`Failed to fetch current period activity: ${currentError.message}`);
     }
 
-    const currentActivity = new Map();
+    const currentActivity = new Map<string, { debits: number; credits: number; netActivity: number; }>();
     for (const row of currentData || []) {
-        const debits = parseFloat(row.total_debits || '0');
-        const credits = parseFloat(row.total_credits || '0');
+        const rowData = row as any;
+        const debits = parseFloat(rowData.total_debits || '0');
+        const credits = parseFloat(rowData.total_credits || '0');
 
         // Calculate net activity based on normal balance
-        const netActivity = row.normal_balance === 'DEBIT'
+        const netActivity = rowData.normal_balance === 'DEBIT'
             ? debits - credits
             : credits - debits;
 
-        currentActivity.set(row.account_id, {
+        currentActivity.set(rowData.account_id, {
             debits,
             credits,
             netActivity
@@ -302,7 +303,7 @@ async function getPeriodActivity(
     }
 
     // Query for comparative period activity (if requested)
-    let comparativeActivity: Map<string, any> | undefined = undefined;
+    let comparativeActivity: Map<string, { debits: number; credits: number; netActivity: number; }> | undefined = undefined;
     if (comparativePeriod) {
         const comparativeQuery = `
       SELECT 
@@ -323,7 +324,7 @@ async function getPeriodActivity(
       GROUP BY jl.account_id, coa.account_type, coa.normal_balance
     `;
 
-        const { data: comparativeData, error: comparativeError } = await dbClient
+        const { data: comparativeData, error: comparativeError } = await (dbClient as any)
             .rpc('execute_sql', {
                 query: comparativeQuery,
                 params: [tenantId, companyId, comparativePeriod.startDate, comparativePeriod.endDate]
@@ -335,14 +336,15 @@ async function getPeriodActivity(
 
         comparativeActivity = new Map();
         for (const row of comparativeData || []) {
-            const debits = parseFloat(row.total_debits || '0');
-            const credits = parseFloat(row.total_credits || '0');
+            const rowData = row as any;
+            const debits = parseFloat(rowData.total_debits || '0');
+            const credits = parseFloat(rowData.total_credits || '0');
 
-            const netActivity = row.normal_balance === 'DEBIT'
+            const netActivity = rowData.normal_balance === 'DEBIT'
                 ? debits - credits
                 : credits - debits;
 
-            comparativeActivity.set(row.account_id, {
+            comparativeActivity.set(rowData.account_id, {
                 debits,
                 credits,
                 netActivity
@@ -361,9 +363,9 @@ async function getPeriodActivity(
  */
 function classifyProfitLossAccounts(
     trialBalanceAccounts: TrialBalanceAccount[],
-    currentActivity: Map<string, any>,
+    currentActivity: Map<string, { debits: number; credits: number; netActivity: number; }>,
     comparativeAccounts?: TrialBalanceAccount[],
-    comparativeActivity?: Map<string, any>
+    comparativeActivity?: Map<string, { debits: number; credits: number; netActivity: number; }>
 ): {
     revenue: ProfitLossSection[];
     costOfSales: ProfitLossSection[];

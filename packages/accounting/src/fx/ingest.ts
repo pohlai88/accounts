@@ -1,6 +1,10 @@
 // D2 FX Rate Ingest System - Primary + Fallback Sources with Staleness Detection
 import { validateFxPolicy } from './policy';
 
+// Use Node.js built-in fetch (Node 18+) and AbortController
+const fetch = globalThis.fetch;
+const AbortController = globalThis.AbortController;
+
 export interface FxRateSource {
   name: string;
   priority: 'primary' | 'fallback';
@@ -49,7 +53,7 @@ export const FX_SOURCES: Record<string, FxRateSource> = {
     timeout: 10000, // 10 seconds
     retries: 3
   },
-  
+
   // Fallback source: ExchangeRate-API
   EXCHANGE_RATE_API: {
     name: 'ExchangeRate-API',
@@ -58,7 +62,7 @@ export const FX_SOURCES: Record<string, FxRateSource> = {
     timeout: 15000, // 15 seconds
     retries: 2
   },
-  
+
   // Additional fallback: Fixer.io
   FIXER: {
     name: 'Fixer.io',
@@ -85,7 +89,7 @@ export async function ingestFxRates(
   targetCurrencies: string[] = ['USD', 'EUR', 'GBP', 'SGD', 'JPY'],
   stalenessThreshold: number = STALENESS_THRESHOLDS.WARNING
 ): Promise<FxIngestResult | FxIngestError> {
-  
+
   // 1. Validate inputs
   for (const currency of [baseCurrency, ...targetCurrencies]) {
     try {
@@ -106,7 +110,7 @@ export async function ingestFxRates(
     if (!primarySource) {
       throw new Error('Primary FX source (BNM) not configured');
     }
-    
+
     const primaryResult = await fetchFromSource(
       primarySource,
       baseCurrency,
@@ -115,7 +119,7 @@ export async function ingestFxRates(
 
     if (primaryResult.success) {
       const staleness = calculateStaleness(primaryResult.rates, stalenessThreshold);
-      
+
       return {
         success: true,
         rates: primaryResult.rates,
@@ -134,13 +138,13 @@ export async function ingestFxRates(
 
   for (const source of fallbackSources) {
     if (!source) continue;
-    
+
     try {
       const fallbackResult = await fetchFromSource(source, baseCurrency, targetCurrencies);
-      
+
       if (fallbackResult.success) {
         const staleness = calculateStaleness(fallbackResult.rates, stalenessThreshold);
-        
+
         return {
           success: true,
           rates: fallbackResult.rates,
@@ -173,19 +177,19 @@ async function fetchFromSource(
   baseCurrency: string,
   targetCurrencies: string[]
 ): Promise<{ success: boolean; rates: FxRateData[] }> {
-  
+
   let attempt = 0;
   let lastError: Error | null = null;
 
   while (attempt < source.retries) {
     attempt++;
-    
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), source.timeout);
 
       let url: string;
-      let headers: Record<string, string> = {
+      const headers: Record<string, string> = {
         'Accept': 'application/json',
         'User-Agent': 'AIBOS-Accounting/1.0'
       };
@@ -195,18 +199,18 @@ async function fetchFromSource(
         case 'Bank Negara Malaysia':
           url = `${source.baseUrl}?quote=${baseCurrency}&base=${targetCurrencies.join(',')}`;
           break;
-          
+
         case 'ExchangeRate-API':
           url = `${source.baseUrl}/${baseCurrency}`;
           break;
-          
+
         case 'Fixer.io':
           url = `${source.baseUrl}?base=${baseCurrency}&symbols=${targetCurrencies.join(',')}`;
           if (source.apiKey) {
             headers['Authorization'] = `Bearer ${source.apiKey}`;
           }
           break;
-          
+
         default:
           throw new Error(`Unknown FX source: ${source.name}`);
       }
@@ -230,7 +234,7 @@ async function fetchFromSource(
 
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error');
-      
+
       if (attempt < source.retries) {
         // Exponential backoff: 1s, 2s, 4s
         const delay = Math.pow(2, attempt - 1) * 1000;
@@ -247,7 +251,7 @@ async function fetchFromSource(
  */
 function parseSourceResponse(
   source: FxRateSource,
-  data: any,
+  data: Record<string, unknown>,
   baseCurrency: string,
   targetCurrencies: string[]
 ): FxRateData[] {
@@ -323,13 +327,13 @@ function calculateStaleness(
   rates: FxRateData[],
   threshold: number
 ): { isStale: boolean; ageMinutes: number; threshold: number } {
-  
+
   if (rates.length === 0) {
     return { isStale: true, ageMinutes: Infinity, threshold };
   }
 
   // Find the oldest rate
-  const oldestRate = rates.reduce((oldest, rate) => 
+  const oldestRate = rates.reduce((oldest, rate) =>
     rate.timestamp < oldest.timestamp ? rate : oldest
   );
 
@@ -347,14 +351,14 @@ export async function getCurrentFxRate(
   toCurrency: string,
   stalenessThreshold: number = STALENESS_THRESHOLDS.WARNING
 ): Promise<{ rate: number; source: string; age: number } | null> {
-  
+
   const result = await ingestFxRates(fromCurrency, [toCurrency], stalenessThreshold);
-  
+
   if (!result.success) {
     return null;
   }
 
-  const rate = result.rates.find(r => 
+  const rate = result.rates.find(r =>
     r.fromCurrency === fromCurrency && r.toCurrency === toCurrency
   );
 
@@ -378,7 +382,7 @@ export function validateFxRateFreshness(
   timestamp: Date,
   threshold: number = STALENESS_THRESHOLDS.WARNING
 ): { isValid: boolean; ageMinutes: number; threshold: number } {
-  
+
   const ageMinutes = (Date.now() - timestamp.getTime()) / (1000 * 60);
   const isValid = ageMinutes <= threshold;
 

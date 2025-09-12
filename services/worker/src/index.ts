@@ -8,6 +8,9 @@ import { pdfGeneration } from "./workflows/pdfGeneration";
 import { emailWorkflow } from "./workflows/emailWorkflow";
 import { dlqHandler, dlqRetryHandler } from "./workflows/dlqHandler";
 import { invoiceApproved } from "./workflows/invoiceApproved";
+import { ocrProcessing } from "./workflows/ocrProcessing";
+import { documentApprovalWorkflow, documentApprovalDecision, documentApprovalReminder } from "./workflows/documentApproval";
+import { documentRetentionPolicy, documentRetentionMonitor, documentLegalHold } from "./workflows/documentRetention";
 import { fxRateIngestJob, fxRateIngestManual, fxRateStalnessAlert } from "./fx-ingest";
 
 // V1 Inngest Functions Registry
@@ -18,6 +21,13 @@ export const inngestFunctions = [
   dlqHandler,
   dlqRetryHandler,
   invoiceApproved,
+  ocrProcessing,
+  documentApprovalWorkflow,
+  documentApprovalDecision,
+  documentApprovalReminder,
+  documentRetentionPolicy,
+  documentRetentionMonitor,
+  documentLegalHold,
   fxRateIngestJob,
   fxRateIngestManual,
   fxRateStalnessAlert,

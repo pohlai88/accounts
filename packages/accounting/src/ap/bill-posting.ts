@@ -1,6 +1,20 @@
 // D3 AP Bill Posting Engine - Bill to GL Integration
-import { validateJournalPosting, type JournalPostingInput, type PostingContext } from '../posting';
+import { validateJournalPosting, type JournalPostingInput } from '../posting';
 import { validateFxPolicy } from '../fx/policy';
+
+// Database client interface
+interface DbClient {
+    query: (sql: string, params?: unknown[]) => Promise<unknown>;
+    transaction?: (callback: (tx: DbClient) => Promise<void>) => Promise<void>;
+}
+
+// Posting context interface
+interface PostingContext {
+    tenantId: string;
+    companyId: string;
+    userId: string;
+    userRole: string;
+}
 
 export interface BillPostingInput {
     tenantId: string;
@@ -54,7 +68,7 @@ export interface BillPostingError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: Record<string, unknown>;
 }
 
 /**
@@ -75,7 +89,7 @@ export async function validateBillPosting(
     try {
         // 1. Validate FX policy if foreign currency
         if (input.currency !== baseCurrency) {
-            const fxValidation = validateFxPolicy(
+            validateFxPolicy(
                 baseCurrency,
                 input.currency
             );
@@ -178,7 +192,7 @@ export async function validateBillPosting(
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error occurred',
             code: 'BILL_POSTING_ERROR',
-            details: error
+            details: error as Record<string, unknown>
         };
     }
 }

@@ -47,7 +47,7 @@ export interface PaymentProcessingError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: Record<string, unknown>;
 }
 
 /**
@@ -71,7 +71,7 @@ export async function validatePaymentProcessing(
     try {
         // 1. Validate FX policy if foreign currency
         if (input.currency !== baseCurrency) {
-            const fxValidation = validateFxPolicy(
+            validateFxPolicy(
                 baseCurrency,
                 input.currency
             );
@@ -86,7 +86,7 @@ export async function validatePaymentProcessing(
                 success: false,
                 error: `Payment validation failed: ${businessValidation.errors.join(', ')}`,
                 code: 'PAYMENT_VALIDATION_FAILED',
-                details: businessValidation.errors
+                details: { errors: businessValidation.errors }
             };
         }
 
@@ -200,7 +200,7 @@ export async function validatePaymentProcessing(
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error occurred',
             code: 'PAYMENT_PROCESSING_ERROR',
-            details: error
+            details: error as Record<string, unknown>
         };
     }
 }

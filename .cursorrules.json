@@ -1,39 +1,149 @@
 {
-  "governance": {
-    "diffOnly": true,
-    "requirePassingTests": true,
-    "blockOnTypeErrors": true,
-    "blockOnEslintErrors": true
-  },
-  "allowedPatterns": [
+  "rules": [
+    {
+      "name": "V1 Governance - No Inline Styles",
+      "description": "Block inline styles and raw CSS - tokens only",
+      "pattern": "style\\s*=\\s*[\"']",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: No inline styles allowed. Use tokens from packages/ui only."
+    },
+    {
+      "name": "V1 Governance - No Direct DB in UI",
+      "description": "Block direct database imports in UI components",
+      "pattern": "from\\s+[\"']@aibos/db[\"']",
+      "files": [
+        "apps/web/**/*.tsx",
+        "apps/web/**/*.ts"
+      ],
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: No direct DB access in UI. Use typed hooks only."
+    },
+    {
+      "name": "V1 Governance - Zod Parse Mandatory",
+      "description": "All API routes must use Zod validation",
+      "pattern": "export\\s+async\\s+function\\s+(GET|POST|PUT|DELETE|PATCH)",
+      "files": [
+        "apps/web-api/app/api/**/*.ts"
+      ],
+      "requiresPattern": "z\\.(object|string|number|boolean|array)",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: All API routes must use Zod validation for req/res."
+    },
+    {
+      "name": "V1 Governance - RLS + SoD Required",
+      "description": "All mutations must include RLS and SoD checks",
+      "pattern": "(insert|update|delete)\\s*\\(",
+      "files": [
+        "packages/db/**/*.ts",
+        "apps/web-api/**/*.ts"
+      ],
+      "requiresPattern": "(tenantId|companyId).*checkSoDCompliance",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: All mutations must be scoped with RLS + SoD compliance."
+    },
+    {
+      "name": "V1 Governance - Temporal for Dates",
+      "description": "Use Temporal for date operations, not Date",
+      "pattern": "new\\s+Date\\s*\\(",
+      "severity": "warning",
+      "message": "⚠️ V1 RECOMMENDATION: Use Temporal for date operations instead of Date."
+    },
+    {
+      "name": "V1 Governance - Audit Logging Required",
+      "description": "All mutations must include audit logging",
+      "pattern": "(insert|update|delete)\\s*\\(",
+      "files": [
+        "apps/web-api/**/*.ts"
+      ],
+      "requiresPattern": "(auditService|logOperation|logError)",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: All mutations must include audit logging with requestId + tenantId."
+    },
+    {
+      "name": "V1 Governance - No Raw CSS Files",
+      "description": "Block creation of CSS files",
+      "pattern": "\\.(css|scss|sass|less)$",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: No raw CSS files allowed. Use Tailwind + tokens only."
+    },
+    {
+      "name": "V1 Governance - No Server Direct DB Access",
+      "description": "Block direct database access bypassing repos",
+      "pattern": "from\\s+[\"']drizzle-orm[\"']",
+      "files": [
+        "apps/web/**/*.ts",
+        "apps/web/**/*.tsx"
+      ],
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: No direct Drizzle imports in UI. Use repos only."
+    },
+    {
+      "name": "V1 Governance - Posting Rules Testing",
+      "description": "All posting rules must have unit tests",
+      "pattern": "function\\s+\\w*[Pp]ost\\w*\\s*\\(",
+      "files": [
+        "packages/accounting/**/*.ts"
+      ],
+      "requiresCorrespondingFile": ".test.ts",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: All posting rules require unit tests."
+    },
+    {
+      "name": "V1 Governance - No Any Types",
+      "description": "Block usage of 'any' type",
+      "pattern": ":\\s*any\\b",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: No 'any' types allowed. Use proper TypeScript types."
+    },
+    {
+      "name": "V1 Governance - Idempotency Required",
+      "description": "Payment and posting endpoints must have idempotency",
+      "pattern": "(payment|posting|journal).*route\\.ts",
+      "files": [
+        "apps/web-api/app/api/**/*.ts"
+      ],
+      "requiresPattern": "X-Idempotency-Key",
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: Payment/posting endpoints must support X-Idempotency-Key."
+    },
+    {
+      "name": "V1 Governance - No Fetch in UI",
+      "description": "Block direct fetch calls in UI components",
+      "pattern": "fetch\\s*\\(",
+      "files": [
+        "apps/web/**/*.tsx",
+        "apps/web/**/*.ts"
+      ],
+      "severity": "error",
+      "message": "❌ V1 VIOLATION: No direct fetch in UI. Use typed API hooks only."
+    }
+  ],
+  "allowedDirectories": [
     "apps/**",
     "services/**",
     "packages/**",
     "tests/**"
   ],
-  "forbiddenPatterns": [
+  "forbiddenDirectories": [
     "**/*.css",
     "apps/web/**/styles/**",
     "**/*.any.ts",
     "**/fetch-from-ui/**",
     "apps/web/**/server-direct-db-access/**"
   ],
-  "hardRules": [
-    "No inline styles or raw CSS; use tokens + shadcn.",
-    "No direct DB access from UI; typed hooks only.",
-    "All routes must parse req/res via Zod from packages/contracts.",
-    "All DB mutations must enforce RLS scope (tenant_id/company_id) and SoD checks.",
-    "Use Temporal for dates; forbid other date libs.",
-    "Logs must include requestId and tenantId.",
-    "Posting rules require unit tests before exposure."
-  ],
-  "reviewChecklists": {
-    "pullRequest": [
-      "Contracts versioned & referenced",
-      "Zod parse on req/res present",
-      "RLS & SoD enforced",
-      "Unit + E2E updated",
-      "Indexes added or N+1 avoided"
-    ]
+  "hardRules": {
+    "noInlineStyles": true,
+    "noDirectDbInUi": true,
+    "zodParseRequired": true,
+    "rlsSodRequired": true,
+    "auditLoggingRequired": true,
+    "postingTestsRequired": true,
+    "idempotencyRequired": true
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "description": "V1 Governance Rules - Anti-drift enforcement for AIBOS Accounts",
+    "lastUpdated": "2025-09-12",
+    "compliance": "FINAL_NON-OPTIONAL_PLAN_V1.md"
   }
 }

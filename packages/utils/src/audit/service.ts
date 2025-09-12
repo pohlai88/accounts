@@ -3,16 +3,33 @@ import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+interface AuditLogDbRow {
+  id: string;
+  tenantId: string;
+  companyId?: string;
+  userId?: string;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  oldValues?: string;
+  newValues?: string;
+  metadata?: string;
+  requestId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+}
+
 // Audit action types for business operations
-export type AuditAction = 
-  | 'CREATE' 
-  | 'UPDATE' 
-  | 'DELETE' 
-  | 'POST' 
-  | 'REVERSE' 
-  | 'APPROVE' 
-  | 'REJECT' 
-  | 'SUBMIT' 
+export type AuditAction =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'POST'
+  | 'REVERSE'
+  | 'APPROVE'
+  | 'REJECT'
+  | 'SUBMIT'
   | 'CANCEL'
   | 'VALIDATE'
   | 'EXPORT'
@@ -21,11 +38,11 @@ export type AuditAction =
   | 'EXPIRE';
 
 // Entity types for audit logging
-export type AuditEntityType = 
-  | 'JOURNAL' 
+export type AuditEntityType =
+  | 'JOURNAL'
   | 'JOURNAL_LINE'
-  | 'INVOICE' 
-  | 'PAYMENT' 
+  | 'INVOICE'
+  | 'PAYMENT'
   | 'ACCOUNT'
   | 'TENANT'
   | 'COMPANY'
@@ -92,15 +109,15 @@ export interface AuditLogResult {
  * Database interface for audit operations
  */
 export interface AuditDatabase {
-  insert: (table: any) => {
-    values: (values: any) => Promise<any>;
+  insert: (table: unknown) => {
+    values: (values: unknown) => Promise<unknown>;
   };
   select: () => {
-    from: (table: any) => {
-      where: (condition: any) => {
-        orderBy: (order: any) => {
+    from: (table: unknown) => {
+      where: (condition: unknown) => {
+        orderBy: (order: unknown) => {
           limit: (limit: number) => {
-            offset: (offset: number) => Promise<any[]>;
+            offset: (offset: number) => Promise<unknown[]>;
           };
         };
       };
@@ -313,14 +330,14 @@ export class AuditService {
 
     const results = await query;
 
-    return results.map((row: any) => ({
+    return (results as AuditLogDbRow[]).map((row: AuditLogDbRow) => ({
       id: row.id,
       tenantId: row.tenantId,
       companyId: row.companyId || undefined,
       userId: row.userId || undefined,
       action: row.action,
       entityType: row.entityType,
-      entityId: row.entityId,
+      entityId: row.entityId || '',
       oldValues: row.oldValues ? JSON.parse(row.oldValues as string) : undefined,
       newValues: row.newValues ? JSON.parse(row.newValues as string) : undefined,
       metadata: row.metadata ? JSON.parse(row.metadata as string) : undefined,

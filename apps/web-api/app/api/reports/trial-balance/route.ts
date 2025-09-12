@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { generateTrialBalance } from '@aibos/accounting/src/reports/trial-balance';
 import { createClient } from '@supabase/supabase-js';
 import { processIdempotencyKey } from '@aibos/utils/middleware/idempotency';
-import { getV1AuditService, createV1AuditContext, createV1RequestContext, extractV1UserContext } from '@aibos/utils';
+import { getV1AuditService, createV1AuditContext, createV1RequestContext, extractV1UserContext, performanceMonitor } from '@aibos/utils';
 import { checkSoDCompliance } from '@aibos/auth/src/sod';
 
 // Request schema validation (V1 requirement: Zod for all IO)
@@ -80,6 +80,9 @@ export async function GET(request: NextRequest) {
     const auditService = getV1AuditService();
     let reportResult: any = null;
 
+    // Start performance monitoring
+    const perfTimer = performanceMonitor.createTimer('api.reports.trial-balance.get');
+
     try {
         // 1. Process idempotency key (V1 requirement)
         const idempotencyResult = await processIdempotencyKey(request);
@@ -132,7 +135,7 @@ export async function GET(request: NextRequest) {
         reportResult = await generateTrialBalance({
             ...input,
             asOfDate: new Date(input.asOfDate)
-        }, supabase);
+        }, supabase as any);
 
         if (!reportResult.success) {
             // Log failed report generation (V1 audit requirement)
@@ -221,6 +224,9 @@ export async function GET(request: NextRequest) {
             error: 'Internal server error',
             code: 'INTERNAL_ERROR'
         }, { status: 500 });
+    } finally {
+        // End performance monitoring
+        perfTimer.end();
     }
 }
 
@@ -231,6 +237,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     const auditService = getV1AuditService();
     let reportResult: any = null;
+
+    // Start performance monitoring
+    const perfTimer = performanceMonitor.createTimer('api.reports.trial-balance');
 
     try {
         // 1. Process idempotency key (V1 requirement)
@@ -275,7 +284,7 @@ export async function POST(request: NextRequest) {
         reportResult = await generateTrialBalance({
             ...input,
             asOfDate: new Date(input.asOfDate)
-        }, supabase);
+        }, supabase as any);
 
         if (!reportResult.success) {
             // Log failed report generation
@@ -364,5 +373,8 @@ export async function POST(request: NextRequest) {
             error: 'Internal server error',
             code: 'INTERNAL_ERROR'
         }, { status: 500 });
+    } finally {
+        // End performance monitoring
+        perfTimer.end();
     }
 }

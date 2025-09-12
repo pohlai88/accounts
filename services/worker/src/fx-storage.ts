@@ -208,7 +208,6 @@ export async function getFxRatesForCurrencies(
   validFrom: Date;
   ageMinutes: number;
 }>> {
-  const db = getDb();
   const results: Array<{
     fromCurrency: string;
     toCurrency: string;
@@ -246,7 +245,7 @@ export async function cleanupOldFxRates(): Promise<number> {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const result = await db
+    await db
       .delete(fxRates)
       .where(
         and(

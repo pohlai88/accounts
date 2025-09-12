@@ -5,7 +5,7 @@ describe("FX Policy", () => {
   describe("validateFxPolicy", () => {
     it("should pass for same currency transactions", () => {
       const result = validateFxPolicy("MYR", "MYR");
-      
+
       expect(result.requiresFxRate).toBe(false);
       expect(result.baseCurrency).toBe("MYR");
       expect(result.transactionCurrency).toBe("MYR");
@@ -14,7 +14,7 @@ describe("FX Policy", () => {
 
     it("should require FX rate for different currencies", () => {
       const result = validateFxPolicy("MYR", "USD");
-      
+
       expect(result.requiresFxRate).toBe(true);
       expect(result.baseCurrency).toBe("MYR");
       expect(result.transactionCurrency).toBe("USD");
@@ -23,7 +23,7 @@ describe("FX Policy", () => {
 
     it("should handle EUR to USD conversion", () => {
       const result = validateFxPolicy("EUR", "USD");
-      
+
       expect(result.requiresFxRate).toBe(true);
       expect(result.baseCurrency).toBe("EUR");
       expect(result.transactionCurrency).toBe("USD");
@@ -31,7 +31,7 @@ describe("FX Policy", () => {
 
     it("should handle case insensitive currencies", () => {
       const result = validateFxPolicy("myr", "usd");
-      
+
       expect(result.requiresFxRate).toBe(true);
       expect(result.baseCurrency).toBe("MYR");
       expect(result.transactionCurrency).toBe("USD");
@@ -45,7 +45,7 @@ describe("FX Policy", () => {
 
     it("should handle all major currencies", () => {
       const majorCurrencies = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "SGD", "THB", "VND", "IDR", "PHP"];
-      
+
       majorCurrencies.forEach(currency => {
         expect(() => validateFxPolicy("MYR", currency)).not.toThrow();
       });
@@ -53,7 +53,7 @@ describe("FX Policy", () => {
 
     it("should provide proper validation results structure", () => {
       const result = validateFxPolicy("MYR", "USD");
-      
+
       expect(result).toHaveProperty("requiresFxRate");
       expect(result).toHaveProperty("baseCurrency");
       expect(result).toHaveProperty("transactionCurrency");
@@ -69,7 +69,7 @@ describe("FX Policy", () => {
       const result1 = validateFxPolicy(" MYR ", " USD ");
       expect(result1.baseCurrency).toBe("MYR");
       expect(result1.transactionCurrency).toBe("USD");
-      
+
       // Same currency different case
       const result2 = validateFxPolicy("MYR", "myr");
       expect(result2.requiresFxRate).toBe(false);
@@ -79,11 +79,11 @@ describe("FX Policy", () => {
   describe("Multi-currency scenarios", () => {
     it("should handle SEA currency combinations", () => {
       const seaCurrencies = ["MYR", "SGD", "THB", "VND", "IDR", "PHP"];
-      
+
       seaCurrencies.forEach(base => {
         seaCurrencies.forEach(transaction => {
           const result = validateFxPolicy(base, transaction);
-          
+
           if (base === transaction) {
             expect(result.requiresFxRate).toBe(false);
             expect(result.exchangeRate).toBe(1.0);
@@ -96,7 +96,7 @@ describe("FX Policy", () => {
 
     it("should handle major global currencies", () => {
       const globalCurrencies = ["USD", "EUR", "GBP", "JPY", "AUD"];
-      
+
       globalCurrencies.forEach(currency => {
         const result = validateFxPolicy("MYR", currency);
         expect(result.requiresFxRate).toBe(true);
@@ -108,13 +108,13 @@ describe("FX Policy", () => {
 
   describe("Error handling", () => {
     it("should throw for null/undefined currencies", () => {
-      expect(() => validateFxPolicy(null as any, "USD")).toThrow();
-      expect(() => validateFxPolicy("MYR", undefined as any)).toThrow();
+      expect(() => validateFxPolicy(null as unknown as string, "USD")).toThrow();
+      expect(() => validateFxPolicy("MYR", undefined as unknown as string)).toThrow();
     });
 
     it("should throw for non-string currencies", () => {
-      expect(() => validateFxPolicy(123 as any, "USD")).toThrow();
-      expect(() => validateFxPolicy("MYR", {} as any)).toThrow();
+      expect(() => validateFxPolicy(123 as unknown as string, "USD")).toThrow();
+      expect(() => validateFxPolicy("MYR", {} as unknown as string)).toThrow();
     });
 
     it("should provide meaningful error messages", () => {

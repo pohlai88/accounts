@@ -381,10 +381,11 @@ export function getHealthMonitor(): PuppeteerHealthMonitor {
  * Start health monitoring
  */
 export function startHealthMonitoring(config?: Partial<HealthCheckConfig>): void {
-    const monitor = getHealthMonitor();
     if (config) {
         // Create new instance with custom config
         monitorInstance = new PuppeteerHealthMonitor(config);
+    } else {
+        getHealthMonitor();
     }
     monitorInstance!.start();
 }

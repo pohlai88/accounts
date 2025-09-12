@@ -1,7 +1,7 @@
 // D4 Balance Sheet Report Engine - Financial Position Statement
 // V1 Requirement: BS from GL only with proper classification
 
-import { generateTrialBalance, type TrialBalanceInput, type TrialBalanceAccount, type TrialBalanceResult } from './trial-balance';
+import { generateTrialBalance, type TrialBalanceAccount, type TrialBalanceResult } from './trial-balance';
 
 export interface BalanceSheetInput {
     tenantId: string;
@@ -85,7 +85,7 @@ export interface BalanceSheetError {
     success: false;
     error: string;
     code: string;
-    details?: any;
+    details?: unknown;
 }
 
 /**
@@ -94,7 +94,7 @@ export interface BalanceSheetError {
  */
 export async function generateBalanceSheet(
     input: BalanceSheetInput,
-    dbClient: any
+    dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> }
 ): Promise<BalanceSheetResult | BalanceSheetError> {
     const startTime = Date.now();
 

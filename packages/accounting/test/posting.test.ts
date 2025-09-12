@@ -4,12 +4,12 @@ import { postJournal, JournalPostingInput } from "../src/posting";
 describe("posting", () => {
   const mockContext = {
     tenantId: "tenant-123",
-    companyId: "company-456", 
+    companyId: "company-456",
     userId: "user-789",
     userRole: "manager"
   };
 
-  const createTestInput = (lines: any[]): JournalPostingInput => ({
+  const createTestInput = (lines: Array<{ accountId: string; debit: number; credit: number; description?: string; reference?: string }>): JournalPostingInput => ({
     journalNumber: "JE-001",
     description: "Test journal entry",
     journalDate: new Date("2024-01-01"),
@@ -23,7 +23,7 @@ describe("posting", () => {
       { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 },
       { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 }
     ]);
-    
+
     const res = await postJournal(input);
     expect(res.validated).toBe(true);
     expect(res.totalDebit).toBe(100);
@@ -34,7 +34,7 @@ describe("posting", () => {
     const input = createTestInput([
       { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 }
     ]);
-    
+
     await expect(postJournal(input)).rejects.toThrow("Journal must be balanced");
   });
 
@@ -45,7 +45,7 @@ describe("posting", () => {
       { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 }
     ]);
     input.context = clerkContext;
-    
+
     await expect(postJournal(input)).rejects.toThrow("not authorized to post journal entries");
   });
 
@@ -54,7 +54,7 @@ describe("posting", () => {
       { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 },
       { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 }
     ]);
-    
+
     const res = await postJournal(input);
     expect(res.requiresApproval).toBe(true);
     expect(res.approverRoles).toContain("manager");
