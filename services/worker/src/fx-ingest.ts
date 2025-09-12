@@ -5,18 +5,18 @@ import { insertFxRates, getFxRatesStaleness } from './fx-storage';
 
 // FX rate ingest job - runs every 4 hours
 export const fxRateIngestJob = inngest.createFunction(
-  { 
+  {
     id: 'fx-rate-ingest',
     name: 'FX Rate Ingest Job',
     retries: 3
   },
   { cron: '0 */4 * * *' }, // Every 4 hours
   async ({ event, step }) => {
-    
+
     // Step 1: Check current FX rate staleness
     const stalenessCheck = await step.run('check-staleness', async () => {
       const staleness = await getFxRatesStaleness();
-      
+
       return {
         needsUpdate: staleness.isStale || staleness.ageMinutes > STALENESS_THRESHOLDS.WARNING,
         currentAge: staleness.ageMinutes,
@@ -45,13 +45,18 @@ export const fxRateIngestJob = inngest.createFunction(
       ];
 
       const result = await ingestFxRates(baseCurrency, targetCurrencies, STALENESS_THRESHOLDS.WARNING);
-      
+
       if (!result.success) {
-        throw new Error(`FX ingest failed: ${result.error}`);
+        throw new Error(`FX ingest failed: ${(result as any).error}`);
       }
 
       return {
-        rates: result.rates,
+        rates: result.rates.map(rate => ({
+          ...rate,
+          timestamp: rate.timestamp.toISOString(),
+          validFrom: rate.validFrom.toISOString(),
+          validTo: rate.validTo?.toISOString()
+        })),
         source: result.source,
         staleness: result.staleness,
         rateCount: result.rates.length
@@ -60,8 +65,16 @@ export const fxRateIngestJob = inngest.createFunction(
 
     // Step 3: Store FX rates in database
     const storageResult = await step.run('store-fx-rates', async () => {
-      const storedCount = await insertFxRates(ingestResult.rates);
-      
+      // Convert serialized dates back to Date objects
+      const ratesWithDates: FxRateData[] = ingestResult.rates.map(rate => ({
+        ...rate,
+        timestamp: new Date(rate.timestamp),
+        validFrom: new Date(rate.validFrom),
+        validTo: rate.validTo ? new Date(rate.validTo) : undefined
+      }));
+
+      const storedCount = await insertFxRates(ratesWithDates);
+
       return {
         storedCount,
         totalRates: ingestResult.rates.length
@@ -70,8 +83,16 @@ export const fxRateIngestJob = inngest.createFunction(
 
     // Step 4: Validate stored rates
     const validationResult = await step.run('validate-stored-rates', async () => {
-      const validation = await validateStoredRates(ingestResult.rates);
-      
+      // Convert serialized dates back to Date objects for validation
+      const ratesWithDates: FxRateData[] = ingestResult.rates.map(rate => ({
+        ...rate,
+        timestamp: new Date(rate.timestamp),
+        validFrom: new Date(rate.validFrom),
+        validTo: rate.validTo ? new Date(rate.validTo) : undefined
+      }));
+
+      const validation = await validateStoredRates(ratesWithDates);
+
       if (!validation.isValid) {
         throw new Error(`FX rate validation failed: ${validation.errors.join(', ')}`);
       }
@@ -137,15 +158,31 @@ export const fxRateIngestManual = inngest.createFunction(
       );
 
       if (!result.success) {
-        throw new Error(`Manual FX ingest failed: ${result.error}`);
+        throw new Error(`Manual FX ingest failed: ${(result as any).error}`);
       }
 
-      return result;
+      return {
+        ...result,
+        rates: result.rates.map(rate => ({
+          ...rate,
+          timestamp: rate.timestamp.toISOString(),
+          validFrom: rate.validFrom.toISOString(),
+          validTo: rate.validTo?.toISOString()
+        }))
+      };
     });
 
     // Step 3: Store rates
     const storageResult = await step.run('store-fx-rates', async () => {
-      const storedCount = await insertFxRates(ingestResult.rates);
+      // Convert serialized dates back to Date objects
+      const ratesWithDates: FxRateData[] = ingestResult.rates.map(rate => ({
+        ...rate,
+        timestamp: new Date(rate.timestamp),
+        validFrom: new Date(rate.validFrom),
+        validTo: rate.validTo ? new Date(rate.validTo) : undefined
+      }));
+
+      const storedCount = await insertFxRates(ratesWithDates);
       return { storedCount };
     });
 
@@ -169,10 +206,10 @@ export const fxRateStalnessAlert = inngest.createFunction(
   },
   { cron: '0 9,17 * * *' }, // 9 AM and 5 PM daily
   async ({ event, step }) => {
-    
+
     const stalenessCheck = await step.run('check-staleness', async () => {
       const staleness = await getFxRatesStaleness();
-      
+
       return {
         isStale: staleness.isStale,
         ageMinutes: staleness.ageMinutes,

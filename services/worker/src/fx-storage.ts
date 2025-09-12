@@ -1,7 +1,7 @@
 // D2 FX Storage Helper - Database operations for FX rates
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { fxRates, currencies } from '@aibos/db/schema';
+import { fxRates, currencies } from '@aibos/db/src/schema';
 import { eq, and, desc, gte } from 'drizzle-orm';
 import { type FxRateData, STALENESS_THRESHOLDS } from '@aibos/accounting';
 
@@ -104,6 +104,14 @@ export async function getFxRatesStaleness(): Promise<{
     }
 
     const latestRate = latestRates[0];
+    if (!latestRate || !latestRate.createdAt) {
+      return {
+        isStale: true,
+        ageMinutes: Infinity,
+        threshold: STALENESS_THRESHOLDS.WARNING
+      };
+    }
+
     const ageMinutes = (Date.now() - latestRate.createdAt.getTime()) / (1000 * 60);
     const isStale = ageMinutes > STALENESS_THRESHOLDS.WARNING;
 
@@ -167,6 +175,10 @@ export async function getCurrentFxRateFromDb(
     }
 
     const rate = rates[0];
+    if (!rate || !rate.createdAt) {
+      return null;
+    }
+
     const ageMinutes = (Date.now() - rate.createdAt.getTime()) / (1000 * 60);
 
     return {
@@ -197,7 +209,14 @@ export async function getFxRatesForCurrencies(
   ageMinutes: number;
 }>> {
   const db = getDb();
-  const results = [];
+  const results: Array<{
+    fromCurrency: string;
+    toCurrency: string;
+    rate: number;
+    source: string;
+    validFrom: Date;
+    ageMinutes: number;
+  }> = [];
 
   for (const targetCurrency of targetCurrencies) {
     try {

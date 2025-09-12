@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { PostJournalReq, PostJournalRes, PostingErrorRes } from "@aibos/contracts";
 import { postJournal, PostingError, JournalPostingInput } from "@aibos/accounting";
 import { insertJournal, DatabaseError, Scope } from "@aibos/db";
-import { 
-  createRequestContext, 
-  withIdempotency, 
-  type IdempotencyResult,
-  getAuditService,
-  createAuditContext
+import {
+  createV1RequestContext,
+  processIdempotencyKey,
+  getV1AuditService,
+  createV1AuditContext
 } from "@aibos/utils";
 
 export const runtime = "nodejs";
@@ -23,46 +22,35 @@ function extractUserContext(req: NextRequest): Scope {
   // Mock user context for D0 - in production this would come from JWT
   return {
     tenantId: req.headers.get('x-tenant-id') || 'tenant-123',
-    companyId: req.headers.get('x-company-id') || 'company-456', 
+    companyId: req.headers.get('x-company-id') || 'company-456',
     userId: req.headers.get('x-user-id') || 'user-789',
     userRole: req.headers.get('x-user-role') || 'manager'
   };
 }
 
-async function handleJournalPost(req: NextRequest, idempotencyResult: IdempotencyResult): Promise<NextResponse> {
-  const auditService = getAuditService();
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const auditService = getV1AuditService();
   let journalResult: any = null;
-  
+
   try {
-    // 1. Create request context for tracing and logging
-    const context = createRequestContext(req);
-    
+    // 1. Process idempotency key (V1 requirement)
+    const idempotencyResult = await processIdempotencyKey(req);
+    if (idempotencyResult.cached) {
+      return NextResponse.json(idempotencyResult.response);
+    }
+
+    // 2. Create request context for tracing and logging
+    const context = createV1RequestContext(req);
+
     // 2. Parse and validate request
     const body = PostJournalReq.parse(await req.json());
-    
+
     // 3. Extract user context (with RLS scope)
     const scope = extractUserContext(req);
-    
-    // 4. Create audit context
-    const auditContext = createAuditContext(
-      context.request_id,
-      req.ip || req.headers.get('x-forwarded-for') || 'unknown',
-      req.headers.get('user-agent') || 'unknown',
-      'API'
-    );
 
-    // 5. Log idempotency usage if key provided
-    if (idempotencyResult.key) {
-      await auditService.logIdempotencyUsage(
-        scope,
-        idempotencyResult.key,
-        idempotencyResult.isDuplicate ? 'HIT' : 'CREATE',
-        'JOURNAL',
-        undefined, // entityId not known yet
-        auditContext
-      );
-    }
-    
+    // 4. Create audit context
+    const auditContext = createV1AuditContext(req);
+
     // 5. Build posting input
     const postingInput: JournalPostingInput = {
       journalNumber: body.journalNumber,
@@ -80,7 +68,7 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
 
     // 6. Validate posting rules (SoD, balance, etc.)
     const validation = await postJournal(postingInput);
-    
+
     // 7. Log SoD compliance check
     await auditService.logSoDCompliance(
       scope,
@@ -96,16 +84,15 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
         scope,
         body.lines.map(line => line.accountId),
         'SUCCESS',
-        validation.coaWarnings.map(w => ({ accountId: w.accountId, warning: w.warning })),
-        [],
+        validation.coaWarnings.map(w => `${w.accountId}: ${w.warning}`),
         auditContext
       );
     }
-    
+
     // 9. Determine journal status based on approval requirements
     // Database constraint allows: 'draft', 'posted', 'reversed'
     const status = validation.requiresApproval ? 'draft' : 'posted';
-    
+
     // 10. Insert journal into database with RLS enforcement
     journalResult = await insertJournal(scope, {
       journalNumber: body.journalNumber,
@@ -119,8 +106,9 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
 
     // 11. Log successful journal creation
     await auditService.logJournalPosting(
-      scope,
+      auditContext,
       journalResult.id,
+      status === 'posted' ? 'POST' : 'CREATE',
       {
         journalNumber: body.journalNumber,
         description: body.description,
@@ -133,11 +121,9 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
         requiresApproval: validation.requiresApproval,
         approverRoles: validation.approverRoles,
         idempotencyKey: body.idempotencyKey
-      },
-      status === 'posted' ? 'POST' : 'CREATE',
-      auditContext
+      }
     );
-    
+
     // 12. Build and return success response
     const response = PostJournalRes.parse({
       id: journalResult.id,
@@ -150,10 +136,10 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
       totalCredit: validation.totalCredit
     });
 
-    return NextResponse.json(response, { 
+    return NextResponse.json(response, {
       status: status === 'posted' ? 201 : 202,
       headers: {
-        'X-Request-ID': context.request_id,
+        'X-Request-ID': context.requestId,
         'X-Journal-Status': status,
         'X-Journal-ID': journalResult.id
       }
@@ -162,32 +148,23 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
   } catch (error) {
     // Log error for audit trail
     try {
-      const context = createRequestContext(req);
+      const context = createV1RequestContext(req);
       const scope = extractUserContext(req);
-      const auditContext = createAuditContext(
-        context.request_id,
-        req.ip || req.headers.get('x-forwarded-for') || 'unknown',
-        req.headers.get('user-agent') || 'unknown',
-        'API'
-      );
+      const auditContext = createV1AuditContext(req);
 
       // Log the error based on type
       if (error instanceof PostingError) {
-        await auditService.logOperation({
-          scope,
-          action: 'CREATE',
-          entityType: 'JOURNAL',
-          entityId: 'failed',
-          metadata: {
-            operation: 'journal_posting_error',
+        await auditService.logError(
+          auditContext,
+          'JOURNAL_POSTING_ERROR',
+          {
             errorType: 'PostingError',
             errorCode: error.code,
             errorMessage: error.message,
             errorDetails: error.details,
-            journalNumber: req.body ? JSON.parse(await req.text()).journalNumber : 'unknown'
-          },
-          context: auditContext
-        });
+            operation: 'journal_posting'
+          }
+        );
       }
     } catch (auditError) {
       // Don't fail the main error handling due to audit logging issues
@@ -203,13 +180,13 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
           details: error.details
         }
       });
-      
-      return NextResponse.json(errorResponse, { 
+
+      return NextResponse.json(errorResponse, {
         status: 400,
         headers: { 'X-Error-Type': 'POSTING_ERROR' }
       });
     }
-    
+
     // Handle database errors
     if (error instanceof DatabaseError) {
       const errorResponse = PostingErrorRes.parse({
@@ -219,8 +196,8 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
           details: { operation: 'journal_insertion' }
         }
       });
-      
-      return NextResponse.json(errorResponse, { 
+
+      return NextResponse.json(errorResponse, {
         status: error.code === 'DUPLICATE_KEY' ? 409 : 500,
         headers: { 'X-Error-Type': 'DATABASE_ERROR' }
       });
@@ -235,8 +212,8 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
           details: { zodError: error.message }
         }
       });
-      
-      return NextResponse.json(errorResponse, { 
+
+      return NextResponse.json(errorResponse, {
         status: 400,
         headers: { 'X-Error-Type': 'VALIDATION_ERROR' }
       });
@@ -244,7 +221,7 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
 
     // Generic error handler
     console.error('Unexpected error in journal posting:', error);
-    
+
     const errorResponse = PostingErrorRes.parse({
       error: {
         code: 'INTERNAL_ERROR',
@@ -252,16 +229,12 @@ async function handleJournalPost(req: NextRequest, idempotencyResult: Idempotenc
         details: { message: String(error) }
       }
     });
-    
-    return NextResponse.json(errorResponse, { 
+
+    return NextResponse.json(errorResponse, {
       status: 500,
       headers: { 'X-Error-Type': 'INTERNAL_ERROR' }
     });
   }
 }
 
-// Export POST handler with idempotency middleware
-export const POST = withIdempotency(handleJournalPost, {
-  required: false, // Idempotency key is optional
-  ttlSeconds: 24 * 60 * 60 // 24 hours
-});
+// POST handler now includes V1 compliance features

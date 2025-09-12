@@ -11,8 +11,8 @@ export { createClient as createMiddlewareClient } from "./supabase/middleware";
 // PDF utilities (server-only, not for Edge Runtime)
 export type { PDFOptions } from "./pdf";
 
-// Re-export server utilities for worker access
-export { renderPdf } from "./server";
+// Note: renderPdf is NOT exported here to prevent Puppeteer bundling in API routes
+// Import from "@aibos/utils/server" when you need PDF functionality
 
 // V1 Axiom Telemetry
 export * from "./axiom";
@@ -23,6 +23,18 @@ export * from "./middleware/idempotency";
 
 // Audit service
 export * from "./audit/service";
+
+// V1 Compliance - Audit and Context (avoiding conflicts)
+export { AuditService as V1AuditService, getAuditService as getV1AuditService } from "./audit/audit-service";
+export type { AuditContext as V1AuditContext, AuditEvent } from "./audit/audit-service";
+export {
+  createRequestContext as createV1RequestContext,
+  extractUserContext as extractV1UserContext,
+  createAuditContext as createV1AuditContext,
+  validateContext,
+  sanitizeContext
+} from "./context/request-context";
+export type { RequestContext as V1RequestContext, UserContext } from "./context/request-context";
 
 // Import functions for convenience exports
 import { makeLogger } from "./logger";

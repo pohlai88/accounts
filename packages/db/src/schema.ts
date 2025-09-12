@@ -225,6 +225,268 @@ export const taxCodes = pgTable("tax_codes", {
   tenantCompanyCodeIdx: index("tax_codes_tenant_company_code_idx").on(table.tenantId, table.companyId, table.code)
 }));
 
+// AP (Accounts Payable) - D3 Implementation
+export const suppliers = pgTable("suppliers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  supplierNumber: text("supplier_number").notNull(),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  billingAddress: jsonb("billing_address"),
+  shippingAddress: jsonb("shipping_address"),
+  currency: text("currency").notNull().references(() => currencies.code),
+  paymentTerms: text("payment_terms").notNull().default("NET_30"),
+  creditLimit: numeric("credit_limit", { precision: 18, scale: 2 }).default("0"),
+  taxId: text("tax_id"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyNumberIdx: index("suppliers_tenant_company_number_idx").on(table.tenantId, table.companyId, table.supplierNumber),
+  tenantCompanyEmailIdx: index("suppliers_tenant_company_email_idx").on(table.tenantId, table.companyId, table.email)
+}));
+
+export const bills = pgTable("ap_bills", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  supplierId: uuid("supplier_id").notNull().references(() => suppliers.id),
+  billNumber: text("bill_number").notNull(),
+  supplierInvoiceNumber: text("supplier_invoice_number"),
+  billDate: timestamp("bill_date", { withTimezone: true }).notNull(),
+  dueDate: timestamp("due_date", { withTimezone: true }).notNull(),
+  currency: text("currency").notNull().references(() => currencies.code),
+  exchangeRate: numeric("exchange_rate", { precision: 18, scale: 8 }).default("1"),
+  subtotal: numeric("subtotal", { precision: 18, scale: 2 }).default("0").notNull(),
+  taxAmount: numeric("tax_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  totalAmount: numeric("total_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  paidAmount: numeric("paid_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  balanceAmount: numeric("balance_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  status: text("status").default("draft").notNull(),
+  description: text("description"),
+  notes: text("notes"),
+  journalId: uuid("journal_id").references(() => journals.id),
+  createdBy: uuid("created_by").references(() => users.id),
+  postedBy: uuid("posted_by").references(() => users.id),
+  postedAt: timestamp("posted_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyNumberIdx: index("bills_tenant_company_number_idx").on(table.tenantId, table.companyId, table.billNumber),
+  tenantCompanySupplierIdx: index("bills_tenant_company_supplier_idx").on(table.tenantId, table.companyId, table.supplierId),
+  tenantCompanyDateIdx: index("bills_tenant_company_date_idx").on(table.tenantId, table.companyId, table.billDate),
+  statusIdx: index("bills_status_idx").on(table.status),
+  dueDateIdx: index("bills_due_date_idx").on(table.dueDate)
+}));
+
+export const billLines = pgTable("ap_bill_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  billId: uuid("bill_id").notNull().references(() => bills.id),
+  lineNumber: numeric("line_number").notNull(),
+  description: text("description").notNull(),
+  quantity: numeric("quantity", { precision: 18, scale: 4 }).default("1").notNull(),
+  unitPrice: numeric("unit_price", { precision: 18, scale: 4 }).notNull(),
+  lineAmount: numeric("line_amount", { precision: 18, scale: 2 }).notNull(),
+  taxCode: text("tax_code"),
+  taxRate: numeric("tax_rate", { precision: 5, scale: 4 }).default("0"),
+  taxAmount: numeric("tax_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  expenseAccountId: uuid("expense_account_id").notNull().references(() => chartOfAccounts.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  billLineIdx: index("bill_lines_bill_line_idx").on(table.billId, table.lineNumber)
+}));
+
+export const bankAccounts = pgTable("bank_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  accountNumber: text("account_number").notNull(),
+  accountName: text("account_name").notNull(),
+  bankName: text("bank_name").notNull(),
+  currency: text("currency").notNull().references(() => currencies.code),
+  accountType: text("account_type").default("CHECKING").notNull(),
+  glAccountId: uuid("gl_account_id").notNull().references(() => chartOfAccounts.id),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyIdx: index("bank_accounts_tenant_company_idx").on(table.tenantId, table.companyId)
+}));
+
+export const bankTransactions = pgTable("bank_transactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  bankAccountId: uuid("bank_account_id").notNull().references(() => bankAccounts.id),
+  transactionDate: timestamp("transaction_date", { withTimezone: true }).notNull(),
+  description: text("description").notNull(),
+  reference: text("reference"),
+  debitAmount: numeric("debit_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  creditAmount: numeric("credit_amount", { precision: 18, scale: 2 }).default("0").notNull(),
+  balance: numeric("balance", { precision: 18, scale: 2 }),
+  transactionType: text("transaction_type"),
+  isMatched: boolean("is_matched").notNull().default(false),
+  matchedPaymentId: uuid("matched_payment_id"),
+  importBatchId: text("import_batch_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  accountDateIdx: index("bank_transactions_account_date_idx").on(table.bankAccountId, table.transactionDate),
+  matchedIdx: index("bank_transactions_matched_idx").on(table.isMatched)
+}));
+
+export const payments = pgTable("payments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  paymentNumber: text("payment_number").notNull(),
+  paymentDate: timestamp("payment_date", { withTimezone: true }).notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  bankAccountId: uuid("bank_account_id").notNull().references(() => bankAccounts.id),
+  supplierId: uuid("supplier_id").references(() => suppliers.id),
+  customerId: uuid("customer_id").references(() => customers.id),
+  currency: text("currency").notNull().references(() => currencies.code),
+  exchangeRate: numeric("exchange_rate", { precision: 18, scale: 8 }).default("1"),
+  amount: numeric("amount", { precision: 18, scale: 2 }).notNull(),
+  reference: text("reference"),
+  description: text("description"),
+  status: text("status").default("draft").notNull(),
+  journalId: uuid("journal_id").references(() => journals.id),
+  createdBy: uuid("created_by").references(() => users.id),
+  postedBy: uuid("posted_by").references(() => users.id),
+  postedAt: timestamp("posted_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyNumberIdx: index("payments_tenant_company_number_idx").on(table.tenantId, table.companyId, table.paymentNumber),
+  tenantCompanyDateIdx: index("payments_tenant_company_date_idx").on(table.tenantId, table.companyId, table.paymentDate),
+  statusIdx: index("payments_status_idx").on(table.status)
+}));
+
+export const paymentAllocations = pgTable("payment_allocations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  paymentId: uuid("payment_id").notNull().references(() => payments.id),
+  billId: uuid("bill_id").references(() => bills.id),
+  invoiceId: uuid("invoice_id").references(() => invoices.id),
+  allocatedAmount: numeric("allocated_amount", { precision: 18, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  paymentIdx: index("payment_allocations_payment_idx").on(table.paymentId)
+}));
+
+// Financial Reporting & Period Management - D4 Implementation
+export const fiscalCalendars = pgTable("fiscal_calendars", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  calendarName: text("calendar_name").notNull(),
+  fiscalYearStart: timestamp("fiscal_year_start", { withTimezone: false }).notNull(),
+  fiscalYearEnd: timestamp("fiscal_year_end", { withTimezone: false }).notNull(),
+  periodType: text("period_type").notNull().default("MONTHLY"),
+  numberOfPeriods: numeric("number_of_periods").notNull().default("12"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyIdx: index("fiscal_calendars_tenant_company_idx").on(table.tenantId, table.companyId),
+  fiscalYearIdx: index("fiscal_calendars_fiscal_year_idx").on(table.fiscalYearStart, table.fiscalYearEnd)
+}));
+
+export const fiscalPeriods = pgTable("fiscal_periods", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  fiscalCalendarId: uuid("fiscal_calendar_id").notNull().references(() => fiscalCalendars.id),
+  periodNumber: numeric("period_number").notNull(),
+  periodName: text("period_name").notNull(),
+  startDate: timestamp("start_date", { withTimezone: false }).notNull(),
+  endDate: timestamp("end_date", { withTimezone: false }).notNull(),
+  fiscalYear: numeric("fiscal_year").notNull(),
+  quarter: numeric("quarter"),
+  status: text("status").notNull().default("OPEN"),
+  closedAt: timestamp("closed_at", { withTimezone: true }),
+  closedBy: uuid("closed_by").references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyIdx: index("fiscal_periods_tenant_company_idx").on(table.tenantId, table.companyId),
+  calendarPeriodIdx: index("fiscal_periods_calendar_period_idx").on(table.fiscalCalendarId, table.periodNumber),
+  dateRangeIdx: index("fiscal_periods_date_range_idx").on(table.startDate, table.endDate),
+  statusIdx: index("fiscal_periods_status_idx").on(table.status),
+  fiscalYearIdx: index("fiscal_periods_fiscal_year_idx").on(table.fiscalYear)
+}));
+
+export const periodLocks = pgTable("period_locks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  fiscalPeriodId: uuid("fiscal_period_id").notNull().references(() => fiscalPeriods.id),
+  lockType: text("lock_type").notNull(),
+  lockedAt: timestamp("locked_at", { withTimezone: true }).defaultNow(),
+  lockedBy: uuid("locked_by").notNull().references(() => users.id),
+  unlockRequestedAt: timestamp("unlock_requested_at", { withTimezone: true }),
+  unlockRequestedBy: uuid("unlock_requested_by").references(() => users.id),
+  unlockApprovedAt: timestamp("unlock_approved_at", { withTimezone: true }),
+  unlockApprovedBy: uuid("unlock_approved_by").references(() => users.id),
+  reason: text("reason"),
+  isActive: boolean("is_active").notNull().default(true)
+}, (table) => ({
+  tenantCompanyIdx: index("period_locks_tenant_company_idx").on(table.tenantId, table.companyId),
+  periodTypeIdx: index("period_locks_period_type_idx").on(table.fiscalPeriodId, table.lockType),
+  activeIdx: index("period_locks_active_idx").on(table.isActive)
+}));
+
+export const reversingEntries = pgTable("reversing_entries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  originalJournalId: uuid("original_journal_id").notNull().references(() => journals.id),
+  reversingJournalId: uuid("reversing_journal_id").references(() => journals.id),
+  reversalDate: timestamp("reversal_date", { withTimezone: false }).notNull(),
+  reversalReason: text("reversal_reason").notNull(),
+  status: text("status").notNull().default("PENDING"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  processedAt: timestamp("processed_at", { withTimezone: true })
+}, (table) => ({
+  tenantCompanyIdx: index("reversing_entries_tenant_company_idx").on(table.tenantId, table.companyId),
+  originalJournalIdx: index("reversing_entries_original_journal_idx").on(table.originalJournalId),
+  reversalDateIdx: index("reversing_entries_reversal_date_idx").on(table.reversalDate),
+  statusIdx: index("reversing_entries_status_idx").on(table.status)
+}));
+
+export const reportCache = pgTable("report_cache", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  reportType: text("report_type").notNull(),
+  reportParameters: jsonb("report_parameters").notNull(),
+  reportData: jsonb("report_data").notNull(),
+  generatedAt: timestamp("generated_at", { withTimezone: true }).defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  cacheKey: text("cache_key").notNull()
+}, (table) => ({
+  tenantCompanyIdx: index("report_cache_tenant_company_idx").on(table.tenantId, table.companyId),
+  typeKeyIdx: index("report_cache_type_key_idx").on(table.reportType, table.cacheKey),
+  expiresIdx: index("report_cache_expires_idx").on(table.expiresAt)
+}));
+
+export const reportDefinitions = pgTable("report_definitions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id),
+  companyId: uuid("company_id").notNull().references(() => companies.id),
+  reportName: text("report_name").notNull(),
+  reportType: text("report_type").notNull(),
+  reportConfig: jsonb("report_config").notNull(),
+  isDefault: boolean("is_default").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow()
+}, (table) => ({
+  tenantCompanyIdx: index("report_definitions_tenant_company_idx").on(table.tenantId, table.companyId),
+  typeIdx: index("report_definitions_type_idx").on(table.reportType),
+  activeIdx: index("report_definitions_active_idx").on(table.isActive)
+}));
+
 // Audit Logs (V1 Compliance Requirement)
 export const auditLogs = pgTable("audit_logs", {
   id: uuid("id").primaryKey().defaultRandom(),

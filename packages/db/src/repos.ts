@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { journals, journalLines, idempotencyKeys, chartOfAccounts, customers, invoices, invoiceLines, taxCodes } from "./schema";
-import { eq, and, inArray, desc, asc, gte, lte, like, count } from "drizzle-orm";
+import { eq, and, inArray, desc, asc, gte, lte, count } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -17,9 +17,9 @@ function getDb() {
   return _db;
 }
 
-export interface Scope { 
-  tenantId: string; 
-  companyId: string; 
+export interface Scope {
+  tenantId: string;
+  companyId: string;
   userId: string;
   userRole: string;
 }
@@ -29,12 +29,12 @@ export interface JournalInput {
   description?: string;
   journalDate: Date;
   currency: string;
-  lines: Array<{ 
-    accountId: string; 
-    debit: number; 
-    credit: number; 
-    description?: string; 
-    reference?: string 
+  lines: Array<{
+    accountId: string;
+    debit: number;
+    credit: number;
+    description?: string;
+    reference?: string
   }>;
   status?: 'draft' | 'posted' | 'pending_approval';
   idempotencyKey?: string;
@@ -69,7 +69,7 @@ export async function checkIdempotency(scope: Scope, idempotencyKey: string) {
 
 export async function insertJournal(scope: Scope, input: JournalInput) {
   // NOTE: RLS is enforced at DB level using tenant_id/company_id + JWT claims.
-  
+
   // 1. Check idempotency if key provided
   if (input.idempotencyKey) {
     const existing = await checkIdempotency(scope, input.idempotencyKey);
@@ -84,7 +84,7 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
 
   const totalDebit = input.lines.reduce((sum, line) => sum + line.debit, 0);
   const totalCredit = input.lines.reduce((sum, line) => sum + line.credit, 0);
-  
+
   // Validate balanced journal (V1 requirement)
   if (Math.abs(totalDebit - totalCredit) > 0.01) {
     throw new DatabaseError(
@@ -130,12 +130,12 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
     createdBy: scope.userId,
     postedAt: input.status === 'posted' ? new Date() : null
   }).returning({ id: journals.id });
-  
+
   const jid = j[0]?.id;
   if (!jid) {
     throw new DatabaseError('Failed to create journal entry', 'INSERT_FAILED');
   }
-  
+
   // 4. Insert journal lines
   for (const [index, line] of input.lines.entries()) {
     try {
@@ -155,7 +155,7 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
       );
     }
   }
-  
+
   // 5. Store idempotency key if provided
   if (input.idempotencyKey) {
     await db.insert(idempotencyKeys).values({
@@ -167,9 +167,9 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
     });
   }
-  
-  return { 
-    id: jid, 
+
+  return {
+    id: jid,
     journalNumber: input.journalNumber,
     status: input.status || 'draft',
     totalDebit,
@@ -226,11 +226,11 @@ export interface AccountInfo {
  * Fetch account information for validation
  */
 export async function getAccountsInfo(
-  scope: Scope, 
+  scope: Scope,
   accountIds: string[]
 ): Promise<Map<string, AccountInfo>> {
   const db = getDb();
-  
+
   const accounts = await db
     .select({
       id: chartOfAccounts.id,
@@ -252,7 +252,7 @@ export async function getAccountsInfo(
     );
 
   const accountMap = new Map<string, AccountInfo>();
-  
+
   for (const account of accounts) {
     accountMap.set(account.id, {
       id: account.id,
@@ -274,7 +274,7 @@ export async function getAccountsInfo(
  */
 export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {
   const db = getDb();
-  
+
   const accounts = await db
     .select({
       id: chartOfAccounts.id,
@@ -312,11 +312,11 @@ export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {
 export async function storeIdempotencyResult(
   scope: Scope,
   idempotencyKey: string,
-  response: any,
+  response: Record<string, unknown>,
   status: 'processing' | 'draft' | 'posted' | 'failed'
 ): Promise<void> {
   const db = getDb();
-  
+
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour TTL
 
@@ -344,13 +344,21 @@ export async function storeIdempotencyResult(
 // AR (Accounts Receivable) Repository Functions - D2 Implementation
 // ============================================================================
 
+export interface Address {
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 export interface CustomerInput {
   customerNumber: string;
   name: string;
   email?: string;
   phone?: string;
-  billingAddress?: Record<string, any>;
-  shippingAddress?: Record<string, any>;
+  billingAddress?: Address;
+  shippingAddress?: Address;
   currency: string;
   paymentTerms: string;
   creditLimit?: number;
@@ -435,7 +443,7 @@ export async function insertCustomer(scope: Scope, input: CustomerInput) {
  */
 export async function getCustomer(scope: Scope, customerId: string) {
   const db = getDb();
-  
+
   const result = await db
     .select()
     .from(customers)
@@ -457,6 +465,77 @@ export async function getCustomer(scope: Scope, customerId: string) {
   }
 
   return result[0];
+}
+
+/**
+ * Get tax code information by code
+ */
+export async function getTaxCode(scope: Scope, taxCodeString: string) {
+  const db = getDb();
+
+  const result = await db
+    .select({
+      id: taxCodes.id,
+      code: taxCodes.code,
+      name: taxCodes.name,
+      rate: taxCodes.rate,
+      taxType: taxCodes.taxType,
+      taxAccountId: taxCodes.taxAccountId,
+      isActive: taxCodes.isActive
+    })
+    .from(taxCodes)
+    .where(
+      and(
+        eq(taxCodes.tenantId, scope.tenantId),
+        eq(taxCodes.companyId, scope.companyId),
+        eq(taxCodes.code, taxCodeString),
+        eq(taxCodes.isActive, true)
+      )
+    )
+    .limit(1);
+
+  if (result.length === 0) {
+    throw new DatabaseError(
+      `Tax code not found: ${taxCodeString}`,
+      "TAX_CODE_NOT_FOUND",
+      { taxCode: taxCodeString }
+    );
+  }
+
+  return result[0];
+}
+
+/**
+ * Get multiple tax codes by their codes
+ */
+export async function getTaxCodes(scope: Scope, taxCodeStrings: string[]) {
+  if (taxCodeStrings.length === 0) {
+    return [];
+  }
+
+  const db = getDb();
+
+  const result = await db
+    .select({
+      id: taxCodes.id,
+      code: taxCodes.code,
+      name: taxCodes.name,
+      rate: taxCodes.rate,
+      taxType: taxCodes.taxType,
+      taxAccountId: taxCodes.taxAccountId,
+      isActive: taxCodes.isActive
+    })
+    .from(taxCodes)
+    .where(
+      and(
+        eq(taxCodes.tenantId, scope.tenantId),
+        eq(taxCodes.companyId, scope.companyId),
+        inArray(taxCodes.code, taxCodeStrings),
+        eq(taxCodes.isActive, true)
+      )
+    );
+
+  return result;
 }
 
 /**
@@ -560,10 +639,59 @@ export async function insertInvoice(scope: Scope, input: InvoiceInput) {
   };
 }
 
+// Proper type based on actual schema - core fields are never null due to notNull() constraints
+export interface InvoiceWithLines {
+  // Core invoice fields (never null due to schema constraints)
+  id: string;
+  tenantId: string;
+  companyId: string;
+  customerId: string;
+  invoiceNumber: string;
+  invoiceDate: Date;
+  dueDate: Date;
+  currency: string;
+  exchangeRate: string;
+  subtotal: string;
+  taxAmount: string;
+  totalAmount: string;
+  paidAmount: string;
+  balanceAmount: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Optional fields (can be null in schema)
+  description: string | null;
+  notes: string | null;
+  journalId: string | null;
+  createdBy: string | null;
+  postedBy: string | null;
+  postedAt: Date | null;
+
+  // Customer fields (from leftJoin - can be null)
+  customerName: string | null;
+  customerEmail: string | null;
+
+  // Invoice lines
+  lines: Array<{
+    id: string;
+    lineNumber: string;
+    description: string;
+    quantity: string;
+    unitPrice: string;
+    lineAmount: string;
+    taxCode: string | null;
+    taxRate: string | null;
+    taxAmount: string;
+    revenueAccountId: string;
+    revenueAccountName: string | null;
+  }>;
+}
+
 /**
  * Get invoice with lines
  */
-export async function getInvoice(scope: Scope, invoiceId: string) {
+export async function getInvoice(scope: Scope, invoiceId: string): Promise<InvoiceWithLines> {
   const db = getDb();
 
   // Get invoice
@@ -634,8 +762,42 @@ export async function getInvoice(scope: Scope, invoiceId: string) {
     .where(eq(invoiceLines.invoiceId, invoiceId))
     .orderBy(asc(invoiceLines.lineNumber));
 
+  const invoice = invoiceResult[0]!; // We know it exists because we checked above
+
+  // Cast to proper types based on schema knowledge
   return {
-    ...invoiceResult[0],
+    // Core fields are guaranteed to exist due to schema constraints
+    id: invoice.id!,
+    tenantId: invoice.tenantId!,
+    companyId: invoice.companyId!,
+    customerId: invoice.customerId!,
+    invoiceNumber: invoice.invoiceNumber!,
+    invoiceDate: invoice.invoiceDate!,
+    dueDate: invoice.dueDate!,
+    currency: invoice.currency!,
+    exchangeRate: invoice.exchangeRate!,
+    subtotal: invoice.subtotal!,
+    taxAmount: invoice.taxAmount!,
+    totalAmount: invoice.totalAmount!,
+    paidAmount: invoice.paidAmount!,
+    balanceAmount: invoice.balanceAmount!,
+    status: invoice.status!,
+    createdAt: invoice.createdAt!,
+    updatedAt: invoice.updatedAt!,
+
+    // Optional fields (preserve null possibility)
+    description: invoice.description,
+    notes: invoice.notes,
+    journalId: invoice.journalId,
+    createdBy: invoice.createdBy,
+    postedBy: invoice.postedBy,
+    postedAt: invoice.postedAt,
+
+    // Customer fields from leftJoin
+    customerName: invoice.customerName,
+    customerEmail: invoice.customerEmail,
+
+    // Lines
     lines: linesResult
   };
 }

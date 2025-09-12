@@ -1,5 +1,6 @@
 import { inngest } from "../inngestClient";
-import { renderPdf, createServiceClient, logger } from "@aibos/utils";
+import { createServiceClient, logger } from "@aibos/utils";
+import { renderPdf } from "@aibos/utils/server";
 
 // V1 PDF Generation with Puppeteer pool and health checks
 export const pdfGeneration = inngest.createFunction(
@@ -11,13 +12,13 @@ export const pdfGeneration = inngest.createFunction(
   },
   { event: "pdf/generate" },
   async ({ event, step }) => {
-    const { 
-      templateType, 
-      data, 
-      tenantId, 
-      companyId, 
-      entityId, 
-      entityType 
+    const {
+      templateType,
+      data,
+      tenantId,
+      companyId,
+      entityId,
+      entityType
     } = event.data;
 
     // Step 1: Validate input and prepare template
@@ -37,7 +38,7 @@ export const pdfGeneration = inngest.createFunction(
 
       // Generate HTML template based on type
       const html = await generateTemplate(templateType, data);
-      
+
       return {
         html,
         templateType,
@@ -55,7 +56,7 @@ export const pdfGeneration = inngest.createFunction(
     const pdfBuffer = await step.run("generate-pdf", async () => {
       try {
         const startTime = Date.now();
-        
+
         // V1 requirement: 45s timeout cap
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error("PDF generation timeout (45s)")), 45000);
@@ -74,13 +75,13 @@ export const pdfGeneration = inngest.createFunction(
         });
 
         const pdf = await Promise.race([pdfPromise, timeoutPromise]) as Buffer;
-        
+
         if (!Buffer.isBuffer(pdf)) {
           throw new Error("PDF generation did not return a Buffer");
         }
-        
+
         const duration = Date.now() - startTime;
-        
+
         logger.info("PDF generated successfully", {
           templateType: templateData.templateType,
           duration,
@@ -100,7 +101,7 @@ export const pdfGeneration = inngest.createFunction(
     // Step 3: Store PDF in Supabase Storage
     const storageResult = await step.run("store-pdf", async () => {
       const supabase = createServiceClient();
-      
+
       const fileName = `${templateData.templateType}-${entityId}-${Date.now()}.pdf`;
       const filePath = `${tenantId}/${companyId}/pdfs/${fileName}`;
 
@@ -141,7 +142,7 @@ export const pdfGeneration = inngest.createFunction(
       if (!entityId || !entityType) return;
 
       const supabase = createServiceClient();
-      
+
       try {
         // Store PDF reference in attachments table
         const { error } = await supabase

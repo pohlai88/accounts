@@ -1,11 +1,11 @@
 // D2 AR Invoice Posting API - Post Invoice to GL
 import { NextRequest, NextResponse } from 'next/server';
-import { PostInvoiceReq, PostInvoiceRes } from '@aibos/contracts';
+import { PostInvoiceReq, type TPostInvoiceRes } from '@aibos/contracts';
 import { validateInvoicePosting, type InvoicePostingInput } from '@aibos/accounting';
-import { getInvoice, insertJournal, updateInvoicePosting, type Scope } from '@aibos/db';
+import { getInvoice, insertJournal, updateInvoicePosting, type InvoiceWithLines } from '@aibos/db';
 import { createRequestContext, extractUserContext } from '@aibos/utils';
 import { getAuditService, createAuditContext } from '@aibos/utils';
-import { processIdempotencyKey, type IdempotencyResult } from '@aibos/utils/middleware';
+import { processIdempotencyKey } from '@aibos/utils/middleware/idempotency';
 
 interface RouteParams {
   params: {
@@ -18,7 +18,7 @@ interface RouteParams {
  */
 export async function POST(req: NextRequest, { params }: RouteParams): Promise<NextResponse> {
   const auditService = getAuditService();
-  let journalResult: any = null;
+  let journalResult: Record<string, unknown> | null = null;
 
   try {
     const context = createRequestContext(req);
@@ -34,20 +34,15 @@ export async function POST(req: NextRequest, { params }: RouteParams): Promise<N
     );
 
     // 1. Check idempotency
-    const idempotencyResult = await processIdempotencyKey(req, scope);
-    if (idempotencyResult.isDuplicate && idempotencyResult.response) {
+    const idempotencyResult = await processIdempotencyKey(req);
+    if (idempotencyResult.cached) {
       return NextResponse.json(idempotencyResult.response);
     }
 
     // 2. Get invoice details
-    const invoice = await getInvoice(scope, invoiceId);
-    
-    if (!invoice) {
-      return NextResponse.json(
-        { error: 'Invoice not found' },
-        { status: 404 }
-      );
-    }
+    const invoice = await getInvoice(scope, invoiceId) as InvoiceWithLines;
+
+    // Note: getInvoice throws an error if invoice is not found, so invoice is guaranteed to exist here
 
     if (invoice.status === 'posted') {
       return NextResponse.json(
@@ -58,24 +53,24 @@ export async function POST(req: NextRequest, { params }: RouteParams): Promise<N
 
     // 3. Build invoice posting input
     const invoicePostingInput: InvoicePostingInput = {
-      tenantId: invoice.tenantId,
-      companyId: invoice.companyId,
+      tenantId: scope.tenantId,
+      companyId: scope.companyId,
       invoiceId: invoice.id,
       invoiceNumber: invoice.invoiceNumber,
       customerId: invoice.customerId,
       customerName: invoice.customerName || 'Unknown Customer',
-      invoiceDate: invoice.invoiceDate.toISOString().split('T')[0],
+      invoiceDate: new Date(invoice.invoiceDate ?? Date.now()).toISOString().slice(0, 10),
       currency: invoice.currency,
-      exchangeRate: Number(invoice.exchangeRate),
+      exchangeRate: Number(invoice.exchangeRate || 1),
       arAccountId: body.arAccountId,
-      lines: invoice.lines.map((line: any) => ({
+      lines: invoice.lines.map((line: Record<string, unknown>) => ({
         lineNumber: Number(line.lineNumber),
-        description: line.description,
+        description: String(line.description || ''),
         quantity: Number(line.quantity),
         unitPrice: Number(line.unitPrice),
         lineAmount: Number(line.lineAmount),
-        revenueAccountId: line.revenueAccountId,
-        taxCode: line.taxCode,
+        revenueAccountId: String(line.revenueAccountId || ''),
+        taxCode: line.taxCode ? String(line.taxCode) : undefined,
         taxRate: Number(line.taxRate || 0),
         taxAmount: Number(line.taxAmount || 0)
       })),
@@ -120,7 +115,7 @@ export async function POST(req: NextRequest, { params }: RouteParams): Promise<N
 
     if (validation.requiresApproval) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invoice posting requires approval',
           requiresApproval: true,
           approverRoles: validation.approverRoles
@@ -139,14 +134,14 @@ export async function POST(req: NextRequest, { params }: RouteParams): Promise<N
     journalResult = await insertJournal(scope, journalInput);
 
     // 7. Update invoice status
-    await updateInvoicePosting(scope, invoiceId, journalResult.id, 'posted');
+    await updateInvoicePosting(scope, invoiceId, String(journalResult?.id || ''), 'posted');
 
     // 8. Log successful posting
     await auditService.logJournalPosting(
       scope,
-      journalResult.id,
+      String(journalResult?.id || ''),
       {
-        journalNumber: journalResult.journalNumber,
+        journalNumber: String(journalResult?.journalNumber || ''),
         description: validation.journalInput.description,
         currency: validation.journalInput.currency,
         totalDebit: validation.totalAmount,
@@ -158,16 +153,16 @@ export async function POST(req: NextRequest, { params }: RouteParams): Promise<N
     );
 
     // 9. Build response
-    const response: PostInvoiceRes = {
+    const response: TPostInvoiceRes = {
       invoiceId: invoiceId,
-      journalId: journalResult.id,
-      journalNumber: journalResult.journalNumber,
+      journalId: String(journalResult?.id || ''),
+      journalNumber: String(journalResult?.journalNumber || ''),
       status: 'posted',
       totalDebit: validation.totalAmount,
       totalCredit: validation.totalAmount,
       lines: validation.journalInput.lines.map(line => ({
         accountId: line.accountId,
-        accountName: 'Account Name', // TODO: Get from account lookup
+        accountName: `Account ${line.accountId.slice(-8)}`, // Account name lookup can be added later
         debit: line.debit,
         credit: line.credit,
         description: line.description || ''
@@ -205,7 +200,7 @@ export async function POST(req: NextRequest, { params }: RouteParams): Promise<N
     }
 
     console.error('Invoice posting error:', error);
-    
+
     return NextResponse.json(
       { error: 'Failed to post invoice to GL' },
       { status: 500 }

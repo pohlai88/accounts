@@ -1,8 +1,15 @@
 -- =====================================================
 -- AIBOS V1 SUPABASE SETUP - COMPLETE DATABASE SCHEMA
 -- =====================================================
--- Run this entire file in your Supabase SQL Editor
--- This creates the complete V1-compliant database structure
+-- ⚠️  DEPRECATED: Use separate migration files instead
+-- 
+-- For clean deployment, use these files in order:
+-- 1. 01_d1_setup.sql      (Core foundation)
+-- 2. 02_d2_ar_migration.sql (AR features)
+-- 
+-- This combined file is kept for reference but may cause
+-- execution errors due to mixed D1/D2 structure.
+-- =====================================================
 
 -- 1. CREATE TABLES
 -- ================

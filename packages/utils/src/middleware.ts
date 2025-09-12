@@ -17,14 +17,14 @@ export interface RequestContext {
 
 export function createRequestContext(request: NextRequest): RequestContext {
   const request_id = crypto.randomUUID()
-  
+
   // Extract tenant/company from headers or JWT
-  const tenant_id = request.headers.get('x-tenant-id') || 
-                   extractFromJWT(request, 'tenant_id')
-  const company_id = request.headers.get('x-company-id') || 
-                    extractFromJWT(request, 'company_id')
-  const user_id = request.headers.get('x-user-id') || 
-                 extractFromJWT(request, 'sub')
+  const tenant_id = request.headers.get('x-tenant-id') ||
+    extractFromJWT(request, 'tenant_id')
+  const company_id = request.headers.get('x-company-id') ||
+    extractFromJWT(request, 'company_id')
+  const user_id = request.headers.get('x-user-id') ||
+    extractFromJWT(request, 'sub')
   const user_role = extractFromJWT(request, 'role')
 
   return {
@@ -53,7 +53,7 @@ export function withRequestLogging(
     })
 
     const startTime = Date.now()
-    
+
     // Log request start
     logger.info('Request started', {
       method: context.method,
@@ -66,7 +66,7 @@ export function withRequestLogging(
     try {
       const response = await handler(request, context)
       const duration = Date.now() - startTime
-      
+
       // Log successful response
       logger.info('Request completed', {
         method: context.method,
@@ -78,11 +78,11 @@ export function withRequestLogging(
 
       // Add request ID to response headers
       response.headers.set('x-request-id', context.request_id)
-      
+
       return response
     } catch (error) {
       const duration = Date.now() - startTime
-      
+
       // Log error
       logger.error('Request failed', {
         method: context.method,
@@ -91,7 +91,7 @@ export function withRequestLogging(
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
       })
-      
+
       throw error
     }
   }
@@ -158,7 +158,7 @@ function extractFromJWT(request: NextRequest, claim: string): string | null {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) return null
-    
+
     const token = authHeader.substring(7)
     const tokenPart = token.split('.')[1];
     if (!tokenPart) return null;
@@ -172,14 +172,45 @@ function extractFromJWT(request: NextRequest, claim: string): string | null {
 function getClientIP(request: NextRequest): string | undefined {
   const forwarded = request.headers.get('x-forwarded-for')
   const realIP = request.headers.get('x-real-ip')
-  
+
   if (forwarded) {
     return forwarded.split(',')[0]?.trim()
   }
-  
+
   if (realIP) {
     return realIP
   }
-  
+
   return request.ip
+}
+
+/**
+ * Extract user context for database operations (Scope interface)
+ */
+export function extractUserContext(request: NextRequest): {
+  tenantId: string;
+  companyId: string;
+  userId: string;
+  userRole: string;
+} {
+  const context = createRequestContext(request);
+
+  if (!context.tenant_id) {
+    throw new Error('Missing tenant_id in request context');
+  }
+
+  if (!context.company_id) {
+    throw new Error('Missing company_id in request context');
+  }
+
+  if (!context.user_id) {
+    throw new Error('Missing user_id in request context');
+  }
+
+  return {
+    tenantId: context.tenant_id,
+    companyId: context.company_id,
+    userId: context.user_id,
+    userRole: context.user_role || 'user'
+  };
 }

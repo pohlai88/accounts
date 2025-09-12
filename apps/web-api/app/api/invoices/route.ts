@@ -1,18 +1,18 @@
 // D2 AR Invoice API - Create and Post Invoices to GL
 import { NextRequest, NextResponse } from 'next/server';
-import { CreateInvoiceReq, CreateInvoiceRes, PostInvoiceReq, PostInvoiceRes } from '@aibos/contracts';
-import { validateInvoicePosting, calculateInvoiceTotals, validateInvoiceLines } from '@aibos/accounting';
-import { insertInvoice, insertJournal, updateInvoicePosting, type Scope, type InvoiceInput } from '@aibos/db';
+import { CreateInvoiceReq } from '@aibos/contracts';
+import { calculateInvoiceTotals, validateInvoiceLines, calculateInvoiceTaxes } from '@aibos/accounting';
+import { insertInvoice, type InvoiceInput } from '@aibos/db';
 import { createRequestContext, extractUserContext } from '@aibos/utils';
 import { getAuditService, createAuditContext } from '@aibos/utils';
-import { processIdempotencyKey, type IdempotencyResult } from '@aibos/utils/middleware';
+import { processIdempotencyKey } from '@aibos/utils/middleware/idempotency';
 
 /**
  * POST /api/invoices - Create new invoice
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const auditService = getAuditService();
-  let invoiceResult: any = null;
+  let invoiceResult: Record<string, unknown> | null = null;
 
   try {
     const context = createRequestContext(req);
@@ -26,17 +26,30 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       'API'
     );
 
-    // 1. Validate invoice lines calculations
-    const lineValidation = validateInvoiceLines(body.lines.map(line => ({
+    // 1. Check idempotency
+    const idempotencyResult = await processIdempotencyKey(req);
+    if (idempotencyResult.cached) {
+      return NextResponse.json(idempotencyResult.response);
+    }
+
+    // 2. Calculate taxes for all lines
+    const lineTaxCalculations = await calculateInvoiceTaxes(scope, body.lines.map(line => ({
       lineNumber: line.lineNumber,
-      description: line.description,
-      quantity: line.quantity,
-      unitPrice: line.unitPrice,
-      lineAmount: line.quantity * line.unitPrice, // Calculate line amount
-      taxCode: line.taxCode,
-      taxRate: 0, // TODO: Resolve tax rate from tax code
-      taxAmount: 0, // TODO: Calculate tax amount
-      revenueAccountId: line.revenueAccountId
+      lineAmount: line.quantity * line.unitPrice,
+      taxCode: line.taxCode
+    })));
+
+    // 2. Validate invoice lines calculations with calculated taxes
+    const lineValidation = validateInvoiceLines(lineTaxCalculations.map(calc => ({
+      lineNumber: calc.lineNumber,
+      description: body.lines.find(l => l.lineNumber === calc.lineNumber)?.description || '',
+      quantity: body.lines.find(l => l.lineNumber === calc.lineNumber)?.quantity || 0,
+      unitPrice: body.lines.find(l => l.lineNumber === calc.lineNumber)?.unitPrice || 0,
+      lineAmount: calc.lineAmount,
+      taxCode: calc.taxCode,
+      taxRate: calc.taxRate,
+      taxAmount: calc.taxAmount,
+      revenueAccountId: body.lines.find(l => l.lineNumber === calc.lineNumber)?.revenueAccountId || ''
     })));
 
     if (!lineValidation.valid) {
@@ -45,9 +58,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         action: 'CREATE',
         entityType: 'INVOICE',
         entityId: 'validation-failed',
-        metadata: { 
+        metadata: {
           errors: lineValidation.errors,
-          invoiceNumber: body.invoiceNumber 
+          invoiceNumber: body.invoiceNumber
         },
         context: auditContext
       });
@@ -58,20 +71,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // 2. Calculate invoice totals
-    const totals = calculateInvoiceTotals(body.lines.map(line => ({
-      lineNumber: line.lineNumber,
-      description: line.description,
-      quantity: line.quantity,
-      unitPrice: line.unitPrice,
-      lineAmount: line.quantity * line.unitPrice,
-      taxCode: line.taxCode,
-      taxRate: 0, // TODO: Resolve from tax code
-      taxAmount: 0, // TODO: Calculate
-      revenueAccountId: line.revenueAccountId
+    // 3. Calculate invoice totals with actual tax amounts
+    const totals = calculateInvoiceTotals(lineTaxCalculations.map(calc => ({
+      lineNumber: calc.lineNumber,
+      description: body.lines.find(l => l.lineNumber === calc.lineNumber)?.description || '',
+      quantity: body.lines.find(l => l.lineNumber === calc.lineNumber)?.quantity || 0,
+      unitPrice: body.lines.find(l => l.lineNumber === calc.lineNumber)?.unitPrice || 0,
+      lineAmount: calc.lineAmount,
+      taxCode: calc.taxCode,
+      taxRate: calc.taxRate,
+      taxAmount: calc.taxAmount,
+      revenueAccountId: body.lines.find(l => l.lineNumber === calc.lineNumber)?.revenueAccountId || ''
     })));
 
-    // 3. Create invoice input
+    // 4. Create invoice input with calculated taxes
     const invoiceInput: InvoiceInput = {
       customerId: body.customerId,
       invoiceNumber: body.invoiceNumber,
@@ -81,17 +94,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       exchangeRate: body.exchangeRate,
       description: body.description,
       notes: body.notes,
-      lines: body.lines.map(line => ({
-        lineNumber: line.lineNumber,
-        description: line.description,
-        quantity: line.quantity,
-        unitPrice: line.unitPrice,
-        lineAmount: line.quantity * line.unitPrice,
-        taxCode: line.taxCode,
-        taxRate: 0, // TODO: Resolve from tax code
-        taxAmount: 0, // TODO: Calculate
-        revenueAccountId: line.revenueAccountId
-      }))
+      lines: lineTaxCalculations.map(calc => {
+        const originalLine = body.lines.find(l => l.lineNumber === calc.lineNumber);
+        if (!originalLine) {
+          throw new Error(`Original line not found for line number ${calc.lineNumber}`);
+        }
+        return {
+          lineNumber: calc.lineNumber,
+          description: originalLine.description,
+          quantity: originalLine.quantity,
+          unitPrice: originalLine.unitPrice,
+          lineAmount: calc.lineAmount,
+          taxCode: calc.taxCode,
+          taxRate: calc.taxRate,
+          taxAmount: calc.taxAmount,
+          revenueAccountId: originalLine.revenueAccountId
+        };
+      })
     };
 
     // 4. Insert invoice
@@ -102,7 +121,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       scope,
       action: 'CREATE',
       entityType: 'INVOICE',
-      entityId: invoiceResult.id,
+      entityId: invoiceResult.id as string,
       metadata: {
         invoiceNumber: invoiceResult.invoiceNumber,
         customerId: body.customerId,
@@ -114,11 +133,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     // 6. Build response
-    const response: CreateInvoiceRes = {
+    const response = {
       id: invoiceResult.id,
       invoiceNumber: invoiceResult.invoiceNumber,
       customerId: body.customerId,
-      customerName: 'Customer Name', // TODO: Get from customer lookup
+      customerName: invoiceResult.customerName || 'Unknown Customer',
       invoiceDate: body.invoiceDate,
       dueDate: body.dueDate,
       currency: body.currency,
@@ -126,13 +145,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       taxAmount: totals.taxAmount,
       totalAmount: totals.totalAmount,
       status: 'draft',
-      lines: invoiceResult.lines.map((line: any) => ({
+      lines: (invoiceResult.lines as Array<Record<string, unknown>>).map((line) => ({
         id: line.id,
         lineNumber: Number(line.lineNumber),
         description: line.description,
         quantity: Number(line.quantity),
         unitPrice: Number(line.unitPrice),
         lineAmount: Number(line.lineAmount),
+        taxCode: line.taxCode,
+        taxRate: Number(line.taxRate || 0),
         taxAmount: Number(line.taxAmount),
         revenueAccountId: line.revenueAccountId
       })),
@@ -169,7 +190,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     console.error('Invoice creation error:', error);
-    
+
     if (error instanceof Error && error.message.includes('already exists')) {
       return NextResponse.json(
         { error: 'Invoice number already exists' },

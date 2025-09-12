@@ -61,6 +61,22 @@ export const SOD_MATRIX: Record<string, SoDRule> = {
     approverRoles: ['admin']
   },
 
+  // Financial Reporting Operations (D4 V1 compliance)
+  'report:generate': {
+    action: 'Generate Financial Reports',
+    requiredRole: ['accountant', 'manager', 'admin'],
+  },
+  'report:export': {
+    action: 'Export Financial Reports',
+    requiredRole: ['manager', 'admin'],
+    requiresApproval: true,
+    approverRoles: ['admin']
+  },
+  'report:view_sensitive': {
+    action: 'View Sensitive Financial Data',
+    requiredRole: ['manager', 'admin'],
+  },
+
   // Chart of Accounts
   'coa:modify': {
     action: 'Modify Chart of Accounts',
@@ -79,31 +95,31 @@ export const SOD_MATRIX: Record<string, SoDRule> = {
 };
 
 export function checkSoDCompliance(
-  action: string, 
-  userRole: string, 
+  action: string,
+  userRole: string,
   creatorRole?: string
 ): { allowed: boolean; requiresApproval: boolean; reason?: string } {
   const rule = SOD_MATRIX[action];
-  
+
   if (!rule) {
     return { allowed: false, requiresApproval: false, reason: 'Unknown action' };
   }
 
   // Check if user has required role
   if (!rule.requiredRole.includes(userRole)) {
-    return { 
-      allowed: false, 
-      requiresApproval: false, 
-      reason: `Role '${userRole}' not authorized for '${rule.action}'` 
+    return {
+      allowed: false,
+      requiresApproval: false,
+      reason: `Role '${userRole}' not authorized for '${rule.action}'`
     };
   }
 
   // Check for conflicting roles (SoD violation)
   if (creatorRole && rule.conflictingRoles?.includes(creatorRole)) {
-    return { 
-      allowed: false, 
-      requiresApproval: false, 
-      reason: `SoD violation: '${creatorRole}' cannot approve their own work` 
+    return {
+      allowed: false,
+      requiresApproval: false,
+      reason: `SoD violation: '${creatorRole}' cannot approve their own work`
     };
   }
 
