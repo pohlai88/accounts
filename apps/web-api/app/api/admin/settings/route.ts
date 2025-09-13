@@ -143,7 +143,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
 
         if (error instanceof z.ZodError) {
             return NextResponse.json(
-                { success: false, error: 'Validation error', details: error.errors },
+                { success: false, error: 'Validation error', details: error.issues },
                 { status: 400 }
             );
         }
@@ -223,7 +223,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
 
         if (error instanceof z.ZodError) {
             return NextResponse.json(
-                { success: false, error: 'Validation error', details: error.errors },
+                { success: false, error: 'Validation error', details: error.issues },
                 { status: 400 }
             );
         }

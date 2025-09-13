@@ -10,12 +10,12 @@ vi.mock('../src/supabase/client');
 
 describe('AttachmentService', () => {
   let attachmentService: AttachmentService;
-  let mockSupabase: any;
+  let mockSupabase: Record<string, unknown>;
 
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
-    
+
     // Create mock Supabase client
     mockSupabase = {
       storage: {
@@ -34,7 +34,7 @@ describe('AttachmentService', () => {
       single: vi.fn()
     };
 
-    (createServiceClient as any).mockReturnValue(mockSupabase);
+    (createServiceClient as unknown as { mockReturnValue: (value: unknown) => void }).mockReturnValue(mockSupabase);
     attachmentService = new AttachmentService();
   });
 
@@ -193,7 +193,7 @@ describe('AttachmentService', () => {
         tenant_id: 'tenant-123'
       };
 
-      const mockFileData = new Blob(['file content'], { type: 'application/pdf' });
+      const mockFileData = new globalThis.Blob(['file content'], { type: 'application/pdf' });
 
       // Mock database query
       mockSupabase.single.mockResolvedValue({
@@ -267,7 +267,7 @@ describe('AttachmentService', () => {
     });
 
     it('should enforce tenant isolation', async () => {
-      const result = await attachmentService.downloadFile(
+      await attachmentService.downloadFile(
         'attachment-123',
         'different-tenant',
         'user-789'
@@ -464,7 +464,7 @@ describe('AttachmentService', () => {
 
     it('should validate file size limits', async () => {
       const largeFile = Buffer.alloc(100 * 1024 * 1024); // 100MB
-      
+
       const result = await attachmentService.uploadFile(
         largeFile,
         'large-file.pdf',

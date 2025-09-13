@@ -1,6 +1,7 @@
 import { inngest } from "../inngestClient";
 import { createServiceClient, logger, getV1AuditService, createV1AuditContext } from "@aibos/utils";
-import { RetentionPolicyReq, ApplyRetentionPolicyReq, RetentionStatusRes } from "@aibos/contracts";
+// Note: These types will be used when implementing full document retention
+// import { RetentionPolicyReq, ApplyRetentionPolicyReq, RetentionStatusRes } from "@aibos/contracts";
 
 // V1 Document Retention System with Compliance-based Policies
 // Supports automated retention, legal holds, and compliance reporting
@@ -35,7 +36,7 @@ export const documentRetentionPolicy = inngest.createFunction(
     const auditContext = createV1AuditContext({
       url: `/retention/policy`,
       method: 'POST',
-      headers: new Headers(),
+      headers: new globalThis.Headers(),
       ip: 'worker'
     } as any);
 
@@ -249,7 +250,7 @@ export const documentRetentionMonitor = inngest.createFunction(
     const auditContext = createV1AuditContext({
       url: `/retention/monitor`,
       method: 'POST',
-      headers: new Headers(),
+      headers: new globalThis.Headers(),
       ip: 'worker'
     } as any);
 
@@ -524,7 +525,7 @@ export const documentLegalHold = inngest.createFunction(
     const auditContext = createV1AuditContext({
       url: `/retention/legal-hold`,
       method: 'POST',
-      headers: new Headers(),
+      headers: new globalThis.Headers(),
       ip: 'worker'
     } as any);
 

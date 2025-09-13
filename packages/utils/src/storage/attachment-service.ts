@@ -19,9 +19,10 @@ interface AttachmentDbRecord {
   metadata: Record<string, unknown>;
 }
 
-interface AttachmentQueryResult {
-  attachments: AttachmentDbRecord;
-}
+// Note: This interface will be used when implementing full attachment queries
+// interface AttachmentQueryResult {
+//   attachments: AttachmentDbRecord;
+// }
 
 export interface UploadOptions {
   tenantId: string;
@@ -361,9 +362,9 @@ export class AttachmentService {
         return [];
       }
 
-      return (data as any[])
-        .filter((item: any) => item.attachments)
-        .map((item: any) => ({
+      return (data as Array<{ attachments: any }>)
+        .filter((item) => item.attachments)
+        .map((item) => ({
           id: item.attachments.id,
           filename: item.attachments.filename,
           originalFilename: item.attachments.original_filename,

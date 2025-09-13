@@ -1,0 +1,18 @@
+cache = true
+max_cache_age = "2d"
+timeout = 15
+max_redirects = 5
+max_concurrency = 4
+retry_wait_time = 3
+retries = 3
+user_agent = "AI-BOS-Docs-LinkChecker/1.0"
+
+exclude = [
+  "http://localhost:*",
+  "https://localhost:*",
+  "http://127.0.0.1:*",
+  "mailto:*",
+  "https://example.com/*"
+]
+
+accepted = [200,201,204,301,302,303,307,308]

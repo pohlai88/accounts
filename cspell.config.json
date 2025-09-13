@@ -1,0 +1,97 @@
+{
+    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+    "version": "0.2",
+    "language": "en",
+    "ignorePaths": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/coverage/**",
+      "**/.turbo/**",
+      "**/.vercel/**",
+      "**/.pnpm/**",
+      "**/*.lock",
+      "**/*.log",
+      "**/.git/**",
+      "**/.cache/**",
+      "**/*.min.*",
+      "**/*.svg",
+      "**/*.png",
+      "**/*.jpg",
+      "**/*.ico"
+    ],
+    "dictionaryDefinitions": [
+      {
+        "name": "workspace",
+        "path": "./.cspell-workspace.txt",
+        "addWords": true
+      }
+    ],
+    "dictionaries": ["workspace"],
+    "enableFiletypes": [
+      "cjs",
+      "cts",
+      "js",
+      "jsx",
+      "ts",
+      "tsx",
+      "json",
+      "jsonc",
+      "md",
+      "mdx",
+      "yaml",
+      "yml",
+      "graphql",
+      "dockerfile",
+      "sh"
+    ],
+    "words": [
+      "aibos",
+      "supabase",
+      "drizzle",
+      "turborepo",
+      "eslint",
+      "prettier",
+      "posthog",
+      "zod",
+      "vitest",
+      "playwright",
+      "retool",
+      "framer",
+      "zustand",
+      "storybook",
+      "docusaurus",
+      "typedoc",
+      "typescript",
+      "tailwind",
+      "radix",
+      "vite",
+      "vercel",
+      "cursor"
+    ],
+    "ignoreWords": [
+      "TODO",
+      "FIXME",
+      "XXX",
+      "tmp"
+    ],
+    "overrides": [
+      {
+        "filename": "**/*.md",
+        "words": ["mermaid", "mdx", "readme"]
+      },
+      {
+        "filename": "**/*.ts",
+        "words": ["dto", "uuid", "config"]
+      },
+      {
+        "filename": "**/package.json",
+        "ignoreRegExpList": ["/\"version\":\\s*\"[0-9.]+\"/"]
+      }
+    ],
+    "useGitignore": true,
+    "allowCompoundWords": true,
+    "caseSensitive": false
+  }
+  

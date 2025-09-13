@@ -15,7 +15,7 @@ import { UpdateAttachmentReq } from '@aibos/contracts';
 const MetadataUpdateSchema = z.object({
     tenantId: z.string().uuid(),
     attachmentId: z.string().uuid(),
-    metadata: z.record(z.unknown()),
+    metadata: z.record(z.string(), z.unknown()),
     operation: z.enum(['merge', 'replace', 'delete_keys']).optional().default('merge'),
     keysToDelete: z.array(z.string()).optional()
 });
@@ -151,7 +151,7 @@ export async function PUT(request: NextRequest) {
 
         if (error instanceof z.ZodError) {
             return NextResponse.json(
-                { error: 'Invalid request parameters', details: error.errors },
+                { error: 'Invalid request parameters', details: error.issues },
                 { status: 400 }
             );
         }
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
             operations: z.array(z.object({
                 attachmentId: z.string().uuid(),
                 operation: z.enum(['merge', 'replace', 'delete_keys']),
-                metadata: z.record(z.unknown()).optional(),
+                metadata: z.record(z.string(), z.unknown()).optional(),
                 keysToDelete: z.array(z.string()).optional()
             })).min(1).max(50) // Limit bulk operations
         });
@@ -436,7 +436,7 @@ export async function POST(request: NextRequest) {
 
         if (error instanceof z.ZodError) {
             return NextResponse.json(
-                { error: 'Invalid request parameters', details: error.errors },
+                { error: 'Invalid request parameters', details: error.issues },
                 { status: 400 }
             );
         }

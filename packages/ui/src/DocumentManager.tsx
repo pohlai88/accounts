@@ -1,10 +1,10 @@
 import * as React from "react";
-import { TOKENS } from "./tokens";
 import { FileUpload } from "./FileUpload";
 import { DocumentPreview } from "./DocumentPreview";
+import { cn } from "./utils";
 
-// V1 Compliance: Document Management Interface
-// Categorization, tagging, search, filtering with accessibility
+// SSOT Compliant Document Management Interface
+// Uses semantic tokens throughout, no inline styles
 
 export interface DocumentItem {
   id: string;
@@ -21,16 +21,16 @@ export interface DocumentItem {
   createdAt: string;
   updatedAt: string;
   storageUrl?: string;
-  
+
   // OCR and processing
   ocrStatus?: string;
   ocrData?: Record<string, unknown>;
-  
+
   // Approval workflow
   approvalStatus?: string;
   approvedBy?: string;
   approvedAt?: string;
-  
+
   // Relationships
   relationships?: Array<{
     entityType: string;
@@ -47,24 +47,14 @@ export interface DocumentManagerProps {
   onUpdate?: (documentId: string, updates: Partial<DocumentItem>) => Promise<void>;
   onDownload?: (documentId: string) => Promise<void>;
   onPreview?: (documentId: string) => void;
-  
-  // Configuration
-  allowUpload?: boolean;
-  allowDelete?: boolean;
-  allowEdit?: boolean;
-  categories?: string[];
-  entityType?: string;
-  entityId?: string;
-  
-  // UI customization
-  className?: string;
   showSearch?: boolean;
   showFilters?: boolean;
-  showBulkActions?: boolean;
-  viewMode?: 'list' | 'grid' | 'table';
+  showUpload?: boolean;
+  showPreview?: boolean;
+  className?: string;
 }
 
-export interface DocumentManagerState {
+interface DocumentManagerState {
   searchQuery: string;
   selectedCategory: string;
   selectedStatus: string;
@@ -73,103 +63,60 @@ export interface DocumentManagerState {
   sortOrder: 'asc' | 'desc';
   selectedDocuments: Set<string>;
   previewDocument: DocumentItem | null;
-  isUploading: boolean;
-  viewMode: 'list' | 'grid' | 'table';
+  showPreview: boolean;
 }
 
-const DEFAULT_CATEGORIES = [
-  'invoice',
-  'receipt', 
-  'contract',
-  'report',
-  'statement',
-  'tax_document',
-  'bank_document',
-  'legal_document',
-  'correspondence',
-  'other'
-];
-
-const DEFAULT_STATUSES = ['active', 'archived', 'deleted', 'processing'];
-
-export function DocumentManager({
+export const DocumentManager: React.FC<DocumentManagerProps> = ({
   documents,
   onUpload,
   onDelete,
   onUpdate,
   onDownload,
   onPreview,
-  allowUpload = true,
-  allowDelete = true,
-  allowEdit = true,
-  categories = DEFAULT_CATEGORIES,
-  entityType,
-  entityId,
-  className = "",
   showSearch = true,
   showFilters = true,
-  showBulkActions = true,
-  viewMode: initialViewMode = 'list'
-}: DocumentManagerProps) {
+  showUpload = true,
+  showPreview = true,
+  className
+}) => {
   const [state, setState] = React.useState<DocumentManagerState>({
     searchQuery: '',
-    selectedCategory: '',
-    selectedStatus: '',
+    selectedCategory: 'all',
+    selectedStatus: 'all',
     selectedTags: [],
     sortBy: 'createdAt',
     sortOrder: 'desc',
     selectedDocuments: new Set(),
     previewDocument: null,
-    isUploading: false,
-    viewMode: initialViewMode
+    showPreview: false
   });
-
-  // Get all available tags from documents
-  const availableTags = React.useMemo(() => {
-    const tagSet = new Set<string>();
-    documents.forEach(doc => {
-      doc.tags?.forEach(tag => tagSet.add(tag));
-    });
-    return Array.from(tagSet).sort();
-  }, [documents]);
 
   // Filter and sort documents
   const filteredDocuments = React.useMemo(() => {
     let filtered = documents.filter(doc => {
-      // Search query filter
+      // Search filter
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase();
-        const searchableText = [
-          doc.filename,
-          doc.originalFilename,
-          doc.category,
-          ...(doc.tags || []),
-          doc.uploadedByName || ''
-        ].join(' ').toLowerCase();
-        
-        if (!searchableText.includes(query)) {
+        if (!doc.filename.toLowerCase().includes(query) &&
+          !doc.originalFilename.toLowerCase().includes(query)) {
           return false;
         }
       }
 
       // Category filter
-      if (state.selectedCategory && doc.category !== state.selectedCategory) {
+      if (state.selectedCategory !== 'all' && doc.category !== state.selectedCategory) {
         return false;
       }
 
       // Status filter
-      if (state.selectedStatus && doc.status !== state.selectedStatus) {
+      if (state.selectedStatus !== 'all' && doc.status !== state.selectedStatus) {
         return false;
       }
 
       // Tags filter
       if (state.selectedTags.length > 0) {
-        const hasAllTags = state.selectedTags.every(tag => 
-          doc.tags?.includes(tag)
-        );
-        if (!hasAllTags) {
-          return false;
-        }
+        const hasMatchingTag = state.selectedTags.some(tag => doc.tags.includes(tag));
+        if (!hasMatchingTag) return false;
       }
 
       return true;
@@ -177,86 +124,111 @@ export function DocumentManager({
 
     // Sort documents
     filtered.sort((a, b) => {
-      let aValue: unknown = a[state.sortBy as keyof DocumentItem];
-      let bValue: unknown = b[state.sortBy as keyof DocumentItem];
+      let aValue: any = a[state.sortBy as keyof DocumentItem];
+      let bValue: any = b[state.sortBy as keyof DocumentItem];
 
-      // Handle different data types
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        const aStr = aValue.toLowerCase();
-        const bStr = bValue.toLowerCase();
-        if (aStr < bStr) return state.sortOrder === 'asc' ? -1 : 1;
-        if (aStr > bStr) return state.sortOrder === 'asc' ? 1 : -1;
-        return 0;
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
       }
 
-      // For non-string comparisons, convert to string for comparison
-      const aStr = String(aValue || '').toLowerCase();
-      const bStr = String(bValue || '').toLowerCase();
-      if (aStr < bStr) return state.sortOrder === 'asc' ? -1 : 1;
-      if (aStr > bStr) return state.sortOrder === 'asc' ? 1 : -1;
-      return 0;
+      if (state.sortOrder === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
     });
 
     return filtered;
-  }, [documents, state.searchQuery, state.selectedCategory, state.selectedStatus, state.selectedTags, state.sortBy, state.sortOrder]);
+  }, [documents, state]);
 
-  // Handle file upload
-  const handleFileUpload = async (files: File[]) => {
-    if (!onUpload) return;
-    
-    setState(prev => ({ ...prev, isUploading: true }));
-    try {
+  // Get unique categories and tags
+  const categories = React.useMemo(() => {
+    const cats = new Set(documents.map(doc => doc.category));
+    return Array.from(cats).sort();
+  }, [documents]);
+
+  const tags = React.useMemo(() => {
+    const allTags = documents.flatMap(doc => doc.tags);
+    return Array.from(new Set(allTags)).sort();
+  }, [documents]);
+
+  const statuses = React.useMemo(() => {
+    const stats = new Set(documents.map(doc => doc.status));
+    return Array.from(stats).sort();
+  }, [documents]);
+
+  // Event handlers
+  const handleUpload = async (files: File[]) => {
+    if (onUpload) {
       await onUpload(files);
-    } finally {
-      setState(prev => ({ ...prev, isUploading: false }));
     }
   };
 
-  // Handle document selection
-  const handleDocumentSelect = (documentId: string, selected: boolean) => {
+  const handleDelete = async (documentId: string) => {
+    if (onDelete) {
+      await onDelete(documentId);
+    }
+  };
+
+  const handleDownload = async (documentId: string) => {
+    if (onDownload) {
+      await onDownload(documentId);
+    }
+  };
+
+  const handlePreview = (document: DocumentItem) => {
+    setState(prev => ({ ...prev, previewDocument: document, showPreview: true }));
+    if (onPreview) {
+      onPreview(document.id);
+    }
+  };
+
+  const handleSelectDocument = (documentId: string) => {
     setState(prev => {
       const newSelected = new Set(prev.selectedDocuments);
-      if (selected) {
-        newSelected.add(documentId);
-      } else {
+      if (newSelected.has(documentId)) {
         newSelected.delete(documentId);
+      } else {
+        newSelected.add(documentId);
       }
       return { ...prev, selectedDocuments: newSelected };
     });
   };
 
-  // Handle select all
-  const handleSelectAll = (selected: boolean) => {
+  const handleSelectAll = () => {
     setState(prev => ({
       ...prev,
-      selectedDocuments: selected 
-        ? new Set(filteredDocuments.map(doc => doc.id))
-        : new Set()
+      selectedDocuments: prev.selectedDocuments.size === filteredDocuments.length
+        ? new Set()
+        : new Set(filteredDocuments.map(doc => doc.id))
     }));
   };
 
-  // Format file size
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 B";
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Format date
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString();
-  };
+  const getStatusBadge = (status: string) => {
+    const statusClasses = {
+      'active': 'bg-[var(--sys-status-success)] text-white',
+      'pending': 'bg-[var(--sys-status-warning)] text-white',
+      'rejected': 'bg-[var(--sys-status-error)] text-white',
+      'archived': 'bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]'
+    };
 
-  // Get file icon
-  const getFileIcon = (mimeType: string): string => {
-    if (mimeType.startsWith('image/')) return '🖼️';
-    if (mimeType === 'application/pdf') return '📄';
-    if (mimeType.startsWith('text/')) return '📝';
-    if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return '📊';
-    if (mimeType.includes('document') || mimeType.includes('word')) return '📋';
-    return '📎';
+    return (
+      <span className={cn(
+        "px-2 py-1 text-xs font-medium rounded-full",
+        statusClasses[status as keyof typeof statusClasses] || "bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]"
+      )}>
+        {status}
+      </span>
+    );
   };
 
   // Render search and filters
@@ -264,28 +236,16 @@ export function DocumentManager({
     if (!showSearch && !showFilters) return null;
 
     return (
-      <div style={{
-        padding: TOKENS.spacing.md,
-        borderBottom: `1px solid ${TOKENS.colors.border}`,
-        backgroundColor: TOKENS.colors.muted + '05'
-      }}>
+      <div className="p-4 border-b border-[var(--sys-border-hairline)] bg-[var(--sys-bg-subtle)]">
         {/* Search */}
         {showSearch && (
-          <div style={{ marginBottom: TOKENS.spacing.md }}>
+          <div className="mb-4">
             <input
               type="text"
               placeholder="Search documents..."
               value={state.searchQuery}
               onChange={(e) => setState(prev => ({ ...prev, searchQuery: e.target.value }))}
-              style={{
-                width: '100%',
-                padding: TOKENS.spacing.sm,
-                border: `1px solid ${TOKENS.colors.border}`,
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.sm,
-                backgroundColor: TOKENS.colorBg,
-                color: TOKENS.colors.foreground
-              }}
+              className="w-full px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Search documents"
             />
           </div>
@@ -293,247 +253,52 @@ export function DocumentManager({
 
         {/* Filters */}
         {showFilters && (
-          <div style={{
-            display: 'flex',
-            gap: TOKENS.spacing.md,
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-            {/* Category filter */}
+          <div className="flex flex-wrap gap-4">
             <select
               value={state.selectedCategory}
               onChange={(e) => setState(prev => ({ ...prev, selectedCategory: e.target.value }))}
-              style={{
-                padding: TOKENS.spacing.sm,
-                border: `1px solid ${TOKENS.colors.border}`,
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.sm,
-                backgroundColor: TOKENS.colorBg,
-                color: TOKENS.colors.foreground
-              }}
+              className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Filter by category"
             >
-              <option value="">All Categories</option>
+              <option value="all">All Categories</option>
               {categories.map(category => (
-                <option key={category} value={category}>
-                  {category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </option>
+                <option key={category} value={category}>{category}</option>
               ))}
             </select>
 
-            {/* Status filter */}
             <select
               value={state.selectedStatus}
               onChange={(e) => setState(prev => ({ ...prev, selectedStatus: e.target.value }))}
-              style={{
-                padding: TOKENS.spacing.sm,
-                border: `1px solid ${TOKENS.colors.border}`,
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.sm,
-                backgroundColor: TOKENS.colorBg,
-                color: TOKENS.colors.foreground
-              }}
+              className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Filter by status"
             >
-              <option value="">All Statuses</option>
-              {DEFAULT_STATUSES.map(status => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </option>
+              <option value="all">All Statuses</option>
+              {statuses.map(status => (
+                <option key={status} value={status}>{status}</option>
               ))}
             </select>
 
-            {/* Sort */}
             <select
-              value={`${state.sortBy}-${state.sortOrder}`}
-            onChange={(e) => {
-              const [sortBy, sortOrder] = e.target.value.split('-');
-              setState(prev => ({ 
-                ...prev, 
-                sortBy: sortBy || 'created_at', 
-                sortOrder: (sortOrder as 'asc' | 'desc') || 'desc'
-              }));
-            }}
-              style={{
-                padding: TOKENS.spacing.sm,
-                border: `1px solid ${TOKENS.colors.border}`,
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.sm,
-                backgroundColor: TOKENS.colorBg,
-                color: TOKENS.colors.foreground
-              }}
-              aria-label="Sort documents"
+              value={state.sortBy}
+              onChange={(e) => setState(prev => ({ ...prev, sortBy: e.target.value }))}
+              className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
+              aria-label="Sort by"
             >
-              <option value="createdAt-desc">Newest First</option>
-              <option value="createdAt-asc">Oldest First</option>
-              <option value="filename-asc">Name A-Z</option>
-              <option value="filename-desc">Name Z-A</option>
-              <option value="fileSize-desc">Largest First</option>
-              <option value="fileSize-asc">Smallest First</option>
+              <option value="createdAt">Date Created</option>
+              <option value="filename">Filename</option>
+              <option value="fileSize">File Size</option>
+              <option value="category">Category</option>
             </select>
 
-            {/* View mode toggle */}
-            <div style={{
-              display: 'flex',
-              border: `1px solid ${TOKENS.colors.border}`,
-              borderRadius: TOKENS.radius,
-              overflow: 'hidden'
-            }}>
-              {(['list', 'grid', 'table'] as const).map(mode => (
-                <button
-                  key={mode}
-                  onClick={() => setState(prev => ({ ...prev, viewMode: mode }))}
-                  style={{
-                    padding: TOKENS.spacing.sm,
-                    border: 'none',
-                    backgroundColor: state.viewMode === mode ? TOKENS.colors.primary : 'transparent',
-                    color: state.viewMode === mode ? 'white' : TOKENS.colors.foreground,
-                    fontSize: TOKENS.fontSize.sm,
-                    cursor: 'pointer'
-                  }}
-                  aria-label={`${mode} view`}
-                >
-                  {mode === 'list' ? '☰' : mode === 'grid' ? '⊞' : '⊟'}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Active filters display */}
-        {(state.selectedCategory || state.selectedStatus || state.selectedTags.length > 0) && (
-          <div style={{
-            marginTop: TOKENS.spacing.md,
-            display: 'flex',
-            gap: TOKENS.spacing.xs,
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-            <span style={{ 
-              fontSize: TOKENS.fontSize.sm,
-              color: TOKENS.colors.muted 
-            }}>
-              Active filters:
-            </span>
-            
-            {state.selectedCategory && (
-              <span style={{
-                padding: `${TOKENS.spacing.xs} ${TOKENS.spacing.sm}`,
-                backgroundColor: TOKENS.colors.primary + '20',
-                color: TOKENS.colors.primary,
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.xs,
-                display: 'flex',
-                alignItems: 'center',
-                gap: TOKENS.spacing.xs
-              }}>
-                Category: {state.selectedCategory}
-                <button
-                  onClick={() => setState(prev => ({ ...prev, selectedCategory: '' }))}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'inherit',
-                    cursor: 'pointer',
-                    padding: 0
-                  }}
-                  aria-label="Remove category filter"
-                >
-                  ✕
-                </button>
-              </span>
-            )}
-            
-            {state.selectedStatus && (
-              <span style={{
-                padding: `${TOKENS.spacing.xs} ${TOKENS.spacing.sm}`,
-                backgroundColor: TOKENS.colors.primary + '20',
-                color: TOKENS.colors.primary,
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.xs,
-                display: 'flex',
-                alignItems: 'center',
-                gap: TOKENS.spacing.xs
-              }}>
-                Status: {state.selectedStatus}
-                <button
-                  onClick={() => setState(prev => ({ ...prev, selectedStatus: '' }))}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'inherit',
-                    cursor: 'pointer',
-                    padding: 0
-                  }}
-                  aria-label="Remove status filter"
-                >
-                  ✕
-                </button>
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Render bulk actions
-  const renderBulkActions = () => {
-    if (!showBulkActions || state.selectedDocuments.size === 0) return null;
-
-    return (
-      <div style={{
-        padding: TOKENS.spacing.md,
-        borderBottom: `1px solid ${TOKENS.colors.border}`,
-        backgroundColor: TOKENS.colors.primary + '10',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <span style={{ 
-          fontSize: TOKENS.fontSize.sm,
-          color: TOKENS.colors.foreground 
-        }}>
-          {state.selectedDocuments.size} document(s) selected
-        </span>
-        
-        <div style={{ display: 'flex', gap: TOKENS.spacing.sm }}>
-          {allowDelete && (
             <button
-              onClick={() => {
-                // Handle bulk delete
-                state.selectedDocuments.forEach(id => onDelete?.(id));
-                setState(prev => ({ ...prev, selectedDocuments: new Set() }));
-              }}
-              style={{
-                padding: `${TOKENS.spacing.xs} ${TOKENS.spacing.sm}`,
-                backgroundColor: TOKENS.colors.destructive,
-                color: 'white',
-                border: 'none',
-                borderRadius: TOKENS.radius,
-                fontSize: TOKENS.fontSize.sm,
-                cursor: 'pointer'
-              }}
+              onClick={() => setState(prev => ({ ...prev, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' }))}
+              className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
+              aria-label={`Sort ${state.sortOrder === 'asc' ? 'descending' : 'ascending'}`}
             >
-              Delete Selected
+              {state.sortOrder === 'asc' ? '↑' : '↓'}
             </button>
-          )}
-          
-          <button
-            onClick={() => setState(prev => ({ ...prev, selectedDocuments: new Set() }))}
-            style={{
-              padding: `${TOKENS.spacing.xs} ${TOKENS.spacing.sm}`,
-              backgroundColor: 'transparent',
-              color: TOKENS.colors.muted,
-              border: `1px solid ${TOKENS.colors.border}`,
-              borderRadius: TOKENS.radius,
-              fontSize: TOKENS.fontSize.sm,
-              cursor: 'pointer'
-            }}
-          >
-            Clear Selection
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -542,197 +307,123 @@ export function DocumentManager({
   const renderDocumentList = () => {
     if (filteredDocuments.length === 0) {
       return (
-        <div style={{
-          padding: TOKENS.spacing.lg,
-          textAlign: 'center',
-          color: TOKENS.colors.muted
-        }}>
-          {documents.length === 0 ? (
-            <>
-              <div style={{ fontSize: '3rem', marginBottom: TOKENS.spacing.md }}>📁</div>
-              <div style={{ fontSize: TOKENS.fontSize.base, marginBottom: TOKENS.spacing.sm }}>
-                No documents uploaded yet
-              </div>
-              <div style={{ fontSize: TOKENS.fontSize.sm }}>
-                {allowUpload ? 'Upload your first document to get started' : 'No documents available'}
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: '2rem', marginBottom: TOKENS.spacing.md }}>🔍</div>
-              <div style={{ fontSize: TOKENS.fontSize.base, marginBottom: TOKENS.spacing.sm }}>
-                No documents match your filters
-              </div>
-              <div style={{ fontSize: TOKENS.fontSize.sm }}>
-                Try adjusting your search or filter criteria
-              </div>
-            </>
-          )}
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="text-6xl mb-4">📁</div>
+          <div className="text-lg font-medium text-[var(--sys-text-primary)] mb-2">
+            No documents found
+          </div>
+          <div className="text-sm text-[var(--sys-text-secondary)]">
+            {state.searchQuery || state.selectedCategory !== 'all' || state.selectedStatus !== 'all'
+              ? 'Try adjusting your search or filters'
+              : 'Upload your first document to get started'
+            }
+          </div>
         </div>
       );
     }
 
-    const itemStyle = {
-      padding: TOKENS.spacing.md,
-      borderBottom: `1px solid ${TOKENS.colors.border}`,
-      display: 'flex',
-      alignItems: 'center',
-      gap: TOKENS.spacing.md,
-      cursor: 'pointer',
-      transition: 'background-color 0.2s ease',
-      ':hover': {
-        backgroundColor: TOKENS.colors.muted + '10'
-      }
-    };
-
     return (
-      <div>
-        {/* Select all header */}
-        {showBulkActions && (
-          <div style={{
-            padding: TOKENS.spacing.md,
-            borderBottom: `1px solid ${TOKENS.colors.border}`,
-            backgroundColor: TOKENS.colors.muted + '05',
-            display: 'flex',
-            alignItems: 'center',
-            gap: TOKENS.spacing.md
-          }}>
-            <input
-              type="checkbox"
-              checked={state.selectedDocuments.size === filteredDocuments.length && filteredDocuments.length > 0}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              aria-label="Select all documents"
-            />
-            <span style={{ 
-              fontSize: TOKENS.fontSize.sm,
-              fontWeight: TOKENS.fontWeight.medium,
-              color: TOKENS.colors.foreground 
-            }}>
-              Select All ({filteredDocuments.length})
-            </span>
-          </div>
-        )}
-
-        {/* Document items */}
-        {filteredDocuments.map(doc => (
-          <div
-            key={doc.id}
-            style={itemStyle}
-            onClick={() => onPreview?.(doc.id)}
-          >
-            {showBulkActions && (
+      <div className="divide-y divide-[var(--sys-border-hairline)]">
+        {/* Header */}
+        <div className="px-4 py-3 bg-[var(--sys-bg-subtle)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <input
                 type="checkbox"
-                checked={state.selectedDocuments.has(doc.id)}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  handleDocumentSelect(doc.id, e.target.checked);
-                }}
-                onClick={(e) => e.stopPropagation()}
-                aria-label={`Select ${doc.filename}`}
+                checked={state.selectedDocuments.size === filteredDocuments.length && filteredDocuments.length > 0}
+                onChange={handleSelectAll}
+                className="h-4 w-4 text-[var(--sys-accent)] border-[var(--sys-border-hairline)] rounded focus:ring-[var(--sys-accent)]"
+                aria-label="Select all documents"
               />
+              <span className="text-sm font-medium text-[var(--sys-text-primary)]">
+                {filteredDocuments.length} document{filteredDocuments.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            {state.selectedDocuments.size > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-[var(--sys-text-secondary)]">
+                  {state.selectedDocuments.size} selected
+                </span>
+                <button
+                  onClick={() => {
+                    state.selectedDocuments.forEach(id => handleDelete(id));
+                    setState(prev => ({ ...prev, selectedDocuments: new Set() }));
+                  }}
+                  className="px-3 py-1 text-sm bg-[var(--sys-status-error)] text-white rounded hover:bg-[var(--sys-status-error)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--sys-status-error)]"
+                  aria-label="Delete selected documents"
+                >
+                  Delete Selected
+                </button>
+              </div>
             )}
-            
-            <div style={{ fontSize: '1.5rem' }}>
-              {getFileIcon(doc.mimeType)}
-            </div>
-            
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{
-                fontSize: TOKENS.fontSize.base,
-                fontWeight: TOKENS.fontWeight.medium,
-                color: TOKENS.colors.foreground,
-                marginBottom: TOKENS.spacing.xs,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}>
-                {doc.filename}
-              </div>
-              
-              <div style={{
-                fontSize: TOKENS.fontSize.sm,
-                color: TOKENS.colors.muted,
-                display: 'flex',
-                gap: TOKENS.spacing.md,
-                flexWrap: 'wrap'
-              }}>
-                <span>{doc.category}</span>
-                <span>{formatFileSize(doc.fileSize)}</span>
-                <span>{formatDate(doc.createdAt)}</span>
-                {doc.uploadedByName && <span>by {doc.uploadedByName}</span>}
-              </div>
-              
-              {doc.tags && doc.tags.length > 0 && (
-                <div style={{
-                  marginTop: TOKENS.spacing.xs,
-                  display: 'flex',
-                  gap: TOKENS.spacing.xs,
-                  flexWrap: 'wrap'
-                }}>
-                  {doc.tags.map(tag => (
-                    <span
-                      key={tag}
-                      style={{
-                        padding: `2px ${TOKENS.spacing.xs}`,
-                        backgroundColor: TOKENS.colors.primary + '20',
-                        color: TOKENS.colors.primary,
-                        borderRadius: TOKENS.radius,
-                        fontSize: TOKENS.fontSize.xs
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
+          </div>
+        </div>
+
+        {/* Document items */}
+        {filteredDocuments.map((document) => (
+          <div key={document.id} className="px-4 py-3 hover:bg-[var(--sys-bg-subtle)]">
+            <div className="flex items-center gap-4">
+              <input
+                type="checkbox"
+                checked={state.selectedDocuments.has(document.id)}
+                onChange={() => handleSelectDocument(document.id)}
+                className="h-4 w-4 text-[var(--sys-accent)] border-[var(--sys-border-hairline)] rounded focus:ring-[var(--sys-accent)]"
+                aria-label={`Select ${document.filename}`}
+              />
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="text-lg">📄</div>
+                  <div className="font-medium text-[var(--sys-text-primary)] truncate">
+                    {document.filename}
+                  </div>
+                  {getStatusBadge(document.status)}
                 </div>
-              )}
-            </div>
-            
-            <div style={{
-              display: 'flex',
-              gap: TOKENS.spacing.xs
-            }}>
-              {onDownload && (
+
+                <div className="flex items-center gap-4 text-sm text-[var(--sys-text-secondary)]">
+                  <span>{formatFileSize(document.fileSize)}</span>
+                  <span>{document.category}</span>
+                  <span>{new Date(document.createdAt).toLocaleDateString()}</span>
+                  {document.tags.length > 0 && (
+                    <div className="flex gap-1">
+                      {document.tags.slice(0, 3).map(tag => (
+                        <span key={tag} className="px-2 py-1 bg-[var(--sys-bg-subtle)] rounded text-xs">
+                          {tag}
+                        </span>
+                      ))}
+                      {document.tags.length > 3 && (
+                        <span className="text-xs">+{document.tags.length - 3} more</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {showPreview && (
+                  <button
+                    onClick={() => handlePreview(document)}
+                    className="px-3 py-1 text-sm border border-[var(--sys-border-hairline)] rounded hover:bg-[var(--sys-bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
+                    aria-label={`Preview ${document.filename}`}
+                  >
+                    Preview
+                  </button>
+                )}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDownload(doc.id);
-                  }}
-                  style={{
-                    padding: TOKENS.spacing.xs,
-                    backgroundColor: 'transparent',
-                    color: TOKENS.colors.muted,
-                    border: `1px solid ${TOKENS.colors.border}`,
-                    borderRadius: TOKENS.radius,
-                    fontSize: TOKENS.fontSize.sm,
-                    cursor: 'pointer'
-                  }}
-                  aria-label={`Download ${doc.filename}`}
+                  onClick={() => handleDownload(document.id)}
+                  className="px-3 py-1 text-sm bg-[var(--sys-accent)] text-white rounded hover:bg-[var(--sys-accent)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
+                  aria-label={`Download ${document.filename}`}
                 >
-                  ⬇️
+                  Download
                 </button>
-              )}
-              
-              {allowDelete && onDelete && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(doc.id);
-                  }}
-                  style={{
-                    padding: TOKENS.spacing.xs,
-                    backgroundColor: 'transparent',
-                    color: TOKENS.colors.destructive,
-                    border: `1px solid ${TOKENS.colors.destructive}`,
-                    borderRadius: TOKENS.radius,
-                    fontSize: TOKENS.fontSize.sm,
-                    cursor: 'pointer'
-                  }}
-                  aria-label={`Delete ${doc.filename}`}
+                  onClick={() => handleDelete(document.id)}
+                  className="px-3 py-1 text-sm bg-[var(--sys-status-error)] text-white rounded hover:bg-[var(--sys-status-error)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--sys-status-error)]"
+                  aria-label={`Delete ${document.filename}`}
                 >
-                  🗑️
+                  Delete
                 </button>
-              )}
+              </div>
             </div>
           </div>
         ))}
@@ -741,87 +432,43 @@ export function DocumentManager({
   };
 
   return (
-    <div className={className} style={{
-      border: `1px solid ${TOKENS.colors.border}`,
-      borderRadius: TOKENS.radius,
-      backgroundColor: TOKENS.colorBg,
-      overflow: 'hidden'
-    }}>
+    <div className={cn("bg-[var(--sys-bg-primary)] border border-[var(--sys-border-hairline)] rounded-lg", className)}>
       {/* Header */}
-      <div style={{
-        padding: TOKENS.spacing.md,
-        borderBottom: `1px solid ${TOKENS.colors.border}`,
-        backgroundColor: TOKENS.colors.muted + '05',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h3 style={{
-          margin: 0,
-          fontSize: TOKENS.fontSize.base,
-          fontWeight: TOKENS.fontWeight.medium,
-          color: TOKENS.colors.foreground
-        }}>
-          Documents ({filteredDocuments.length})
-        </h3>
-        
-        {allowUpload && (
-          <div style={{ fontSize: TOKENS.fontSize.sm }}>
-            {state.isUploading ? 'Uploading...' : 'Ready for upload'}
-          </div>
-        )}
-      </div>
-
-      {/* File Upload */}
-      {allowUpload && (
-        <div style={{ padding: TOKENS.spacing.md, borderBottom: `1px solid ${TOKENS.colors.border}` }}>
-          <FileUpload
-            onFileSelect={handleFileUpload}
-            disabled={state.isUploading}
-          />
+      <div className="px-4 py-3 border-b border-[var(--sys-border-hairline)]">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-[var(--sys-text-primary)]">
+            Document Manager
+          </h2>
+          {showUpload && (
+            <FileUpload
+              onUpload={handleUpload}
+              accept="*/*"
+              multiple
+              className="px-4 py-2 bg-[var(--sys-accent)] text-white rounded hover:bg-[var(--sys-accent)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
+            />
+          )}
         </div>
-      )}
+      </div>
 
       {/* Search and Filters */}
       {renderSearchAndFilters()}
 
-      {/* Bulk Actions */}
-      {renderBulkActions()}
-
       {/* Document List */}
-      <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-        {renderDocumentList()}
-      </div>
+      {renderDocumentList()}
 
       {/* Preview Modal */}
-      {state.previewDocument && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: TOKENS.spacing.lg
-        }}>
-          <DocumentPreview
-            url={state.previewDocument.storageUrl}
-            filename={state.previewDocument.filename}
-            mimeType={state.previewDocument.mimeType}
-            fileSize={state.previewDocument.fileSize}
-            onClose={() => setState(prev => ({ ...prev, previewDocument: null }))}
-            onDownload={() => onDownload?.(state.previewDocument!.id)}
-            maxWidth="90vw"
-            maxHeight="90vh"
-          />
-        </div>
+      {state.showPreview && state.previewDocument && (
+        <DocumentPreview
+          url={state.previewDocument.storageUrl}
+          filename={state.previewDocument.filename}
+          mimeType={state.previewDocument.mimeType}
+          fileSize={state.previewDocument.fileSize}
+          onClose={() => setState(prev => ({ ...prev, showPreview: false, previewDocument: null }))}
+          onDownload={() => state.previewDocument && handleDownload(state.previewDocument.id)}
+        />
       )}
     </div>
   );
-}
+};
 
 export default DocumentManager;

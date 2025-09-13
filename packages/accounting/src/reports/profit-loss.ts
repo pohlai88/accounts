@@ -137,7 +137,7 @@ export async function generateProfitLoss(
             includePeriodActivity: true,
             includeZeroBalances: input.includeZeroBalances || false,
             currency: input.currency
-        }, dbClient as any);
+        }, dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> });
 
         if (!currentTrialBalance.success) {
             return {
@@ -158,7 +158,7 @@ export async function generateProfitLoss(
                 includePeriodActivity: true,
                 includeZeroBalances: input.includeZeroBalances || false,
                 currency: input.currency
-            }, dbClient as any);
+            }, dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> });
 
             if (!comparativeResult.success) {
                 return {
@@ -274,19 +274,19 @@ async function getPeriodActivity(
     GROUP BY jl.account_id, coa.account_type, coa.normal_balance
   `;
 
-    const { data: currentData, error: currentError } = await (dbClient as any)
+    const { data: currentData, error: currentError } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', {
             query: currentQuery,
             params: [tenantId, companyId, startDate, endDate]
         });
 
     if (currentError) {
-        throw new Error(`Failed to fetch current period activity: ${currentError.message}`);
+        throw new Error(`Failed to fetch current period activity: ${(currentError as { message: string }).message}`);
     }
 
     const currentActivity = new Map<string, { debits: number; credits: number; netActivity: number; }>();
-    for (const row of currentData || []) {
-        const rowData = row as any;
+    for (const row of (currentData as unknown[]) || []) {
+        const rowData = row as { total_debits: string; total_credits: string; normal_balance: string; account_id: string };
         const debits = parseFloat(rowData.total_debits || '0');
         const credits = parseFloat(rowData.total_credits || '0');
 
@@ -324,19 +324,19 @@ async function getPeriodActivity(
       GROUP BY jl.account_id, coa.account_type, coa.normal_balance
     `;
 
-        const { data: comparativeData, error: comparativeError } = await (dbClient as any)
+        const { data: comparativeData, error: comparativeError } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
             .rpc('execute_sql', {
                 query: comparativeQuery,
                 params: [tenantId, companyId, comparativePeriod.startDate, comparativePeriod.endDate]
             });
 
         if (comparativeError) {
-            throw new Error(`Failed to fetch comparative period activity: ${comparativeError.message}`);
+            throw new Error(`Failed to fetch comparative period activity: ${(comparativeError as { message: string }).message}`);
         }
 
         comparativeActivity = new Map();
-        for (const row of comparativeData || []) {
-            const rowData = row as any;
+        for (const row of (comparativeData as unknown[]) || []) {
+            const rowData = row as { total_debits: string; total_credits: string; normal_balance: string; account_id: string };
             const debits = parseFloat(rowData.total_debits || '0');
             const credits = parseFloat(rowData.total_credits || '0');
 

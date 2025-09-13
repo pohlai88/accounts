@@ -1,0 +1,21 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "packages/accounting/src/index.ts",
+    "packages/ui/src/index.ts",
+    "packages/utils/src/index.ts",
+    "packages/contracts/src/index.ts",
+    "packages/db/src/index.ts",
+    "packages/auth/src/index.ts"
+  ],
+  "out": "docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "none",
+  "name": "AI-BOS API Documentation",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
+  "categoryOrder": ["Core", "Components", "Utilities", "Types", "Other"]
+}

@@ -23,6 +23,8 @@ export {
 } from './governance-packs';
 export type { GovernancePack } from './governance-packs';
 
+// Note: React context moved to @aibos/ui package to avoid React dependency
+
 export const auth = {
   login: async (_email: string, _password: string) => {
     // TODO: Implement Supabase auth

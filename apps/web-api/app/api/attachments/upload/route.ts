@@ -17,7 +17,7 @@ const UploadRequestSchema = z.object({
   category: z.string().min(1).max(50),
   tags: z.array(z.string()).optional(),
   isPublic: z.boolean().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   entityType: z.string().optional(),
   entityId: z.string().uuid().optional(),
   relationshipType: z.string().optional(),
@@ -201,7 +201,7 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request format', details: error.errors },
+        { error: 'Invalid request format', details: error.issues },
         { status: 400 }
       );
     }

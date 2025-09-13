@@ -1,0 +1,15 @@
+source:
+  - 'package.json'
+
+dependencyTypes:
+  - dependencies
+  - devDependencies
+
+semverRange: '^'
+
+versionGroups:
+  - dependencies:
+      - '@aibos/**'
+    packages:
+      - '**'
+    isIgnored: true

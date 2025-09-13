@@ -224,14 +224,25 @@ async function getChartOfAccountsHierarchy(
 
     query += ` ORDER BY account_number`;
 
-    const { data, error } = await (dbClient as any)
-        .rpc('execute_sql', { query, params });
+    const { data, error } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+        .query(query, params);
 
     if (error) {
-        throw new Error(`Failed to fetch chart of accounts: ${error.message}`);
+        throw new Error(`Failed to fetch chart of accounts: ${(error as { message: string }).message}`);
     }
 
-    return data || [];
+    return (data as Array<{
+        id: string;
+        accountNumber: string;
+        accountName: string;
+        accountType: string;
+        accountCategory: string;
+        parentAccountId?: string;
+        level: number;
+        isHeader: boolean;
+        normalBalance: 'DEBIT' | 'CREDIT';
+        isActive: boolean;
+    }>) || [];
 }
 
 /**
@@ -254,7 +265,7 @@ async function calculateAccountBalances(
     oldestTransaction?: Date;
     newestTransaction?: Date;
 }> {
-    const accountIds = accounts.map(a => (a as any).id);
+    const accountIds = accounts.map(a => (a as { id: string }).id);
 
     // Get fiscal year start for opening balance calculation
     const fiscalYearStart = await getFiscalYearStart(tenantId, companyId, asOfDate, dbClient);
@@ -280,14 +291,14 @@ async function calculateAccountBalances(
     GROUP BY jl.account_id
   `;
 
-    const { data, error } = await (dbClient as any)
+    const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', {
             query,
             params: [tenantId, companyId, fiscalYearStart, asOfDate, accountIds]
         });
 
     if (error) {
-        throw new Error(`Failed to calculate account balances: ${error.message}`);
+        throw new Error(`Failed to calculate account balances: ${(error as { message: string }).message}`);
     }
 
     const balances = new Map();
@@ -295,26 +306,26 @@ async function calculateAccountBalances(
     let newestTransaction: Date | undefined;
 
     // Process results and calculate balances
-    for (const row of data || []) {
-        const rowData = row as any;
-        const account = accounts.find(a => (a as any).id === rowData.account_id);
+    for (const row of (data as unknown[]) || []) {
+        const rowData = row as { account_id: string; opening_debits: string; opening_credits: string; period_debits: string; period_credits: string; journal_date: string; oldest_transaction?: string; newest_transaction?: string };
+        const account = accounts.find(a => (a as { id: string }).id === rowData.account_id);
         if (!account) continue;
 
-        const accountData = account as any;
+        const accountData = account as { normal_balance: string; account_type: string; account_name: string };
         const openingDebits = parseFloat(rowData.opening_debits || '0');
         const openingCredits = parseFloat(rowData.opening_credits || '0');
         const periodDebits = parseFloat(rowData.period_debits || '0');
         const periodCredits = parseFloat(rowData.period_credits || '0');
 
         // Calculate opening balance based on normal balance
-        const openingBalance = accountData.normalBalance === 'DEBIT'
+        const openingBalance = accountData.normal_balance === 'DEBIT'
             ? openingDebits - openingCredits
             : openingCredits - openingDebits;
 
         // Calculate closing balance
         const totalDebits = openingDebits + periodDebits;
         const totalCredits = openingCredits + periodCredits;
-        const closingBalance = accountData.normalBalance === 'DEBIT'
+        const closingBalance = accountData.normal_balance === 'DEBIT'
             ? totalDebits - totalCredits
             : totalCredits - totalDebits;
 
@@ -343,7 +354,7 @@ async function calculateAccountBalances(
 
     // Add zero balances for accounts with no transactions
     for (const account of accounts) {
-        const accountData = account as any;
+        const accountData = account as { id: string };
         if (!balances.has(accountData.id)) {
             balances.set(accountData.id, {
                 openingBalance: 0,
@@ -368,14 +379,26 @@ function buildTrialBalanceAccounts(
     const trialBalanceAccounts: TrialBalanceAccount[] = [];
 
     for (const account of chartOfAccounts) {
-        const accountData = account as any;
+        const accountData = account as {
+            id: string;
+            account_name: string;
+            account_type: string;
+            normal_balance: string;
+            accountNumber?: string;
+            accountName?: string;
+            accountType?: string;
+            accountCategory?: string;
+            parentAccountId?: string;
+            level?: number;
+            isHeader?: boolean;
+        };
         const balance = accountBalances.balances.get(accountData.id) || {
             openingBalance: 0,
             periodDebits: 0,
             periodCredits: 0,
             closingBalance: 0
         };
-        const balanceData = balance as any;
+        const balanceData = balance as { openingBalance: number; periodDebits: number; periodCredits: number; closingBalance: number };
 
         // Skip zero balance accounts if not requested
         if (!includeZeroBalances &&
@@ -388,18 +411,18 @@ function buildTrialBalanceAccounts(
 
         trialBalanceAccounts.push({
             accountId: accountData.id,
-            accountNumber: accountData.accountNumber,
-            accountName: accountData.accountName,
-            accountType: accountData.accountType,
-            accountCategory: accountData.accountCategory,
+            accountNumber: accountData.accountNumber || accountData.id,
+            accountName: accountData.accountName || accountData.account_name,
+            accountType: accountData.accountType || accountData.account_type,
+            accountCategory: accountData.accountCategory || '',
             parentAccountId: accountData.parentAccountId,
-            level: accountData.level,
-            isHeader: accountData.isHeader,
+            level: accountData.level || 0,
+            isHeader: accountData.isHeader || false,
             openingBalance: balanceData.openingBalance,
             periodDebits: balanceData.periodDebits,
             periodCredits: balanceData.periodCredits,
             closingBalance: balanceData.closingBalance,
-            normalBalance: accountData.normalBalance,
+            normalBalance: accountData.normal_balance as 'DEBIT' | 'CREDIT',
             currency: 'MYR' // TODO: Multi-currency support
         });
     }
@@ -492,19 +515,16 @@ async function getFiscalYearStart(
     LIMIT 1
   `;
 
-    const { data, error } = await (dbClient as any)
-        .rpc('execute_sql', {
-            query,
-            params: [tenantId, companyId, asOfDate]
-        });
+    const { data, error } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+        .query(query, [tenantId, companyId, asOfDate]);
 
-    if (error || !data || data.length === 0) {
+    if (error || !data || (data as unknown[]).length === 0) {
         // Default to January 1st of the same year
         const year = asOfDate.getFullYear();
         return new Date(year, 0, 1);
     }
 
-    return new Date((data[0] as any).fiscal_year_start);
+    return new Date(((data as unknown[])[0] as { fiscal_year_start: string }).fiscal_year_start);
 }
 
 /**

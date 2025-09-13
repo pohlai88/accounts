@@ -34,7 +34,7 @@ export {
   validateContext,
   sanitizeContext
 } from "./context/request-context";
-export type { RequestContext as V1RequestContext, UserContext } from "./context/request-context";
+export type { UserContext } from "./context/request-context";
 
 // Export functionality for V1 compliance - Complete implementation
 export {
@@ -76,6 +76,10 @@ export { errorTracker, ErrorContext, ErrorEvent, ErrorSummary } from "./monitori
 // Enhanced Auth utilities for admin configuration
 export * from "./auth/enhanced-context";
 export * from "./auth/react-hooks";
+
+// API Client and State Management
+export * from "./api-client";
+export * from "./state-management";
 
 // Import functions for convenience exports
 import { makeLogger } from "./logger";

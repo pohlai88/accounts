@@ -1,25 +1,25 @@
 {
   "name": "@aibos/db",
   "version": "0.1.0",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push",
-    "lint": "eslint ."
-  },
   "dependencies": {
     "drizzle-orm": "^0.33.0",
-    "pg": "^8.11.5"
+    "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/pg": "^8.15.5",
     "drizzle-kit": "^0.24.0",
-    "@types/pg": "^8.11.6",
     "typescript": "^5.6.2"
-  }
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "eslint ."
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
 }

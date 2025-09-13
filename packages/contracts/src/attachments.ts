@@ -63,7 +63,7 @@ export const UploadAttachmentReq = z.object({
   category: AttachmentCategory,
   tags: z.array(z.string().min(1).max(50)).optional().default([]),
   isPublic: z.boolean().optional().default(false),
-  metadata: z.record(z.unknown()).optional().default({}),
+  metadata: z.record(z.string(), z.unknown()).optional().default({}),
   
   // Optional entity linking
   entityType: EntityType.optional(),
@@ -116,11 +116,11 @@ export const AttachmentDetailsRes = z.object({
   // Status and metadata
   status: AttachmentStatus,
   isPublic: z.boolean(),
-  metadata: z.record(z.unknown()),
+  metadata: z.record(z.string(), z.unknown()),
   
   // OCR and processing
   ocrStatus: z.enum(['pending', 'processing', 'completed', 'failed', 'not_applicable']).optional(),
-  ocrData: z.record(z.unknown()).optional(),
+  ocrData: z.record(z.string(), z.unknown()).optional(),
   ocrConfidence: z.number().min(0).max(1).optional(),
   
   // Approval workflow
@@ -196,7 +196,7 @@ export const ListAttachmentsRes = z.object({
     hasPrev: z.boolean()
   }),
   filters: z.object({
-    appliedFilters: z.record(z.unknown()),
+    appliedFilters: z.record(z.string(), z.unknown()),
     availableCategories: z.array(AttachmentCategory),
     availableTags: z.array(z.string())
   })
@@ -211,7 +211,7 @@ export const UpdateAttachmentReq = z.object({
   category: AttachmentCategory.optional(),
   tags: z.array(z.string().min(1).max(50)).optional(),
   isPublic: z.boolean().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   status: AttachmentStatus.optional()
 });
 
@@ -224,7 +224,7 @@ export const BatchAttachmentOperationReq = z.object({
   // Operation-specific data
   category: AttachmentCategory.optional(),
   tags: z.array(z.string()).optional(),
-  metadata: z.record(z.unknown()).optional()
+  metadata: z.record(z.string(), z.unknown()).optional()
 });
 
 // ============================================================================

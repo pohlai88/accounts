@@ -4,3 +4,6 @@ export * from "./reports";
 export * from "./events";
 export * from "./enums";
 export * from "./attachments";
+export * from "./types/api";
+export * from "./types/entities";
+export * from "./types/errors";

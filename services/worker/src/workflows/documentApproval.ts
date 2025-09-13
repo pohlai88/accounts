@@ -1,6 +1,7 @@
 import { inngest } from "../inngestClient";
 import { createServiceClient, logger, getV1AuditService, createV1AuditContext } from "@aibos/utils";
-import { DocumentApprovalReq, ApprovalDecisionReq, ApprovalStatusRes } from "@aibos/contracts";
+// Note: These types will be used when implementing full document approval
+// import { DocumentApprovalReq, ApprovalDecisionReq, ApprovalStatusRes } from "@aibos/contracts";
 
 // V1 Document Approval Workflow with Multi-stage Support
 // Supports single approver, multi-stage, and parallel approval workflows
@@ -22,7 +23,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
       allowSelfApproval = false,
       autoApproveThreshold,
       notifyOnSubmission = true,
-      notifyOnApproval = true,
+      notifyOnApproval = true, // eslint-disable-line @typescript-eslint/no-unused-vars
       reminderInterval = 24,
       comments,
       priority = 'normal',
@@ -35,7 +36,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
     const auditContext = createV1AuditContext({
       url: `/document/approval/${attachmentId}`,
       method: 'POST',
-      headers: new Headers(),
+      headers: new globalThis.Headers(),
       ip: 'worker'
     } as any);
 
@@ -275,7 +276,7 @@ export const documentApprovalDecision = inngest.createFunction(
     const auditContext = createV1AuditContext({
       url: `/document/approval/${attachmentId}/decision`,
       method: 'POST',
-      headers: new Headers(),
+      headers: new globalThis.Headers(),
       ip: 'worker'
     } as any);
 

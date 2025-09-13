@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ApproveInvoiceReq, ApproveInvoiceRes, InvoiceApprovedEvt } from "@aibos/contracts";
+import { ApproveInvoiceReq, ApproveInvoiceRes, InvoiceApprovedEvt, TInvoiceApprovedEvt } from "@aibos/contracts";
 
 export const runtime = "nodejs";
 
-async function sendEvent(evt: typeof InvoiceApprovedEvt._type) {
+async function sendEvent(evt: TInvoiceApprovedEvt) {
   // Placeholder: wire to Inngest client in services/worker
   return true;
 }

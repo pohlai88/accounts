@@ -1,22 +1,22 @@
 {
   "name": "@aibos/accounting",
   "version": "0.1.0",
-  "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
-    "test": "vitest run",
-    "lint": "eslint ."
-  },
   "dependencies": {
     "@aibos/auth": "workspace:*",
     "@aibos/db": "workspace:*",
-    "zod": "^3.23.8"
+    "zod": "4.0.0-beta.20250424T163858"
   },
   "devDependencies": {
     "typescript": "^5.6.2",
-    "vitest": "^2.0.5"
-  }
+    "vitest": "^2.1.9"
+  },
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "type": "module",
+  "types": "dist/src/index.d.ts"
 }

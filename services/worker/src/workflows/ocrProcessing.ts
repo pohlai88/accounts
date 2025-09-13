@@ -1,6 +1,7 @@
 import { inngest } from "../inngestClient";
 import { createServiceClient, logger, getV1AuditService, createV1AuditContext } from "@aibos/utils";
-import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from "@aibos/contracts";
+// Note: These types will be used when implementing full OCR processing
+// import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from "@aibos/contracts";
 
 // V1 OCR Processing Workflow with Inngest
 // Supports text extraction, table extraction, and structured data extraction
@@ -32,7 +33,7 @@ export const ocrProcessing = inngest.createFunction(
     const auditContext = createV1AuditContext({
       url: `/ocr/process/${attachmentId}`,
       method: 'POST',
-      headers: new Headers(),
+      headers: new globalThis.Headers(),
       ip: 'worker'
     } as any);
 
@@ -390,7 +391,7 @@ async function extractTextFromFile(
 }
 
 async function extractTextFromPDF(
-  buffer: Buffer,
+  _buffer: Buffer,
   _languages: string[]
 ): Promise<{ text: string; confidence: number }> {
   // Placeholder implementation
@@ -403,13 +404,13 @@ This is simulated text extracted from a PDF document.
 In production, this would use actual OCR libraries or cloud services.`;
 
     return { text, confidence: 0.85 };
-  } catch (error) {
+  } catch {
     return { text: '', confidence: 0 };
   }
 }
 
 async function extractTextFromImage(
-  buffer: Buffer,
+  _buffer: Buffer,
   _languages: string[]
 ): Promise<{ text: string; confidence: number }> {
   // Placeholder implementation
@@ -422,7 +423,7 @@ This is simulated text extracted from an image.
 In production, this would use actual OCR libraries or cloud services.`;
 
     return { text, confidence: 0.80 };
-  } catch (error) {
+  } catch {
     return { text: '', confidence: 0 };
   }
 }
@@ -446,7 +447,7 @@ async function extractTablesFromPDF(
     ];
 
     return { tables, confidence: 0.90 };
-  } catch (error) {
+  } catch {
     return { tables: [], confidence: 0 };
   }
 }

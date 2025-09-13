@@ -98,10 +98,11 @@ export async function closeFiscalPeriod(
         }
 
         // 3. Check if period is already closed
-        if (fiscalPeriod.status === 'CLOSED' || fiscalPeriod.status === 'LOCKED') {
+        const period = fiscalPeriod as { status: string };
+        if (period.status === 'CLOSED' || period.status === 'LOCKED') {
             return {
                 success: false,
-                error: `Period is already ${fiscalPeriod.status.toLowerCase()}`,
+                error: `Period is already ${period.status.toLowerCase()}`,
                 code: 'PERIOD_ALREADY_CLOSED'
             };
         }
@@ -127,7 +128,7 @@ export async function closeFiscalPeriod(
             input.tenantId,
             input.companyId,
             fiscalPeriod,
-            dbClient as any
+            dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> }
         );
 
         // 6. Check if force close is required
@@ -147,7 +148,7 @@ export async function closeFiscalPeriod(
                 input.tenantId,
                 input.companyId,
                 fiscalPeriod,
-                dbClient as any
+                dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> }
             );
         }
 
@@ -157,7 +158,7 @@ export async function closeFiscalPeriod(
             'CLOSED',
             input.closedBy,
             input.closeDate,
-            dbClient as any,
+            dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> },
             input.closeReason
         );
 
@@ -182,7 +183,7 @@ export async function closeFiscalPeriod(
             closedBy: input.closedBy,
             status: 'CLOSED',
             reversingEntriesCreated,
-            nextPeriodId: nextPeriod?.id,
+            nextPeriodId: (nextPeriod as { id: string })?.id,
             validationResults: validation
         };
 
@@ -224,7 +225,7 @@ export async function openFiscalPeriod(
         }
 
         // 3. Check if period can be opened
-        if (fiscalPeriod.status === 'OPEN') {
+        if ((fiscalPeriod as { status: string }).status === 'OPEN') {
             return {
                 success: false,
                 error: 'Period is already open',
@@ -263,7 +264,7 @@ export async function openFiscalPeriod(
             'OPEN',
             input.openedBy,
             new Date(),
-            dbClient as any,
+            dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> },
             input.openReason
         );
 
@@ -334,7 +335,7 @@ export async function createPeriodLock(
       RETURNING id
     `;
 
-        const { data, error } = await (dbClient as any)
+        const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
             .rpc('execute_sql', {
                 query,
                 params: [
@@ -348,12 +349,12 @@ export async function createPeriodLock(
             });
 
         if (error) {
-            throw new Error(`Failed to create period lock: ${error.message}`);
+            throw new Error(`Failed to create period lock: ${(error as { message: string }).message}`);
         }
 
         return {
             success: true,
-            lockId: data[0]?.id
+            lockId: ((data as unknown[])[0] as { id: string })?.id
         };
 
     } catch (error) {
@@ -382,7 +383,7 @@ async function validatePeriodClose(
         companyId,
         (fiscalPeriod as { startDate: Date }).startDate,
         (fiscalPeriod as { endDate: Date }).endDate,
-        dbClient as any
+        dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> }
     );
 
     const allJournalsPosted = unpostedJournals === 0;
@@ -395,7 +396,7 @@ async function validatePeriodClose(
         tenantId,
         companyId,
         (fiscalPeriod as { endDate: Date }).endDate,
-        dbClient as any
+        dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> }
     );
 
     if (!trialBalanceCheck.balanced) {
@@ -407,7 +408,7 @@ async function validatePeriodClose(
         tenantId,
         companyId,
         (fiscalPeriod as { endDate: Date }).endDate,
-        dbClient as any
+        dbClient as { query: (sql: string, params?: unknown[]) => Promise<unknown> }
     );
 
     const noUnreconciledTransactions = unreconciledTransactions === 0;
@@ -465,24 +466,24 @@ async function createReversingEntries(
       )
   `;
 
-    const { data, error } = await (dbClient as any)
+    const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', {
             query,
             params: [tenantId, companyId, (fiscalPeriod as { startDate: Date }).startDate, (fiscalPeriod as { endDate: Date }).endDate]
         });
 
     if (error) {
-        throw new Error(`Failed to find accrual journals: ${error.message}`);
+        throw new Error(`Failed to find accrual journals: ${(error as { message: string }).message}`);
     }
 
     let reversingEntriesCreated = 0;
 
     // Create reversing entries for each accrual journal
-    for (const journal of data || []) {
+    for (const journal of (data as unknown[]) || []) {
         const nextPeriod = await getNextFiscalPeriod(fiscalPeriod, dbClient);
         if (!nextPeriod) continue;
 
-        const reversalDate = nextPeriod.startDate;
+        const reversalDate = (nextPeriod as { startDate: Date }).startDate;
 
         // Insert reversing entry record
         const insertQuery = `
@@ -492,14 +493,14 @@ async function createReversingEntries(
       ) VALUES ($1, $2, $3, $4, $5, 'PENDING')
     `;
 
-        await (dbClient as any).rpc('execute_sql', {
+        await (dbClient as { rpc: (name: string, params: unknown) => Promise<unknown> }).rpc('execute_sql', {
             query: insertQuery,
             params: [
                 tenantId,
                 companyId,
-                journal.id,
+                (journal as { id: string }).id,
                 reversalDate,
-                `Auto-reversal for period close: ${journal.description}`
+                `Auto-reversal for period close: ${(journal as { description: string }).description}`
             ]
         });
 
@@ -518,14 +519,14 @@ async function getFiscalPeriod(fiscalPeriodId: string, dbClient: unknown) {
     WHERE id = $1
   `;
 
-    const { data, error } = await (dbClient as any)
+    const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', { query, params: [fiscalPeriodId] });
 
     if (error) {
-        throw new Error(`Failed to fetch fiscal period: ${error.message}`);
+        throw new Error(`Failed to fetch fiscal period: ${(error as { message: string }).message}`);
     }
 
-    return data?.[0];
+    return (data as unknown[])?.[0];
 }
 
 async function getNextFiscalPeriod(currentPeriod: unknown, dbClient: unknown) {
@@ -537,17 +538,17 @@ async function getNextFiscalPeriod(currentPeriod: unknown, dbClient: unknown) {
     LIMIT 1
   `;
 
-    const { data, error } = await (dbClient as any)
+    const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', {
             query,
             params: [(currentPeriod as { fiscal_calendar_id: string }).fiscal_calendar_id, (currentPeriod as { period_number: number }).period_number + 1]
         });
 
     if (error) {
-        throw new Error(`Failed to fetch next fiscal period: ${error.message}`);
+        throw new Error(`Failed to fetch next fiscal period: ${(error as { message: string }).message}`);
     }
 
-    return data?.[0];
+    return (data as unknown[])?.[0];
 }
 
 async function updateFiscalPeriodStatus(
@@ -567,14 +568,14 @@ async function updateFiscalPeriodStatus(
     WHERE id = $4
   `;
 
-    const { error } = await (dbClient as any)
+    const { error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ error: unknown }> })
         .rpc('execute_sql', {
             query,
             params: [status, date, userId, fiscalPeriodId]
         });
 
     if (error) {
-        throw new Error(`Failed to update fiscal period status: ${error.message}`);
+        throw new Error(`Failed to update fiscal period status: ${(error as { message: string }).message}`);
     }
 }
 
@@ -585,11 +586,11 @@ async function removePeriodLocks(fiscalPeriodId: string, dbClient?: unknown) {
     WHERE fiscal_period_id = $1
   `;
 
-    const { error } = await (dbClient as any)
+    const { error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ error: unknown }> })
         .rpc('execute_sql', { query, params: [fiscalPeriodId] });
 
     if (error) {
-        throw new Error(`Failed to remove period locks: ${error.message}`);
+        throw new Error(`Failed to remove period locks: ${(error as { message: string }).message}`);
     }
 }
 
@@ -609,14 +610,14 @@ async function checkUnpostedJournals(
       AND status != 'posted'
   `;
 
-    const { data, error } = await (dbClient as any)
+    const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', { query, params: [tenantId, companyId, startDate, endDate] });
 
     if (error) {
-        throw new Error(`Failed to check unposted journals: ${error.message}`);
+        throw new Error(`Failed to check unposted journals: ${(error as { message: string }).message}`);
     }
 
-    return parseInt(data?.[0]?.count || '0');
+    return parseInt(((data as unknown[])?.[0] as { count: string })?.count || '0');
 }
 
 async function checkTrialBalanceBalanced(
@@ -637,15 +638,15 @@ async function checkTrialBalanceBalanced(
       AND j.journal_date <= $3
   `;
 
-    const { data, error } = await (dbClient as any)
+    const { data, error } = await (dbClient as { rpc: (name: string, params: unknown) => Promise<{ data: unknown; error: unknown }> })
         .rpc('execute_sql', { query, params: [tenantId, companyId, asOfDate] });
 
     if (error) {
-        throw new Error(`Failed to check trial balance: ${error.message}`);
+        throw new Error(`Failed to check trial balance: ${(error as { message: string }).message}`);
     }
 
-    const totalDebits = parseFloat(data?.[0]?.total_debits || '0');
-    const totalCredits = parseFloat(data?.[0]?.total_credits || '0');
+    const totalDebits = parseFloat(((data as unknown[])?.[0] as { total_debits: string })?.total_debits || '0');
+    const totalCredits = parseFloat(((data as unknown[])?.[0] as { total_credits: string })?.total_credits || '0');
     const difference = totalDebits - totalCredits;
     const balanced = Math.abs(difference) < 0.01; // 1 cent tolerance
 

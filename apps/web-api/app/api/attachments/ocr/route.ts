@@ -10,10 +10,16 @@ import {
   createV1AuditContext
 } from '@aibos/utils';
 import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from '@aibos/contracts';
-import { Inngest } from 'inngest';
 
-// Create Inngest client for triggering OCR jobs
-const inngest = new Inngest({ id: "web-api" });
+// Lazy load Inngest to avoid circular dependencies during build
+let inngest: any = null;
+const getInngest = async () => {
+  if (!inngest) {
+    const { Inngest } = await import('inngest');
+    inngest = new Inngest({ id: "web-api" });
+  }
+  return inngest;
+};
 
 // POST /api/attachments/ocr - Trigger OCR processing
 export async function POST(request: NextRequest) {
@@ -108,7 +114,8 @@ export async function POST(request: NextRequest) {
 
     // Send OCR processing job to Inngest
     try {
-      await inngest.send({
+      const inngestClient = await getInngest();
+      await inngestClient.send({
         name: "ocr/process",
         data: {
           ...validatedData,
@@ -185,7 +192,7 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request parameters', details: error.errors },
+        { error: 'Invalid request parameters', details: error.issues },
         { status: 400 }
       );
     }

@@ -3,8 +3,8 @@
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { canPerformAction, isFeatureEnabled, type UserContext as AuthUserContext, type FeatureFlags, type PolicySettings, type MemberPermissions } from '@aibos/auth';
-import { extractUserContext, type UserContext } from '../context/request-context';
+import { canPerformAction, isFeatureEnabled, type FeatureFlags, type PolicySettings, type MemberPermissions } from '@aibos/auth';
+import { extractUserContext } from '../context/request-context';
 
 // Enhanced user context with admin configuration
 export interface EnhancedUserContext {
@@ -176,8 +176,8 @@ export async function assertPermission(
 
     if (!decision.allowed) {
         const error = new Error(`Forbidden: ${action}${decision.reason ? ` (${decision.reason})` : ''}`);
-        (error as any).status = 403;
-        (error as any).code = 'PERMISSION_DENIED';
+        (error as Error & { status?: number; code?: string }).status = 403;
+        (error as Error & { status?: number; code?: string }).code = 'PERMISSION_DENIED';
         throw error;
     }
 }

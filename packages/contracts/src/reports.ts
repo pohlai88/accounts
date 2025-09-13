@@ -204,7 +204,7 @@ export const ReportExportReq = z.object({
     companyId: z.string().uuid(),
     reportType: z.enum(['trial-balance', 'balance-sheet', 'profit-loss', 'cash-flow']),
     format: z.enum(['csv', 'xlsx', 'pdf', 'jsonl']),
-    reportData: z.record(z.unknown()), // The actual report data to export
+    reportData: z.record(z.string(), z.unknown()), // The actual report data to export
     filename: z.string().optional(),
     includeMetadata: z.boolean().default(true)
 });
@@ -233,7 +233,7 @@ export const ReportCacheRes = z.object({
     cached: z.boolean(),
     cacheKey: z.string(),
     expiresAt: z.string().datetime().optional(),
-    data: z.record(z.unknown()).optional()
+    data: z.record(z.string(), z.unknown()).optional()
 });
 
 // Type exports

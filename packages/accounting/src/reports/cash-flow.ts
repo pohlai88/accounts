@@ -292,19 +292,16 @@ async function getCashFlowActivities(
     GROUP BY jl.account_id, coa.account_type, coa.account_category, coa.normal_balance
   `;
 
-    const { data: currentData, error: currentError } = await (dbClient as any)
-        .rpc('execute_sql', {
-            query: currentQuery,
-            params: [tenantId, companyId, startDate, endDate]
-        });
+    const { data: currentData, error: currentError } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+        .query(currentQuery, [tenantId, companyId, startDate, endDate]);
 
     if (currentError) {
-        throw new Error(`Failed to fetch current period cash flow activities: ${currentError.message}`);
+        throw new Error(`Failed to fetch current period cash flow activities: ${(currentError as { message: string }).message}`);
     }
 
     const currentActivity = new Map<string, { debits: number; credits: number; netActivity: number; accountType: string; }>();
-    for (const row of currentData || []) {
-        const rowData = row as any;
+    for (const row of (currentData as unknown[]) || []) {
+        const rowData = row as { total_debits: string; total_credits: string; normal_balance: string; account_id: string; account_type: string };
         const debits = parseFloat(rowData.total_debits || '0');
         const credits = parseFloat(rowData.total_credits || '0');
 
@@ -324,19 +321,16 @@ async function getCashFlowActivities(
     // Query for comparative period (if requested)
     let comparativeActivity: Map<string, { debits: number; credits: number; netActivity: number; accountType: string; }> | undefined = undefined;
     if (comparativePeriod) {
-        const { data: comparativeData, error: comparativeError } = await (dbClient as any)
-            .rpc('execute_sql', {
-                query: currentQuery,
-                params: [tenantId, companyId, comparativePeriod.startDate, comparativePeriod.endDate]
-            });
+        const { data: comparativeData, error: comparativeError } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+            .query(currentQuery, [tenantId, companyId, comparativePeriod.startDate, comparativePeriod.endDate]);
 
         if (comparativeError) {
-            throw new Error(`Failed to fetch comparative period cash flow activities: ${comparativeError.message}`);
+            throw new Error(`Failed to fetch comparative period cash flow activities: ${(comparativeError as { message: string }).message}`);
         }
 
         comparativeActivity = new Map();
-        for (const row of comparativeData || []) {
-            const rowData = row as any;
+        for (const row of (comparativeData as unknown[]) || []) {
+            const rowData = row as { total_debits: string; total_credits: string; normal_balance: string; account_id: string; account_type: string };
             const debits = parseFloat(rowData.total_debits || '0');
             const credits = parseFloat(rowData.total_credits || '0');
 
@@ -401,9 +395,9 @@ function classifyCashFlowActivities(
         // Classify based on account type and category per IAS 7 standards
         if (isOperatingActivity(activityData.accountType)) {
             operatingActivitiesList.push(cashFlowActivity);
-        } else if (isInvestingActivity(activityData.accountType, (activityData as any).accountCategory)) {
+        } else if (isInvestingActivity(activityData.accountType, (activityData as { accountCategory?: string }).accountCategory)) {
             investingActivitiesList.push(cashFlowActivity);
-        } else if (isFinancingActivity(activityData.accountType, (activityData as any).accountCategory)) {
+        } else if (isFinancingActivity(activityData.accountType, (activityData as { accountCategory?: string }).accountCategory)) {
             financingActivitiesList.push(cashFlowActivity);
         }
     }
@@ -471,40 +465,28 @@ async function calculateCashBalances(
   `;
 
     // Beginning balance (before start date)
-    const { data: beginningData } = await (dbClient as any)
-        .rpc('execute_sql', {
-            query: cashBalanceQuery,
-            params: [tenantId, companyId, startDate]
-        });
+    const { data: beginningData } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+        .query(cashBalanceQuery, [tenantId, companyId, startDate]);
 
     // Ending balance (up to end date)
-    const { data: endingData } = await (dbClient as any)
-        .rpc('execute_sql', {
-            query: cashBalanceQuery.replace('< $3', '<= $3'),
-            params: [tenantId, companyId, endDate]
-        });
+    const { data: endingData } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+        .query(cashBalanceQuery.replace('< $3', '<= $3'), [tenantId, companyId, endDate]);
 
-    const beginningCashBalance = parseFloat((beginningData as any)?.[0]?.balance || '0');
-    const endingCashBalance = parseFloat((endingData as any)?.[0]?.balance || '0');
+    const beginningCashBalance = parseFloat((beginningData as Array<{ balance: string }>)?.[0]?.balance || '0');
+    const endingCashBalance = parseFloat((endingData as Array<{ balance: string }>)?.[0]?.balance || '0');
 
     let comparativeBeginningCashBalance: number | undefined;
     let comparativeEndingCashBalance: number | undefined;
 
     if (comparativePeriod) {
-        const { data: compBeginningData } = await (dbClient as any)
-            .rpc('execute_sql', {
-                query: cashBalanceQuery,
-                params: [tenantId, companyId, comparativePeriod.startDate]
-            });
+        const { data: compBeginningData } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+            .query(cashBalanceQuery, [tenantId, companyId, comparativePeriod.startDate]);
 
-        const { data: compEndingData } = await (dbClient as any)
-            .rpc('execute_sql', {
-                query: cashBalanceQuery.replace('< $3', '<= $3'),
-                params: [tenantId, companyId, comparativePeriod.endDate]
-            });
+        const { data: compEndingData } = await (dbClient as { query: (sql: string, params?: unknown[]) => Promise<{ data: unknown; error: unknown }> })
+            .query(cashBalanceQuery.replace('< $3', '<= $3'), [tenantId, companyId, comparativePeriod.endDate]);
 
-        comparativeBeginningCashBalance = parseFloat((compBeginningData as any)?.[0]?.balance || '0');
-        comparativeEndingCashBalance = parseFloat((compEndingData as any)?.[0]?.balance || '0');
+        comparativeBeginningCashBalance = parseFloat((compBeginningData as Array<{ balance: string }>)?.[0]?.balance || '0');
+        comparativeEndingCashBalance = parseFloat((compEndingData as Array<{ balance: string }>)?.[0]?.balance || '0');
     }
 
     return {
@@ -548,8 +530,8 @@ function calculateCashFlowMetrics(
         netCashFromInvesting: Math.round(netCashFromInvesting * 100) / 100,
         netCashFromFinancing: Math.round(netCashFromFinancing * 100) / 100,
         netChangeInCash: Math.round(netChangeInCash * 100) / 100,
-        beginningCashBalance: Math.round((cashBalances as any).beginningCashBalance * 100) / 100,
-        endingCashBalance: Math.round((cashBalances as any).endingCashBalance * 100) / 100,
+        beginningCashBalance: Math.round((cashBalances as { beginningCashBalance: number; endingCashBalance: number }).beginningCashBalance * 100) / 100,
+        endingCashBalance: Math.round((cashBalances as { beginningCashBalance: number; endingCashBalance: number }).endingCashBalance * 100) / 100,
 
         comparativeNetCashFromOperating: comparativeNetCashFromOperating ? Math.round(comparativeNetCashFromOperating * 100) / 100 : undefined,
         comparativeNetCashFromInvesting: comparativeNetCashFromInvesting ? Math.round(comparativeNetCashFromInvesting * 100) / 100 : undefined,

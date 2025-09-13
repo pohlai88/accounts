@@ -1,0 +1,44 @@
+# Which package.json files to scan
+source:
+  - 'package.json'
+  - 'apps/*/package.json'
+  - 'packages/*/package.json'
+  - 'services/*/package.json'
+  - 'docs/package.json'
+
+# Keep external deps tidy, but don't touch workspace links
+dependencyTypes:
+  - dependencies
+  - devDependencies
+  - peerDependencies
+  - optionalDependencies
+
+semverRange: '^'
+
+versionGroups:
+  # 1) Ignore all internal workspace packages (let pnpm handle `workspace:*`)
+  - dependencies:
+      - '@aibos/**'
+    packages:
+      - '**'
+    isIgnored: true
+
+  # 2) Critical externals must be consistent across all packages
+  - dependencies:
+      - react
+      - react-dom
+      - zod
+      - typescript
+      - next
+      - drizzle-orm
+      - vitest
+      - winston
+      - '@types/node'
+      - '@types/react'
+    packages:
+      - '**'
+    dependencyTypes:
+      - dependencies
+      - devDependencies
+      - peerDependencies
+      - optionalDependencies
