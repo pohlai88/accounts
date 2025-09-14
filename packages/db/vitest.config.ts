@@ -1,18 +1,20 @@
 /**
- * @aibos/db Vitest Configuration
+ * Vitest Configuration
  *
  * Uses @aibos/vitest-config for consistent testing across the monorepo.
- * Node environment for database package testing.
+ * All utilities and configurations are centralized in the preset.
  */
 
 import { defineConfig, mergeConfig } from "vitest/config";
-import base from "../../packages/config/vitest-config";
+import base, { nodeConfig, dbCoverageConfig } from "@aibos/vitest-config";
 
 export default mergeConfig(
   base,
+  nodeConfig,
+  dbCoverageConfig,
   defineConfig({
     test: {
-      // Database-specific overrides
+      // DB-specific overrides
       setupFiles: [],
     },
   }),

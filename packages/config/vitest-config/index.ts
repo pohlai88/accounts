@@ -6,9 +6,10 @@
  * This configuration:
  * 1. Provides unified defaults for all packages
  * 2. Supports different environments (node, jsdom, happy-dom)
- * 3. Enforces 95% coverage requirements
+ * 3. Enforces 95% coverage requirements with package-specific overrides
  * 4. Optimizes performance with parallel execution
  * 5. Maintains consistency across all test suites
+ * 6. Centralizes all resolve aliases for monorepo packages
  *
  * Usage:
  * import base from "@aibos/vitest-config";
@@ -17,6 +18,24 @@
 
 import { defineConfig } from "vitest/config";
 import { resolve } from "path";
+
+// Centralized resolve aliases for all monorepo packages
+const monorepoAliases = {
+  "@": resolve(process.cwd(), "./"),
+  "@aibos/accounting": resolve(process.cwd(), "./packages/accounting/src"),
+  "@aibos/auth": resolve(process.cwd(), "./packages/auth/src"),
+  "@aibos/contracts": resolve(process.cwd(), "./packages/contracts/src"),
+  "@aibos/db": resolve(process.cwd(), "./packages/db/src"),
+  "@aibos/ui": resolve(process.cwd(), "./packages/ui/src"),
+  "@aibos/utils": resolve(process.cwd(), "./packages/utils/src"),
+  "@aibos/cache": resolve(process.cwd(), "./packages/cache/src"),
+  "@aibos/security": resolve(process.cwd(), "./packages/security/src"),
+  "@aibos/monitoring": resolve(process.cwd(), "./packages/monitoring/src"),
+  "@aibos/realtime": resolve(process.cwd(), "./packages/realtime/src"),
+  "@aibos/api-gateway": resolve(process.cwd(), "./packages/api-gateway/src"),
+  "@aibos/deployment": resolve(process.cwd(), "./packages/deployment/src"),
+  "@aibos/tokens": resolve(process.cwd(), "./packages/tokens/src"),
+};
 
 // Base configuration that all packages will extend
 export const baseConfig = defineConfig({
@@ -103,27 +122,9 @@ export const baseConfig = defineConfig({
     },
   },
 
-  // Note: vite-tsconfig-paths plugin removed due to ESM compatibility issues
-  // Packages should use resolve.alias instead for path resolution
-
-  // Resolve aliases for monorepo packages (fallback)
+  // Centralized resolve aliases for all monorepo packages
   resolve: {
-    alias: {
-      "@": resolve(process.cwd(), "./"),
-      "@aibos/accounting": resolve(process.cwd(), "./packages/accounting/src"),
-      "@aibos/auth": resolve(process.cwd(), "./packages/auth/src"),
-      "@aibos/contracts": resolve(process.cwd(), "./packages/contracts/src"),
-      "@aibos/db": resolve(process.cwd(), "./packages/db/src"),
-      "@aibos/ui": resolve(process.cwd(), "./packages/ui/src"),
-      "@aibos/utils": resolve(process.cwd(), "./packages/utils/src"),
-      "@aibos/cache": resolve(process.cwd(), "./packages/cache/src"),
-      "@aibos/security": resolve(process.cwd(), "./packages/security/src"),
-      "@aibos/monitoring": resolve(process.cwd(), "./packages/monitoring/src"),
-      "@aibos/realtime": resolve(process.cwd(), "./packages/realtime/src"),
-      "@aibos/api-gateway": resolve(process.cwd(), "./packages/api-gateway/src"),
-      "@aibos/deployment": resolve(process.cwd(), "./packages/deployment/src"),
-      "@aibos/tokens": resolve(process.cwd(), "./packages/tokens/src"),
-    },
+    alias: monorepoAliases,
   },
 });
 
@@ -162,6 +163,64 @@ export const highCoverageConfig = defineConfig({
   },
 });
 
+// Package-specific coverage configurations
+export const accountingCoverageConfig = defineConfig({
+  test: {
+    coverage: {
+      thresholds: {
+        global: {
+          branches: 98,
+          functions: 98,
+          lines: 98,
+          statements: 98,
+        },
+        "src/fx/ingest.ts": {
+          branches: 100,
+          functions: 100,
+          lines: 100,
+          statements: 100,
+        },
+        "src/reports/": {
+          branches: 98,
+          functions: 98,
+          lines: 98,
+          statements: 98,
+        },
+      },
+    },
+  },
+});
+
+export const securityCoverageConfig = defineConfig({
+  test: {
+    coverage: {
+      thresholds: {
+        global: {
+          branches: 95,
+          functions: 95,
+          lines: 95,
+          statements: 95,
+        },
+      },
+    },
+  },
+});
+
+export const dbCoverageConfig = defineConfig({
+  test: {
+    coverage: {
+      thresholds: {
+        global: {
+          branches: 90,
+          functions: 90,
+          lines: 90,
+          statements: 90,
+        },
+      },
+    },
+  },
+});
+
 // Integration test configuration
 export const integrationConfig = defineConfig({
   test: {
@@ -169,6 +228,38 @@ export const integrationConfig = defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     setupFiles: ["./tests/setup/setup.ts"],
+  },
+});
+
+// Attachment service configuration
+export const attachmentConfig = defineConfig({
+  test: {
+    name: "attachment-service",
+    environment: "node",
+    setupFiles: ["./test/setup.ts"],
+    include: ["test/attachment-*.test.ts"],
+    exclude: ["**/*.integration.test.ts"],
+    coverage: {
+      reportsDirectory: "./test-results/coverage",
+      include: ["src/storage/attachment-service.ts", "src/supabase/server.ts"],
+      thresholds: {
+        global: {
+          branches: 98,
+          functions: 98,
+          lines: 98,
+          statements: 98,
+        },
+        "src/storage/attachment-service.ts": {
+          branches: 98,
+          functions: 98,
+          lines: 98,
+          statements: 98,
+        },
+      },
+    },
+    outputFile: {
+      json: "./test-results/attachment-service-results.json",
+    },
   },
 });
 

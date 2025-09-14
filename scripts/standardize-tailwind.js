@@ -2,7 +2,7 @@
 
 /**
  * Standardize Tailwind CSS configurations across the monorepo
- * 
+ *
  * This script ensures all packages use the centralized @aibos/tailwind-preset
  * and removes any duplicate configurations or custom overrides.
  */
@@ -42,41 +42,41 @@ module.exports = {
 
 // Package-specific content overrides
 const PACKAGE_CONTENT_OVERRIDES = {
-  "packages/ui": [
-    "./src/**/*.{ts,tsx}",
-    "../../packages/tokens/src/**/*.{ts,tsx}",
-  ],
-  "apps/web": [
-    "../../packages/ui/src/**/*.{ts,tsx}",
-    "../../packages/tokens/src/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-  ],
-  "apps/web-api": [
-    "../../packages/ui/src/**/*.{ts,tsx}",
-    "../../packages/tokens/src/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-  ],
+    "packages/ui": [
+        "./src/**/*.{ts,tsx}",
+        "../../packages/tokens/src/**/*.{ts,tsx}",
+    ],
+    "apps/web": [
+        "../../packages/ui/src/**/*.{ts,tsx}",
+        "../../packages/tokens/src/**/*.{ts,tsx}",
+        "./app/**/*.{ts,tsx}",
+        "./components/**/*.{ts,tsx}",
+    ],
+    "apps/web-api": [
+        "../../packages/ui/src/**/*.{ts,tsx}",
+        "../../packages/tokens/src/**/*.{ts,tsx}",
+        "./app/**/*.{ts,tsx}",
+    ],
 };
 
 function standardizeTailwindConfig(packagePath) {
-  const tailwindConfigPath = join(rootDir, packagePath, "tailwind.config.cjs");
-  
-  try {
-    // Check if file exists
-    const existingConfig = readFileSync(tailwindConfigPath, "utf8");
-    
-    // Create package-specific content
-    const content = PACKAGE_CONTENT_OVERRIDES[packagePath] || [
-      "./src/**/*.{ts,tsx,js,jsx}",
-      "./app/**/*.{ts,tsx,js,jsx}",
-      "./components/**/*.{ts,tsx,js,jsx}",
-      "./pages/**/*.{ts,tsx,js,jsx}",
-      "../../packages/ui/src/**/*.{ts,tsx,js,jsx}",
-      "../../packages/tokens/src/**/*.{ts,tsx,js,jsx}",
-    ];
+    const tailwindConfigPath = join(rootDir, packagePath, "tailwind.config.cjs");
 
-    const packageSpecificConfig = `/**
+    try {
+        // Check if file exists
+        const existingConfig = readFileSync(tailwindConfigPath, "utf8");
+
+        // Create package-specific content
+        const content = PACKAGE_CONTENT_OVERRIDES[packagePath] || [
+            "./src/**/*.{ts,tsx,js,jsx}",
+            "./app/**/*.{ts,tsx,js,jsx}",
+            "./components/**/*.{ts,tsx,js,jsx}",
+            "./pages/**/*.{ts,tsx,js,jsx}",
+            "../../packages/ui/src/**/*.{ts,tsx,js,jsx}",
+            "../../packages/tokens/src/**/*.{ts,tsx,js,jsx}",
+        ];
+
+        const packageSpecificConfig = `/**
  * Tailwind Configuration
  *
  * Uses @aibos/tailwind-preset for consistent design system.
@@ -93,20 +93,20 @@ module.exports = {
 };
 `;
 
-    writeFileSync(tailwindConfigPath, packageSpecificConfig);
-    console.log(`✅ Standardized ${packagePath}/tailwind.config.cjs`);
-  } catch (error) {
-    console.error(`❌ Error standardizing ${packagePath}:`, error.message);
-  }
+        writeFileSync(tailwindConfigPath, packageSpecificConfig);
+        console.log(`✅ Standardized ${packagePath}/tailwind.config.cjs`);
+    } catch (error) {
+        console.error(`❌ Error standardizing ${packagePath}:`, error.message);
+    }
 }
 
 console.log("🎨 Standardizing Tailwind CSS configurations...\n");
 
 // Standardize all packages with Tailwind configs
 const packagesWithTailwind = [
-  "packages/ui",
-  "apps/web", 
-  "apps/web-api",
+    "packages/ui",
+    "apps/web",
+    "apps/web-api",
 ];
 
 packagesWithTailwind.forEach(standardizeTailwindConfig);

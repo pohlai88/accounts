@@ -14,7 +14,7 @@ module.exports = {
     "../../packages/tokens/src/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}"
-],
+  ],
   // No additional theme extensions or plugins - everything comes from SSOT preset
   // This ensures zero drift and single source of truth
 };

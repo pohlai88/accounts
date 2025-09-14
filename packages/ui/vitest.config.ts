@@ -1,12 +1,12 @@
 /**
- * @aibos/ui Vitest Configuration
+ * Vitest Configuration
  *
  * Uses @aibos/vitest-config for consistent testing across the monorepo.
- * JSdom environment for React component testing.
+ * All utilities and configurations are centralized in the preset.
  */
 
 import { defineConfig, mergeConfig } from "vitest/config";
-import base, { jsdomConfig } from "../../packages/config/vitest-config";
+import base, { jsdomConfig } from "@aibos/vitest-config";
 
 export default mergeConfig(
   base,
