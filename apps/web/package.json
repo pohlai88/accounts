@@ -34,7 +34,9 @@
     "start": "next start",
     "typecheck": "tsc -p . --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json}\""
   },
   "type": "module"
 }

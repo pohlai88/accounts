@@ -10,7 +10,9 @@
     "test": "vitest run",
     "typecheck": "tsc -p . --noEmit",
     "lint": "eslint .",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
   "dependencies": {
     "jose": "^5.10.0"

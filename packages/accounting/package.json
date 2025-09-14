@@ -21,7 +21,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc -p . --noEmit",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
   "type": "module",
   "types": "dist/src/index.d.ts"

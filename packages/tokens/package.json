@@ -25,12 +25,14 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p . --noEmit && node scripts/build-preset.cjs",
+    "build": "tsc -p . --noEmit",
     "lint": "eslint .",
     "typecheck": "tsc -p . --noEmit",
     "dev": "tsc -p . --watch",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
   "type": "module",
   "types": "dist/index.d.ts"

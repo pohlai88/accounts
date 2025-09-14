@@ -2,7 +2,7 @@
 
 /**
  * Standardize Vitest configurations across the monorepo
- * 
+ *
  * This script ensures all packages use the centralized @aibos/vitest-config
  * and removes any duplicate configurations or custom overrides.
  */
@@ -17,10 +17,10 @@ const rootDir = join(__dirname, "..");
 
 // Package-specific Vitest configurations
 const PACKAGE_VITEST_CONFIGS = {
-  // UI package - React components with jsdom
-  "packages/ui": {
-    imports: "import base, { jsdomConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // UI package - React components with jsdom
+    "packages/ui": {
+        imports: "import base, { jsdomConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   jsdomConfig,
   defineConfig({
@@ -36,12 +36,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Accounting package - High coverage requirements
-  "packages/accounting": {
-    imports: "import base, { nodeConfig, accountingCoverageConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Accounting package - High coverage requirements
+    "packages/accounting": {
+        imports: "import base, { nodeConfig, accountingCoverageConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   accountingCoverageConfig,
@@ -52,12 +52,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Auth package - Standard node environment
-  "packages/auth": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Auth package - Standard node environment
+    "packages/auth": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -67,12 +67,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Security package - High coverage requirements
-  "packages/security": {
-    imports: "import base, { nodeConfig, securityCoverageConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Security package - High coverage requirements
+    "packages/security": {
+        imports: "import base, { nodeConfig, securityCoverageConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   securityCoverageConfig,
@@ -83,12 +83,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // DB package - Standard coverage requirements
-  "packages/db": {
-    imports: "import base, { nodeConfig, dbCoverageConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // DB package - Standard coverage requirements
+    "packages/db": {
+        imports: "import base, { nodeConfig, dbCoverageConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   dbCoverageConfig,
@@ -99,12 +99,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Other packages - Standard configuration
-  "packages/contracts": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Other packages - Standard configuration
+    "packages/contracts": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -114,11 +114,11 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  "packages/cache": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    "packages/cache": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -128,11 +128,11 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  "packages/monitoring": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    "packages/monitoring": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -142,11 +142,11 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  "packages/realtime": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    "packages/realtime": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -156,11 +156,11 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  "packages/api-gateway": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    "packages/api-gateway": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -170,11 +170,11 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  "packages/deployment": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    "packages/deployment": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -184,11 +184,11 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  "packages/tokens": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    "packages/tokens": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -198,12 +198,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Utils package - Special attachment service config
-  "packages/utils": {
-    imports: "import base, { nodeConfig, attachmentConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Utils package - Special attachment service config
+    "packages/utils": {
+        imports: "import base, { nodeConfig, attachmentConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   attachmentConfig,
@@ -214,12 +214,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Integration tests
-  "tests/integration": {
-    imports: "import base, { integrationConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Integration tests
+    "tests/integration": {
+        imports: "import base, { integrationConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   integrationConfig,
   defineConfig({
@@ -229,12 +229,12 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  },
+    },
 
-  // Test setup
-  "tests/setup": {
-    imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
-    config: `export default mergeConfig(
+    // Test setup
+    "tests/setup": {
+        imports: "import base, { nodeConfig } from \"@aibos/vitest-config\";",
+        config: `export default mergeConfig(
   base,
   nodeConfig,
   defineConfig({
@@ -244,17 +244,17 @@ const PACKAGE_VITEST_CONFIGS = {
     },
   }),
 );`
-  }
+    }
 };
 
 function standardizeVitestConfig(packagePath, config) {
-  const vitestConfigPath = join(rootDir, packagePath, "vitest.config.ts");
-  
-  try {
-    // Check if file exists
-    const existingConfig = readFileSync(vitestConfigPath, "utf8");
-    
-    const standardizedConfig = `/**
+    const vitestConfigPath = join(rootDir, packagePath, "vitest.config.ts");
+
+    try {
+        // Check if file exists
+        const existingConfig = readFileSync(vitestConfigPath, "utf8");
+
+        const standardizedConfig = `/**
  * Vitest Configuration
  *
  * Uses @aibos/vitest-config for consistent testing across the monorepo.
@@ -267,18 +267,18 @@ ${config.imports}
 ${config.config}
 `;
 
-    writeFileSync(vitestConfigPath, standardizedConfig);
-    console.log(`✅ Standardized ${packagePath}/vitest.config.ts`);
-  } catch (error) {
-    console.error(`❌ Error standardizing ${packagePath}:`, error.message);
-  }
+        writeFileSync(vitestConfigPath, standardizedConfig);
+        console.log(`✅ Standardized ${packagePath}/vitest.config.ts`);
+    } catch (error) {
+        console.error(`❌ Error standardizing ${packagePath}:`, error.message);
+    }
 }
 
 console.log("🧪 Standardizing Vitest configurations...\n");
 
 // Standardize all packages with Vitest configs
 for (const [packagePath, config] of Object.entries(PACKAGE_VITEST_CONFIGS)) {
-  standardizeVitestConfig(packagePath, config);
+    standardizeVitestConfig(packagePath, config);
 }
 
 console.log("\n✅ Vitest standardization complete!");

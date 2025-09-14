@@ -14,7 +14,9 @@
     "health-check": "node dist/scripts/health-check.js",
     "typecheck": "tsc -p . --noEmit",
     "lint": "eslint .",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
   "dependencies": {
     "@aibos/cache": "workspace:*",

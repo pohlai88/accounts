@@ -53,7 +53,9 @@
     "test:attachments:watch": "vitest test/attachment-*.test.ts --config vitest.config.attachments.ts --watch",
     "typecheck": "tsc -p . --noEmit",
     "dev": "tsc -p . --watch",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
   "type": "module",
   "types": "dist/index.d.ts"
