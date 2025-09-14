@@ -1,9 +1,9 @@
 // Attachment service for V1 compliance
 // Handles file upload, storage, and management with Supabase Storage
 
-import { createServiceClient } from '../supabase/server';
-import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto';
+import { createServiceClient } from "../supabase/server";
+import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 
 // interface AttachmentDbRecord {
 //   id: string;
@@ -58,7 +58,7 @@ export interface AttachmentInfo {
 
 export class AttachmentService {
   private supabase = createServiceClient();
-  private bucketName = 'attachments';
+  private bucketName = "attachments";
 
   /**
    * Upload a file and create attachment record
@@ -67,14 +67,17 @@ export class AttachmentService {
     file: Buffer | ArrayBuffer,
     originalFilename: string,
     mimeType: string,
-    options: UploadOptions
+    options: UploadOptions,
   ): Promise<UploadResult> {
     try {
       // Generate unique filename and calculate hash
-      const fileExtension = originalFilename.split('.').pop() || '';
+      const fileExtension = originalFilename.split(".").pop() || "";
       const uniqueFilename = `${uuidv4()}.${fileExtension}`;
       const fileBuffer = file instanceof ArrayBuffer ? Buffer.from(file) : file;
-      const fileHash = crypto.createHash('sha256').update(fileBuffer instanceof ArrayBuffer ? Buffer.from(fileBuffer) : fileBuffer).digest('hex');
+      const fileHash = crypto
+        .createHash("sha256")
+        .update(fileBuffer instanceof ArrayBuffer ? Buffer.from(fileBuffer) : fileBuffer)
+        .digest("hex");
 
       // Check for duplicate files
       const existingFile = await this.findByHash(fileHash, options.tenantId, options.companyId);
@@ -83,7 +86,7 @@ export class AttachmentService {
           success: true,
           attachmentId: existingFile.id,
           filename: existingFile.filename,
-          url: existingFile.storageUrl
+          url: existingFile.storageUrl,
         };
       }
 
@@ -95,14 +98,14 @@ export class AttachmentService {
         .from(this.bucketName)
         .upload(storagePath, fileBuffer, {
           contentType: mimeType,
-          cacheControl: '3600',
-          upsert: false
+          cacheControl: "3600",
+          upsert: false,
         });
 
       if (uploadError) {
         return {
           success: false,
-          error: `Upload failed: ${uploadError.message}`
+          error: `Upload failed: ${uploadError.message}`,
         };
       }
 
@@ -113,7 +116,7 @@ export class AttachmentService {
 
       // Create attachment record in database
       const { data: attachmentData, error: dbError } = await this.supabase
-        .from('attachments')
+        .from("attachments")
         .insert({
           tenant_id: options.tenantId,
           company_id: options.companyId,
@@ -123,14 +126,14 @@ export class AttachmentService {
           mime_type: mimeType,
           file_size: fileBuffer.byteLength,
           file_hash: fileHash,
-          storage_provider: 'supabase',
+          storage_provider: "supabase",
           storage_path: storagePath,
           storage_url: urlData.publicUrl,
           category: options.category,
           tags: options.tags || [],
           is_public: options.isPublic || false,
           metadata: options.metadata || {},
-          status: 'active'
+          status: "active",
         })
         .select()
         .single();
@@ -140,7 +143,7 @@ export class AttachmentService {
         await this.supabase.storage.from(this.bucketName).remove([storagePath]);
         return {
           success: false,
-          error: `Database error: ${dbError.message}`
+          error: `Database error: ${dbError.message}`,
         };
       }
 
@@ -148,13 +151,12 @@ export class AttachmentService {
         success: true,
         attachmentId: attachmentData.id,
         filename: uniqueFilename,
-        url: urlData.publicUrl
+        url: urlData.publicUrl,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown upload error'
+        error: error instanceof Error ? error.message : "Unknown upload error",
       };
     }
   }
@@ -165,11 +167,11 @@ export class AttachmentService {
   async getAttachment(attachmentId: string, tenantId: string): Promise<AttachmentInfo | null> {
     try {
       const { data, error } = await this.supabase
-        .from('attachments')
-        .select('*')
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId)
-        .eq('status', 'active')
+        .from("attachments")
+        .select("*")
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId)
+        .eq("status", "active")
         .single();
 
       if (error || !data) {
@@ -187,11 +189,10 @@ export class AttachmentService {
         storageUrl: data.storage_url,
         uploadedBy: data.uploaded_by,
         createdAt: data.created_at,
-        metadata: data.metadata || {}
+        metadata: data.metadata || {},
       };
-
     } catch (error) {
-      console.error('Error getting attachment:', error);
+      console.error("Error getting attachment:", error);
       return null;
     }
   }
@@ -199,7 +200,11 @@ export class AttachmentService {
   /**
    * Download attachment file
    */
-  async downloadFile(attachmentId: string, tenantId: string, userId: string): Promise<{
+  async downloadFile(
+    attachmentId: string,
+    tenantId: string,
+    userId: string,
+  ): Promise<{
     success: boolean;
     data?: ArrayBuffer;
     filename?: string;
@@ -210,16 +215,16 @@ export class AttachmentService {
       // Get attachment info
       const attachment = await this.getAttachment(attachmentId, tenantId);
       if (!attachment) {
-        return { success: false, error: 'Attachment not found' };
+        return { success: false, error: "Attachment not found" };
       }
 
       // Log access
-      await this.logAccess(attachmentId, userId, 'download');
+      await this.logAccess(attachmentId, userId, "download");
 
       // Download from storage
       const { data, error } = await this.supabase.storage
         .from(this.bucketName)
-        .download(attachment.storageUrl.split('/').pop() || '');
+        .download(attachment.storageUrl.split("/").pop() || "");
 
       if (error) {
         return { success: false, error: `Download failed: ${error.message}` };
@@ -229,13 +234,12 @@ export class AttachmentService {
         success: true,
         data: await data.arrayBuffer(),
         filename: attachment.originalFilename,
-        mimeType: attachment.mimeType
+        mimeType: attachment.mimeType,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Download failed'
+        error: error instanceof Error ? error.message : "Download failed",
       };
     }
   }
@@ -243,7 +247,11 @@ export class AttachmentService {
   /**
    * Delete attachment
    */
-  async deleteAttachment(attachmentId: string, tenantId: string, userId: string): Promise<{
+  async deleteAttachment(
+    attachmentId: string,
+    tenantId: string,
+    userId: string,
+  ): Promise<{
     success: boolean;
     error?: string;
   }> {
@@ -251,36 +259,35 @@ export class AttachmentService {
       // Get attachment info
       const attachment = await this.getAttachment(attachmentId, tenantId);
       if (!attachment) {
-        return { success: false, error: 'Attachment not found' };
+        return { success: false, error: "Attachment not found" };
       }
 
       // Mark as deleted in database (soft delete)
       const { error: dbError } = await this.supabase
-        .from('attachments')
+        .from("attachments")
         .update({
-          status: 'deleted',
+          status: "deleted",
           deleted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId);
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId);
 
       if (dbError) {
         return { success: false, error: `Database error: ${dbError.message}` };
       }
 
       // Log access
-      await this.logAccess(attachmentId, userId, 'delete');
+      await this.logAccess(attachmentId, userId, "delete");
 
       // Note: We don't immediately delete from storage to allow for recovery
       // A background job should clean up deleted files after a retention period
 
       return { success: true };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Delete failed'
+        error: error instanceof Error ? error.message : "Delete failed",
       };
     }
   }
@@ -292,34 +299,31 @@ export class AttachmentService {
     attachmentId: string,
     entityType: string,
     entityId: string,
-    relationshipType: string = 'attachment',
+    relationshipType: string = "attachment",
     userId: string,
     description?: string,
-    isRequired: boolean = false
+    isRequired: boolean = false,
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('attachment_relationships')
-        .insert({
-          attachment_id: attachmentId,
-          entity_type: entityType,
-          entity_id: entityId,
-          relationship_type: relationshipType,
-          description,
-          is_required: isRequired,
-          created_by: userId
-        });
+      const { error } = await this.supabase.from("attachment_relationships").insert({
+        attachment_id: attachmentId,
+        entity_type: entityType,
+        entity_id: entityId,
+        relationship_type: relationshipType,
+        description,
+        is_required: isRequired,
+        created_by: userId,
+      });
 
       if (error) {
         return { success: false, error: `Link failed: ${error.message}` };
       }
 
       return { success: true };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Link failed'
+        error: error instanceof Error ? error.message : "Link failed",
       };
     }
   }
@@ -330,12 +334,13 @@ export class AttachmentService {
   async getEntityAttachments(
     entityType: string,
     entityId: string,
-    tenantId: string
+    tenantId: string,
   ): Promise<AttachmentInfo[]> {
     try {
       const { data, error } = await this.supabase
-        .from('attachment_relationships')
-        .select(`
+        .from("attachment_relationships")
+        .select(
+          `
           attachment_id,
           relationship_type,
           description,
@@ -352,37 +357,40 @@ export class AttachmentService {
             created_at,
             metadata
           )
-        `)
-        .eq('entity_type', entityType)
-        .eq('entity_id', entityId)
-        .eq('attachments.tenant_id', tenantId)
-        .eq('attachments.status', 'active');
+        `,
+        )
+        .eq("entity_type", entityType)
+        .eq("entity_id", entityId)
+        .eq("attachments.tenant_id", tenantId)
+        .eq("attachments.status", "active");
 
       if (error || !data) {
         return [];
       }
 
-      return (data as Array<{
-        attachment_id: unknown;
-        relationship_type: unknown;
-        description: unknown;
-        attachments: Array<{
-          id: unknown;
-          filename: unknown;
-          original_filename: unknown;
-          mime_type: unknown;
-          file_size: unknown;
-          category: unknown;
-          tags: unknown;
-          storage_url: unknown;
-          uploaded_by: unknown;
-          created_at: unknown;
-          metadata: unknown;
-        }>;
-      }>)
-        .filter((item) => item.attachments && Array.isArray(item.attachments))
-        .flatMap((item) => item.attachments)
-        .map((attachment) => ({
+      return (
+        data as Array<{
+          attachment_id: unknown;
+          relationship_type: unknown;
+          description: unknown;
+          attachments: Array<{
+            id: unknown;
+            filename: unknown;
+            original_filename: unknown;
+            mime_type: unknown;
+            file_size: unknown;
+            category: unknown;
+            tags: unknown;
+            storage_url: unknown;
+            uploaded_by: unknown;
+            created_at: unknown;
+            metadata: unknown;
+          }>;
+        }>
+      )
+        .filter(item => item.attachments && Array.isArray(item.attachments))
+        .flatMap(item => item.attachments)
+        .map(attachment => ({
           id: String(attachment.id),
           filename: String(attachment.filename),
           originalFilename: String(attachment.original_filename),
@@ -393,11 +401,13 @@ export class AttachmentService {
           storageUrl: String(attachment.storage_url),
           uploadedBy: String(attachment.uploaded_by),
           createdAt: String(attachment.created_at),
-          metadata: attachment.metadata && typeof attachment.metadata === 'object' ? attachment.metadata as Record<string, unknown> : {}
+          metadata:
+            attachment.metadata && typeof attachment.metadata === "object"
+              ? (attachment.metadata as Record<string, unknown>)
+              : {},
         }));
-
     } catch (error) {
-      console.error('Error getting entity attachments:', error);
+      console.error("Error getting entity attachments:", error);
       return [];
     }
   }
@@ -408,16 +418,16 @@ export class AttachmentService {
   private async findByHash(
     fileHash: string,
     tenantId: string,
-    companyId: string
+    companyId: string,
   ): Promise<AttachmentInfo | null> {
     try {
       const { data, error } = await this.supabase
-        .from('attachments')
-        .select('*')
-        .eq('file_hash', fileHash)
-        .eq('tenant_id', tenantId)
-        .eq('company_id', companyId)
-        .eq('status', 'active')
+        .from("attachments")
+        .select("*")
+        .eq("file_hash", fileHash)
+        .eq("tenant_id", tenantId)
+        .eq("company_id", companyId)
+        .eq("status", "active")
         .single();
 
       if (error || !data) {
@@ -435,9 +445,8 @@ export class AttachmentService {
         storageUrl: data.storage_url,
         uploadedBy: data.uploaded_by,
         createdAt: data.created_at,
-        metadata: data.metadata || {}
+        metadata: data.metadata || {},
       };
-
     } catch {
       return null;
     }
@@ -450,21 +459,19 @@ export class AttachmentService {
     attachmentId: string,
     userId: string,
     action: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     try {
-      await this.supabase
-        .from('attachment_access_log')
-        .insert({
-          attachment_id: attachmentId,
-          user_id: userId,
-          action,
-          accessed_at: new Date().toISOString(),
-          metadata: metadata || {}
-        });
+      await this.supabase.from("attachment_access_log").insert({
+        attachment_id: attachmentId,
+        user_id: userId,
+        action,
+        accessed_at: new Date().toISOString(),
+        metadata: metadata || {},
+      });
     } catch (error) {
       // Log access errors but don't fail the main operation
-      console.error('Error logging attachment access:', error);
+      console.error("Error logging attachment access:", error);
     }
   }
 
@@ -483,7 +490,7 @@ export class AttachmentService {
       dateTo?: string;
       limit?: number;
       offset?: number;
-    } = {}
+    } = {},
   ): Promise<{
     success: boolean;
     data?: AttachmentInfo[];
@@ -492,32 +499,34 @@ export class AttachmentService {
   }> {
     try {
       let query = this.supabase
-        .from('attachments')
-        .select('*', { count: 'exact' })
-        .eq('tenant_id', tenantId)
-        .eq('status', 'active');
+        .from("attachments")
+        .select("*", { count: "exact" })
+        .eq("tenant_id", tenantId)
+        .eq("status", "active");
 
       // Apply filters
       if (filters.search) {
-        query = query.or(`original_filename.ilike.%${filters.search}%,filename.ilike.%${filters.search}%`);
+        query = query.or(
+          `original_filename.ilike.%${filters.search}%,filename.ilike.%${filters.search}%`,
+        );
       }
       if (filters.category) {
-        query = query.eq('category', filters.category);
+        query = query.eq("category", filters.category);
       }
       if (filters.tags && filters.tags.length > 0) {
-        query = query.overlaps('tags', filters.tags);
+        query = query.overlaps("tags", filters.tags);
       }
       if (filters.mimeType) {
-        query = query.eq('mime_type', filters.mimeType);
+        query = query.eq("mime_type", filters.mimeType);
       }
       if (filters.uploadedBy) {
-        query = query.eq('uploaded_by', filters.uploadedBy);
+        query = query.eq("uploaded_by", filters.uploadedBy);
       }
       if (filters.dateFrom) {
-        query = query.gte('created_at', filters.dateFrom);
+        query = query.gte("created_at", filters.dateFrom);
       }
       if (filters.dateTo) {
-        query = query.lte('created_at', filters.dateTo);
+        query = query.lte("created_at", filters.dateTo);
       }
 
       // Apply pagination
@@ -534,7 +543,7 @@ export class AttachmentService {
         return { success: false, error: `Search failed: ${error.message}` };
       }
 
-      const attachments = (data || []).map((item) => ({
+      const attachments = (data || []).map(item => ({
         id: item.id,
         filename: item.filename,
         originalFilename: item.original_filename,
@@ -545,19 +554,18 @@ export class AttachmentService {
         storageUrl: item.storage_url,
         uploadedBy: item.uploaded_by,
         createdAt: item.created_at,
-        metadata: item.metadata || {}
+        metadata: item.metadata || {},
       }));
 
       return {
         success: true,
         data: attachments,
-        total: count || 0
+        total: count || 0,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Search failed'
+        error: error instanceof Error ? error.message : "Search failed",
       };
     }
   }
@@ -569,38 +577,37 @@ export class AttachmentService {
     attachmentId: string,
     tenantId: string,
     userId: string,
-    metadata: Record<string, unknown>
+    metadata: Record<string, unknown>,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // Verify attachment exists and user has access
       const attachment = await this.getAttachment(attachmentId, tenantId);
       if (!attachment) {
-        return { success: false, error: 'Attachment not found' };
+        return { success: false, error: "Attachment not found" };
       }
 
       // Update metadata
       const { error } = await this.supabase
-        .from('attachments')
+        .from("attachments")
         .update({
           metadata: { ...attachment.metadata, ...metadata },
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId);
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId);
 
       if (error) {
         return { success: false, error: `Update failed: ${error.message}` };
       }
 
       // Log access
-      await this.logAccess(attachmentId, userId, 'update_metadata', { metadata });
+      await this.logAccess(attachmentId, userId, "update_metadata", { metadata });
 
       return { success: true };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Update failed'
+        error: error instanceof Error ? error.message : "Update failed",
       };
     }
   }
@@ -611,7 +618,7 @@ export class AttachmentService {
   async batchDelete(
     attachmentIds: string[],
     tenantId: string,
-    userId: string
+    userId: string,
   ): Promise<{
     success: boolean;
     results: Array<{ id: string; success: boolean; error?: string }>;
@@ -627,13 +634,13 @@ export class AttachmentService {
           results.push({
             id: attachmentId,
             success: result.success,
-            error: result.error
+            error: result.error,
           });
         } catch (error) {
           results.push({
             id: attachmentId,
             success: false,
-            error: error instanceof Error ? error.message : 'Delete failed'
+            error: error instanceof Error ? error.message : "Delete failed",
           });
         }
       }
@@ -644,14 +651,16 @@ export class AttachmentService {
       return {
         success: successCount > 0,
         results,
-        error: successCount < totalCount ? `${successCount}/${totalCount} deletions successful` : undefined
+        error:
+          successCount < totalCount
+            ? `${successCount}/${totalCount} deletions successful`
+            : undefined,
       };
-
     } catch (error) {
       return {
         success: false,
         results: [],
-        error: error instanceof Error ? error.message : 'Batch delete failed'
+        error: error instanceof Error ? error.message : "Batch delete failed",
       };
     }
   }
@@ -672,10 +681,10 @@ export class AttachmentService {
     try {
       // Get total count and size
       const { data: stats, error: statsError } = await this.supabase
-        .from('attachments')
-        .select('file_size, category, created_at')
-        .eq('tenant_id', tenantId)
-        .eq('status', 'active');
+        .from("attachments")
+        .select("file_size, category, created_at")
+        .eq("tenant_id", tenantId)
+        .eq("status", "active");
 
       if (statsError) {
         return { success: false, error: `Stats failed: ${statsError.message}` };
@@ -693,9 +702,7 @@ export class AttachmentService {
       // Count recent uploads (last 7 days)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const recentUploads = stats.filter(item =>
-        new Date(item.created_at) > sevenDaysAgo
-      ).length;
+      const recentUploads = stats.filter(item => new Date(item.created_at) > sevenDaysAgo).length;
 
       return {
         success: true,
@@ -703,14 +710,13 @@ export class AttachmentService {
           totalAttachments,
           totalSize,
           categories,
-          recentUploads
-        }
+          recentUploads,
+        },
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Stats failed'
+        error: error instanceof Error ? error.message : "Stats failed",
       };
     }
   }

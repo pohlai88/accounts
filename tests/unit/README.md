@@ -44,7 +44,7 @@ import {
   testComponent,
   testFunction,
   testModule,
-} from '@aibos/tests/unit';
+} from "@aibos/tests/unit";
 
 // Test API contract
 await testApiContract();
@@ -175,39 +175,39 @@ pnpm typecheck
 ### API Contract Testing
 
 ```typescript
-import { testApiContract } from '@aibos/tests/unit';
+import { testApiContract } from "@aibos/tests/unit";
 
 // Test API contract
 async function testApiContract() {
   const contract = {
-    endpoint: '/api/v1/invoices',
-    method: 'POST',
+    endpoint: "/api/v1/invoices",
+    method: "POST",
     requestSchema: {
-      type: 'object',
+      type: "object",
       properties: {
-        customerId: { type: 'string' },
-        amount: { type: 'number' },
-        dueDate: { type: 'string', format: 'date' },
+        customerId: { type: "string" },
+        amount: { type: "number" },
+        dueDate: { type: "string", format: "date" },
       },
-      required: ['customerId', 'amount', 'dueDate'],
+      required: ["customerId", "amount", "dueDate"],
     },
     responseSchema: {
-      type: 'object',
+      type: "object",
       properties: {
-        id: { type: 'string' },
-        status: { type: 'string' },
-        createdAt: { type: 'string', format: 'date-time' },
+        id: { type: "string" },
+        status: { type: "string" },
+        createdAt: { type: "string", format: "date-time" },
       },
-      required: ['id', 'status', 'createdAt'],
+      required: ["id", "status", "createdAt"],
     },
   };
 
   const result = await testApiContract(contract);
 
   if (result.valid) {
-    console.log('API contract is valid');
+    console.log("API contract is valid");
   } else {
-    console.error('API contract validation failed:', result.errors);
+    console.error("API contract validation failed:", result.errors);
   }
 }
 ```
@@ -215,33 +215,33 @@ async function testApiContract() {
 ### Database Contract Testing
 
 ```typescript
-import { testDatabaseContract } from '@aibos/tests/unit';
+import { testDatabaseContract } from "@aibos/tests/unit";
 
 // Test database contract
 async function testDatabaseContract() {
   const contract = {
-    table: 'gl_journal',
+    table: "gl_journal",
     schema: {
-      id: { type: 'string', primaryKey: true },
-      tenantId: { type: 'string', notNull: true },
-      companyId: { type: 'string', notNull: true },
-      journalDate: { type: 'date', notNull: true },
-      description: { type: 'string', maxLength: 255 },
-      status: { type: 'enum', values: ['draft', 'posted', 'reversed'] },
+      id: { type: "string", primaryKey: true },
+      tenantId: { type: "string", notNull: true },
+      companyId: { type: "string", notNull: true },
+      journalDate: { type: "date", notNull: true },
+      description: { type: "string", maxLength: 255 },
+      status: { type: "enum", values: ["draft", "posted", "reversed"] },
     },
     constraints: [
-      { type: 'foreignKey', column: 'tenantId', references: 'tenants.id' },
-      { type: 'foreignKey', column: 'companyId', references: 'companies.id' },
-      { type: 'check', condition: "journalDate >= '2020-01-01'" },
+      { type: "foreignKey", column: "tenantId", references: "tenants.id" },
+      { type: "foreignKey", column: "companyId", references: "companies.id" },
+      { type: "check", condition: "journalDate >= '2020-01-01'" },
     ],
   };
 
   const result = await testDatabaseContract(contract);
 
   if (result.valid) {
-    console.log('Database contract is valid');
+    console.log("Database contract is valid");
   } else {
-    console.error('Database contract validation failed:', result.errors);
+    console.error("Database contract validation failed:", result.errors);
   }
 }
 ```
@@ -304,8 +304,8 @@ async function testInvoiceForm() {
 ### Function Testing
 
 ```typescript
-import { testFunction } from '@aibos/tests/unit';
-import { calculateInvoiceTotal } from '@aibos/accounting/invoices';
+import { testFunction } from "@aibos/tests/unit";
+import { calculateInvoiceTotal } from "@aibos/accounting/invoices";
 
 // Test function
 async function testCalculateInvoiceTotal() {
@@ -313,7 +313,7 @@ async function testCalculateInvoiceTotal() {
     function: calculateInvoiceTotal,
     testCases: [
       {
-        name: 'calculates total with tax',
+        name: "calculates total with tax",
         input: {
           subtotal: 1000,
           taxRate: 0.1,
@@ -322,7 +322,7 @@ async function testCalculateInvoiceTotal() {
         expected: 1100,
       },
       {
-        name: 'calculates total with discount',
+        name: "calculates total with discount",
         input: {
           subtotal: 1000,
           taxRate: 0.1,
@@ -331,7 +331,7 @@ async function testCalculateInvoiceTotal() {
         expected: 990,
       },
       {
-        name: 'handles zero subtotal',
+        name: "handles zero subtotal",
         input: {
           subtotal: 0,
           taxRate: 0.1,
@@ -345,9 +345,9 @@ async function testCalculateInvoiceTotal() {
   const result = await testFunction(testConfig);
 
   if (result.success) {
-    console.log('Function test passed');
+    console.log("Function test passed");
   } else {
-    console.error('Function test failed:', result.errors);
+    console.error("Function test failed:", result.errors);
   }
 }
 ```
@@ -355,18 +355,18 @@ async function testCalculateInvoiceTotal() {
 ### Module Testing
 
 ```typescript
-import { testModule } from '@aibos/tests/unit';
-import * as invoiceModule from '@aibos/accounting/invoices';
+import { testModule } from "@aibos/tests/unit";
+import * as invoiceModule from "@aibos/accounting/invoices";
 
 // Test module
 async function testInvoiceModule() {
   const testConfig = {
     module: invoiceModule,
-    exports: ['calculateInvoiceTotal', 'validateInvoice', 'createInvoice', 'updateInvoice'],
-    dependencies: ['@aibos/db', '@aibos/utils'],
+    exports: ["calculateInvoiceTotal", "validateInvoice", "createInvoice", "updateInvoice"],
+    dependencies: ["@aibos/db", "@aibos/utils"],
     testCases: [
       {
-        name: 'exports all required functions',
+        name: "exports all required functions",
         test: () => {
           expect(invoiceModule.calculateInvoiceTotal).toBeDefined();
           expect(invoiceModule.validateInvoice).toBeDefined();
@@ -375,7 +375,7 @@ async function testInvoiceModule() {
         },
       },
       {
-        name: 'handles module initialization',
+        name: "handles module initialization",
         test: () => {
           expect(() => invoiceModule.initialize()).not.toThrow();
         },
@@ -386,9 +386,9 @@ async function testInvoiceModule() {
   const result = await testModule(testConfig);
 
   if (result.success) {
-    console.log('Module test passed');
+    console.log("Module test passed");
   } else {
-    console.error('Module test failed:', result.errors);
+    console.error("Module test failed:", result.errors);
   }
 }
 ```
@@ -396,9 +396,9 @@ async function testInvoiceModule() {
 ### Mock Testing
 
 ```typescript
-import { testFunction } from '@aibos/tests/unit';
-import { vi } from 'vitest';
-import { sendEmail } from '@aibos/utils/email';
+import { testFunction } from "@aibos/tests/unit";
+import { vi } from "vitest";
+import { sendEmail } from "@aibos/utils/email";
 
 // Test function with mocks
 async function testSendEmail() {
@@ -410,29 +410,29 @@ async function testSendEmail() {
   const testConfig = {
     function: sendEmail,
     mocks: {
-      '@aibos/utils/email': mockEmailService,
+      "@aibos/utils/email": mockEmailService,
     },
     testCases: [
       {
-        name: 'sends email successfully',
+        name: "sends email successfully",
         input: {
-          to: 'test@example.com',
-          subject: 'Test Email',
-          body: 'Test content',
+          to: "test@example.com",
+          subject: "Test Email",
+          body: "Test content",
         },
         expected: { success: true },
       },
       {
-        name: 'handles email service failure',
+        name: "handles email service failure",
         input: {
-          to: 'test@example.com',
-          subject: 'Test Email',
-          body: 'Test content',
+          to: "test@example.com",
+          subject: "Test Email",
+          body: "Test content",
         },
         setup: () => {
-          mockEmailService.send.mockRejectedValue(new Error('Email service unavailable'));
+          mockEmailService.send.mockRejectedValue(new Error("Email service unavailable"));
         },
-        expected: { success: false, error: 'Email service unavailable' },
+        expected: { success: false, error: "Email service unavailable" },
       },
     ],
   };
@@ -440,9 +440,9 @@ async function testSendEmail() {
   const result = await testFunction(testConfig);
 
   if (result.success) {
-    console.log('Mock test passed');
+    console.log("Mock test passed");
   } else {
-    console.error('Mock test failed:', result.errors);
+    console.error("Mock test failed:", result.errors);
   }
 }
 ```
@@ -456,7 +456,7 @@ import {
   testComponent,
   testFunction,
   testModule,
-} from '@aibos/tests/unit';
+} from "@aibos/tests/unit";
 
 // Comprehensive unit testing suite
 async function runUnitTests() {
@@ -471,21 +471,21 @@ async function runUnitTests() {
   try {
     // Test API contracts
     results.api = await testApiContract({
-      endpoint: '/api/v1/invoices',
-      method: 'POST',
+      endpoint: "/api/v1/invoices",
+      method: "POST",
       requestSchema: invoiceRequestSchema,
       responseSchema: invoiceResponseSchema,
     });
 
     // Test database contracts
     results.database = await testDatabaseContract({
-      table: 'gl_journal',
+      table: "gl_journal",
       schema: journalSchema,
       constraints: journalConstraints,
     });
 
     // Test components
-    const components = ['InvoiceForm', 'BillForm', 'JournalForm', 'ReportViewer'];
+    const components = ["InvoiceForm", "BillForm", "JournalForm", "ReportViewer"];
 
     for (const component of components) {
       const result = await testComponent({
@@ -498,10 +498,10 @@ async function runUnitTests() {
 
     // Test functions
     const functions = [
-      'calculateInvoiceTotal',
-      'validateInvoice',
-      'createInvoice',
-      'updateInvoice',
+      "calculateInvoiceTotal",
+      "validateInvoice",
+      "createInvoice",
+      "updateInvoice",
     ];
 
     for (const func of functions) {
@@ -514,10 +514,10 @@ async function runUnitTests() {
 
     // Test modules
     const modules = [
-      '@aibos/accounting/invoices',
-      '@aibos/accounting/bills',
-      '@aibos/accounting/journals',
-      '@aibos/accounting/reports',
+      "@aibos/accounting/invoices",
+      "@aibos/accounting/bills",
+      "@aibos/accounting/journals",
+      "@aibos/accounting/reports",
     ];
 
     for (const module of modules) {
@@ -529,9 +529,9 @@ async function runUnitTests() {
       results.modules.push({ module, result });
     }
 
-    console.log('All unit tests completed:', results);
+    console.log("All unit tests completed:", results);
   } catch (error) {
-    console.error('Unit test suite failed:', error);
+    console.error("Unit test suite failed:", error);
     throw error;
   }
 
@@ -552,7 +552,7 @@ async function runUnitTests() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_UNIT = 'true';
+process.env.DEBUG_UNIT = "true";
 ```
 
 **Logs**: Check test logs for unit test execution details

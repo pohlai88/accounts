@@ -7,8 +7,8 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '20.12.0'
-  PNPM_VERSION: '9.7.0'
+  NODE_VERSION: "20.12.0"
+  PNPM_VERSION: "9.7.0"
 
 jobs:
   # V1 Requirement: Unit Tests with 95% Coverage
@@ -61,30 +61,30 @@ jobs:
             echo "❌ Coverage report not found"
             exit 1
           fi
-          
+
           # Extract coverage percentages
           LINES=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
           FUNCTIONS=$(cat coverage/coverage-summary.json | jq '.total.functions.pct')
           BRANCHES=$(cat coverage/coverage-summary.json | jq '.total.branches.pct')
           STATEMENTS=$(cat coverage/coverage-summary.json | jq '.total.statements.pct')
-          
+
           echo "📊 Coverage Results:"
           echo "Lines: ${LINES}%"
           echo "Functions: ${FUNCTIONS}%"
           echo "Branches: ${BRANCHES}%"
           echo "Statements: ${STATEMENTS}%"
-          
+
           # V1 Requirement: 95% coverage
           if (( $(echo "$LINES < 95" | bc -l) )); then
             echo "❌ Line coverage ${LINES}% is below 95% threshold"
             exit 1
           fi
-          
+
           if (( $(echo "$FUNCTIONS < 95" | bc -l) )); then
             echo "❌ Function coverage ${FUNCTIONS}% is below 95% threshold"
             exit 1
           fi
-          
+
           echo "✅ All coverage thresholds met!"
 
       - name: Upload coverage reports
@@ -221,7 +221,6 @@ jobs:
 
       - name: Build packages
         run: pnpm build
-
 
       - name: Start API server
         run: |

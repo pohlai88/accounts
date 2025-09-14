@@ -9,15 +9,27 @@ export interface PDFOptions {
   html: string;
   margin?: { top?: string; right?: string; bottom?: string; left?: string };
   headerHtml?: string;
-  footerHtml?: string
+  footerHtml?: string;
 }
 
-export interface PdfInput extends PDFOptions { }
-export async function renderPdf({ html, margin, headerHtml, footerHtml }: PdfInput): Promise<Buffer> {
+export interface PdfInput extends PDFOptions {}
+export async function renderPdf({
+  html,
+  margin,
+  headerHtml,
+  footerHtml,
+}: PdfInput): Promise<Buffer> {
   const b = await getBrowser();
   const page = await b.newPage();
   await page.setContent(html, { waitUntil: "networkidle" });
-  const pdf = await page.pdf({ printBackground: true, format: "A4", margin, displayHeaderFooter: Boolean(headerHtml || footerHtml), headerTemplate: headerHtml ?? "<span></span>", footerTemplate: footerHtml ?? "<span></span>" });
+  const pdf = await page.pdf({
+    printBackground: true,
+    format: "A4",
+    margin,
+    displayHeaderFooter: Boolean(headerHtml || footerHtml),
+    headerTemplate: headerHtml ?? "<span></span>",
+    footerTemplate: footerHtml ?? "<span></span>",
+  });
   await page.close();
   return pdf;
 }

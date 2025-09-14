@@ -21,9 +21,9 @@ export const ocrProcessing = inngest.createFunction(
       extractText = true,
       extractTables = true,
       extractMetadata = true,
-      documentType = 'general',
-      languages = ['en'],
-      priority = 'normal'
+      documentType = "general",
+      languages = ["en"],
+      priority = "normal",
     } = event.data as any;
 
     const supabase = createServiceClient();
@@ -32,9 +32,9 @@ export const ocrProcessing = inngest.createFunction(
     // Create audit context for tracking
     const auditContext = createV1AuditContext({
       url: `/ocr/process/${attachmentId}`,
-      method: 'POST',
+      method: "POST",
       headers: new globalThis.Headers(),
-      ip: 'worker'
+      ip: "worker",
     } as any);
 
     // Step 1: Validate input and fetch attachment
@@ -57,10 +57,10 @@ export const ocrProcessing = inngest.createFunction(
 
       // Fetch attachment details from database
       const { data: attachment, error } = await supabase
-        .from('attachments')
-        .select('*')
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId)
+        .from("attachments")
+        .select("*")
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId)
         .single();
 
       if (error || !attachment) {
@@ -69,12 +69,12 @@ export const ocrProcessing = inngest.createFunction(
 
       // Validate file type for OCR processing
       const supportedMimeTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'image/bmp',
-        'image/tiff',
-        'application/pdf'
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/bmp",
+        "image/tiff",
+        "application/pdf",
       ];
 
       if (!supportedMimeTypes.includes(attachment.mime_type)) {
@@ -83,19 +83,19 @@ export const ocrProcessing = inngest.createFunction(
 
       // Update OCR status to processing
       await supabase
-        .from('attachments')
+        .from("attachments")
         .update({
           metadata: {
             ...attachment.metadata,
-            ocrStatus: 'processing',
-            ocrStartedAt: new Date().toISOString()
-          }
+            ocrStatus: "processing",
+            ocrStartedAt: new Date().toISOString(),
+          },
         })
-        .eq('id', attachmentId);
+        .eq("id", attachmentId);
 
       // Log OCR processing start
       await auditService.logOperation(auditContext, {
-        operation: 'ocr_processing_started',
+        operation: "ocr_processing_started",
         data: {
           attachmentId,
           filename: attachment.filename,
@@ -104,8 +104,8 @@ export const ocrProcessing = inngest.createFunction(
           documentType,
           extractText,
           extractTables,
-          extractMetadata
-        }
+          extractMetadata,
+        },
       });
 
       return {
@@ -115,7 +115,7 @@ export const ocrProcessing = inngest.createFunction(
         fileSize: attachment.file_size,
         storagePath: attachment.storage_path,
         storageUrl: attachment.storage_url,
-        category: attachment.category
+        category: attachment.category,
       };
     });
 
@@ -124,7 +124,7 @@ export const ocrProcessing = inngest.createFunction(
       try {
         // Download file from Supabase Storage
         const { data: fileData, error: downloadError } = await supabase.storage
-          .from('attachments')
+          .from("attachments")
           .download(attachmentData.storagePath);
 
         if (downloadError || !fileData) {
@@ -136,14 +136,14 @@ export const ocrProcessing = inngest.createFunction(
         logger.info("File downloaded for OCR", {
           attachmentId,
           filename: attachmentData.filename,
-          bufferSize: buffer.length
+          bufferSize: buffer.length,
         });
 
         return buffer;
       } catch (error) {
         logger.error("File download failed", {
           attachmentId,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
         throw error;
       }
@@ -157,8 +157,8 @@ export const ocrProcessing = inngest.createFunction(
         // Initialize OCR results
         const results: any = {
           attachmentId,
-          status: 'processing',
-          confidence: 0
+          status: "processing",
+          confidence: 0,
         };
 
         // Text extraction
@@ -166,14 +166,14 @@ export const ocrProcessing = inngest.createFunction(
           const textResult = await extractTextFromFile(
             Buffer.from(fileBuffer as any),
             attachmentData.mimeType,
-            languages
+            languages,
           );
           results.extractedText = textResult.text;
           results.confidence = Math.max(results.confidence || 0, textResult.confidence);
         }
 
         // Table extraction
-        if (extractTables && attachmentData.mimeType === 'application/pdf') {
+        if (extractTables && attachmentData.mimeType === "application/pdf") {
           const tableResult = await extractTablesFromPDF(Buffer.from(fileBuffer as any));
           results.extractedTables = tableResult.tables;
           results.confidence = Math.max(results.confidence || 0, tableResult.confidence);
@@ -185,7 +185,7 @@ export const ocrProcessing = inngest.createFunction(
             Buffer.from(fileBuffer as any),
             attachmentData.mimeType,
             documentType,
-            results.extractedText || ''
+            results.extractedText || "",
           );
           results.structuredData = structuredResult.data;
           results.confidence = Math.max(results.confidence || 0, structuredResult.confidence);
@@ -193,7 +193,7 @@ export const ocrProcessing = inngest.createFunction(
 
         const processingTime = Date.now() - startTime;
 
-        results.status = 'completed';
+        results.status = "completed";
         results.processedAt = new Date().toISOString();
         results.processingTime = processingTime;
 
@@ -203,23 +203,23 @@ export const ocrProcessing = inngest.createFunction(
           confidence: results.confidence,
           hasText: !!results.extractedText,
           hasStructuredData: !!results.structuredData,
-          tableCount: results.extractedTables?.length || 0
+          tableCount: results.extractedTables?.length || 0,
         });
 
         return results as any;
       } catch (error) {
         logger.error("OCR processing failed", {
           attachmentId,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
 
         return {
           attachmentId,
-          status: 'failed' as const,
+          status: "failed" as const,
           confidence: 0,
           processedAt: new Date().toISOString(),
           processingTime: 0,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         };
       }
     });
@@ -229,7 +229,7 @@ export const ocrProcessing = inngest.createFunction(
       try {
         // Update attachment with OCR results
         const { error: updateError } = await supabase
-          .from('attachments')
+          .from("attachments")
           .update({
             metadata: {
               ...attachmentData,
@@ -241,53 +241,53 @@ export const ocrProcessing = inngest.createFunction(
                 confidence: ocrResults.confidence,
                 processedAt: ocrResults.processedAt,
                 processingTime: ocrResults.processingTime,
-                error: ocrResults.error
+                error: ocrResults.error,
               },
-              ocrConfidence: ocrResults.confidence
+              ocrConfidence: ocrResults.confidence,
             },
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
-          .eq('id', attachmentId);
+          .eq("id", attachmentId);
 
         if (updateError) {
           throw new Error(`Failed to update attachment: ${updateError.message}`);
         }
 
         // Log OCR completion
-        if (ocrResults.status === 'completed') {
+        if (ocrResults.status === "completed") {
           await auditService.logOperation(auditContext, {
-            operation: 'ocr_processing_completed',
+            operation: "ocr_processing_completed",
             data: {
               attachmentId,
               confidence: ocrResults.confidence,
               processingTime: ocrResults.processingTime,
               hasText: !!ocrResults.extractedText,
               hasStructuredData: !!ocrResults.structuredData,
-              tableCount: ocrResults.extractedTables?.length || 0
-            }
+              tableCount: ocrResults.extractedTables?.length || 0,
+            },
           });
         } else {
-          await auditService.logError(auditContext, 'OCR_PROCESSING_ERROR', {
-            operation: 'ocr_processing',
-            error: ocrResults.error || 'Unknown OCR processing error',
+          await auditService.logError(auditContext, "OCR_PROCESSING_ERROR", {
+            operation: "ocr_processing",
+            error: ocrResults.error || "Unknown OCR processing error",
             data: {
               attachmentId,
-              processingTime: ocrResults.processingTime
-            }
+              processingTime: ocrResults.processingTime,
+            },
           });
         }
 
         logger.info("OCR results stored", {
           attachmentId,
           status: ocrResults.status,
-          confidence: ocrResults.confidence
+          confidence: ocrResults.confidence,
         });
 
         return { success: true, results: ocrResults };
       } catch (error) {
         logger.error("Failed to store OCR results", {
           attachmentId,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
         throw error;
       }
@@ -296,43 +296,42 @@ export const ocrProcessing = inngest.createFunction(
     // Step 5: Trigger downstream processing if needed
     await step.run("trigger-downstream-processing", async () => {
       // If OCR was successful and we have structured data, trigger additional workflows
-      if (ocrResults.status === 'completed' && ocrResults.structuredData) {
+      if (ocrResults.status === "completed" && ocrResults.structuredData) {
         const structuredData = ocrResults.structuredData;
 
         // Trigger invoice processing workflow if this looks like an invoice
-        if (attachmentData.category === 'invoice' ||
-          structuredData.documentType === 'invoice' ||
-          (structuredData.invoiceNumber && structuredData.totalAmount)) {
-
+        if (
+          attachmentData.category === "invoice" ||
+          structuredData.documentType === "invoice" ||
+          (structuredData.invoiceNumber && structuredData.totalAmount)
+        ) {
           await inngest.send({
             name: "invoice/ocr-extracted",
             data: {
               attachmentId,
               tenantId,
               ocrData: structuredData,
-              confidence: ocrResults.confidence
-            }
+              confidence: ocrResults.confidence,
+            },
           });
 
           logger.info("Triggered invoice processing workflow", {
             attachmentId,
             invoiceNumber: structuredData.invoiceNumber,
-            totalAmount: structuredData.totalAmount
+            totalAmount: structuredData.totalAmount,
           });
         }
 
         // Trigger receipt processing workflow if this looks like a receipt
-        if (attachmentData.category === 'receipt' ||
-          structuredData.documentType === 'receipt') {
-
+        if (attachmentData.category === "receipt" || structuredData.documentType === "receipt") {
           await inngest.send({
             name: "receipt/ocr-extracted",
             data: {
               attachmentId,
               tenantId,
               ocrData: structuredData,
-              confidence: ocrResults.confidence
-            }
+              confidence: ocrResults.confidence,
+            },
           });
 
           logger.info("Triggered receipt processing workflow", { attachmentId });
@@ -351,9 +350,9 @@ export const ocrProcessing = inngest.createFunction(
       hasText: !!ocrResults.extractedText,
       hasStructuredData: !!ocrResults.structuredData,
       tableCount: ocrResults.extractedTables?.length || 0,
-      error: ocrResults.error
+      error: ocrResults.error,
     };
-  }
+  },
 );
 
 // OCR Helper Functions
@@ -361,7 +360,7 @@ export const ocrProcessing = inngest.createFunction(
 async function extractTextFromFile(
   buffer: Buffer,
   mimeType: string,
-  languages: string[]
+  languages: string[],
 ): Promise<{ text: string; confidence: number }> {
   // This is a placeholder implementation
   // In production, you would use libraries like:
@@ -372,10 +371,10 @@ async function extractTextFromFile(
   // - Tesseract with node-tesseract-ocr
 
   try {
-    if (mimeType === 'application/pdf') {
+    if (mimeType === "application/pdf") {
       // For PDFs, you might use pdf-parse or pdf2pic + OCR
       return await extractTextFromPDF(buffer, languages);
-    } else if (mimeType.startsWith('image/')) {
+    } else if (mimeType.startsWith("image/")) {
       // For images, use OCR directly
       return await extractTextFromImage(buffer, languages);
     }
@@ -384,15 +383,15 @@ async function extractTextFromFile(
   } catch (error) {
     logger.error("Text extraction failed", {
       mimeType,
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
-    return { text: '', confidence: 0 };
+    return { text: "", confidence: 0 };
   }
 }
 
 async function extractTextFromPDF(
   _buffer: Buffer,
-  _languages: string[]
+  _languages: string[],
 ): Promise<{ text: string; confidence: number }> {
   // Placeholder implementation
   // In production, use libraries like pdf-parse, pdf2pic + tesseract, or cloud APIs
@@ -405,13 +404,13 @@ In production, this would use actual OCR libraries or cloud services.`;
 
     return { text, confidence: 0.85 };
   } catch {
-    return { text: '', confidence: 0 };
+    return { text: "", confidence: 0 };
   }
 }
 
 async function extractTextFromImage(
   _buffer: Buffer,
-  _languages: string[]
+  _languages: string[],
 ): Promise<{ text: string; confidence: number }> {
   // Placeholder implementation
   // In production, use Tesseract.js, cloud OCR APIs, or other OCR libraries
@@ -422,31 +421,32 @@ async function extractTextFromImage(
 This is simulated text extracted from an image.
 In production, this would use actual OCR libraries or cloud services.`;
 
-    return { text, confidence: 0.80 };
+    return { text, confidence: 0.8 };
   } catch {
-    return { text: '', confidence: 0 };
+    return { text: "", confidence: 0 };
   }
 }
 
-async function extractTablesFromPDF(
-  _buffer: Buffer
-): Promise<{ tables: Array<{ headers: string[]; rows: string[][]; confidence: number }>; confidence: number }> {
+async function extractTablesFromPDF(_buffer: Buffer): Promise<{
+  tables: Array<{ headers: string[]; rows: string[][]; confidence: number }>;
+  confidence: number;
+}> {
   // Placeholder implementation
   // In production, use libraries like tabula-js, camelot-py via API, or cloud services
 
   try {
     const tables = [
       {
-        headers: ['Description', 'Quantity', 'Unit Price', 'Amount'],
+        headers: ["Description", "Quantity", "Unit Price", "Amount"],
         rows: [
-          ['Sample Item 1', '2', '$10.00', '$20.00'],
-          ['Sample Item 2', '1', '$15.00', '$15.00']
+          ["Sample Item 1", "2", "$10.00", "$20.00"],
+          ["Sample Item 2", "1", "$15.00", "$15.00"],
         ],
-        confidence: 0.90
-      }
+        confidence: 0.9,
+      },
     ];
 
-    return { tables, confidence: 0.90 };
+    return { tables, confidence: 0.9 };
   } catch {
     return { tables: [], confidence: 0 };
   }
@@ -456,20 +456,20 @@ async function extractStructuredData(
   _buffer: Buffer,
   mimeType: string,
   documentType: string,
-  extractedText: string
+  extractedText: string,
 ): Promise<{ data: Record<string, unknown>; confidence: number }> {
   // Placeholder implementation for structured data extraction
   // In production, this would use NLP, regex patterns, or ML models
 
   try {
     const data: Record<string, unknown> = {
-      documentType
+      documentType,
     };
 
     // Simple pattern matching for common document types
-    if (documentType === 'invoice' || extractedText.toLowerCase().includes('invoice')) {
+    if (documentType === "invoice" || extractedText.toLowerCase().includes("invoice")) {
       // Extract invoice-specific data
-      data.documentType = 'invoice';
+      data.documentType = "invoice";
 
       // Simulate invoice number extraction
       const invoiceMatch = extractedText.match(/invoice\s*#?\s*(\w+)/i);
@@ -480,8 +480,8 @@ async function extractStructuredData(
       // Simulate total amount extraction
       const totalMatch = extractedText.match(/total[:\s]*\$?(\d+\.?\d*)/i);
       if (totalMatch) {
-        data.totalAmount = parseFloat(totalMatch[1] || '0');
-        data.currency = 'USD'; // Default currency
+        data.totalAmount = parseFloat(totalMatch[1] || "0");
+        data.currency = "USD"; // Default currency
       }
 
       // Simulate date extraction
@@ -493,33 +493,32 @@ async function extractStructuredData(
       return { data, confidence: 0.75 };
     }
 
-    if (documentType === 'receipt' || extractedText.toLowerCase().includes('receipt')) {
-      data.documentType = 'receipt';
+    if (documentType === "receipt" || extractedText.toLowerCase().includes("receipt")) {
+      data.documentType = "receipt";
 
       // Extract receipt-specific data
       const totalMatch = extractedText.match(/total[:\s]*\$?(\d+\.?\d*)/i);
       if (totalMatch) {
-        data.totalAmount = parseFloat(totalMatch[1] || '0');
-        data.currency = 'USD';
+        data.totalAmount = parseFloat(totalMatch[1] || "0");
+        data.currency = "USD";
       }
 
-      return { data, confidence: 0.70 };
+      return { data, confidence: 0.7 };
     }
 
     // For other document types, return basic metadata
     return {
       data: {
-        documentType: 'general',
+        documentType: "general",
         textLength: extractedText.length,
-        mimeType
+        mimeType,
       },
-      confidence: 0.60
+      confidence: 0.6,
     };
-
   } catch (error) {
     logger.error("Structured data extraction failed", {
       documentType,
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
     return { data: {}, confidence: 0 };
   }

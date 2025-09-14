@@ -270,7 +270,7 @@ The design system implements two complete, optimized experiences:
 ### **Basic Token Usage**
 
 ```typescript
-import { SEMANTIC_TOKENS, applyModeToDocument } from '@aibos/tokens';
+import { SEMANTIC_TOKENS, applyModeToDocument } from "@aibos/tokens";
 
 // Use semantic tokens in CSS
 const styles = {
@@ -280,7 +280,7 @@ const styles = {
 };
 
 // Apply design mode to document
-applyModeToDocument('aesthetic');
+applyModeToDocument("aesthetic");
 ```
 
 ### **Tailwind CSS Integration**
@@ -288,7 +288,7 @@ applyModeToDocument('aesthetic');
 ```typescript
 // tailwind.config.js
 module.exports = {
-  presets: [require('@aibos/tokens/tailwind.preset.cjs')],
+  presets: [require("@aibos/tokens/tailwind.preset.cjs")],
   // ... rest of config
 };
 ```
@@ -304,7 +304,7 @@ module.exports = {
 ### **Mode Switching**
 
 ```typescript
-import { toggleAccessibilityMode, isAccessibilityMode } from '@aibos/tokens';
+import { toggleAccessibilityMode, isAccessibilityMode } from "@aibos/tokens";
 
 // Toggle between modes
 const currentMode = toggleAccessibilityMode();
@@ -313,7 +313,7 @@ const currentMode = toggleAccessibilityMode();
 const isAccessibility = isAccessibilityMode();
 
 // Initialize with default mode
-initializeDesignMode('aesthetic');
+initializeDesignMode("aesthetic");
 ```
 
 ### **CSS Variable Usage**

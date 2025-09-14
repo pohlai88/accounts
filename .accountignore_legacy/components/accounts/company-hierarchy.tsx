@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog'
-import { 
-  Building2, 
-  Plus, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Building2,
+  Plus,
   TreePine,
   Users,
   TrendingUp,
@@ -32,80 +32,82 @@ import {
   Eye,
   Edit,
   Trash2,
-  AlertTriangle
-} from 'lucide-react'
-import { 
+  AlertTriangle,
+} from "lucide-react";
+import {
   CompanyHierarchyService,
   CompanyHierarchy,
   CompanyRelationship,
   ConsolidatedStructure,
   Company,
-  RelationshipType
-} from '@/lib/company-hierarchy'
+  RelationshipType,
+} from "@/lib/company-hierarchy";
 
 interface CompanyHierarchyProps {
-  companyId: string
+  companyId: string;
 }
 
 export function CompanyHierarchyManagement({ companyId }: CompanyHierarchyProps) {
-  const [relationships, setRelationships] = useState<CompanyRelationship[]>([])
-  const [consolidatedStructure, setConsolidatedStructure] = useState<ConsolidatedStructure[]>([])
-  const [allCompanies, setAllCompanies] = useState<Company[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [relationships, setRelationships] = useState<CompanyRelationship[]>([]);
+  const [consolidatedStructure, setConsolidatedStructure] = useState<ConsolidatedStructure[]>([]);
+  const [allCompanies, setAllCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   useEffect(() => {
-    loadData()
-  }, [companyId])
+    loadData();
+  }, [companyId]);
 
   const loadData = async () => {
     try {
       const [relationshipsResult, structureResult, companiesResult] = await Promise.all([
         CompanyHierarchyService.getCompanyRelationships(companyId),
         CompanyHierarchyService.getConsolidatedStructure(companyId),
-        CompanyHierarchyService.getAllCompanies()
-      ])
+        CompanyHierarchyService.getAllCompanies(),
+      ]);
 
       if (relationshipsResult.success && relationshipsResult.relationships) {
-        setRelationships(relationshipsResult.relationships)
+        setRelationships(relationshipsResult.relationships);
       }
 
       if (structureResult.success && structureResult.structure) {
-        setConsolidatedStructure(structureResult.structure)
+        setConsolidatedStructure(structureResult.structure);
       }
 
       if (companiesResult.success && companiesResult.companies) {
-        setAllCompanies(companiesResult.companies)
+        setAllCompanies(companiesResult.companies);
       }
     } catch (error) {
-      console.error('Error loading data:', error)
+      console.error("Error loading data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleCreateRelationship = async (relationshipData: Omit<CompanyHierarchy, 'id' | 'created_at' | 'updated_at'>) => {
+  const handleCreateRelationship = async (
+    relationshipData: Omit<CompanyHierarchy, "id" | "created_at" | "updated_at">,
+  ) => {
     try {
-      const result = await CompanyHierarchyService.createRelationship(relationshipData)
+      const result = await CompanyHierarchyService.createRelationship(relationshipData);
       if (result.success) {
-        setShowCreateDialog(false)
-        loadData()
+        setShowCreateDialog(false);
+        loadData();
       }
     } catch (error) {
-      console.error('Error creating relationship:', error)
+      console.error("Error creating relationship:", error);
     }
-  }
+  };
 
   const handleDeactivateRelationship = async (relationshipId: string) => {
     try {
-      const result = await CompanyHierarchyService.deactivateRelationship(relationshipId)
+      const result = await CompanyHierarchyService.deactivateRelationship(relationshipId);
       if (result.success) {
-        loadData()
+        loadData();
       }
     } catch (error) {
-      console.error('Error deactivating relationship:', error)
+      console.error("Error deactivating relationship:", error);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -124,7 +126,7 @@ export function CompanyHierarchyManagement({ companyId }: CompanyHierarchyProps)
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <CreateRelationshipForm 
+            <CreateRelationshipForm
               companyId={companyId}
               allCompanies={allCompanies}
               onSuccess={handleCreateRelationship}
@@ -159,7 +161,7 @@ export function CompanyHierarchyManagement({ companyId }: CompanyHierarchyProps)
                 <div className="space-y-4">
                   {relationships.map(relationship => (
                     <RelationshipCard
-                      key={`${relationship.related_company_id}-${relationship.is_parent ? 'parent' : 'child'}`}
+                      key={`${relationship.related_company_id}-${relationship.is_parent ? "parent" : "child"}`}
                       relationship={relationship}
                       onDeactivate={handleDeactivateRelationship}
                     />
@@ -191,17 +193,21 @@ export function CompanyHierarchyManagement({ companyId }: CompanyHierarchyProps)
               {consolidatedStructure.length > 0 ? (
                 <div className="space-y-2">
                   {consolidatedStructure.map(company => (
-                    <div 
-                      key={company.company_id} 
+                    <div
+                      key={company.company_id}
                       className="flex items-center justify-between p-3 border rounded-lg"
                       style={{ marginLeft: `${company.level * 20}px` }}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          company.level === 0 ? 'bg-blue-500' : 
-                          company.level === 1 ? 'bg-green-500' : 
-                          'bg-gray-400'
-                        }`}></div>
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            company.level === 0
+                              ? "bg-blue-500"
+                              : company.level === 1
+                                ? "bg-green-500"
+                                : "bg-gray-400"
+                          }`}
+                        ></div>
                         <div>
                           <p className="font-medium">{company.company_name}</p>
                           <p className="text-sm text-muted-foreground">
@@ -234,9 +240,7 @@ export function CompanyHierarchyManagement({ companyId }: CompanyHierarchyProps)
                 <Settings className="h-5 w-5 mr-2" />
                 Intercompany Setup
               </CardTitle>
-              <CardDescription>
-                Configure intercompany accounts and validate setup
-              </CardDescription>
+              <CardDescription>Configure intercompany accounts and validate setup</CardDescription>
             </CardHeader>
             <CardContent>
               <IntercompanySetup companyId={companyId} />
@@ -245,32 +249,40 @@ export function CompanyHierarchyManagement({ companyId }: CompanyHierarchyProps)
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
 interface RelationshipCardProps {
-  relationship: CompanyRelationship
-  onDeactivate: (id: string) => void
+  relationship: CompanyRelationship;
+  onDeactivate: (id: string) => void;
 }
 
 function RelationshipCard({ relationship, onDeactivate }: RelationshipCardProps) {
   const getRelationshipIcon = (type: RelationshipType) => {
     switch (type) {
-      case 'Parent': return <TrendingUp className="h-4 w-4 text-blue-500" />
-      case 'Subsidiary': return <TrendingUp className="h-4 w-4 text-green-500" />
-      case 'Sister': return <Users className="h-4 w-4 text-purple-500" />
-      case 'Joint Venture': return <Building2 className="h-4 w-4 text-orange-500" />
+      case "Parent":
+        return <TrendingUp className="h-4 w-4 text-blue-500" />;
+      case "Subsidiary":
+        return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case "Sister":
+        return <Users className="h-4 w-4 text-purple-500" />;
+      case "Joint Venture":
+        return <Building2 className="h-4 w-4 text-orange-500" />;
     }
-  }
+  };
 
   const getRelationshipColor = (type: RelationshipType) => {
     switch (type) {
-      case 'Parent': return 'bg-blue-100 text-blue-800'
-      case 'Subsidiary': return 'bg-green-100 text-green-800'
-      case 'Sister': return 'bg-purple-100 text-purple-800'
-      case 'Joint Venture': return 'bg-orange-100 text-orange-800'
+      case "Parent":
+        return "bg-blue-100 text-blue-800";
+      case "Subsidiary":
+        return "bg-green-100 text-green-800";
+      case "Sister":
+        return "bg-purple-100 text-purple-800";
+      case "Joint Venture":
+        return "bg-orange-100 text-orange-800";
     }
-  }
+  };
 
   return (
     <div className="p-4 border rounded-lg">
@@ -280,7 +292,7 @@ function RelationshipCard({ relationship, onDeactivate }: RelationshipCardProps)
           <div>
             <p className="font-medium">{relationship.related_company_name}</p>
             <p className="text-sm text-muted-foreground">
-              {relationship.is_parent ? 'Parent Company' : 'Related Company'}
+              {relationship.is_parent ? "Parent Company" : "Related Company"}
             </p>
           </div>
         </div>
@@ -295,47 +307,47 @@ function RelationshipCard({ relationship, onDeactivate }: RelationshipCardProps)
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 interface CreateRelationshipFormProps {
-  companyId: string
-  allCompanies: Company[]
-  onSuccess: (relationship: Omit<CompanyHierarchy, 'id' | 'created_at' | 'updated_at'>) => void
-  onCancel: () => void
+  companyId: string;
+  allCompanies: Company[];
+  onSuccess: (relationship: Omit<CompanyHierarchy, "id" | "created_at" | "updated_at">) => void;
+  onCancel: () => void;
 }
 
-function CreateRelationshipForm({ 
-  companyId, 
-  allCompanies, 
-  onSuccess, 
-  onCancel 
+function CreateRelationshipForm({
+  companyId,
+  allCompanies,
+  onSuccess,
+  onCancel,
 }: CreateRelationshipFormProps) {
   const [formData, setFormData] = useState({
     parent_company_id: companyId,
-    child_company_id: '',
-    relationship_type: 'Subsidiary' as RelationshipType,
+    child_company_id: "",
+    relationship_type: "Subsidiary" as RelationshipType,
     ownership_percentage: 100,
-    established_date: new Date().toISOString().split('T')[0]
-  })
+    established_date: new Date().toISOString().split("T")[0],
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     onSuccess({
       ...formData,
-      is_active: true
-    })
-  }
+      is_active: true,
+    });
+  };
 
-  const availableCompanies = allCompanies.filter(c => c.id !== companyId)
+  const availableCompanies = allCompanies.filter(c => c.id !== companyId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="parent_company_id">Parent Company</Label>
-        <Select 
-          value={formData.parent_company_id} 
-          onValueChange={(value) => setFormData({ ...formData, parent_company_id: value })}
+        <Select
+          value={formData.parent_company_id}
+          onValueChange={value => setFormData({ ...formData, parent_company_id: value })}
         >
           <SelectTrigger>
             <SelectValue />
@@ -352,9 +364,9 @@ function CreateRelationshipForm({
 
       <div>
         <Label htmlFor="child_company_id">Child Company</Label>
-        <Select 
-          value={formData.child_company_id} 
-          onValueChange={(value) => setFormData({ ...formData, child_company_id: value })}
+        <Select
+          value={formData.child_company_id}
+          onValueChange={value => setFormData({ ...formData, child_company_id: value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select child company" />
@@ -371,9 +383,11 @@ function CreateRelationshipForm({
 
       <div>
         <Label htmlFor="relationship_type">Relationship Type</Label>
-        <Select 
-          value={formData.relationship_type} 
-          onValueChange={(value: RelationshipType) => setFormData({ ...formData, relationship_type: value })}
+        <Select
+          value={formData.relationship_type}
+          onValueChange={(value: RelationshipType) =>
+            setFormData({ ...formData, relationship_type: value })
+          }
         >
           <SelectTrigger>
             <SelectValue />
@@ -395,7 +409,9 @@ function CreateRelationshipForm({
           max="100"
           step="0.01"
           value={formData.ownership_percentage}
-          onChange={(e) => setFormData({ ...formData, ownership_percentage: parseFloat(e.target.value) || 0 })}
+          onChange={e =>
+            setFormData({ ...formData, ownership_percentage: parseFloat(e.target.value) || 0 })
+          }
           placeholder="Enter ownership percentage"
           required
         />
@@ -407,7 +423,7 @@ function CreateRelationshipForm({
           id="established_date"
           type="date"
           value={formData.established_date}
-          onChange={(e) => setFormData({ ...formData, established_date: e.target.value })}
+          onChange={e => setFormData({ ...formData, established_date: e.target.value })}
           required
         />
       </div>
@@ -419,36 +435,36 @@ function CreateRelationshipForm({
         <Button type="submit">Create Relationship</Button>
       </div>
     </form>
-  )
+  );
 }
 
 interface IntercompanySetupProps {
-  companyId: string
+  companyId: string;
 }
 
 function IntercompanySetup({ companyId }: IntercompanySetupProps) {
-  const [hasRelationships, setHasRelationships] = useState<boolean | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [hasRelationships, setHasRelationships] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkRelationships()
-  }, [companyId])
+    checkRelationships();
+  }, [companyId]);
 
   const checkRelationships = async () => {
     try {
-      const result = await CompanyHierarchyService.hasRelationships(companyId)
+      const result = await CompanyHierarchyService.hasRelationships(companyId);
       if (result.success) {
-        setHasRelationships(result.hasRelationships || false)
+        setHasRelationships(result.hasRelationships || false);
       }
     } catch (error) {
-      console.error('Error checking relationships:', error)
+      console.error("Error checking relationships:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
-    return <div className="text-center py-8">Checking setup...</div>
+    return <div className="text-center py-8">Checking setup...</div>;
   }
 
   return (
@@ -474,7 +490,8 @@ function IntercompanySetup({ companyId }: IntercompanySetupProps) {
             <div>
               <p className="font-medium text-yellow-800">Setup Required</p>
               <p className="text-sm text-yellow-600">
-                No company relationships found. Add relationships to enable intercompany transactions.
+                No company relationships found. Add relationships to enable intercompany
+                transactions.
               </p>
             </div>
           </>
@@ -513,5 +530,5 @@ function IntercompanySetup({ companyId }: IntercompanySetupProps) {
         </Card>
       </div>
     </div>
-  )
+  );
 }

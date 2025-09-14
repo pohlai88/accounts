@@ -38,7 +38,7 @@ without over-engineering.
 
 ```typescript
 // packages/contracts/src/types/api.ts
-export type SortOrder = 'asc' | 'desc';
+export type SortOrder = "asc" | "desc";
 
 export interface PaginationParams {
   page: number;
@@ -105,7 +105,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user' | 'viewer';
+  role: "admin" | "user" | "viewer";
   companyId: string; // For tenant isolation
   createdAt: string;
   updatedAt: string;
@@ -121,7 +121,7 @@ export interface Company {
 }
 
 // Ensure all layers use the same interfaces
-export type { User, Company } from './entities';
+export type { User, Company } from "./entities";
 ```
 
 #### **1.3 Enhanced Error Standardization**
@@ -129,14 +129,14 @@ export type { User, Company } from './entities';
 ```typescript
 // packages/contracts/src/types/errors.ts
 export enum ErrorCode {
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
-  AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
-  NOT_FOUND = 'NOT_FOUND',
-  CONFLICT = 'CONFLICT',
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
-  TIMEOUT = 'TIMEOUT',
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  VALIDATION_ERROR = "VALIDATION_ERROR",
+  AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR",
+  AUTHORIZATION_ERROR = "AUTHORIZATION_ERROR",
+  NOT_FOUND = "NOT_FOUND",
+  CONFLICT = "CONFLICT",
+  RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED",
+  TIMEOUT = "TIMEOUT",
+  INTERNAL_ERROR = "INTERNAL_ERROR",
 }
 
 export const httpStatusFor = (code: ErrorCode): number => {
@@ -167,8 +167,8 @@ export const httpStatusFor = (code: ErrorCode): number => {
 
 ```typescript
 // packages/middleware/src/auth.ts
-import { createHash } from 'crypto';
-import type { User } from '@contracts/types/entities';
+import { createHash } from "crypto";
+import type { User } from "@contracts/types/entities";
 
 export interface SecurityContext {
   user: User;
@@ -180,10 +180,10 @@ export interface SecurityContext {
 
 export class AuthMiddleware {
   async validateToken(token?: string): Promise<User> {
-    if (!token) throw new Error('Missing token');
+    if (!token) throw new Error("Missing token");
     // TODO: verify JWT (issuer, audience, exp, signature) and map claims → User
     // return user object with id/email/name/role/companyId
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   async checkPermissions(user: User, required: string[] = []): Promise<boolean> {
@@ -193,7 +193,7 @@ export class AuthMiddleware {
   }
 
   makeRequestId(seed?: string): string {
-    return seed || createHash('sha1').update(`${Date.now()}-${Math.random()}`).digest('hex');
+    return seed || createHash("sha1").update(`${Date.now()}-${Math.random()}`).digest("hex");
   }
 
   async buildSecurityContext(token: string, requestId: string): Promise<SecurityContext> {
@@ -219,10 +219,10 @@ export class MiddlewareStack {
   private tracer: Tracer;
 
   async processRequest(req: Request, res: Response, next: NextFunction) {
-    const requestId = (req.headers['x-request-id'] as string) || this.generateRequestId();
+    const requestId = (req.headers["x-request-id"] as string) || this.generateRequestId();
 
     // 1. Set correlation ID
-    res.setHeader('x-request-id', requestId);
+    res.setHeader("x-request-id", requestId);
 
     // 2. Authentication
     const token = this.extractToken(req);
@@ -245,17 +245,17 @@ export class MiddlewareStack {
 
 ```typescript
 // packages/api-gateway/src/gateway.ts
-import type { ApiResponse } from '@contracts/types/api';
-import { isSuccess } from '@contracts/types/api';
-import type { AuthMiddleware, SecurityContext } from '@middleware/auth';
+import type { ApiResponse } from "@contracts/types/api";
+import { isSuccess } from "@contracts/types/api";
+import type { AuthMiddleware, SecurityContext } from "@middleware/auth";
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export enum Route {
-  GetRules = '/api/rules',
-  CreateRule = '/api/rules',
-  UpdateRule = '/api/rules/:id',
-  DeleteRule = '/api/rules/:id',
+  GetRules = "/api/rules",
+  CreateRule = "/api/rules",
+  UpdateRule = "/api/rules/:id",
+  DeleteRule = "/api/rules/:id",
 }
 
 export interface RequestOptions {
@@ -273,16 +273,16 @@ export class ApiGateway {
     private readonly cache: {
       get<T>(k: string): Promise<T | null>;
       set(k: string, v: any, ttl?: number): Promise<void>;
-    }
+    },
   ) {}
 
-  private cacheKey(route: Route, q?: RequestOptions['query']) {
+  private cacheKey(route: Route, q?: RequestOptions["query"]) {
     const qs = q
       ? Object.entries(q)
           .map(([k, v]) => `${k}=${v}`)
           .sort()
-          .join('&')
-      : '';
+          .join("&")
+      : "";
     return `${route}?${qs}`;
   }
 
@@ -290,7 +290,7 @@ export class ApiGateway {
     route: Route,
     method: HttpMethod,
     body?: unknown,
-    opts: RequestOptions = {}
+    opts: RequestOptions = {},
   ): Promise<ApiResponse<T>> {
     // 1. Build security context
     const ctx = await this.auth.buildSecurityContext(opts.token!, opts.requestId!);
@@ -299,12 +299,12 @@ export class ApiGateway {
     await this.rateLimiter.checkLimit(`${ctx.tenantId}:${route}`);
 
     // 3. Idempotency for mutations
-    if (method !== 'GET' && !opts.idempotencyKey) {
-      return this.createErrorResponse('IDEMPOTENCY_REQUIRED', 400, ctx);
+    if (method !== "GET" && !opts.idempotencyKey) {
+      return this.createErrorResponse("IDEMPOTENCY_REQUIRED", 400, ctx);
     }
 
     // 4. GET caching only
-    if (method === 'GET') {
+    if (method === "GET") {
       const key = this.cacheKey(route, opts.query);
       const cached = await this.cache.get<ApiResponse<T>>(key);
       if (cached) return cached;
@@ -322,12 +322,12 @@ export class ApiGateway {
     method: HttpMethod,
     body: unknown,
     opts: RequestOptions,
-    ctx: SecurityContext
+    ctx: SecurityContext,
   ): Promise<ApiResponse<T>> {
-    const url = new URL(route, globalThis.location?.origin ?? 'http://localhost');
+    const url = new URL(route, globalThis.location?.origin ?? "http://localhost");
     if (opts.query) {
       Object.entries(opts.query).forEach(([k, v]) =>
-        v !== undefined ? url.searchParams.set(k, String(v)) : undefined
+        v !== undefined ? url.searchParams.set(k, String(v)) : undefined,
       );
     }
 
@@ -335,13 +335,13 @@ export class ApiGateway {
       method,
       signal: opts.signal,
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${opts.token ?? ''}`,
-        'X-Request-Id': ctx.requestId,
-        'X-Tenant-Id': ctx.tenantId,
-        ...(opts.idempotencyKey ? { 'Idempotency-Key': opts.idempotencyKey } : {}),
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.token ?? ""}`,
+        "X-Request-Id": ctx.requestId,
+        "X-Tenant-Id": ctx.tenantId,
+        ...(opts.idempotencyKey ? { "Idempotency-Key": opts.idempotencyKey } : {}),
       },
-      body: method === 'GET' ? undefined : JSON.stringify(body ?? {}),
+      body: method === "GET" ? undefined : JSON.stringify(body ?? {}),
     });
 
     const json = await res.json().catch(() => ({}));
@@ -351,7 +351,7 @@ export class ApiGateway {
   private createErrorResponse(
     code: string,
     status: number,
-    ctx: SecurityContext
+    ctx: SecurityContext,
   ): ApiResponse<any> {
     return {
       success: false,
@@ -359,8 +359,8 @@ export class ApiGateway {
       requestId: ctx.requestId,
       traceId: ctx.traceId,
       error: {
-        type: 'about:blank',
-        title: 'Request Error',
+        type: "about:blank",
+        title: "Request Error",
         status,
         code,
         instance: ctx.requestId,
@@ -384,7 +384,7 @@ export class AppStore {
       return this.cache.get(cacheKey);
     }
 
-    const response = await this.apiGateway.handleRequest<Rule[]>(Route.GetRules, 'GET', undefined, {
+    const response = await this.apiGateway.handleRequest<Rule[]>(Route.GetRules, "GET", undefined, {
       query: { tenantId },
     });
 
@@ -397,7 +397,7 @@ export class AppStore {
   }
 
   async createRule(rule: CreateRuleRequest, tenantId: string): Promise<Rule> {
-    const response = await this.apiGateway.handleRequest<Rule>(Route.CreateRule, 'POST', rule, {
+    const response = await this.apiGateway.handleRequest<Rule>(Route.CreateRule, "POST", rule, {
       idempotencyKey: this.generateIdempotencyKey(rule),
       query: { tenantId },
     });
@@ -442,14 +442,14 @@ export const useRules = (tenantId: string) => {
       setError(null);
       try {
         const newRule = await appStore.createRule(ruleData, tenantId);
-        setRules((prev) => [...prev, newRule]);
+        setRules(prev => [...prev, newRule]);
       } catch (err) {
         setError(err as Problem);
       } finally {
         setLoading(false);
       }
     },
-    [tenantId]
+    [tenantId],
   );
 
   return { rules, loading, error, fetchRules, createRule };
@@ -472,10 +472,10 @@ export class WebSocketManager {
 
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
-      console.log('WebSocket connected');
+      console.log("WebSocket connected");
     };
 
-    this.ws.onmessage = (event) => {
+    this.ws.onmessage = event => {
       const message = JSON.parse(event.data);
       this.notifyListeners(message.type, message.data);
     };
@@ -492,7 +492,7 @@ export class WebSocketManager {
         () => {
           this.connect(token, tenantId);
         },
-        Math.pow(2, this.reconnectAttempts) * 1000
+        Math.pow(2, this.reconnectAttempts) * 1000,
       );
     }
   }
@@ -506,7 +506,7 @@ export class WebSocketManager {
 
   private notifyListeners(eventType: string, data: any) {
     const callbacks = this.listeners.get(eventType) || [];
-    callbacks.forEach((callback) => callback(data));
+    callbacks.forEach(callback => callback(data));
   }
 }
 ```
@@ -521,21 +521,21 @@ export class WebSocketManager {
 
 ```typescript
 // packages/contracts/src/validation.ts
-import { z } from 'zod';
-import type { ApiResponse, Problem } from './types/api';
+import { z } from "zod";
+import type { ApiResponse, Problem } from "./types/api";
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   name: z.string().min(1),
-  role: z.enum(['admin', 'user', 'viewer']),
+  role: z.enum(["admin", "user", "viewer"]),
   companyId: z.string().uuid(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 
 export const ProblemSchema = z.object({
-  type: z.string().url().or(z.literal('about:blank')),
+  type: z.string().url().or(z.literal("about:blank")),
   title: z.string(),
   status: z.number().int(),
   detail: z.string().optional(),
@@ -597,7 +597,7 @@ export class SecurityManager {
 
     // 5. Tenant isolation enforcement
     if (req.tenantId !== user.companyId) {
-      throw new Error('Tenant access denied');
+      throw new Error("Tenant access denied");
     }
 
     return { user, permissions, tenantId: user.companyId };
@@ -626,7 +626,7 @@ export class EventStore {
 
   async getEvents(streamId: string, tenantId: string): Promise<DomainEvent[]> {
     // Retrieve events for rebuilding state with tenant scope
-    return this.database.events.where({ streamId, tenantId }).orderBy('version').toArray();
+    return this.database.events.where({ streamId, tenantId }).orderBy("version").toArray();
   }
 }
 ```
@@ -695,13 +695,13 @@ export class HealthChecker {
       const start = Date.now();
       await this.database.ping();
       return {
-        status: 'healthy',
+        status: "healthy",
         latency: Date.now() - start,
         tenantId,
       };
     } catch (error) {
       return {
-        status: 'unhealthy',
+        status: "unhealthy",
         error: error.message,
         tenantId,
       };
@@ -712,12 +712,12 @@ export class HealthChecker {
     try {
       const response = await fetch(`/api/health?tenantId=${tenantId}`);
       return {
-        status: response.ok ? 'healthy' : 'unhealthy',
+        status: response.ok ? "healthy" : "unhealthy",
         tenantId,
       };
     } catch (error) {
       return {
-        status: 'unhealthy',
+        status: "unhealthy",
         error: error.message,
         tenantId,
       };
@@ -738,7 +738,7 @@ export class MetricsCollector {
     method: string,
     statusCode: number,
     duration: number,
-    tenantId: string
+    tenantId: string,
   ) {
     this.prometheus.httpRequestsTotal
       .labels({

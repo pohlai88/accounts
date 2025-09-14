@@ -12,14 +12,7 @@ export const pdfGeneration = inngest.createFunction(
   },
   { event: "pdf/generate" },
   async ({ event, step }) => {
-    const {
-      templateType,
-      data,
-      tenantId,
-      companyId,
-      entityId,
-      entityType
-    } = event.data;
+    const { templateType, data, tenantId, companyId, entityId, entityType } = event.data;
 
     // Step 1: Validate input and prepare template
     const templateData = await step.run("prepare-template", async () => {
@@ -74,7 +67,7 @@ export const pdfGeneration = inngest.createFunction(
           footerHtml: generateFooter(templateData.metadata),
         });
 
-        const pdf = await Promise.race([pdfPromise, timeoutPromise]) as Buffer;
+        const pdf = (await Promise.race([pdfPromise, timeoutPromise])) as Buffer;
 
         if (!Buffer.isBuffer(pdf)) {
           throw new Error("PDF generation did not return a Buffer");
@@ -145,19 +138,17 @@ export const pdfGeneration = inngest.createFunction(
 
       try {
         // Store PDF reference in attachments table
-        const { error } = await supabase
-          .from("attachments")
-          .insert({
-            tenant_id: tenantId,
-            company_id: companyId,
-            entity_type: entityType,
-            entity_id: entityId,
-            file_name: storageResult.fileName,
-            file_path: storageResult.filePath,
-            file_type: "application/pdf",
-            file_size: (pdfBuffer as unknown as Buffer).length,
-            created_by: null, // System generated
-          });
+        const { error } = await supabase.from("attachments").insert({
+          tenant_id: tenantId,
+          company_id: companyId,
+          entity_type: entityType,
+          entity_id: entityId,
+          file_name: storageResult.fileName,
+          file_path: storageResult.filePath,
+          file_type: "application/pdf",
+          file_size: (pdfBuffer as unknown as Buffer).length,
+          created_by: null, // System generated
+        });
 
         if (error) {
           logger.error("Failed to create attachment record", {
@@ -196,7 +187,7 @@ export const pdfGeneration = inngest.createFunction(
       publicUrl: storageResult.publicUrl,
       sizeKB: Math.round((pdfBuffer as unknown as Buffer).length / 1024),
     };
-  }
+  },
 );
 
 // Template generators
@@ -242,8 +233,8 @@ function generateInvoiceTemplate(data: any): string {
       
       <div class="invoice-details">
         <div><strong>Bill To:</strong></div>
-        <div>${data.customer?.name || 'N/A'}</div>
-        <div>${data.customer?.address || ''}</div>
+        <div>${data.customer?.name || "N/A"}</div>
+        <div>${data.customer?.address || ""}</div>
       </div>
 
       <table class="line-items">
@@ -256,19 +247,25 @@ function generateInvoiceTemplate(data: any): string {
           </tr>
         </thead>
         <tbody>
-          ${data.lineItems?.map((item: any) => `
+          ${
+            data.lineItems
+              ?.map(
+                (item: any) => `
             <tr>
               <td>${item.description}</td>
               <td>${item.quantity}</td>
               <td>${item.rate}</td>
               <td>${item.amount}</td>
             </tr>
-          `).join('') || '<tr><td colspan="4">No items</td></tr>'}
+          `,
+              )
+              .join("") || '<tr><td colspan="4">No items</td></tr>'
+          }
         </tbody>
       </table>
 
       <div class="total">
-        Total: ${data.currency} ${data.total || '0.00'}
+        Total: ${data.currency} ${data.total || "0.00"}
       </div>
     </body>
     </html>
@@ -297,7 +294,7 @@ function generateJournalTemplate(data: any): string {
         <div class="journal-title">JOURNAL ENTRY</div>
         <div>Journal #: ${data.journalNumber}</div>
         <div>Date: ${data.date}</div>
-        <div>Description: ${data.description || ''}</div>
+        <div>Description: ${data.description || ""}</div>
       </div>
 
       <table class="journal-lines">
@@ -310,20 +307,26 @@ function generateJournalTemplate(data: any): string {
           </tr>
         </thead>
         <tbody>
-          ${data.lines?.map((line: any) => `
+          ${
+            data.lines
+              ?.map(
+                (line: any) => `
             <tr>
               <td>${line.accountName}</td>
-              <td>${line.description || ''}</td>
-              <td>${line.debit > 0 ? line.debit : ''}</td>
-              <td>${line.credit > 0 ? line.credit : ''}</td>
+              <td>${line.description || ""}</td>
+              <td>${line.debit > 0 ? line.debit : ""}</td>
+              <td>${line.credit > 0 ? line.credit : ""}</td>
             </tr>
-          `).join('') || '<tr><td colspan="4">No lines</td></tr>'}
+          `,
+              )
+              .join("") || '<tr><td colspan="4">No lines</td></tr>'
+          }
         </tbody>
       </table>
 
       <div class="totals">
-        <div>Total Debits: ${data.totalDebit || '0.00'}</div>
-        <div>Total Credits: ${data.totalCredit || '0.00'}</div>
+        <div>Total Debits: ${data.totalDebit || "0.00"}</div>
+        <div>Total Credits: ${data.totalCredit || "0.00"}</div>
       </div>
     </body>
     </html>
@@ -341,7 +344,7 @@ function generateProfitLossTemplate(_data: any): string {
 function generateHeader(metadata: any): string {
   return `
     <div style="font-size: 10px; text-align: center; margin: 10px;">
-      ${metadata.companyName || 'Company Name'} | Generated: ${new Date(metadata.generatedAt).toLocaleDateString()}
+      ${metadata.companyName || "Company Name"} | Generated: ${new Date(metadata.generatedAt).toLocaleDateString()}
     </div>
   `;
 }

@@ -1,6 +1,6 @@
 // D2 AR Invoice Posting Engine - Invoice to GL Integration
-import { validateJournalPosting, type JournalPostingInput } from '../posting';
-import { validateFxPolicy } from '../fx/policy';
+import { validateJournalPosting, type JournalPostingInput } from "../posting";
+import { validateFxPolicy } from "../fx/policy";
 
 export interface InvoicePostingInput {
   tenantId: string;
@@ -34,7 +34,7 @@ export interface TaxLineInput {
   taxCode: string;
   taxAccountId: string;
   taxAmount: number;
-  taxType: 'INPUT' | 'OUTPUT' | 'EXEMPT';
+  taxType: "INPUT" | "OUTPUT" | "EXEMPT";
 }
 
 export interface InvoicePostingResult {
@@ -51,12 +51,12 @@ export interface InvoicePostingResult {
 export interface InvoicePostingError {
   validated: false;
   error: string;
-  code: 'INVALID_AMOUNTS' | 'INVALID_ACCOUNTS' | 'INVALID_CURRENCY' | 'BUSINESS_RULE_VIOLATION';
+  code: "INVALID_AMOUNTS" | "INVALID_ACCOUNTS" | "INVALID_CURRENCY" | "BUSINESS_RULE_VIOLATION";
 }
 
 /**
  * Validates and prepares an AR invoice for GL posting
- * 
+ *
  * Business Rules:
  * 1. Invoice must be balanced (AR = Revenue + Tax)
  * 2. All accounts must exist and be active
@@ -70,21 +70,22 @@ export async function validateInvoicePosting(
   input: InvoicePostingInput,
   userId: string,
   userRole: string,
-  baseCurrency: string = 'MYR'
+  baseCurrency: string = "MYR",
 ): Promise<InvoicePostingResult | InvoicePostingError> {
   try {
     // 1. Validate basic input
     if (!input.invoiceId || !input.arAccountId || !input.lines.length) {
       return {
         validated: false,
-        error: 'Missing required fields: invoiceId, arAccountId, or lines',
-        code: 'INVALID_AMOUNTS'
+        error: "Missing required fields: invoiceId, arAccountId, or lines",
+        code: "INVALID_AMOUNTS",
       };
     }
 
     // 2. Calculate totals from lines
     const totalRevenue = input.lines.reduce((sum, line) => sum + line.lineAmount, 0);
-    const totalTax = input.lines.reduce((sum, line) => sum + (line.taxAmount || 0), 0) +
+    const totalTax =
+      input.lines.reduce((sum, line) => sum + (line.taxAmount || 0), 0) +
       (input.taxLines?.reduce((sum, tax) => sum + tax.taxAmount, 0) || 0);
     const totalAmount = totalRevenue + totalTax;
 
@@ -92,16 +93,16 @@ export async function validateInvoicePosting(
     if (totalRevenue <= 0) {
       return {
         validated: false,
-        error: 'Invoice revenue must be positive',
-        code: 'INVALID_AMOUNTS'
+        error: "Invoice revenue must be positive",
+        code: "INVALID_AMOUNTS",
       };
     }
 
     if (totalAmount <= 0) {
       return {
         validated: false,
-        error: 'Invoice total amount must be positive',
-        code: 'INVALID_AMOUNTS'
+        error: "Invoice total amount must be positive",
+        code: "INVALID_AMOUNTS",
       };
     }
 
@@ -113,7 +114,7 @@ export async function validateInvoicePosting(
       return {
         validated: false,
         error: `Exchange rate required for ${input.currency} to ${baseCurrency} conversion`,
-        code: 'INVALID_CURRENCY'
+        code: "INVALID_CURRENCY",
       };
     }
 
@@ -133,7 +134,7 @@ export async function validateInvoicePosting(
       debit: arAmountBase,
       credit: 0,
       description: `AR - ${input.customerName} - ${input.invoiceNumber}`,
-      reference: input.invoiceNumber
+      reference: input.invoiceNumber,
     });
 
     // Credit: Revenue accounts (line amounts in base currency)
@@ -144,7 +145,7 @@ export async function validateInvoicePosting(
         debit: 0,
         credit: revenueAmountBase,
         description: `Revenue - ${line.description}`,
-        reference: input.invoiceNumber
+        reference: input.invoiceNumber,
       });
 
       // Credit: Tax amount if applicable
@@ -163,7 +164,7 @@ export async function validateInvoicePosting(
           debit: 0,
           credit: taxAmountBase,
           description: `${taxLine.taxCode} Tax - ${input.invoiceNumber}`,
-          reference: input.invoiceNumber
+          reference: input.invoiceNumber,
         });
       }
     }
@@ -179,8 +180,8 @@ export async function validateInvoicePosting(
         tenantId: input.tenantId,
         companyId: input.companyId,
         userId,
-        userRole
-      }
+        userRole,
+      },
     };
 
     // 7. Validate the journal posting
@@ -189,8 +190,8 @@ export async function validateInvoicePosting(
     if (!journalValidation.validated) {
       return {
         validated: false,
-        error: `Journal validation failed: ${(journalValidation as { error?: string }).error || 'Unknown validation error'}`,
-        code: 'BUSINESS_RULE_VIOLATION'
+        error: `Journal validation failed: ${(journalValidation as { error?: string }).error || "Unknown validation error"}`,
+        code: "BUSINESS_RULE_VIOLATION",
       };
     }
 
@@ -203,14 +204,13 @@ export async function validateInvoicePosting(
       totalAmount,
       requiresApproval: journalValidation.requiresApproval,
       approverRoles: journalValidation.approverRoles,
-      coaWarnings: journalValidation.coaWarnings
+      coaWarnings: journalValidation.coaWarnings,
     };
-
   } catch (error) {
     return {
       validated: false,
-      error: error instanceof Error ? error.message : 'Unknown validation error',
-      code: 'BUSINESS_RULE_VIOLATION'
+      error: error instanceof Error ? error.message : "Unknown validation error",
+      code: "BUSINESS_RULE_VIOLATION",
     };
   }
 }
@@ -230,7 +230,7 @@ export function calculateInvoiceTotals(lines: InvoiceLineInput[]): {
   return {
     subtotal: Math.round(subtotal * 100) / 100, // Round to 2 decimal places
     taxAmount: Math.round(taxAmount * 100) / 100,
-    totalAmount: Math.round(totalAmount * 100) / 100
+    totalAmount: Math.round(totalAmount * 100) / 100,
   };
 }
 
@@ -249,7 +249,9 @@ export function validateInvoiceLines(lines: InvoiceLineInput[]): {
     const actualLineAmount = line.lineAmount;
 
     if (Math.abs(expectedLineAmount - actualLineAmount) > 0.01) {
-      errors.push(`Line ${line.lineNumber}: Line amount ${actualLineAmount} does not match quantity × unit price ${expectedLineAmount}`);
+      errors.push(
+        `Line ${line.lineNumber}: Line amount ${actualLineAmount} does not match quantity × unit price ${expectedLineAmount}`,
+      );
     }
 
     // Validate tax calculation if tax is applied
@@ -258,7 +260,9 @@ export function validateInvoiceLines(lines: InvoiceLineInput[]): {
       const actualTaxAmount = line.taxAmount || 0;
 
       if (Math.abs(expectedTaxAmount - actualTaxAmount) > 0.01) {
-        errors.push(`Line ${line.lineNumber}: Tax amount ${actualTaxAmount} does not match line amount × tax rate ${expectedTaxAmount}`);
+        errors.push(
+          `Line ${line.lineNumber}: Tax amount ${actualTaxAmount} does not match line amount × tax rate ${expectedTaxAmount}`,
+        );
       }
     }
 
@@ -278,7 +282,7 @@ export function validateInvoiceLines(lines: InvoiceLineInput[]): {
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -289,7 +293,7 @@ export function generateInvoiceDescription(
   invoiceNumber: string,
   customerName: string,
   totalAmount: number,
-  currency: string
+  currency: string,
 ): string {
   return `Invoice ${invoiceNumber} - ${customerName} - ${currency} ${totalAmount.toFixed(2)}`;
 }

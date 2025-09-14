@@ -1,7 +1,7 @@
 import { Inngest } from "inngest";
 
 // V1 Inngest Configuration with DLQ and retry policies
-export const inngest = new Inngest({ 
+export const inngest = new Inngest({
   id: "aibos-worker",
   name: "AIBOS Worker",
   retries: 3,

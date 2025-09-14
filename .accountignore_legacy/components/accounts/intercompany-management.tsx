@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog'
-import { 
-  Building2, 
-  Plus, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Building2,
+  Plus,
   ArrowRightLeft,
   CheckCircle,
   XCircle,
@@ -34,96 +34,107 @@ import {
   TrendingDown,
   Settings,
   Eye,
-  RotateCcw
-} from 'lucide-react'
-import { 
+  RotateCcw,
+} from "lucide-react";
+import {
   IntercompanyManagementService,
   IntercompanyTransaction,
   IntercompanyBalance,
   IntercompanyTransactionType,
-  IntercompanyStatus
-} from '@/lib/intercompany-management'
-import { CurrencyManagementService, Currency } from '@/lib/currency-management'
+  IntercompanyStatus,
+} from "@/lib/intercompany-management";
+import { CurrencyManagementService, Currency } from "@/lib/currency-management";
 
 interface IntercompanyManagementProps {
-  companyId: string
+  companyId: string;
 }
 
 export function IntercompanyManagement({ companyId }: IntercompanyManagementProps) {
-  const [transactions, setTransactions] = useState<IntercompanyTransaction[]>([])
-  const [balances, setBalances] = useState<IntercompanyBalance[]>([])
-  const [currencies, setCurrencies] = useState<Currency[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const [selectedStatus, setSelectedStatus] = useState<IntercompanyStatus | 'All'>('All')
+  const [transactions, setTransactions] = useState<IntercompanyTransaction[]>([]);
+  const [balances, setBalances] = useState<IntercompanyBalance[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<IntercompanyStatus | "All">("All");
 
   useEffect(() => {
-    loadData()
-  }, [companyId])
+    loadData();
+  }, [companyId]);
 
   const loadData = async () => {
     try {
       const [transactionsResult, balancesResult, currenciesResult] = await Promise.all([
         IntercompanyManagementService.getIntercompanyTransactions(companyId),
         IntercompanyManagementService.getIntercompanyBalances(companyId),
-        CurrencyManagementService.getCurrencies()
-      ])
+        CurrencyManagementService.getCurrencies(),
+      ]);
 
       if (transactionsResult.success && transactionsResult.transactions) {
-        setTransactions(transactionsResult.transactions)
+        setTransactions(transactionsResult.transactions);
       }
 
       if (balancesResult.success && balancesResult.balances) {
-        setBalances(balancesResult.balances)
+        setBalances(balancesResult.balances);
       }
 
       if (currenciesResult.success && currenciesResult.currencies) {
-        setCurrencies(currenciesResult.currencies)
+        setCurrencies(currenciesResult.currencies);
       }
     } catch (error) {
-      console.error('Error loading data:', error)
+      console.error("Error loading data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleCreateTransaction = async (transactionData: Omit<IntercompanyTransaction, 'id' | 'transaction_no' | 'created_at' | 'updated_at'>) => {
+  const handleCreateTransaction = async (
+    transactionData: Omit<
+      IntercompanyTransaction,
+      "id" | "transaction_no" | "created_at" | "updated_at"
+    >,
+  ) => {
     try {
-      const result = await IntercompanyManagementService.createIntercompanyTransaction(transactionData)
+      const result =
+        await IntercompanyManagementService.createIntercompanyTransaction(transactionData);
       if (result.success) {
-        setShowCreateDialog(false)
-        loadData()
+        setShowCreateDialog(false);
+        loadData();
       }
     } catch (error) {
-      console.error('Error creating transaction:', error)
+      console.error("Error creating transaction:", error);
     }
-  }
+  };
 
   const handleApproveTransaction = async (transactionId: string) => {
     try {
-      const result = await IntercompanyManagementService.approveIntercompanyTransaction(transactionId, 'current-user-id')
+      const result = await IntercompanyManagementService.approveIntercompanyTransaction(
+        transactionId,
+        "current-user-id",
+      );
       if (result.success) {
-        loadData()
+        loadData();
       }
     } catch (error) {
-      console.error('Error approving transaction:', error)
+      console.error("Error approving transaction:", error);
     }
-  }
+  };
 
   const handleCancelTransaction = async (transactionId: string) => {
     try {
-      const result = await IntercompanyManagementService.cancelIntercompanyTransaction(transactionId, 'Cancelled by user')
+      const result = await IntercompanyManagementService.cancelIntercompanyTransaction(
+        transactionId,
+        "Cancelled by user",
+      );
       if (result.success) {
-        loadData()
+        loadData();
       }
     } catch (error) {
-      console.error('Error cancelling transaction:', error)
+      console.error("Error cancelling transaction:", error);
     }
-  }
+  };
 
-  const filteredTransactions = selectedStatus === 'All' 
-    ? transactions 
-    : transactions.filter(t => t.status === selectedStatus)
+  const filteredTransactions =
+    selectedStatus === "All" ? transactions : transactions.filter(t => t.status === selectedStatus);
 
   return (
     <div className="space-y-6">
@@ -142,7 +153,7 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <CreateIntercompanyTransactionForm 
+            <CreateIntercompanyTransactionForm
               companyId={companyId}
               currencies={currencies}
               onSuccess={handleCreateTransaction}
@@ -162,7 +173,10 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
         <TabsContent value="transactions" className="space-y-4">
           <div className="flex items-center space-x-4">
             <Label htmlFor="status-filter">Filter by Status</Label>
-            <Select value={selectedStatus} onValueChange={(value: IntercompanyStatus | 'All') => setSelectedStatus(value)}>
+            <Select
+              value={selectedStatus}
+              onValueChange={(value: IntercompanyStatus | "All") => setSelectedStatus(value)}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue />
               </SelectTrigger>
@@ -182,9 +196,7 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
                 <ArrowRightLeft className="h-5 w-5 mr-2" />
                 Intercompany Transactions
               </CardTitle>
-              <CardDescription>
-                Track and manage transactions between companies
-              </CardDescription>
+              <CardDescription>Track and manage transactions between companies</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -218,9 +230,7 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
                 <DollarSign className="h-5 w-5 mr-2" />
                 Intercompany Balances
               </CardTitle>
-              <CardDescription>
-                Current balances with other companies
-              </CardDescription>
+              <CardDescription>Current balances with other companies</CardDescription>
             </CardHeader>
             <CardContent>
               {balances.length > 0 ? (
@@ -246,11 +256,17 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-lg font-bold ${
-                            balance.net_amount > 0 ? 'text-green-600' : 
-                            balance.net_amount < 0 ? 'text-red-600' : 'text-gray-600'
-                          }`}>
-                            {balance.net_amount > 0 ? '+' : ''}${balance.net_amount.toLocaleString()}
+                          <p
+                            className={`text-lg font-bold ${
+                              balance.net_amount > 0
+                                ? "text-green-600"
+                                : balance.net_amount < 0
+                                  ? "text-red-600"
+                                  : "text-gray-600"
+                            }`}
+                          >
+                            {balance.net_amount > 0 ? "+" : ""}$
+                            {balance.net_amount.toLocaleString()}
                           </p>
                           <p className="text-sm text-muted-foreground">Net Balance</p>
                         </div>
@@ -276,9 +292,7 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
                 <Settings className="h-5 w-5 mr-2" />
                 Intercompany Settings
               </CardTitle>
-              <CardDescription>
-                Configure intercompany accounts and preferences
-              </CardDescription>
+              <CardDescription>Configure intercompany accounts and preferences</CardDescription>
             </CardHeader>
             <CardContent>
               <IntercompanySettings companyId={companyId} />
@@ -287,33 +301,41 @@ export function IntercompanyManagement({ companyId }: IntercompanyManagementProp
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
 interface TransactionCardProps {
-  transaction: IntercompanyTransaction
-  onApprove: (id: string) => void
-  onCancel: (id: string) => void
+  transaction: IntercompanyTransaction;
+  onApprove: (id: string) => void;
+  onCancel: (id: string) => void;
 }
 
 function TransactionCard({ transaction, onApprove, onCancel }: TransactionCardProps) {
   const getStatusIcon = (status: IntercompanyStatus) => {
     switch (status) {
-      case 'Draft': return <Clock className="h-4 w-4 text-gray-500" />
-      case 'Submitted': return <Clock className="h-4 w-4 text-yellow-500" />
-      case 'Approved': return <CheckCircle className="h-4 w-4 text-green-500" />
-      case 'Cancelled': return <XCircle className="h-4 w-4 text-red-500" />
+      case "Draft":
+        return <Clock className="h-4 w-4 text-gray-500" />;
+      case "Submitted":
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      case "Approved":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "Cancelled":
+        return <XCircle className="h-4 w-4 text-red-500" />;
     }
-  }
+  };
 
   const getStatusColor = (status: IntercompanyStatus) => {
     switch (status) {
-      case 'Draft': return 'bg-gray-100 text-gray-800'
-      case 'Submitted': return 'bg-yellow-100 text-yellow-800'
-      case 'Approved': return 'bg-green-100 text-green-800'
-      case 'Cancelled': return 'bg-red-100 text-red-800'
+      case "Draft":
+        return "bg-gray-100 text-gray-800";
+      case "Submitted":
+        return "bg-yellow-100 text-yellow-800";
+      case "Approved":
+        return "bg-green-100 text-green-800";
+      case "Cancelled":
+        return "bg-red-100 text-red-800";
     }
-  }
+  };
 
   return (
     <div className="p-4 border rounded-lg">
@@ -336,12 +358,10 @@ function TransactionCard({ transaction, onApprove, onCancel }: TransactionCardPr
               Base: ${transaction.base_amount.toLocaleString()}
             </p>
           </div>
-          <Badge className={getStatusColor(transaction.status)}>
-            {transaction.status}
-          </Badge>
+          <Badge className={getStatusColor(transaction.status)}>{transaction.status}</Badge>
         </div>
       </div>
-      
+
       {transaction.description && (
         <p className="mt-2 text-sm text-muted-foreground">{transaction.description}</p>
       )}
@@ -352,13 +372,13 @@ function TransactionCard({ transaction, onApprove, onCancel }: TransactionCardPr
             <Eye className="h-4 w-4 mr-1" />
             View
           </Button>
-          {transaction.status === 'Submitted' && (
+          {transaction.status === "Submitted" && (
             <Button variant="outline" size="sm" onClick={() => onApprove(transaction.id)}>
               <CheckCircle className="h-4 w-4 mr-1" />
               Approve
             </Button>
           )}
-          {(transaction.status === 'Draft' || transaction.status === 'Submitted') && (
+          {(transaction.status === "Draft" || transaction.status === "Submitted") && (
             <Button variant="outline" size="sm" onClick={() => onCancel(transaction.id)}>
               <XCircle className="h-4 w-4 mr-1" />
               Cancel
@@ -370,48 +390,53 @@ function TransactionCard({ transaction, onApprove, onCancel }: TransactionCardPr
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 interface CreateIntercompanyTransactionFormProps {
-  companyId: string
-  currencies: Currency[]
-  onSuccess: (transaction: Omit<IntercompanyTransaction, 'id' | 'transaction_no' | 'created_at' | 'updated_at'>) => void
-  onCancel: () => void
+  companyId: string;
+  currencies: Currency[];
+  onSuccess: (
+    transaction: Omit<
+      IntercompanyTransaction,
+      "id" | "transaction_no" | "created_at" | "updated_at"
+    >,
+  ) => void;
+  onCancel: () => void;
 }
 
-function CreateIntercompanyTransactionForm({ 
-  companyId, 
-  currencies, 
-  onSuccess, 
-  onCancel 
+function CreateIntercompanyTransactionForm({
+  companyId,
+  currencies,
+  onSuccess,
+  onCancel,
 }: CreateIntercompanyTransactionFormProps) {
   const [formData, setFormData] = useState({
-    to_company_id: '',
-    transaction_type: 'Transfer' as IntercompanyTransactionType,
+    to_company_id: "",
+    transaction_type: "Transfer" as IntercompanyTransactionType,
     amount: 0,
-    currency: 'USD' as any,
-    description: '',
-    posting_date: new Date().toISOString().split('T')[0],
-    created_by: 'current-user-id'
-  })
+    currency: "USD" as any,
+    description: "",
+    posting_date: new Date().toISOString().split("T")[0],
+    created_by: "current-user-id",
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     onSuccess({
       ...formData,
       from_company_id: companyId,
-      status: 'Draft' as IntercompanyStatus
-    })
-  }
+      status: "Draft" as IntercompanyStatus,
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="to_company_id">To Company</Label>
-        <Select 
-          value={formData.to_company_id} 
-          onValueChange={(value) => setFormData({ ...formData, to_company_id: value })}
+        <Select
+          value={formData.to_company_id}
+          onValueChange={value => setFormData({ ...formData, to_company_id: value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select company" />
@@ -425,9 +450,11 @@ function CreateIntercompanyTransactionForm({
 
       <div>
         <Label htmlFor="transaction_type">Transaction Type</Label>
-        <Select 
-          value={formData.transaction_type} 
-          onValueChange={(value: IntercompanyTransactionType) => setFormData({ ...formData, transaction_type: value })}
+        <Select
+          value={formData.transaction_type}
+          onValueChange={(value: IntercompanyTransactionType) =>
+            setFormData({ ...formData, transaction_type: value })
+          }
         >
           <SelectTrigger>
             <SelectValue />
@@ -449,16 +476,16 @@ function CreateIntercompanyTransactionForm({
             type="number"
             step="0.01"
             value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+            onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
             placeholder="Enter amount"
             required
           />
         </div>
         <div>
           <Label htmlFor="currency">Currency</Label>
-          <Select 
-            value={formData.currency} 
-            onValueChange={(value) => setFormData({ ...formData, currency: value })}
+          <Select
+            value={formData.currency}
+            onValueChange={value => setFormData({ ...formData, currency: value })}
           >
             <SelectTrigger>
               <SelectValue />
@@ -479,7 +506,7 @@ function CreateIntercompanyTransactionForm({
         <Input
           id="description"
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={e => setFormData({ ...formData, description: e.target.value })}
           placeholder="Enter description"
         />
       </div>
@@ -490,7 +517,7 @@ function CreateIntercompanyTransactionForm({
           id="posting_date"
           type="date"
           value={formData.posting_date}
-          onChange={(e) => setFormData({ ...formData, posting_date: e.target.value })}
+          onChange={e => setFormData({ ...formData, posting_date: e.target.value })}
           required
         />
       </div>
@@ -502,49 +529,49 @@ function CreateIntercompanyTransactionForm({
         <Button type="submit">Create Transaction</Button>
       </div>
     </form>
-  )
+  );
 }
 
 interface IntercompanySettingsProps {
-  companyId: string
+  companyId: string;
 }
 
 function IntercompanySettings({ companyId }: IntercompanySettingsProps) {
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [isSetupComplete, setIsSetupComplete] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadSettings()
-  }, [companyId])
+    loadSettings();
+  }, [companyId]);
 
   const loadSettings = async () => {
     try {
-      const result = await IntercompanyManagementService.getIntercompanyAccountStatus(companyId)
+      const result = await IntercompanyManagementService.getIntercompanyAccountStatus(companyId);
       if (result.success) {
-        setAccounts(result.accounts || [])
-        setIsSetupComplete(result.isSetupComplete || false)
+        setAccounts(result.accounts || []);
+        setIsSetupComplete(result.isSetupComplete || false);
       }
     } catch (error) {
-      console.error('Error loading settings:', error)
+      console.error("Error loading settings:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSetupAccounts = async () => {
     try {
-      const result = await IntercompanyManagementService.setupIntercompanyAccounts(companyId)
+      const result = await IntercompanyManagementService.setupIntercompanyAccounts(companyId);
       if (result.success) {
-        loadSettings()
+        loadSettings();
       }
     } catch (error) {
-      console.error('Error setting up accounts:', error)
+      console.error("Error setting up accounts:", error);
     }
-  }
+  };
 
   if (loading) {
-    return <div className="text-center py-8">Loading settings...</div>
+    return <div className="text-center py-8">Loading settings...</div>;
   }
 
   return (
@@ -553,7 +580,7 @@ function IntercompanySettings({ companyId }: IntercompanySettingsProps) {
         <div>
           <h3 className="font-medium">Intercompany Accounts</h3>
           <p className="text-sm text-muted-foreground">
-            {isSetupComplete ? 'Setup complete' : 'Setup required'}
+            {isSetupComplete ? "Setup complete" : "Setup required"}
           </p>
         </div>
         {!isSetupComplete && (
@@ -567,7 +594,10 @@ function IntercompanySettings({ companyId }: IntercompanySettingsProps) {
       {accounts.length > 0 && (
         <div className="space-y-2">
           {accounts.map(account => (
-            <div key={account.id} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={account.id}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div>
                 <p className="font-medium">{account.account.name}</p>
                 <p className="text-sm text-muted-foreground">
@@ -582,5 +612,5 @@ function IntercompanySettings({ companyId }: IntercompanySettingsProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

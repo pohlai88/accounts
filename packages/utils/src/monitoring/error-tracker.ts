@@ -1,7 +1,7 @@
 // Error tracking for V1 compliance
 // Comprehensive error monitoring with Axiom integration
 
-import { axiom } from '../axiom';
+import { axiom } from "../axiom";
 
 export interface ErrorContext {
   requestId?: string;
@@ -18,7 +18,7 @@ export interface ErrorContext {
 export interface ErrorEvent {
   id: string;
   timestamp: number;
-  level: 'error' | 'warning' | 'info';
+  level: "error" | "warning" | "info";
   message: string;
   error?: Error;
   stack?: string;
@@ -72,22 +72,22 @@ export class ErrorTracker {
   public trackError(
     error: Error | string,
     context: ErrorContext = {},
-    level: 'error' | 'warning' | 'info' = 'error',
-    tags: string[] = []
+    level: "error" | "warning" | "info" = "error",
+    tags: string[] = [],
   ): string {
     const errorId = this.generateErrorId();
     const timestamp = Date.now();
-    
+
     const errorEvent: ErrorEvent = {
       id: errorId,
       timestamp,
       level,
-      message: typeof error === 'string' ? error : error.message,
-      error: typeof error === 'string' ? undefined : error,
-      stack: typeof error === 'string' ? undefined : error.stack,
+      message: typeof error === "string" ? error : error.message,
+      error: typeof error === "string" ? undefined : error,
+      stack: typeof error === "string" ? undefined : error.stack,
       context,
       fingerprint: this.generateFingerprint(error, context),
-      tags
+      tags,
     };
 
     // Add to buffer
@@ -101,7 +101,7 @@ export class ErrorTracker {
     this.checkErrorRateCompliance();
 
     // Immediate flush for critical errors
-    if (level === 'error') {
+    if (level === "error") {
       this.flushErrors();
     }
 
@@ -116,18 +116,23 @@ export class ErrorTracker {
     method: string,
     path: string,
     statusCode: number,
-    context: ErrorContext = {}
+    context: ErrorContext = {},
   ): string {
-    return this.trackError(error, {
-      ...context,
-      operation: `${method} ${path}`,
-      metadata: {
-        ...context.metadata,
-        method,
-        path,
-        statusCode
-      }
-    }, 'error', ['api', 'http']);
+    return this.trackError(
+      error,
+      {
+        ...context,
+        operation: `${method} ${path}`,
+        metadata: {
+          ...context.metadata,
+          method,
+          path,
+          statusCode,
+        },
+      },
+      "error",
+      ["api", "http"],
+    );
   }
 
   /**
@@ -136,16 +141,21 @@ export class ErrorTracker {
   public trackBusinessError(
     error: Error | string,
     operation: string,
-    context: ErrorContext = {}
+    context: ErrorContext = {},
   ): string {
-    return this.trackError(error, {
-      ...context,
-      operation,
-      metadata: {
-        ...context.metadata,
-        category: 'business_logic'
-      }
-    }, 'error', ['business', 'logic']);
+    return this.trackError(
+      error,
+      {
+        ...context,
+        operation,
+        metadata: {
+          ...context.metadata,
+          category: "business_logic",
+        },
+      },
+      "error",
+      ["business", "logic"],
+    );
   }
 
   /**
@@ -154,17 +164,22 @@ export class ErrorTracker {
   public trackDatabaseError(
     error: Error | string,
     query: string,
-    context: ErrorContext = {}
+    context: ErrorContext = {},
   ): string {
-    return this.trackError(error, {
-      ...context,
-      operation: 'database_query',
-      metadata: {
-        ...context.metadata,
-        query: query.substring(0, 200), // Truncate long queries
-        category: 'database'
-      }
-    }, 'error', ['database', 'sql']);
+    return this.trackError(
+      error,
+      {
+        ...context,
+        operation: "database_query",
+        metadata: {
+          ...context.metadata,
+          query: query.substring(0, 200), // Truncate long queries
+          category: "database",
+        },
+      },
+      "error",
+      ["database", "sql"],
+    );
   }
 
   /**
@@ -174,18 +189,23 @@ export class ErrorTracker {
     error: Error | string,
     field: string,
     value: unknown,
-    context: ErrorContext = {}
+    context: ErrorContext = {},
   ): string {
-    return this.trackError(error, {
-      ...context,
-      operation: 'validation',
-      metadata: {
-        ...context.metadata,
-        field,
-        value: typeof value === 'object' ? JSON.stringify(value) : String(value),
-        category: 'validation'
-      }
-    }, 'warning', ['validation', 'input']);
+    return this.trackError(
+      error,
+      {
+        ...context,
+        operation: "validation",
+        metadata: {
+          ...context.metadata,
+          field,
+          value: typeof value === "object" ? JSON.stringify(value) : String(value),
+          category: "validation",
+        },
+      },
+      "warning",
+      ["validation", "input"],
+    );
   }
 
   /**
@@ -194,17 +214,22 @@ export class ErrorTracker {
   public trackSecurityError(
     error: Error | string,
     securityEvent: string,
-    context: ErrorContext = {}
+    context: ErrorContext = {},
   ): string {
-    return this.trackError(error, {
-      ...context,
-      operation: securityEvent,
-      metadata: {
-        ...context.metadata,
-        securityEvent,
-        category: 'security'
-      }
-    }, 'error', ['security', 'auth']);
+    return this.trackError(
+      error,
+      {
+        ...context,
+        operation: securityEvent,
+        metadata: {
+          ...context.metadata,
+          securityEvent,
+          category: "security",
+        },
+      },
+      "error",
+      ["security", "auth"],
+    );
   }
 
   /**
@@ -212,14 +237,14 @@ export class ErrorTracker {
    */
   public async getErrorSummary(hours: number = 1): Promise<ErrorSummary> {
     const now = Date.now();
-    const cutoff = now - (hours * 60 * 60 * 1000);
-    
+    const cutoff = now - hours * 60 * 60 * 1000;
+
     const recentErrors = this.errorBuffer.filter(e => e.timestamp >= cutoff);
     const totalErrors = recentErrors.length;
-    
+
     // Calculate error rate (errors per minute)
     const errorRate = totalErrors / (hours * 60);
-    
+
     // Get top errors by fingerprint
     const errorCounts = new Map<string, { count: number; lastSeen: number; message: string }>();
     recentErrors.forEach(error => {
@@ -232,7 +257,7 @@ export class ErrorTracker {
         errorCounts.set(key, {
           count: 1,
           lastSeen: error.timestamp,
-          message: error.message
+          message: error.message,
         });
       }
     });
@@ -243,14 +268,17 @@ export class ErrorTracker {
       .map(([, data]) => ({
         message: data.message,
         count: data.count,
-        lastSeen: new Date(data.lastSeen).toISOString()
+        lastSeen: new Date(data.lastSeen).toISOString(),
       }));
 
     // Count errors by level
-    const errorsByLevel = recentErrors.reduce((acc, error) => {
-      acc[error.level] = (acc[error.level] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const errorsByLevel = recentErrors.reduce(
+      (acc, error) => {
+        acc[error.level] = (acc[error.level] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // V1 compliance check: Error rate ≤ 1%
     const threshold = 0.01; // 1%
@@ -264,8 +292,8 @@ export class ErrorTracker {
       complianceStatus: {
         isCompliant,
         currentErrorRate: errorRate,
-        threshold
-      }
+        threshold,
+      },
     };
   }
 
@@ -274,22 +302,27 @@ export class ErrorTracker {
    */
   private setupGlobalHandlers(): void {
     // Handle uncaught exceptions
-    process.on('uncaughtException', (error) => {
-      this.trackError(error, {
-        operation: 'uncaught_exception'
-      }, 'error', ['uncaught', 'critical']);
+    process.on("uncaughtException", error => {
+      this.trackError(
+        error,
+        {
+          operation: "uncaught_exception",
+        },
+        "error",
+        ["uncaught", "critical"],
+      );
     });
 
     // Handle unhandled promise rejections
-    process.on('unhandledRejection', (reason, promise) => {
+    process.on("unhandledRejection", (reason, promise) => {
       this.trackError(
         reason instanceof Error ? reason : new Error(String(reason)),
         {
-          operation: 'unhandled_rejection',
-          metadata: { promise: String(promise) }
+          operation: "unhandled_rejection",
+          metadata: { promise: String(promise) },
         },
-        'error',
-        ['unhandled', 'promise']
+        "error",
+        ["unhandled", "promise"],
       );
     });
   }
@@ -304,22 +337,26 @@ export class ErrorTracker {
     this.errorBuffer = [];
 
     try {
-      await axiom.ingest('error_events', errorsToFlush.map(error => ({
-        ...error,
-        _time: new Date(error.timestamp).toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        service: 'aibos-accounts',
-        version: process.env.APP_VERSION || '1.0.0',
-        // Serialize error object for Axiom
-        errorDetails: error.error ? {
-          name: error.error.name,
-          message: error.error.message,
-          stack: error.error.stack
-        } : undefined
-      })));
-
+      await axiom.ingest(
+        "error_events",
+        errorsToFlush.map(error => ({
+          ...error,
+          _time: new Date(error.timestamp).toISOString(),
+          environment: process.env.NODE_ENV || "development",
+          service: "aibos-accounts",
+          version: process.env.APP_VERSION || "1.0.0",
+          // Serialize error object for Axiom
+          errorDetails: error.error
+            ? {
+                name: error.error.name,
+                message: error.error.message,
+                stack: error.error.stack,
+              }
+            : undefined,
+        })),
+      );
     } catch (error) {
-      console.error('Failed to flush errors to Axiom:', error);
+      console.error("Failed to flush errors to Axiom:", error);
       // Re-add errors to buffer for retry
       this.errorBuffer.unshift(...errorsToFlush);
     }
@@ -330,11 +367,11 @@ export class ErrorTracker {
    */
   private checkErrorRateCompliance(): void {
     const recentErrors = this.errorBuffer.filter(
-      e => e.timestamp > Date.now() - (60 * 1000) // Last minute
+      e => e.timestamp > Date.now() - 60 * 1000, // Last minute
     );
-    
+
     const errorRate = recentErrors.length / 60; // Errors per second
-    
+
     // V1 Requirement: Error rate ≤ 1%
     if (errorRate > 0.01) {
       this.reportComplianceViolation(errorRate);
@@ -346,18 +383,20 @@ export class ErrorTracker {
    */
   private async reportComplianceViolation(currentRate: number): Promise<void> {
     try {
-      await axiom.ingest('compliance_violations', [{
-        _time: new Date().toISOString(),
-        type: 'ERROR_RATE',
-        violation: `Error rate ${currentRate} exceeds 1% threshold`,
-        currentRate,
-        threshold: 0.01,
-        severity: 'critical',
-        environment: process.env.NODE_ENV || 'development',
-        service: 'aibos-accounts'
-      }]);
+      await axiom.ingest("compliance_violations", [
+        {
+          _time: new Date().toISOString(),
+          type: "ERROR_RATE",
+          violation: `Error rate ${currentRate} exceeds 1% threshold`,
+          currentRate,
+          threshold: 0.01,
+          severity: "critical",
+          environment: process.env.NODE_ENV || "development",
+          service: "aibos-accounts",
+        },
+      ]);
     } catch (error) {
-      console.error('Failed to report error rate violation:', error);
+      console.error("Failed to report error rate violation:", error);
     }
   }
 
@@ -372,14 +411,15 @@ export class ErrorTracker {
    * Generate error fingerprint for grouping similar errors
    */
   private generateFingerprint(error: Error | string, context: ErrorContext): string {
-    const message = typeof error === 'string' ? error : error.message;
-    const operation = context.operation || 'unknown';
-    
+    const message = typeof error === "string" ? error : error.message;
+    const operation = context.operation || "unknown";
+
     // Create a hash-like fingerprint
     const combined = `${operation}:${message}`;
-    return combined.replace(/[0-9]+/g, 'N') // Replace numbers with N
-                  .replace(/[a-f0-9-]{8,}/gi, 'ID') // Replace IDs with ID
-                  .toLowerCase();
+    return combined
+      .replace(/[0-9]+/g, "N") // Replace numbers with N
+      .replace(/[a-f0-9-]{8,}/gi, "ID") // Replace IDs with ID
+      .toLowerCase();
   }
 
   /**

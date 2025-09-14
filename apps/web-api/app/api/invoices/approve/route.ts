@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ApproveInvoiceReq, ApproveInvoiceRes, InvoiceApprovedEvt, TInvoiceApprovedEvt } from "@aibos/contracts";
+import {
+  ApproveInvoiceReq,
+  ApproveInvoiceRes,
+  InvoiceApprovedEvt,
+  TInvoiceApprovedEvt,
+} from "@aibos/contracts";
 
 export const runtime = "nodejs";
 
@@ -16,7 +21,7 @@ export async function POST(req: NextRequest) {
     tenantId: body.tenantId,
     invoiceId: body.invoiceId,
     customerEmail: undefined,
-    idemKey: body.idemKey
+    idemKey: body.idemKey,
   });
   return NextResponse.json(ApproveInvoiceRes.parse({ id: body.invoiceId }), { status: 200 });
 }

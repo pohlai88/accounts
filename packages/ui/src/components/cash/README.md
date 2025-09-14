@@ -557,7 +557,7 @@ function AdvancedCashManagement() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_CASH = 'true';
+process.env.DEBUG_CASH = "true";
 ```
 
 **Logs**: Check browser console for cash operation logs

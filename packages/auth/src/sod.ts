@@ -66,142 +66,142 @@ export interface Decision {
 // SoD Matrix - V1 Compliance
 export const SOD_MATRIX: Record<string, SoDRule> = {
   // Journal Entry Operations
-  'journal:create': {
-    action: 'Create Journal Entry',
-    requiredRole: ['accountant', 'manager', 'admin'],
-    requiresFeature: 'je',
-    module: 'GL'
+  "journal:create": {
+    action: "Create Journal Entry",
+    requiredRole: ["accountant", "manager", "admin"],
+    requiresFeature: "je",
+    module: "GL",
   },
-  'journal:post': {
-    action: 'Post Journal Entry',
-    requiredRole: ['manager', 'admin'],
-    conflictingRoles: ['clerk'], // Clerks cannot post what they create
+  "journal:post": {
+    action: "Post Journal Entry",
+    requiredRole: ["manager", "admin"],
+    conflictingRoles: ["clerk"], // Clerks cannot post what they create
     requiresApproval: true,
-    approverRoles: ['manager', 'admin'],
-    requiresFeature: 'je',
-    module: 'GL',
-    amountThreshold: 50000 // Default threshold, can be overridden by policy
+    approverRoles: ["manager", "admin"],
+    requiresFeature: "je",
+    module: "GL",
+    amountThreshold: 50000, // Default threshold, can be overridden by policy
   },
-  'journal:reverse': {
-    action: 'Reverse Journal Entry',
-    requiredRole: ['admin'],
+  "journal:reverse": {
+    action: "Reverse Journal Entry",
+    requiredRole: ["admin"],
     requiresApproval: true,
-    approverRoles: ['admin']
+    approverRoles: ["admin"],
   },
 
   // Invoice Operations
-  'invoice:create': {
-    action: 'Create Invoice',
-    requiredRole: ['clerk', 'accountant', 'manager', 'admin'],
-    requiresFeature: 'ar',
-    module: 'AR'
+  "invoice:create": {
+    action: "Create Invoice",
+    requiredRole: ["clerk", "accountant", "manager", "admin"],
+    requiresFeature: "ar",
+    module: "AR",
   },
-  'invoice:post': {
-    action: 'Post Invoice',
-    requiredRole: ['accountant', 'manager', 'admin'],
-    requiresFeature: 'ar',
-    module: 'AR',
+  "invoice:post": {
+    action: "Post Invoice",
+    requiredRole: ["accountant", "manager", "admin"],
+    requiresFeature: "ar",
+    module: "AR",
     amountThreshold: 50000,
-    approverRoles: ['manager', 'admin']
+    approverRoles: ["manager", "admin"],
   },
-  'invoice:approve': {
-    action: 'Approve Invoice',
-    requiredRole: ['manager', 'admin'],
-    conflictingRoles: ['clerk'], // Clerks cannot approve what they create
-    requiresFeature: 'ar',
-    module: 'AR'
+  "invoice:approve": {
+    action: "Approve Invoice",
+    requiredRole: ["manager", "admin"],
+    conflictingRoles: ["clerk"], // Clerks cannot approve what they create
+    requiresFeature: "ar",
+    module: "AR",
   },
 
   // Payment Operations
-  'payment:create': {
-    action: 'Create Payment',
-    requiredRole: ['accountant', 'manager', 'admin'],
-    requiresFeature: 'ap',
-    module: 'AP'
+  "payment:create": {
+    action: "Create Payment",
+    requiredRole: ["accountant", "manager", "admin"],
+    requiresFeature: "ap",
+    module: "AP",
   },
-  'payment:approve': {
-    action: 'Approve Payment',
-    requiredRole: ['manager', 'admin'],
+  "payment:approve": {
+    action: "Approve Payment",
+    requiredRole: ["manager", "admin"],
     requiresApproval: true,
-    approverRoles: ['admin'], // Payments require admin approval
-    requiresFeature: 'ap',
-    module: 'AP',
-    amountThreshold: 10000 // Lower threshold for payments
+    approverRoles: ["admin"], // Payments require admin approval
+    requiresFeature: "ap",
+    module: "AP",
+    amountThreshold: 10000, // Lower threshold for payments
   },
 
   // Period Close Operations
-  'period:close': {
-    action: 'Close Accounting Period',
-    requiredRole: ['admin'],
+  "period:close": {
+    action: "Close Accounting Period",
+    requiredRole: ["admin"],
     requiresApproval: true,
-    approverRoles: ['admin']
+    approverRoles: ["admin"],
   },
 
   // Financial Reporting Operations (D4 V1 compliance)
-  'report:generate': {
-    action: 'Generate Financial Reports',
-    requiredRole: ['accountant', 'manager', 'admin'],
-    requiresFeature: 'reports',
-    module: 'REPORTS'
+  "report:generate": {
+    action: "Generate Financial Reports",
+    requiredRole: ["accountant", "manager", "admin"],
+    requiresFeature: "reports",
+    module: "REPORTS",
   },
-  'report:export': {
-    action: 'Export Financial Reports',
-    requiredRole: ['manager', 'admin'],
+  "report:export": {
+    action: "Export Financial Reports",
+    requiredRole: ["manager", "admin"],
     requiresApproval: true,
-    approverRoles: ['admin'],
-    requiresFeature: 'reports',
-    module: 'REPORTS'
+    approverRoles: ["admin"],
+    requiresFeature: "reports",
+    module: "REPORTS",
   },
-  'report:view_sensitive': {
-    action: 'View Sensitive Financial Data',
-    requiredRole: ['manager', 'admin'],
-    requiresFeature: 'regulated_mode',
-    module: 'REPORTS'
+  "report:view_sensitive": {
+    action: "View Sensitive Financial Data",
+    requiredRole: ["manager", "admin"],
+    requiresFeature: "regulated_mode",
+    module: "REPORTS",
   },
 
   // Attachment Operations
-  'attachment:upload': {
-    action: 'Upload Attachment',
-    requiredRole: ['clerk', 'accountant', 'manager', 'admin'],
-    requiresFeature: 'attachments',
-    module: 'ATTACHMENTS'
+  "attachment:upload": {
+    action: "Upload Attachment",
+    requiredRole: ["clerk", "accountant", "manager", "admin"],
+    requiresFeature: "attachments",
+    module: "ATTACHMENTS",
   },
-  'attachment:delete': {
-    action: 'Delete Attachment',
-    requiredRole: ['manager', 'admin'],
-    requiresFeature: 'attachments',
-    module: 'ATTACHMENTS'
+  "attachment:delete": {
+    action: "Delete Attachment",
+    requiredRole: ["manager", "admin"],
+    requiresFeature: "attachments",
+    module: "ATTACHMENTS",
   },
 
   // Chart of Accounts
-  'coa:modify': {
-    action: 'Modify Chart of Accounts',
-    requiredRole: ['admin'],
+  "coa:modify": {
+    action: "Modify Chart of Accounts",
+    requiredRole: ["admin"],
   },
 
   // User Management
-  'user:create': {
-    action: 'Create User',
-    requiredRole: ['admin'],
-    module: 'ADMIN'
+  "user:create": {
+    action: "Create User",
+    requiredRole: ["admin"],
+    module: "ADMIN",
   },
-  'user:modify_roles': {
-    action: 'Modify User Roles',
-    requiredRole: ['admin'],
-    module: 'ADMIN'
+  "user:modify_roles": {
+    action: "Modify User Roles",
+    requiredRole: ["admin"],
+    module: "ADMIN",
   },
 
   // Admin Operations
-  'admin:access': {
-    action: 'Access Admin Panel',
-    requiredRole: ['admin'],
-    module: 'ADMIN'
+  "admin:access": {
+    action: "Access Admin Panel",
+    requiredRole: ["admin"],
+    module: "ADMIN",
   },
-  'admin:configure': {
-    action: 'Configure System Settings',
-    requiredRole: ['admin'],
-    module: 'ADMIN'
-  }
+  "admin:configure": {
+    action: "Configure System Settings",
+    requiredRole: ["admin"],
+    module: "ADMIN",
+  },
 };
 
 // Enhanced permission checking with RBAC + ABAC + Feature Flags
@@ -210,12 +210,12 @@ export function canPerformAction(
   action: string,
   context: ActionContext,
   featureFlags: FeatureFlags,
-  policySettings: PolicySettings
+  policySettings: PolicySettings,
 ): Decision {
   const rule = SOD_MATRIX[action];
 
   if (!rule) {
-    return { allowed: false, reason: 'Unknown action' };
+    return { allowed: false, reason: "Unknown action" };
   }
 
   // 1. Check feature flag requirement
@@ -225,7 +225,7 @@ export function canPerformAction(
 
   // 2. Check explicit deny in member permissions
   if (user.permissions?.deny?.includes(action)) {
-    return { allowed: false, reason: 'Explicitly denied' };
+    return { allowed: false, reason: "Explicitly denied" };
   }
 
   // 3. Check explicit allow in member permissions (bypasses role check)
@@ -237,7 +237,7 @@ export function canPerformAction(
   if (!explicitAllow && !roleAllowed) {
     return {
       allowed: false,
-      reason: `Role(s) '${user.roles.join(', ')}' not authorized for '${rule.action}'`
+      reason: `Role(s) '${user.roles.join(", ")}' not authorized for '${rule.action}'`,
     };
   }
 
@@ -245,13 +245,14 @@ export function canPerformAction(
   if (context.creatorRole && rule.conflictingRoles?.includes(context.creatorRole)) {
     return {
       allowed: false,
-      reason: `SoD violation: '${context.creatorRole}' cannot approve their own work`
+      reason: `SoD violation: '${context.creatorRole}' cannot approve their own work`,
     };
   }
 
   // 6. Check amount thresholds (ABAC)
   if (context.amount && rule.amountThreshold) {
-    const threshold = user.permissions?.overrides?.approval_threshold_rm ??
+    const threshold =
+      user.permissions?.overrides?.approval_threshold_rm ??
       policySettings.approval_threshold_rm ??
       rule.amountThreshold;
 
@@ -261,7 +262,7 @@ export function canPerformAction(
       if (!hasApproverRole) {
         return {
           allowed: false,
-          reason: `Amount ${context.amount} exceeds threshold ${threshold}, requires approver role`
+          reason: `Amount ${context.amount} exceeds threshold ${threshold}, requires approver role`,
         };
       }
     }
@@ -269,7 +270,7 @@ export function canPerformAction(
 
   return {
     allowed: true,
-    requiresApproval: rule.requiresApproval || false
+    requiresApproval: rule.requiresApproval || false,
   };
 }
 
@@ -277,7 +278,7 @@ export function canPerformAction(
 export function isFeatureEnabled(
   feature: string,
   featureFlags: FeatureFlags,
-  userRoles: string[]
+  userRoles: string[],
 ): boolean {
   // Check if feature is globally enabled
   if (!featureFlags[feature]) {
@@ -285,8 +286,8 @@ export function isFeatureEnabled(
   }
 
   // Special role-based feature restrictions
-  if (feature === 'regulated_mode') {
-    return userRoles.includes('admin') || userRoles.includes('manager');
+  if (feature === "regulated_mode") {
+    return userRoles.includes("admin") || userRoles.includes("manager");
   }
 
   return true;
@@ -296,18 +297,18 @@ export function isFeatureEnabled(
 export function checkSoDCompliance(
   action: string,
   userRole: string,
-  creatorRole?: string
+  creatorRole?: string,
 ): { allowed: boolean; requiresApproval: boolean; reason?: string } {
   // Convert to new format for backward compatibility
   const user: UserContext = {
-    id: 'legacy',
-    tenantId: 'legacy',
-    companyId: 'legacy',
-    roles: [userRole]
+    id: "legacy",
+    tenantId: "legacy",
+    companyId: "legacy",
+    roles: [userRole],
   };
 
   const context: ActionContext = {
-    creatorRole
+    creatorRole,
   };
 
   // Default feature flags for backward compatibility
@@ -316,19 +317,25 @@ export function checkSoDCompliance(
     ar: true,
     ap: true,
     attachments: true,
-    reports: true
+    reports: true,
   };
 
   const defaultPolicySettings: PolicySettings = {
-    approval_threshold_rm: 50000
+    approval_threshold_rm: 50000,
   };
 
-  const decision = canPerformAction(user, action, context, defaultFeatureFlags, defaultPolicySettings);
+  const decision = canPerformAction(
+    user,
+    action,
+    context,
+    defaultFeatureFlags,
+    defaultPolicySettings,
+  );
 
   return {
     allowed: decision.allowed,
     requiresApproval: decision.requiresApproval || false,
-    reason: decision.reason
+    reason: decision.reason,
   };
 }
 

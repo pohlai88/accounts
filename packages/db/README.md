@@ -305,57 +305,57 @@ pnpm build
 ### **Journal Entry Creation**
 
 ```typescript
-import { insertJournal, Scope } from '@aibos/db';
+import { insertJournal, Scope } from "@aibos/db";
 
 const scope: Scope = {
-  tenantId: 'uuid',
-  companyId: 'uuid',
-  userId: 'uuid',
-  userRole: 'accountant',
+  tenantId: "uuid",
+  companyId: "uuid",
+  userId: "uuid",
+  userRole: "accountant",
 };
 
 const journal = await insertJournal(scope, {
-  journalNumber: 'JE-001',
-  description: 'Monthly adjustment',
-  journalDate: new Date('2024-01-01'),
-  currency: 'MYR',
+  journalNumber: "JE-001",
+  description: "Monthly adjustment",
+  journalDate: new Date("2024-01-01"),
+  currency: "MYR",
   lines: [
-    { accountId: 'uuid', debit: 100.0, credit: 0, description: 'Debit entry' },
-    { accountId: 'uuid', debit: 0, credit: 100.0, description: 'Credit entry' },
+    { accountId: "uuid", debit: 100.0, credit: 0, description: "Debit entry" },
+    { accountId: "uuid", debit: 0, credit: 100.0, description: "Credit entry" },
   ],
-  idempotencyKey: 'unique-key',
+  idempotencyKey: "unique-key",
 });
 ```
 
 ### **Invoice Creation**
 
 ```typescript
-import { insertInvoice, insertCustomer } from '@aibos/db';
+import { insertInvoice, insertCustomer } from "@aibos/db";
 
 // Create customer first
 const customer = await insertCustomer(scope, {
-  customerNumber: 'CUST-001',
-  name: 'Acme Corp',
-  email: 'billing@acme.com',
-  currency: 'MYR',
-  paymentTerms: 'NET_30',
+  customerNumber: "CUST-001",
+  name: "Acme Corp",
+  email: "billing@acme.com",
+  currency: "MYR",
+  paymentTerms: "NET_30",
 });
 
 // Create invoice
 const invoice = await insertInvoice(scope, {
   customerId: customer.id,
-  invoiceNumber: 'INV-001',
-  invoiceDate: new Date('2024-01-01'),
-  dueDate: new Date('2024-01-31'),
-  currency: 'MYR',
+  invoiceNumber: "INV-001",
+  invoiceDate: new Date("2024-01-01"),
+  dueDate: new Date("2024-01-31"),
+  currency: "MYR",
   lines: [
     {
       lineNumber: 1,
-      description: 'Product A',
+      description: "Product A",
       quantity: 1,
       unitPrice: 100.0,
       lineAmount: 100.0,
-      revenueAccountId: 'uuid',
+      revenueAccountId: "uuid",
     },
   ],
 });
@@ -364,10 +364,10 @@ const invoice = await insertInvoice(scope, {
 ### **Account Validation**
 
 ```typescript
-import { getAccountsInfo } from '@aibos/db';
+import { getAccountsInfo } from "@aibos/db";
 
 // Validate accounts before journal posting
-const accountIds = ['uuid1', 'uuid2', 'uuid3'];
+const accountIds = ["uuid1", "uuid2", "uuid3"];
 const accounts = await getAccountsInfo(scope, accountIds);
 
 // Check if all accounts are active and valid

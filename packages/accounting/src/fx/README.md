@@ -38,17 +38,17 @@
 ## 3) Getting Started
 
 ```typescript
-import { ingestFxRates, getCurrentFxRate, validateFxRateFreshness } from '@aibos/accounting/fx';
-import { validateFxPolicy, defaultFxPolicy } from '@aibos/accounting/fx';
+import { ingestFxRates, getCurrentFxRate, validateFxRateFreshness } from "@aibos/accounting/fx";
+import { validateFxPolicy, defaultFxPolicy } from "@aibos/accounting/fx";
 
 // Ingest FX rates
-const fxResult = await ingestFxRates('MYR', ['USD', 'EUR', 'GBP']);
+const fxResult = await ingestFxRates("MYR", ["USD", "EUR", "GBP"]);
 
 // Get current rate
-const currentRate = await getCurrentFxRate('MYR', 'USD');
+const currentRate = await getCurrentFxRate("MYR", "USD");
 
 // Validate FX policy
-const policyResult = validateFxPolicy('MYR', 'USD');
+const policyResult = validateFxPolicy("MYR", "USD");
 ```
 
 ## 4) Architecture & Dependencies
@@ -158,93 +158,93 @@ pnpm --filter @aibos/accounting typecheck
 ### Basic FX Rate Ingestion
 
 ```typescript
-import { ingestFxRates, STALENESS_THRESHOLDS } from '@aibos/accounting/fx';
+import { ingestFxRates, STALENESS_THRESHOLDS } from "@aibos/accounting/fx";
 
 // Ingest FX rates for common currencies
 const fxResult = await ingestFxRates(
-  'MYR', // Base currency
-  ['USD', 'EUR', 'GBP', 'SGD', 'JPY'], // Target currencies
-  STALENESS_THRESHOLDS.WARNING // 4 hours staleness threshold
+  "MYR", // Base currency
+  ["USD", "EUR", "GBP", "SGD", "JPY"], // Target currencies
+  STALENESS_THRESHOLDS.WARNING, // 4 hours staleness threshold
 );
 
 if (fxResult.success) {
-  console.log('FX rates ingested successfully');
-  console.log('Source:', fxResult.source); // 'primary' or 'fallback'
-  console.log('Rates count:', fxResult.rates.length);
-  console.log('Staleness:', fxResult.staleness);
+  console.log("FX rates ingested successfully");
+  console.log("Source:", fxResult.source); // 'primary' or 'fallback'
+  console.log("Rates count:", fxResult.rates.length);
+  console.log("Staleness:", fxResult.staleness);
 
   // Process each rate
   for (const rate of fxResult.rates) {
     console.log(`${rate.fromCurrency} to ${rate.toCurrency}: ${rate.rate}`);
-    console.log('Source:', rate.source);
-    console.log('Timestamp:', rate.timestamp);
-    console.log('Valid from:', rate.validFrom);
-    console.log('Valid to:', rate.validTo);
+    console.log("Source:", rate.source);
+    console.log("Timestamp:", rate.timestamp);
+    console.log("Valid from:", rate.validFrom);
+    console.log("Valid to:", rate.validTo);
   }
 } else {
-  console.error('FX ingestion failed:', fxResult.error);
-  console.log('Retryable:', fxResult.retryable);
+  console.error("FX ingestion failed:", fxResult.error);
+  console.log("Retryable:", fxResult.retryable);
 }
 ```
 
 ### Get Current FX Rate
 
 ```typescript
-import { getCurrentFxRate, validateFxRateFreshness } from '@aibos/accounting/fx';
+import { getCurrentFxRate, validateFxRateFreshness } from "@aibos/accounting/fx";
 
 // Get current rate for specific currency pair
-const currentRate = await getCurrentFxRate('MYR', 'USD');
+const currentRate = await getCurrentFxRate("MYR", "USD");
 
 if (currentRate) {
-  console.log('Current MYR to USD rate:', currentRate.rate);
-  console.log('Source:', currentRate.source);
-  console.log('Age (minutes):', currentRate.age);
+  console.log("Current MYR to USD rate:", currentRate.rate);
+  console.log("Source:", currentRate.source);
+  console.log("Age (minutes):", currentRate.age);
 
   // Validate rate freshness
   const freshness = validateFxRateFreshness(
     new Date(Date.now() - currentRate.age * 60 * 1000), // Convert age back to timestamp
-    STALENESS_THRESHOLDS.WARNING
+    STALENESS_THRESHOLDS.WARNING,
   );
 
-  console.log('Rate is valid:', freshness.isValid);
-  console.log('Age (minutes):', freshness.ageMinutes);
-  console.log('Threshold (minutes):', freshness.threshold);
+  console.log("Rate is valid:", freshness.isValid);
+  console.log("Age (minutes):", freshness.ageMinutes);
+  console.log("Threshold (minutes):", freshness.threshold);
 } else {
-  console.log('No current rate available');
+  console.log("No current rate available");
 }
 ```
 
 ### FX Policy Validation
 
 ```typescript
-import { validateFxPolicy, defaultFxPolicy } from '@aibos/accounting/fx';
+import { validateFxPolicy, defaultFxPolicy } from "@aibos/accounting/fx";
 
 // Validate FX policy for currency conversion
 try {
-  const policyResult = validateFxPolicy('MYR', 'USD');
+  const policyResult = validateFxPolicy("MYR", "USD");
 
-  console.log('FX policy validation result:');
-  console.log('Requires FX rate:', policyResult.requiresFxRate);
-  console.log('Base currency:', policyResult.baseCurrency);
-  console.log('Transaction currency:', policyResult.transactionCurrency);
-  console.log('Exchange rate:', policyResult.exchangeRate);
+  console.log("FX policy validation result:");
+  console.log("Requires FX rate:", policyResult.requiresFxRate);
+  console.log("Base currency:", policyResult.baseCurrency);
+  console.log("Transaction currency:", policyResult.transactionCurrency);
+  console.log("Exchange rate:", policyResult.exchangeRate);
 
   if (policyResult.requiresFxRate) {
-    console.log('FX rate required for conversion');
+    console.log("FX rate required for conversion");
     // Fetch current rate using getCurrentFxRate()
   } else {
-    console.log('No FX conversion needed (same currency)');
+    console.log("No FX conversion needed (same currency)");
   }
 } catch (error) {
-  console.error('FX policy validation failed:', error.message);
+  console.error("FX policy validation failed:", error.message);
   // Handle invalid currency codes or other errors
 }
 
 // Validate with invalid currency
 try {
-  validateFxPolicy('MYR', 'INVALID');
+  validateFxPolicy("MYR", "INVALID");
 } catch (error) {
-  console.error('Invalid currency error:', error.message);
+  console.error("Invalid currency error:", error.message);
   // "Invalid currency code: INVALID. Must be 3 uppercase letters."
 }
 ```
@@ -252,57 +252,57 @@ try {
 ### Multi-Source FX Ingestion
 
 ```typescript
-import { ingestFxRates, FX_SOURCES } from '@aibos/accounting/fx';
+import { ingestFxRates, FX_SOURCES } from "@aibos/accounting/fx";
 
 // Ingest with custom staleness threshold
 const fxResult = await ingestFxRates(
-  'MYR',
-  ['USD', 'EUR'],
-  STALENESS_THRESHOLDS.CRITICAL // 1 hour threshold
+  "MYR",
+  ["USD", "EUR"],
+  STALENESS_THRESHOLDS.CRITICAL, // 1 hour threshold
 );
 
 if (fxResult.success) {
-  console.log('FX ingestion successful');
-  console.log('Source used:', fxResult.source);
+  console.log("FX ingestion successful");
+  console.log("Source used:", fxResult.source);
 
-  if (fxResult.source === 'primary') {
-    console.log('Used primary source (BNM)');
-  } else if (fxResult.source === 'fallback') {
-    console.log('Used fallback source');
+  if (fxResult.source === "primary") {
+    console.log("Used primary source (BNM)");
+  } else if (fxResult.source === "fallback") {
+    console.log("Used fallback source");
   }
 
   // Check staleness
   if (fxResult.staleness.isStale) {
-    console.warn('FX rates are stale!');
-    console.log('Age (minutes):', fxResult.staleness.ageMinutes);
-    console.log('Threshold (minutes):', fxResult.staleness.threshold);
+    console.warn("FX rates are stale!");
+    console.log("Age (minutes):", fxResult.staleness.ageMinutes);
+    console.log("Threshold (minutes):", fxResult.staleness.threshold);
   } else {
-    console.log('FX rates are fresh');
+    console.log("FX rates are fresh");
   }
 } else {
-  console.error('All FX sources failed:', fxResult.error);
-  console.log('Retryable:', fxResult.retryable);
+  console.error("All FX sources failed:", fxResult.error);
+  console.log("Retryable:", fxResult.retryable);
 }
 ```
 
 ### Custom FX Source Configuration
 
 ```typescript
-import { ingestFxRates, FX_SOURCES } from '@aibos/accounting/fx';
+import { ingestFxRates, FX_SOURCES } from "@aibos/accounting/fx";
 
 // Check available FX sources
-console.log('Available FX sources:');
+console.log("Available FX sources:");
 for (const [key, source] of Object.entries(FX_SOURCES)) {
   console.log(`${key}: ${source.name}`);
   console.log(`  Priority: ${source.priority}`);
   console.log(`  Base URL: ${source.baseUrl}`);
   console.log(`  Timeout: ${source.timeout}ms`);
   console.log(`  Retries: ${source.retries}`);
-  console.log(`  API Key: ${source.apiKey ? 'Configured' : 'Not configured'}`);
+  console.log(`  API Key: ${source.apiKey ? "Configured" : "Not configured"}`);
 }
 
 // Ingest with specific source preference
-const fxResult = await ingestFxRates('MYR', ['USD', 'EUR']);
+const fxResult = await ingestFxRates("MYR", ["USD", "EUR"]);
 
 // The function will try sources in order:
 // 1. BNM (primary)
@@ -324,7 +324,7 @@ const fxResult = await ingestFxRates('MYR', ['USD', 'EUR']);
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_FX = 'true';
+process.env.DEBUG_FX = "true";
 ```
 
 **Logs**: Check Axiom telemetry for FX operation logs

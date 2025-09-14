@@ -1,5 +1,5 @@
 // D2 FX Rate Ingest System - Primary + Fallback Sources with Staleness Detection
-import { validateFxPolicy } from './policy';
+import { validateFxPolicy } from "./policy";
 
 // Use Node.js built-in fetch (Node 18+) and AbortController
 const fetch = globalThis.fetch;
@@ -7,7 +7,7 @@ const AbortController = globalThis.AbortController;
 
 export interface FxRateSource {
   name: string;
-  priority: 'primary' | 'fallback';
+  priority: "primary" | "fallback";
   baseUrl: string;
   apiKey?: string;
   timeout: number; // milliseconds
@@ -28,7 +28,7 @@ export interface FxIngestResult {
   success: boolean;
   rates: FxRateData[];
   errors: string[];
-  source: 'primary' | 'fallback';
+  source: "primary" | "fallback";
   staleness: {
     isStale: boolean;
     ageMinutes: number;
@@ -47,49 +47,48 @@ export interface FxIngestError {
 export const FX_SOURCES: Record<string, FxRateSource> = {
   // Primary source: Bank Negara Malaysia (BNM)
   BNM: {
-    name: 'Bank Negara Malaysia',
-    priority: 'primary',
-    baseUrl: 'https://api.bnm.gov.my/public/exchange-rate',
+    name: "Bank Negara Malaysia",
+    priority: "primary",
+    baseUrl: "https://api.bnm.gov.my/public/exchange-rate",
     timeout: 10000, // 10 seconds
-    retries: 3
+    retries: 3,
   },
 
   // Fallback source: ExchangeRate-API
   EXCHANGE_RATE_API: {
-    name: 'ExchangeRate-API',
-    priority: 'fallback',
-    baseUrl: 'https://api.exchangerate-api.com/v4/latest',
+    name: "ExchangeRate-API",
+    priority: "fallback",
+    baseUrl: "https://api.exchangerate-api.com/v4/latest",
     timeout: 15000, // 15 seconds
-    retries: 2
+    retries: 2,
   },
 
   // Additional fallback: Fixer.io
   FIXER: {
-    name: 'Fixer.io',
-    priority: 'fallback',
-    baseUrl: 'https://api.fixer.io/latest',
+    name: "Fixer.io",
+    priority: "fallback",
+    baseUrl: "https://api.fixer.io/latest",
     apiKey: process.env.FIXER_API_KEY,
     timeout: 12000, // 12 seconds
-    retries: 2
-  }
+    retries: 2,
+  },
 };
 
 // Staleness thresholds (in minutes)
 export const STALENESS_THRESHOLDS = {
-  CRITICAL: 60,    // 1 hour - critical for real-time trading
-  WARNING: 240,    // 4 hours - warning level
-  ACCEPTABLE: 1440 // 24 hours - acceptable for accounting
+  CRITICAL: 60, // 1 hour - critical for real-time trading
+  WARNING: 240, // 4 hours - warning level
+  ACCEPTABLE: 1440, // 24 hours - acceptable for accounting
 };
 
 /**
  * Ingest FX rates from primary source with fallback
  */
 export async function ingestFxRates(
-  baseCurrency: string = 'MYR',
-  targetCurrencies: string[] = ['USD', 'EUR', 'GBP', 'SGD', 'JPY'],
-  stalenessThreshold: number = STALENESS_THRESHOLDS.WARNING
+  baseCurrency: string = "MYR",
+  targetCurrencies: string[] = ["USD", "EUR", "GBP", "SGD", "JPY"],
+  stalenessThreshold: number = STALENESS_THRESHOLDS.WARNING,
 ): Promise<FxIngestResult | FxIngestError> {
-
   // 1. Validate inputs
   for (const currency of [baseCurrency, ...targetCurrencies]) {
     try {
@@ -97,9 +96,9 @@ export async function ingestFxRates(
     } catch (error) {
       return {
         success: false,
-        error: `Invalid currency: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        source: 'validation',
-        retryable: false
+        error: `Invalid currency: ${error instanceof Error ? error.message : "Unknown error"}`,
+        source: "validation",
+        retryable: false,
       };
     }
   }
@@ -108,14 +107,10 @@ export async function ingestFxRates(
   try {
     const primarySource = FX_SOURCES.BNM;
     if (!primarySource) {
-      throw new Error('Primary FX source (BNM) not configured');
+      throw new Error("Primary FX source (BNM) not configured");
     }
 
-    const primaryResult = await fetchFromSource(
-      primarySource,
-      baseCurrency,
-      targetCurrencies
-    );
+    const primaryResult = await fetchFromSource(primarySource, baseCurrency, targetCurrencies);
 
     if (primaryResult.success) {
       const staleness = calculateStaleness(primaryResult.rates, stalenessThreshold);
@@ -124,12 +119,12 @@ export async function ingestFxRates(
         success: true,
         rates: primaryResult.rates,
         errors: [],
-        source: 'primary',
-        staleness
+        source: "primary",
+        staleness,
       };
     }
   } catch (error) {
-    console.warn('Primary FX source failed:', error);
+    console.warn("Primary FX source failed:", error);
   }
 
   // 3. Try fallback sources
@@ -149,23 +144,23 @@ export async function ingestFxRates(
           success: true,
           rates: fallbackResult.rates,
           errors,
-          source: 'fallback',
-          staleness
+          source: "fallback",
+          staleness,
         };
       }
     } catch (error) {
-      const errorMsg = `${source.name}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      const errorMsg = `${source.name}: ${error instanceof Error ? error.message : "Unknown error"}`;
       errors.push(errorMsg);
-      console.warn('Fallback FX source failed:', errorMsg);
+      console.warn("Fallback FX source failed:", errorMsg);
     }
   }
 
   // 4. All sources failed
   return {
     success: false,
-    error: `All FX sources failed: ${errors.join('; ')}`,
-    source: 'all',
-    retryable: true
+    error: `All FX sources failed: ${errors.join("; ")}`,
+    source: "all",
+    retryable: true,
   };
 }
 
@@ -175,9 +170,8 @@ export async function ingestFxRates(
 async function fetchFromSource(
   source: FxRateSource,
   baseCurrency: string,
-  targetCurrencies: string[]
+  targetCurrencies: string[],
 ): Promise<{ success: boolean; rates: FxRateData[] }> {
-
   let attempt = 0;
   let lastError: Error | null = null;
 
@@ -190,24 +184,24 @@ async function fetchFromSource(
 
       let url: string;
       const headers: Record<string, string> = {
-        'Accept': 'application/json',
-        'User-Agent': 'AIBOS-Accounting/1.0'
+        Accept: "application/json",
+        "User-Agent": "AIBOS-Accounting/1.0",
       };
 
       // Build URL based on source
       switch (source.name) {
-        case 'Bank Negara Malaysia':
-          url = `${source.baseUrl}?quote=${baseCurrency}&base=${targetCurrencies.join(',')}`;
+        case "Bank Negara Malaysia":
+          url = `${source.baseUrl}?quote=${baseCurrency}&base=${targetCurrencies.join(",")}`;
           break;
 
-        case 'ExchangeRate-API':
+        case "ExchangeRate-API":
           url = `${source.baseUrl}/${baseCurrency}`;
           break;
 
-        case 'Fixer.io':
-          url = `${source.baseUrl}?base=${baseCurrency}&symbols=${targetCurrencies.join(',')}`;
+        case "Fixer.io":
+          url = `${source.baseUrl}?base=${baseCurrency}&symbols=${targetCurrencies.join(",")}`;
           if (source.apiKey) {
-            headers['Authorization'] = `Bearer ${source.apiKey}`;
+            headers["Authorization"] = `Bearer ${source.apiKey}`;
           }
           break;
 
@@ -216,9 +210,9 @@ async function fetchFromSource(
       }
 
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers,
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -227,13 +221,12 @@ async function fetchFromSource(
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as Record<string, unknown>;
       const rates = parseSourceResponse(source, data, baseCurrency, targetCurrencies);
 
       return { success: true, rates };
-
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unknown error');
+      lastError = error instanceof Error ? error : new Error("Unknown error");
 
       if (attempt < source.retries) {
         // Exponential backoff: 1s, 2s, 4s
@@ -243,7 +236,7 @@ async function fetchFromSource(
     }
   }
 
-  throw lastError || new Error('All retry attempts failed');
+  throw lastError || new Error("All retry attempts failed");
 }
 
 /**
@@ -253,13 +246,13 @@ function parseSourceResponse(
   source: FxRateSource,
   data: Record<string, unknown>,
   baseCurrency: string,
-  targetCurrencies: string[]
+  targetCurrencies: string[],
 ): FxRateData[] {
   const rates: FxRateData[] = [];
   const timestamp = new Date();
 
   switch (source.name) {
-    case 'Bank Negara Malaysia':
+    case "Bank Negara Malaysia":
       // BNM API format: { data: [{ currency_code: 'USD', rate: { middle_rate: '4.2500' } }] }
       if (data.data && Array.isArray(data.data)) {
         for (const item of data.data) {
@@ -267,18 +260,18 @@ function parseSourceResponse(
             rates.push({
               fromCurrency: baseCurrency,
               toCurrency: item.currency_code,
-              rate: parseFloat(item.rate?.middle_rate || item.rate?.selling_rate || '0'),
+              rate: parseFloat(item.rate?.middle_rate || item.rate?.selling_rate || "0"),
               source: source.name,
               timestamp,
               validFrom: timestamp,
-              validTo: new Date(timestamp.getTime() + 24 * 60 * 60 * 1000) // 24 hours
+              validTo: new Date(timestamp.getTime() + 24 * 60 * 60 * 1000), // 24 hours
             });
           }
         }
       }
       break;
 
-    case 'ExchangeRate-API':
+    case "ExchangeRate-API":
       // ExchangeRate-API format: { rates: { USD: 0.24, EUR: 0.21 } }
       if (data.rates) {
         for (const [currency, rate] of Object.entries(data.rates)) {
@@ -286,18 +279,18 @@ function parseSourceResponse(
             rates.push({
               fromCurrency: baseCurrency,
               toCurrency: currency,
-              rate: typeof rate === 'number' ? rate : parseFloat(String(rate)),
+              rate: typeof rate === "number" ? rate : parseFloat(String(rate)),
               source: source.name,
               timestamp,
               validFrom: timestamp,
-              validTo: new Date(timestamp.getTime() + 24 * 60 * 60 * 1000)
+              validTo: new Date(timestamp.getTime() + 24 * 60 * 60 * 1000),
             });
           }
         }
       }
       break;
 
-    case 'Fixer.io':
+    case "Fixer.io":
       // Fixer.io format: { rates: { USD: 0.24, EUR: 0.21 } }
       if (data.rates) {
         for (const [currency, rate] of Object.entries(data.rates)) {
@@ -305,11 +298,11 @@ function parseSourceResponse(
             rates.push({
               fromCurrency: baseCurrency,
               toCurrency: currency,
-              rate: typeof rate === 'number' ? rate : parseFloat(String(rate)),
+              rate: typeof rate === "number" ? rate : parseFloat(String(rate)),
               source: source.name,
               timestamp,
               validFrom: timestamp,
-              validTo: new Date(timestamp.getTime() + 24 * 60 * 60 * 1000)
+              validTo: new Date(timestamp.getTime() + 24 * 60 * 60 * 1000),
             });
           }
         }
@@ -325,16 +318,15 @@ function parseSourceResponse(
  */
 function calculateStaleness(
   rates: FxRateData[],
-  threshold: number
+  threshold: number,
 ): { isStale: boolean; ageMinutes: number; threshold: number } {
-
   if (rates.length === 0) {
     return { isStale: true, ageMinutes: Infinity, threshold };
   }
 
   // Find the oldest rate
   const oldestRate = rates.reduce((oldest, rate) =>
-    rate.timestamp < oldest.timestamp ? rate : oldest
+    rate.timestamp < oldest.timestamp ? rate : oldest,
   );
 
   const ageMinutes = (Date.now() - oldestRate.timestamp.getTime()) / (1000 * 60);
@@ -349,17 +341,16 @@ function calculateStaleness(
 export async function getCurrentFxRate(
   fromCurrency: string,
   toCurrency: string,
-  stalenessThreshold: number = STALENESS_THRESHOLDS.WARNING
+  stalenessThreshold: number = STALENESS_THRESHOLDS.WARNING,
 ): Promise<{ rate: number; source: string; age: number } | null> {
-
   const result = await ingestFxRates(fromCurrency, [toCurrency], stalenessThreshold);
 
   if (!result.success) {
     return null;
   }
 
-  const rate = result.rates.find(r =>
-    r.fromCurrency === fromCurrency && r.toCurrency === toCurrency
+  const rate = result.rates.find(
+    r => r.fromCurrency === fromCurrency && r.toCurrency === toCurrency,
   );
 
   if (!rate) {
@@ -371,7 +362,7 @@ export async function getCurrentFxRate(
   return {
     rate: rate.rate,
     source: rate.source,
-    age: ageMinutes
+    age: ageMinutes,
   };
 }
 
@@ -380,9 +371,8 @@ export async function getCurrentFxRate(
  */
 export function validateFxRateFreshness(
   timestamp: Date,
-  threshold: number = STALENESS_THRESHOLDS.WARNING
+  threshold: number = STALENESS_THRESHOLDS.WARNING,
 ): { isValid: boolean; ageMinutes: number; threshold: number } {
-
   const ageMinutes = (Date.now() - timestamp.getTime()) / (1000 * 60);
   const isValid = ageMinutes <= threshold;
 

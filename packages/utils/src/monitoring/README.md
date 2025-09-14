@@ -46,21 +46,21 @@ import {
   UIMetrics,
   ErrorContext,
   ErrorEvent,
-} from '@aibos/utils/monitoring';
+} from "@aibos/utils/monitoring";
 
 // Performance monitoring
-const metrics = performanceMonitor.startTimer('api-request');
+const metrics = performanceMonitor.startTimer("api-request");
 // ... perform operation
 metrics.endTimer();
 
 // Error tracking
 errorTracker.trackError({
-  message: 'Database connection failed',
+  message: "Database connection failed",
   stack: error.stack,
   context: {
-    userId: 'user-123',
-    operation: 'create-journal',
-    tenantId: 'tenant-456',
+    userId: "user-123",
+    operation: "create-journal",
+    tenantId: "tenant-456",
   },
 });
 ```
@@ -172,14 +172,14 @@ pnpm --filter @aibos/utils typecheck
 ### Performance Monitoring
 
 ```typescript
-import { performanceMonitor, PerformanceMetrics } from '@aibos/utils/monitoring';
+import { performanceMonitor, PerformanceMetrics } from "@aibos/utils/monitoring";
 
 // API performance monitoring
-const apiMetrics = performanceMonitor.startTimer('api-request', {
-  endpoint: '/api/journals',
-  method: 'POST',
-  userId: 'user-123',
-  tenantId: 'tenant-456',
+const apiMetrics = performanceMonitor.startTimer("api-request", {
+  endpoint: "/api/journals",
+  method: "POST",
+  userId: "user-123",
+  tenantId: "tenant-456",
 });
 
 try {
@@ -192,10 +192,10 @@ try {
 }
 
 // UI performance monitoring
-const uiMetrics = performanceMonitor.startTimer('ui-interaction', {
-  component: 'JournalForm',
-  action: 'submit',
-  userId: 'user-123',
+const uiMetrics = performanceMonitor.startTimer("ui-interaction", {
+  component: "JournalForm",
+  action: "submit",
+  userId: "user-123",
 });
 
 // Perform UI operation
@@ -203,20 +203,20 @@ await handleFormSubmit(formData);
 uiMetrics.endTimer({ success: true });
 
 // Database performance monitoring
-const dbMetrics = performanceMonitor.startTimer('database-query', {
-  query: 'SELECT * FROM gl_journal',
-  table: 'gl_journal',
-  operation: 'SELECT',
+const dbMetrics = performanceMonitor.startTimer("database-query", {
+  query: "SELECT * FROM gl_journal",
+  table: "gl_journal",
+  operation: "SELECT",
 });
 
-const results = await db.query('SELECT * FROM gl_journal');
+const results = await db.query("SELECT * FROM gl_journal");
 dbMetrics.endTimer({ success: true, recordCount: results.length });
 ```
 
 ### Error Tracking
 
 ```typescript
-import { errorTracker, ErrorContext } from '@aibos/utils/monitoring';
+import { errorTracker, ErrorContext } from "@aibos/utils/monitoring";
 
 // Basic error tracking
 try {
@@ -226,10 +226,10 @@ try {
     message: error.message,
     stack: error.stack,
     context: {
-      userId: 'user-123',
-      operation: 'create-journal',
-      tenantId: 'tenant-456',
-      companyId: 'company-789',
+      userId: "user-123",
+      operation: "create-journal",
+      tenantId: "tenant-456",
+      companyId: "company-789",
     },
   });
   throw error;
@@ -237,53 +237,53 @@ try {
 
 // Advanced error tracking with custom context
 const errorContext: ErrorContext = {
-  userId: 'user-123',
-  userRole: 'accountant',
-  tenantId: 'tenant-456',
-  companyId: 'company-789',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
-  operation: 'journal-posting',
+  userId: "user-123",
+  userRole: "accountant",
+  tenantId: "tenant-456",
+  companyId: "company-789",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
+  operation: "journal-posting",
   metadata: {
-    journalNumber: 'JE-001',
+    journalNumber: "JE-001",
     lineCount: 2,
     totalAmount: 1000.0,
   },
 };
 
 errorTracker.trackError({
-  message: 'Journal posting failed',
+  message: "Journal posting failed",
   stack: error.stack,
   context: errorContext,
-  severity: 'high',
-  category: 'business-logic',
+  severity: "high",
+  category: "business-logic",
 });
 
 // Error summary and analytics
 const errorSummary = await errorTracker.getErrorSummary({
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
-  userId: 'user-123',
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
+  userId: "user-123",
 });
 
-console.log('Error summary:', errorSummary);
-console.log('Total errors:', errorSummary.totalErrors);
-console.log('Error rate:', errorSummary.errorRate);
-console.log('Most common errors:', errorSummary.commonErrors);
+console.log("Error summary:", errorSummary);
+console.log("Total errors:", errorSummary.totalErrors);
+console.log("Error rate:", errorSummary.errorRate);
+console.log("Most common errors:", errorSummary.commonErrors);
 ```
 
 ### API Metrics Tracking
 
 ```typescript
-import { performanceMonitor, APIMetrics } from '@aibos/utils/monitoring';
+import { performanceMonitor, APIMetrics } from "@aibos/utils/monitoring";
 
 // Track API endpoint performance
-app.post('/api/journals', async (req, res) => {
-  const apiMetrics = performanceMonitor.startTimer('api-endpoint', {
-    endpoint: '/api/journals',
-    method: 'POST',
+app.post("/api/journals", async (req, res) => {
+  const apiMetrics = performanceMonitor.startTimer("api-endpoint", {
+    endpoint: "/api/journals",
+    method: "POST",
     userId: req.user?.id,
-    tenantId: req.headers['x-tenant-id'],
+    tenantId: req.headers["x-tenant-id"],
   });
 
   try {
@@ -309,15 +309,15 @@ app.post('/api/journals', async (req, res) => {
 });
 
 // Track API response times
-const responseTimeMetrics = performanceMonitor.trackResponseTime('api-request', {
-  endpoint: '/api/journals',
-  method: 'GET',
-  userId: 'user-123',
+const responseTimeMetrics = performanceMonitor.trackResponseTime("api-request", {
+  endpoint: "/api/journals",
+  method: "GET",
+  userId: "user-123",
 });
 
 // Track API throughput
-const throughputMetrics = performanceMonitor.trackThroughput('api-requests', {
-  endpoint: '/api/journals',
+const throughputMetrics = performanceMonitor.trackThroughput("api-requests", {
+  endpoint: "/api/journals",
   timeWindow: 60000, // 1 minute
 });
 ```
@@ -374,34 +374,34 @@ useEffect(() => {
 ### Monitoring Alerts and Notifications
 
 ```typescript
-import { performanceMonitor, errorTracker } from '@aibos/utils/monitoring';
+import { performanceMonitor, errorTracker } from "@aibos/utils/monitoring";
 
 // Set up performance alerts
-performanceMonitor.setAlertThreshold('api-response-time', {
+performanceMonitor.setAlertThreshold("api-response-time", {
   threshold: 5000, // 5 seconds
-  condition: 'greater-than',
-  action: 'notify',
-  recipients: ['admin@company.com'],
+  condition: "greater-than",
+  action: "notify",
+  recipients: ["admin@company.com"],
 });
 
 // Set up error rate alerts
-errorTracker.setAlertThreshold('error-rate', {
+errorTracker.setAlertThreshold("error-rate", {
   threshold: 0.05, // 5% error rate
   timeWindow: 300000, // 5 minutes
-  condition: 'greater-than',
-  action: 'notify',
-  recipients: ['dev-team@company.com'],
+  condition: "greater-than",
+  action: "notify",
+  recipients: ["dev-team@company.com"],
 });
 
 // Custom alert handling
-performanceMonitor.onAlert('api-response-time', (alert) => {
-  console.log('Performance alert triggered:', alert);
+performanceMonitor.onAlert("api-response-time", alert => {
+  console.log("Performance alert triggered:", alert);
   // Send notification to monitoring system
   sendSlackNotification(`API response time exceeded threshold: ${alert.value}ms`);
 });
 
-errorTracker.onAlert('error-rate', (alert) => {
-  console.log('Error rate alert triggered:', alert);
+errorTracker.onAlert("error-rate", alert => {
+  console.log("Error rate alert triggered:", alert);
   // Send notification to dev team
   sendEmailNotification(`Error rate exceeded threshold: ${alert.value}%`);
 });
@@ -410,34 +410,34 @@ errorTracker.onAlert('error-rate', (alert) => {
 ### Monitoring Dashboard Integration
 
 ```typescript
-import { performanceMonitor, errorTracker } from '@aibos/utils/monitoring';
+import { performanceMonitor, errorTracker } from "@aibos/utils/monitoring";
 
 // Get performance metrics for dashboard
 const performanceData = await performanceMonitor.getMetrics({
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
-  metrics: ['response-time', 'throughput', 'error-rate'],
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
+  metrics: ["response-time", "throughput", "error-rate"],
 });
 
-console.log('Performance data:', performanceData);
+console.log("Performance data:", performanceData);
 
 // Get error analytics for dashboard
 const errorAnalytics = await errorTracker.getAnalytics({
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
-  groupBy: 'category',
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
+  groupBy: "category",
   includeStackTraces: false,
 });
 
-console.log('Error analytics:', errorAnalytics);
+console.log("Error analytics:", errorAnalytics);
 
 // Get real-time monitoring data
 const realTimeData = await performanceMonitor.getRealTimeMetrics({
   timeWindow: 300000, // 5 minutes
-  metrics: ['response-time', 'throughput', 'active-users'],
+  metrics: ["response-time", "throughput", "active-users"],
 });
 
-console.log('Real-time data:', realTimeData);
+console.log("Real-time data:", realTimeData);
 ```
 
 ## 10) Troubleshooting
@@ -453,7 +453,7 @@ console.log('Real-time data:', realTimeData);
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_MONITORING = 'true';
+process.env.DEBUG_MONITORING = "true";
 ```
 
 **Logs**: Check Axiom telemetry for monitoring operation logs

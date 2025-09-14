@@ -252,32 +252,32 @@ pnpm build
 ### **Invoice Creation**
 
 ```typescript
-import { CreateInvoiceReq, CreateInvoiceRes } from '@aibos/contracts';
+import { CreateInvoiceReq, CreateInvoiceRes } from "@aibos/contracts";
 
 // Validate request
 const request = CreateInvoiceReq.parse({
-  tenantId: 'uuid',
-  companyId: 'uuid',
-  customerId: 'uuid',
-  invoiceNumber: 'INV-001',
-  invoiceDate: '2024-01-01',
-  dueDate: '2024-01-31',
-  currency: 'MYR',
+  tenantId: "uuid",
+  companyId: "uuid",
+  customerId: "uuid",
+  invoiceNumber: "INV-001",
+  invoiceDate: "2024-01-01",
+  dueDate: "2024-01-31",
+  currency: "MYR",
   lines: [
     {
       lineNumber: 1,
-      description: 'Product A',
+      description: "Product A",
       quantity: 1,
       unitPrice: 100.0,
-      revenueAccountId: 'uuid',
+      revenueAccountId: "uuid",
     },
   ],
 });
 
 // Type-safe response
 const response: CreateInvoiceRes = {
-  id: 'uuid',
-  invoiceNumber: 'INV-001',
+  id: "uuid",
+  invoiceNumber: "INV-001",
   // ... other fields
 };
 ```
@@ -285,32 +285,32 @@ const response: CreateInvoiceRes = {
 ### **Journal Posting**
 
 ```typescript
-import { PostJournalReq, PostJournalRes } from '@aibos/contracts';
+import { PostJournalReq, PostJournalRes } from "@aibos/contracts";
 
 const journalRequest = PostJournalReq.parse({
-  journalNumber: 'JE-001',
-  description: 'Monthly adjustment',
-  journalDate: '2024-01-01T00:00:00Z',
-  currency: 'MYR',
+  journalNumber: "JE-001",
+  description: "Monthly adjustment",
+  journalDate: "2024-01-01T00:00:00Z",
+  currency: "MYR",
   lines: [
-    { accountId: 'uuid', debit: 100.0, credit: 0 },
-    { accountId: 'uuid', debit: 0, credit: 100.0 },
+    { accountId: "uuid", debit: 100.0, credit: 0 },
+    { accountId: "uuid", debit: 0, credit: 100.0 },
   ],
-  idempotencyKey: 'uuid',
+  idempotencyKey: "uuid",
 });
 ```
 
 ### **Report Generation**
 
 ```typescript
-import { TrialBalanceReq, TrialBalanceRes } from '@aibos/contracts';
+import { TrialBalanceReq, TrialBalanceRes } from "@aibos/contracts";
 
 const reportRequest = TrialBalanceReq.parse({
-  tenantId: 'uuid',
-  companyId: 'uuid',
-  asOfDate: '2024-01-01T00:00:00Z',
+  tenantId: "uuid",
+  companyId: "uuid",
+  asOfDate: "2024-01-01T00:00:00Z",
   includePeriodActivity: true,
-  currency: 'MYR',
+  currency: "MYR",
 });
 ```
 

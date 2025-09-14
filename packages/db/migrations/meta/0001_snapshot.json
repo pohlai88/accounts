@@ -144,12 +144,8 @@
           "name": "audit_logs_tenant_id_tenants_id_fk",
           "tableFrom": "audit_logs",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -157,12 +153,8 @@
           "name": "audit_logs_company_id_companies_id_fk",
           "tableFrom": "audit_logs",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -170,12 +162,8 @@
           "name": "audit_logs_user_id_users_id_fk",
           "tableFrom": "audit_logs",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -299,12 +287,8 @@
           "name": "chart_of_accounts_tenant_id_tenants_id_fk",
           "tableFrom": "chart_of_accounts",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -312,12 +296,8 @@
           "name": "chart_of_accounts_company_id_companies_id_fk",
           "tableFrom": "chart_of_accounts",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -325,12 +305,8 @@
           "name": "chart_of_accounts_currency_currencies_code_fk",
           "tableFrom": "chart_of_accounts",
           "tableTo": "currencies",
-          "columnsFrom": [
-            "currency"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["currency"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -424,12 +400,8 @@
           "name": "companies_tenant_id_tenants_id_fk",
           "tableFrom": "companies",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -648,12 +620,8 @@
           "name": "customers_tenant_id_tenants_id_fk",
           "tableFrom": "customers",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -661,12 +629,8 @@
           "name": "customers_company_id_companies_id_fk",
           "tableFrom": "customers",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -674,12 +638,8 @@
           "name": "customers_currency_currencies_code_fk",
           "tableFrom": "customers",
           "tableTo": "currencies",
-          "columnsFrom": [
-            "currency"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["currency"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -776,12 +736,8 @@
           "name": "fx_rates_from_currency_currencies_code_fk",
           "tableFrom": "fx_rates",
           "tableTo": "currencies",
-          "columnsFrom": [
-            "from_currency"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["from_currency"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -789,12 +745,8 @@
           "name": "fx_rates_to_currency_currencies_code_fk",
           "tableFrom": "fx_rates",
           "tableTo": "currencies",
-          "columnsFrom": [
-            "to_currency"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["to_currency"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -879,12 +831,8 @@
           "name": "idempotency_keys_tenant_id_tenants_id_fk",
           "tableFrom": "idempotency_keys",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1002,12 +950,8 @@
           "name": "ar_invoice_lines_invoice_id_ar_invoices_id_fk",
           "tableFrom": "ar_invoice_lines",
           "tableTo": "ar_invoices",
-          "columnsFrom": [
-            "invoice_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invoice_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1015,12 +959,8 @@
           "name": "ar_invoice_lines_revenue_account_id_chart_of_accounts_id_fk",
           "tableFrom": "ar_invoice_lines",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "revenue_account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["revenue_account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1299,12 +1239,8 @@
           "name": "ar_invoices_tenant_id_tenants_id_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1312,12 +1248,8 @@
           "name": "ar_invoices_company_id_companies_id_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1325,12 +1257,8 @@
           "name": "ar_invoices_customer_id_customers_id_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1338,12 +1266,8 @@
           "name": "ar_invoices_currency_currencies_code_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "currencies",
-          "columnsFrom": [
-            "currency"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["currency"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1351,12 +1275,8 @@
           "name": "ar_invoices_journal_id_gl_journal_id_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "gl_journal",
-          "columnsFrom": [
-            "journal_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["journal_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1364,12 +1284,8 @@
           "name": "ar_invoices_created_by_users_id_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1377,12 +1293,8 @@
           "name": "ar_invoices_posted_by_users_id_fk",
           "tableFrom": "ar_invoices",
           "tableTo": "users",
-          "columnsFrom": [
-            "posted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["posted_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1475,12 +1387,8 @@
           "name": "gl_journal_lines_journal_id_gl_journal_id_fk",
           "tableFrom": "gl_journal_lines",
           "tableTo": "gl_journal",
-          "columnsFrom": [
-            "journal_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["journal_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1488,12 +1396,8 @@
           "name": "gl_journal_lines_account_id_chart_of_accounts_id_fk",
           "tableFrom": "gl_journal_lines",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1643,12 +1547,8 @@
           "name": "gl_journal_tenant_id_tenants_id_fk",
           "tableFrom": "gl_journal",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1656,12 +1556,8 @@
           "name": "gl_journal_company_id_companies_id_fk",
           "tableFrom": "gl_journal",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1669,12 +1565,8 @@
           "name": "gl_journal_currency_currencies_code_fk",
           "tableFrom": "gl_journal",
           "tableTo": "currencies",
-          "columnsFrom": [
-            "currency"
-          ],
-          "columnsTo": [
-            "code"
-          ],
+          "columnsFrom": ["currency"],
+          "columnsTo": ["code"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1682,12 +1574,8 @@
           "name": "gl_journal_created_by_users_id_fk",
           "tableFrom": "gl_journal",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1695,12 +1583,8 @@
           "name": "gl_journal_posted_by_users_id_fk",
           "tableFrom": "gl_journal",
           "tableTo": "users",
-          "columnsFrom": [
-            "posted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["posted_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1785,12 +1669,8 @@
           "name": "memberships_user_id_users_id_fk",
           "tableFrom": "memberships",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1798,12 +1678,8 @@
           "name": "memberships_tenant_id_tenants_id_fk",
           "tableFrom": "memberships",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1811,12 +1687,8 @@
           "name": "memberships_company_id_companies_id_fk",
           "tableFrom": "memberships",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1933,12 +1805,8 @@
           "name": "tax_codes_tenant_id_tenants_id_fk",
           "tableFrom": "tax_codes",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1946,12 +1814,8 @@
           "name": "tax_codes_company_id_companies_id_fk",
           "tableFrom": "tax_codes",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1959,12 +1823,8 @@
           "name": "tax_codes_tax_account_id_chart_of_accounts_id_fk",
           "tableFrom": "tax_codes",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "tax_account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tax_account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2017,9 +1877,7 @@
         "tenants_slug_unique": {
           "name": "tenants_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       }
     },
@@ -2073,9 +1931,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       }
     }

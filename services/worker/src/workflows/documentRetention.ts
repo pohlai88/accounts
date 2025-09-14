@@ -22,12 +22,12 @@ export const documentRetentionPolicy = inngest.createFunction(
       retentionPeriod,
       category,
       entityType,
-      actionAfterRetention = 'archive',
+      actionAfterRetention = "archive",
       notifyBeforeExpiry = 30,
       legalHoldOverride = false,
       complianceNotes,
       effectiveFrom,
-      effectiveUntil
+      effectiveUntil,
     } = event.data as any;
 
     const supabase = createServiceClient();
@@ -35,9 +35,9 @@ export const documentRetentionPolicy = inngest.createFunction(
 
     const auditContext = createV1AuditContext({
       url: `/retention/policy`,
-      method: 'POST',
+      method: "POST",
       headers: new globalThis.Headers(),
-      ip: 'worker'
+      ip: "worker",
     } as any);
 
     // Step 1: Validate and create retention policy
@@ -73,28 +73,26 @@ export const documentRetentionPolicy = inngest.createFunction(
         complianceNotes,
         effectiveFrom,
         effectiveUntil,
-        status: 'active',
+        status: "active",
         createdAt: new Date().toISOString(),
-        createdBy: event.user?.id || 'system'
+        createdBy: event.user?.id || "system",
       };
 
       // Store policy in database (using a dedicated retention_policies table)
-      const { error: policyError } = await supabase
-        .from('retention_policies')
-        .insert(policy);
+      const { error: policyError } = await supabase.from("retention_policies").insert(policy);
 
       if (policyError) {
         // If table doesn't exist, store in metadata for now
         logger.warn("Retention policies table not found, storing in company metadata", {
-          error: policyError.message
+          error: policyError.message,
         });
 
         // Fallback: store in company metadata
         const { data: company, error: companyError } = await supabase
-          .from('companies')
-          .select('metadata')
-          .eq('id', companyId)
-          .eq('tenant_id', tenantId)
+          .from("companies")
+          .select("metadata")
+          .eq("id", companyId)
+          .eq("tenant_id", tenantId)
           .single();
 
         if (companyError) {
@@ -105,14 +103,14 @@ export const documentRetentionPolicy = inngest.createFunction(
         const updatedPolicies = [...existingPolicies, policy];
 
         const { error: updateError } = await supabase
-          .from('companies')
+          .from("companies")
           .update({
             metadata: {
               ...company.metadata,
-              retentionPolicies: updatedPolicies
-            }
+              retentionPolicies: updatedPolicies,
+            },
           })
-          .eq('id', companyId);
+          .eq("id", companyId);
 
         if (updateError) {
           throw new Error(`Failed to store retention policy: ${updateError.message}`);
@@ -120,15 +118,15 @@ export const documentRetentionPolicy = inngest.createFunction(
       }
 
       await auditService.logOperation(auditContext, {
-        operation: 'retention_policy_created',
+        operation: "retention_policy_created",
         data: {
           policyId,
           policyName,
           retentionPeriod,
           category,
           entityType,
-          actionAfterRetention
-        }
+          actionAfterRetention,
+        },
       });
 
       return policy;
@@ -137,21 +135,21 @@ export const documentRetentionPolicy = inngest.createFunction(
     // Step 2: Apply policy to existing documents if specified
     await step.run("apply-to-existing-documents", async () => {
       let query = supabase
-        .from('attachments')
-        .select('id, created_at, category, metadata')
-        .eq('tenant_id', tenantId)
-        .eq('company_id', companyId);
+        .from("attachments")
+        .select("id, created_at, category, metadata")
+        .eq("tenant_id", tenantId)
+        .eq("company_id", companyId);
 
       // Apply category filter if specified
       if (category) {
-        query = query.eq('category', category);
+        query = query.eq("category", category);
       }
 
       const { data: attachments, error: queryError } = await query;
 
       if (queryError) {
         logger.error("Failed to query existing attachments", {
-          error: queryError.message
+          error: queryError.message,
         });
         return { applied: 0 };
       }
@@ -179,18 +177,18 @@ export const documentRetentionPolicy = inngest.createFunction(
                 policyName: policyData.policyName,
                 retentionUntil: retentionUntil.toISOString(),
                 actionAfterRetention: policyData.actionAfterRetention,
-                appliedAt: new Date().toISOString()
-              }
-            }
+                appliedAt: new Date().toISOString(),
+              },
+            },
           };
         });
 
         // Update batch
         for (const update of updates) {
           const { error: updateError } = await supabase
-            .from('attachments')
+            .from("attachments")
             .update({ metadata: update.metadata })
-            .eq('id', update.id);
+            .eq("id", update.id);
 
           if (!updateError) {
             appliedCount++;
@@ -201,7 +199,7 @@ export const documentRetentionPolicy = inngest.createFunction(
       logger.info("Retention policy applied to existing documents", {
         policyId: policyData.id,
         totalDocuments: attachments.length,
-        appliedCount
+        appliedCount,
       });
 
       return { applied: appliedCount };
@@ -209,16 +207,19 @@ export const documentRetentionPolicy = inngest.createFunction(
 
     // Step 3: Schedule retention monitoring job
     await step.run("schedule-retention-monitoring", async () => {
-      await inngest.send({
-        name: "retention/monitor",
-        data: {
-          tenantId,
-          companyId,
-          policyId: policyData.id
-        }
-      }, {
-        // delay: "1d" // Check daily - removed due to Inngest API constraints
-      });
+      await inngest.send(
+        {
+          name: "retention/monitor",
+          data: {
+            tenantId,
+            companyId,
+            policyId: policyData.id,
+          },
+        },
+        {
+          // delay: "1d" // Check daily - removed due to Inngest API constraints
+        },
+      );
 
       return { monitoringScheduled: true };
     });
@@ -228,9 +229,9 @@ export const documentRetentionPolicy = inngest.createFunction(
       policyId: policyData.id,
       policyName: policyData.policyName,
       retentionPeriod: policyData.retentionPeriod,
-      actionAfterRetention: policyData.actionAfterRetention
+      actionAfterRetention: policyData.actionAfterRetention,
     };
-  }
+  },
 );
 
 // Document Retention Monitoring Job
@@ -249,9 +250,9 @@ export const documentRetentionMonitor = inngest.createFunction(
 
     const auditContext = createV1AuditContext({
       url: `/retention/monitor`,
-      method: 'POST',
+      method: "POST",
       headers: new globalThis.Headers(),
-      ip: 'worker'
+      ip: "worker",
     } as any);
 
     // Step 1: Find documents approaching retention expiry
@@ -262,11 +263,11 @@ export const documentRetentionMonitor = inngest.createFunction(
 
       // Query documents with retention policies
       const { data: attachments, error: queryError } = await supabase
-        .from('attachments')
-        .select('id, filename, category, metadata, created_at')
-        .eq('tenant_id', tenantId)
-        .eq('company_id', companyId)
-        .not('metadata->retentionPolicy', 'is', null);
+        .from("attachments")
+        .select("id, filename, category, metadata, created_at")
+        .eq("tenant_id", tenantId)
+        .eq("company_id", companyId)
+        .not("metadata->retentionPolicy", "is", null);
 
       if (queryError) {
         throw new Error(`Failed to query attachments: ${queryError.message}`);
@@ -293,7 +294,7 @@ export const documentRetentionMonitor = inngest.createFunction(
         companyId,
         policyId,
         expiringCount: expiring.length,
-        expiredCount: expired.length
+        expiredCount: expired.length,
       });
 
       return { expiring, expired };
@@ -306,89 +307,87 @@ export const documentRetentionMonitor = inngest.createFunction(
           if (!document) continue;
 
           const retentionPolicy = document.metadata?.retentionPolicy;
-          const action = retentionPolicy?.actionAfterRetention || 'archive';
+          const action = retentionPolicy?.actionAfterRetention || "archive";
 
           // Check for legal hold
           const onLegalHold = document.metadata?.legalHold?.active || false;
           if (onLegalHold) {
             logger.info("Skipping expired document due to legal hold", {
               attachmentId: document.id,
-              filename: document.filename
+              filename: document.filename,
             });
             continue;
           }
 
           try {
-            if (action === 'delete') {
+            if (action === "delete") {
               // Soft delete the document
               await supabase
-                .from('attachments')
+                .from("attachments")
                 .update({
-                  status: 'deleted',
+                  status: "deleted",
                   deleted_at: new Date().toISOString(),
                   metadata: {
                     ...document.metadata,
                     retentionAction: {
-                      action: 'deleted',
+                      action: "deleted",
                       processedAt: new Date().toISOString(),
-                      reason: 'retention_policy_expiry'
-                    }
-                  }
+                      reason: "retention_policy_expiry",
+                    },
+                  },
                 })
-                .eq('id', document.id);
+                .eq("id", document.id);
 
               await auditService.logOperation(auditContext, {
-                operation: 'document_retention_deleted',
+                operation: "document_retention_deleted",
                 data: {
                   attachmentId: document.id,
                   filename: document.filename,
                   policyId: retentionPolicy.policyId,
-                  retentionDate: document.retentionDate
-                }
+                  retentionDate: document.retentionDate,
+                },
               });
-
-            } else if (action === 'archive') {
+            } else if (action === "archive") {
               // Archive the document
               await supabase
-                .from('attachments')
+                .from("attachments")
                 .update({
-                  status: 'archived',
+                  status: "archived",
                   metadata: {
                     ...document.metadata,
                     retentionAction: {
-                      action: 'archived',
+                      action: "archived",
                       processedAt: new Date().toISOString(),
-                      reason: 'retention_policy_expiry'
-                    }
-                  }
+                      reason: "retention_policy_expiry",
+                    },
+                  },
                 })
-                .eq('id', document.id);
+                .eq("id", document.id);
 
               await auditService.logOperation(auditContext, {
-                operation: 'document_retention_archived',
+                operation: "document_retention_archived",
                 data: {
                   attachmentId: document.id,
                   filename: document.filename,
                   policyId: retentionPolicy.policyId,
-                  retentionDate: document.retentionDate
-                }
+                  retentionDate: document.retentionDate,
+                },
               });
-
-            } else if (action === 'review') {
+            } else if (action === "review") {
               // Flag for manual review
               await supabase
-                .from('attachments')
+                .from("attachments")
                 .update({
                   metadata: {
                     ...document.metadata,
                     retentionReview: {
                       flaggedAt: new Date().toISOString(),
-                      reason: 'retention_policy_expiry',
-                      status: 'pending_review'
-                    }
-                  }
+                      reason: "retention_policy_expiry",
+                      status: "pending_review",
+                    },
+                  },
                 })
-                .eq('id', document.id);
+                .eq("id", document.id);
 
               // Send notification for manual review
               await inngest.send({
@@ -403,18 +402,17 @@ export const documentRetentionMonitor = inngest.createFunction(
                     category: document.category,
                     retentionDate: document.retentionDate,
                     policyName: retentionPolicy.policyName,
-                    reviewUrl: `${process.env.APP_URL}/documents/${document.id}/retention-review`
+                    reviewUrl: `${process.env.APP_URL}/documents/${document.id}/retention-review`,
                   },
-                  tenantId
-                }
+                  tenantId,
+                },
               });
             }
-
           } catch (error) {
             logger.error("Failed to process expired document", {
               attachmentId: document.id,
               action,
-              error: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error),
             });
           }
         }
@@ -433,7 +431,7 @@ export const documentRetentionMonitor = inngest.createFunction(
           if (!document) continue;
 
           const daysUntilExpiry = Math.ceil(
-            (document.retentionDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+            (document.retentionDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
           );
 
           if (!groupedByDays[daysUntilExpiry]) {
@@ -462,12 +460,12 @@ export const documentRetentionMonitor = inngest.createFunction(
                   id: doc.id,
                   filename: doc.filename,
                   category: doc.category,
-                  retentionDate: doc.retentionDate
+                  retentionDate: doc.retentionDate,
                 })),
-                reviewUrl: `${process.env.APP_URL}/compliance/retention-review`
+                reviewUrl: `${process.env.APP_URL}/compliance/retention-review`,
               },
-              tenantId
-            }
+              tenantId,
+            },
           });
         }
 
@@ -477,16 +475,19 @@ export const documentRetentionMonitor = inngest.createFunction(
 
     // Step 4: Schedule next monitoring cycle
     await step.run("schedule-next-monitoring", async () => {
-      await inngest.send({
-        name: "retention/monitor",
-        data: {
-          tenantId,
-          companyId,
-          policyId
-        }
-      }, {
-        // delay: "1d" // Check daily - removed due to Inngest API constraints
-      });
+      await inngest.send(
+        {
+          name: "retention/monitor",
+          data: {
+            tenantId,
+            companyId,
+            policyId,
+          },
+        },
+        {
+          // delay: "1d" // Check daily - removed due to Inngest API constraints
+        },
+      );
 
       return { nextMonitoringScheduled: true };
     });
@@ -495,9 +496,9 @@ export const documentRetentionMonitor = inngest.createFunction(
       success: true,
       expiringCount: expiringDocuments.expiring.length,
       expiredCount: expiringDocuments.expired.length,
-      processedCount: expiringDocuments.expired.length
+      processedCount: expiringDocuments.expired.length,
     };
-  }
+  },
 );
 
 // Legal Hold Management
@@ -516,7 +517,7 @@ export const documentLegalHold = inngest.createFunction(
       reason,
       holdUntil,
       legalCase,
-      requestedBy
+      requestedBy,
     } = event.data;
 
     const supabase = createServiceClient();
@@ -524,9 +525,9 @@ export const documentLegalHold = inngest.createFunction(
 
     const auditContext = createV1AuditContext({
       url: `/retention/legal-hold`,
-      method: 'POST',
+      method: "POST",
       headers: new globalThis.Headers(),
-      ip: 'worker'
+      ip: "worker",
     } as any);
 
     // Step 1: Validate and process legal hold
@@ -549,47 +550,47 @@ export const documentLegalHold = inngest.createFunction(
       for (const attachmentId of attachmentIds) {
         try {
           const { data: attachment, error: fetchError } = await supabase
-            .from('attachments')
-            .select('*')
-            .eq('id', attachmentId)
-            .eq('tenant_id', tenantId)
+            .from("attachments")
+            .select("*")
+            .eq("id", attachmentId)
+            .eq("tenant_id", tenantId)
             .single();
 
           if (fetchError || !attachment) {
             results.push({
               attachmentId,
               success: false,
-              error: 'Attachment not found'
+              error: "Attachment not found",
             });
             continue;
           }
 
           const legalHoldData = {
-            active: action === 'apply',
+            active: action === "apply",
             reason,
             holdUntil,
             legalCase,
             requestedBy,
-            appliedAt: action === 'apply' ? new Date().toISOString() : undefined,
-            releasedAt: action === 'release' ? new Date().toISOString() : undefined,
-            previousHold: attachment.metadata?.legalHold
+            appliedAt: action === "apply" ? new Date().toISOString() : undefined,
+            releasedAt: action === "release" ? new Date().toISOString() : undefined,
+            previousHold: attachment.metadata?.legalHold,
           };
 
           const { error: updateError } = await supabase
-            .from('attachments')
+            .from("attachments")
             .update({
               metadata: {
                 ...attachment.metadata,
-                legalHold: legalHoldData
-              }
+                legalHold: legalHoldData,
+              },
             })
-            .eq('id', attachmentId);
+            .eq("id", attachmentId);
 
           if (updateError) {
             results.push({
               attachmentId,
               success: false,
-              error: updateError.message
+              error: updateError.message,
             });
             continue;
           }
@@ -601,21 +602,20 @@ export const documentLegalHold = inngest.createFunction(
               filename: attachment.filename,
               reason,
               legalCase,
-              requestedBy
-            }
+              requestedBy,
+            },
           });
 
           results.push({
             attachmentId,
             success: true,
-            action
+            action,
           });
-
         } catch (error) {
           results.push({
             attachmentId,
             success: false,
-            error: error instanceof Error ? error.message : String(error)
+            error: error instanceof Error ? error.message : String(error),
           });
         }
       }
@@ -628,7 +628,7 @@ export const documentLegalHold = inngest.createFunction(
         action,
         totalCount: results.length,
         successCount,
-        failureCount
+        failureCount,
       });
 
       return { results, successCount, failureCount };
@@ -643,7 +643,7 @@ export const documentLegalHold = inngest.createFunction(
           name: "email/send",
           data: {
             to: "legal@company.com", // Configure based on tenant
-            subject: `Legal Hold ${action === 'apply' ? 'Applied' : 'Released'}: ${successfulHolds.length} documents`,
+            subject: `Legal Hold ${action === "apply" ? "Applied" : "Released"}: ${successfulHolds.length} documents`,
             template: "document-legal-hold-notification",
             data: {
               action,
@@ -652,10 +652,10 @@ export const documentLegalHold = inngest.createFunction(
               legalCase,
               requestedBy,
               attachmentIds: successfulHolds.map(r => r.attachmentId),
-              processedAt: new Date().toISOString()
+              processedAt: new Date().toISOString(),
             },
-            tenantId
-          }
+            tenantId,
+          },
         });
       }
 
@@ -668,8 +668,7 @@ export const documentLegalHold = inngest.createFunction(
       totalCount: holdResult.results.length,
       successCount: holdResult.successCount,
       failureCount: holdResult.failureCount,
-      results: holdResult.results
+      results: holdResult.results,
     };
-  }
+  },
 );
-

@@ -44,7 +44,21 @@ describe("FX Policy", () => {
     });
 
     it("should handle all major currencies", () => {
-      const majorCurrencies = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "SGD", "THB", "VND", "IDR", "PHP"];
+      const majorCurrencies = [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "AUD",
+        "CAD",
+        "CHF",
+        "CNY",
+        "SGD",
+        "THB",
+        "VND",
+        "IDR",
+        "PHP",
+      ];
 
       majorCurrencies.forEach(currency => {
         expect(() => validateFxPolicy("MYR", currency)).not.toThrow();

@@ -42,14 +42,14 @@ import {
   autoMatchTransactions,
   importBankTransactions,
   BANK_FORMATS,
-} from '@aibos/accounting/bank';
+} from "@aibos/accounting/bank";
 
 // Import bank transactions
 const importResult = await importBankTransactions(
   csvData,
   BANK_FORMATS.MAYBANK,
-  'bank-account-123',
-  'import-batch-456'
+  "bank-account-123",
+  "import-batch-456",
 );
 
 // Auto-match transactions
@@ -164,7 +164,7 @@ pnpm --filter @aibos/accounting typecheck
 ### Bank Transaction Import
 
 ```typescript
-import { importBankTransactions, BANK_FORMATS, detectBankFormat } from '@aibos/accounting/bank';
+import { importBankTransactions, BANK_FORMATS, detectBankFormat } from "@aibos/accounting/bank";
 
 // Auto-detect bank format
 const csvData = `Date,Description,Debit,Credit,Balance
@@ -172,37 +172,37 @@ const csvData = `Date,Description,Debit,Credit,Balance
 16/01/2024,Payment Received,0.00,1000.00,11000.00`;
 
 const detectedFormat = detectBankFormat(csvData);
-console.log('Detected format:', detectedFormat?.name); // Maybank
+console.log("Detected format:", detectedFormat?.name); // Maybank
 
 // Import with specific format
 const importResult = await importBankTransactions(
   csvData,
   BANK_FORMATS.MAYBANK,
-  'bank-account-123',
-  'import-batch-456'
+  "bank-account-123",
+  "import-batch-456",
 );
 
 if (importResult.success) {
-  console.log('Import successful');
-  console.log('Valid transactions:', importResult.transactions.length);
-  console.log('Errors:', importResult.errors.length);
-  console.log('Warnings:', importResult.warnings.length);
+  console.log("Import successful");
+  console.log("Valid transactions:", importResult.transactions.length);
+  console.log("Errors:", importResult.errors.length);
+  console.log("Warnings:", importResult.warnings.length);
 } else {
-  console.error('Import failed:', importResult.errors);
+  console.error("Import failed:", importResult.errors);
 }
 ```
 
 ### Auto-Matching Transactions
 
 ```typescript
-import { autoMatchTransactions, groupMatchesByConfidence } from '@aibos/accounting/bank';
+import { autoMatchTransactions, groupMatchesByConfidence } from "@aibos/accounting/bank";
 
 // Prepare transaction data
 const transactions = [
   {
-    transactionDate: new Date('2024-01-15'),
-    description: 'Office Supplies Payment',
-    reference: 'BILL-001',
+    transactionDate: new Date("2024-01-15"),
+    description: "Office Supplies Payment",
+    reference: "BILL-001",
     debitAmount: 500.0,
     creditAmount: 0.0,
     balance: 10000.0,
@@ -213,14 +213,14 @@ const transactions = [
 // Prepare matching candidates
 const candidates = [
   {
-    type: 'PAYMENT' as const,
-    id: 'pay-001',
-    number: 'PAY-001',
-    date: new Date('2024-01-15'),
+    type: "PAYMENT" as const,
+    id: "pay-001",
+    number: "PAY-001",
+    date: new Date("2024-01-15"),
     amount: 500.0,
-    description: 'Office Supplies Payment',
-    reference: 'BILL-001',
-    supplierId: 'supplier-123',
+    description: "Office Supplies Payment",
+    reference: "BILL-001",
+    supplierId: "supplier-123",
   },
 ];
 
@@ -233,24 +233,24 @@ const matchResult = await autoMatchTransactions(transactions, candidates, {
   enableFuzzyMatching: true,
 });
 
-console.log('Auto-match results:');
-console.log('Total transactions:', matchResult.summary.totalTransactions);
-console.log('Automatic matches:', matchResult.summary.automaticMatches);
-console.log('Suggested matches:', matchResult.summary.suggestedMatches);
-console.log('Unmatched:', matchResult.summary.unmatched);
-console.log('Average confidence:', matchResult.summary.averageConfidence);
+console.log("Auto-match results:");
+console.log("Total transactions:", matchResult.summary.totalTransactions);
+console.log("Automatic matches:", matchResult.summary.automaticMatches);
+console.log("Suggested matches:", matchResult.summary.suggestedMatches);
+console.log("Unmatched:", matchResult.summary.unmatched);
+console.log("Average confidence:", matchResult.summary.averageConfidence);
 
 // Group matches by confidence
 const groupedMatches = groupMatchesByConfidence(matchResult.matches);
-console.log('Automatic matches:', groupedMatches.automatic.length);
-console.log('Suggested matches:', groupedMatches.suggested.length);
-console.log('Low confidence matches:', groupedMatches.lowConfidence.length);
+console.log("Automatic matches:", groupedMatches.automatic.length);
+console.log("Suggested matches:", groupedMatches.suggested.length);
+console.log("Low confidence matches:", groupedMatches.lowConfidence.length);
 ```
 
 ### Multi-Format Bank Support
 
 ```typescript
-import { importBankTransactions, BANK_FORMATS } from '@aibos/accounting/bank';
+import { importBankTransactions, BANK_FORMATS } from "@aibos/accounting/bank";
 
 // Maybank format
 const maybankData = `Date,Description,Reference,Debit,Credit,Balance
@@ -259,8 +259,8 @@ const maybankData = `Date,Description,Reference,Debit,Credit,Balance
 const maybankResult = await importBankTransactions(
   maybankData,
   BANK_FORMATS.MAYBANK,
-  'maybank-account',
-  'import-001'
+  "maybank-account",
+  "import-001",
 );
 
 // CIMB format
@@ -270,8 +270,8 @@ const cimbData = `Transaction Date,Description,Reference No,Amount,Dr/Cr,Balance
 const cimbResult = await importBankTransactions(
   cimbData,
   BANK_FORMATS.CIMB,
-  'cimb-account',
-  'import-002'
+  "cimb-account",
+  "import-002",
 );
 
 // Public Bank format
@@ -281,15 +281,15 @@ const publicBankData = `Date,Transaction Details,Withdrawal,Deposit,Balance
 const publicBankResult = await importBankTransactions(
   publicBankData,
   BANK_FORMATS.PUBLIC_BANK,
-  'public-bank-account',
-  'import-003'
+  "public-bank-account",
+  "import-003",
 );
 ```
 
 ### Advanced Matching Configuration
 
 ```typescript
-import { autoMatchTransactions } from '@aibos/accounting/bank';
+import { autoMatchTransactions } from "@aibos/accounting/bank";
 
 // Custom matching configuration
 const customConfig = {
@@ -310,15 +310,15 @@ const matchResult = await autoMatchTransactions(transactions, candidates, custom
 // Validate specific matches
 for (const match of matchResult.matches) {
   const validation = validateMatch(
-    transactions.find((t) => t.transactionDate === match.transactionDate),
-    match.candidate
+    transactions.find(t => t.transactionDate === match.transactionDate),
+    match.candidate,
   );
 
   if (validation.valid) {
     console.log(`Match ${match.transactionId} is valid`);
   } else {
     console.log(`Match ${match.transactionId} has issues:`, validation.errors);
-    console.log('Warnings:', validation.warnings);
+    console.log("Warnings:", validation.warnings);
   }
 }
 ```
@@ -337,7 +337,7 @@ for (const match of matchResult.matches) {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_BANK = 'true';
+process.env.DEBUG_BANK = "true";
 ```
 
 **Logs**: Check Axiom telemetry for banking operation logs

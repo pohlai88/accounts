@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "./base.json",
   "compilerOptions": {
     "lib": ["ES2023", "WebWorker", "WebWorker.Iterable"],
     "target": "ES2020",

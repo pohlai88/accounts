@@ -1,9 +1,9 @@
 // D2 FX Storage Helper - Database operations for FX rates
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import { fxRates, currencies } from '@aibos/db/src/schema';
-import { eq, and, desc, gte } from 'drizzle-orm';
-import { type FxRateData, STALENESS_THRESHOLDS } from '@aibos/accounting';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { fxRates, currencies } from "@aibos/db/src/schema";
+import { eq, and, desc, gte } from "drizzle-orm";
+import { type FxRateData, STALENESS_THRESHOLDS } from "@aibos/accounting";
 
 // Database connection
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -12,7 +12,7 @@ function getDb() {
   if (!_db) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
-      throw new Error('DATABASE_URL environment variable is required');
+      throw new Error("DATABASE_URL environment variable is required");
     }
     const pool = new Pool({ connectionString });
     _db = drizzle(pool);
@@ -37,8 +37,8 @@ export async function insertFxRates(rates: FxRateData[]): Promise<number> {
           and(
             eq(fxRates.fromCurrency, rate.fromCurrency),
             eq(fxRates.toCurrency, rate.toCurrency),
-            gte(fxRates.validFrom, rate.validFrom)
-          )
+            gte(fxRates.validFrom, rate.validFrom),
+          ),
         )
         .limit(1);
 
@@ -50,7 +50,7 @@ export async function insertFxRates(rates: FxRateData[]): Promise<number> {
           rate: rate.rate.toString(),
           source: rate.source,
           validFrom: rate.validFrom,
-          validTo: rate.validTo || null
+          validTo: rate.validTo || null,
         });
 
         insertedCount++;
@@ -89,7 +89,7 @@ export async function getFxRatesStaleness(): Promise<{
         rate: fxRates.rate,
         source: fxRates.source,
         validFrom: fxRates.validFrom,
-        createdAt: fxRates.createdAt
+        createdAt: fxRates.createdAt,
       })
       .from(fxRates)
       .orderBy(desc(fxRates.createdAt))
@@ -99,7 +99,7 @@ export async function getFxRatesStaleness(): Promise<{
       return {
         isStale: true,
         ageMinutes: Infinity,
-        threshold: STALENESS_THRESHOLDS.WARNING
+        threshold: STALENESS_THRESHOLDS.WARNING,
       };
     }
 
@@ -108,7 +108,7 @@ export async function getFxRatesStaleness(): Promise<{
       return {
         isStale: true,
         ageMinutes: Infinity,
-        threshold: STALENESS_THRESHOLDS.WARNING
+        threshold: STALENESS_THRESHOLDS.WARNING,
       };
     }
 
@@ -124,16 +124,15 @@ export async function getFxRatesStaleness(): Promise<{
         toCurrency: latestRate.toCurrency,
         rate: Number(latestRate.rate),
         source: latestRate.source,
-        validFrom: latestRate.validFrom
-      }
+        validFrom: latestRate.validFrom,
+      },
     };
-
   } catch (error) {
-    console.error('Failed to check FX rate staleness:', error);
+    console.error("Failed to check FX rate staleness:", error);
     return {
       isStale: true,
       ageMinutes: Infinity,
-      threshold: STALENESS_THRESHOLDS.WARNING
+      threshold: STALENESS_THRESHOLDS.WARNING,
     };
   }
 }
@@ -143,7 +142,7 @@ export async function getFxRatesStaleness(): Promise<{
  */
 export async function getCurrentFxRateFromDb(
   fromCurrency: string,
-  toCurrency: string
+  toCurrency: string,
 ): Promise<{
   rate: number;
   source: string;
@@ -158,15 +157,10 @@ export async function getCurrentFxRateFromDb(
         rate: fxRates.rate,
         source: fxRates.source,
         validFrom: fxRates.validFrom,
-        createdAt: fxRates.createdAt
+        createdAt: fxRates.createdAt,
       })
       .from(fxRates)
-      .where(
-        and(
-          eq(fxRates.fromCurrency, fromCurrency),
-          eq(fxRates.toCurrency, toCurrency)
-        )
-      )
+      .where(and(eq(fxRates.fromCurrency, fromCurrency), eq(fxRates.toCurrency, toCurrency)))
       .orderBy(desc(fxRates.validFrom))
       .limit(1);
 
@@ -185,9 +179,8 @@ export async function getCurrentFxRateFromDb(
       rate: Number(rate.rate),
       source: rate.source,
       validFrom: rate.validFrom,
-      ageMinutes
+      ageMinutes,
     };
-
   } catch (error) {
     console.error(`Failed to get FX rate ${fromCurrency}/${toCurrency}:`, error);
     return null;
@@ -199,15 +192,17 @@ export async function getCurrentFxRateFromDb(
  */
 export async function getFxRatesForCurrencies(
   baseCurrency: string,
-  targetCurrencies: string[]
-): Promise<Array<{
-  fromCurrency: string;
-  toCurrency: string;
-  rate: number;
-  source: string;
-  validFrom: Date;
-  ageMinutes: number;
-}>> {
+  targetCurrencies: string[],
+): Promise<
+  Array<{
+    fromCurrency: string;
+    toCurrency: string;
+    rate: number;
+    source: string;
+    validFrom: Date;
+    ageMinutes: number;
+  }>
+> {
   const results: Array<{
     fromCurrency: string;
     toCurrency: string;
@@ -224,7 +219,7 @@ export async function getFxRatesForCurrencies(
         results.push({
           fromCurrency: baseCurrency,
           toCurrency: targetCurrency,
-          ...rate
+          ...rate,
         });
       }
     } catch (error) {
@@ -245,20 +240,13 @@ export async function cleanupOldFxRates(): Promise<number> {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    await db
-      .delete(fxRates)
-      .where(
-        and(
-          gte(fxRates.createdAt, thirtyDaysAgo)
-        )
-      );
+    await db.delete(fxRates).where(and(gte(fxRates.createdAt, thirtyDaysAgo)));
 
     // Note: Drizzle doesn't return affected rows count directly
     // This is a placeholder - in production you might want to count first
     return 0;
-
   } catch (error) {
-    console.error('Failed to cleanup old FX rates:', error);
+    console.error("Failed to cleanup old FX rates:", error);
     return 0;
   }
 }
@@ -271,39 +259,35 @@ export async function ensureCurrenciesExist(currencyCodes: string[]): Promise<vo
 
   // Standard currency data
   const currencyData: Record<string, { name: string; symbol: string; decimalPlaces: number }> = {
-    'MYR': { name: 'Malaysian Ringgit', symbol: 'RM', decimalPlaces: 2 },
-    'USD': { name: 'US Dollar', symbol: '$', decimalPlaces: 2 },
-    'EUR': { name: 'Euro', symbol: '€', decimalPlaces: 2 },
-    'GBP': { name: 'British Pound', symbol: '£', decimalPlaces: 2 },
-    'JPY': { name: 'Japanese Yen', symbol: '¥', decimalPlaces: 0 },
-    'SGD': { name: 'Singapore Dollar', symbol: 'S$', decimalPlaces: 2 },
-    'THB': { name: 'Thai Baht', symbol: '฿', decimalPlaces: 2 },
-    'VND': { name: 'Vietnamese Dong', symbol: '₫', decimalPlaces: 0 },
-    'IDR': { name: 'Indonesian Rupiah', symbol: 'Rp', decimalPlaces: 0 },
-    'PHP': { name: 'Philippine Peso', symbol: '₱', decimalPlaces: 2 },
-    'AUD': { name: 'Australian Dollar', symbol: 'A$', decimalPlaces: 2 },
-    'CAD': { name: 'Canadian Dollar', symbol: 'C$', decimalPlaces: 2 },
-    'CHF': { name: 'Swiss Franc', symbol: 'CHF', decimalPlaces: 2 },
-    'CNY': { name: 'Chinese Yuan', symbol: '¥', decimalPlaces: 2 },
-    'HKD': { name: 'Hong Kong Dollar', symbol: 'HK$', decimalPlaces: 2 },
-    'TWD': { name: 'Taiwan Dollar', symbol: 'NT$', decimalPlaces: 2 },
-    'KRW': { name: 'South Korean Won', symbol: '₩', decimalPlaces: 0 },
-    'INR': { name: 'Indian Rupee', symbol: '₹', decimalPlaces: 2 }
+    MYR: { name: "Malaysian Ringgit", symbol: "RM", decimalPlaces: 2 },
+    USD: { name: "US Dollar", symbol: "$", decimalPlaces: 2 },
+    EUR: { name: "Euro", symbol: "€", decimalPlaces: 2 },
+    GBP: { name: "British Pound", symbol: "£", decimalPlaces: 2 },
+    JPY: { name: "Japanese Yen", symbol: "¥", decimalPlaces: 0 },
+    SGD: { name: "Singapore Dollar", symbol: "S$", decimalPlaces: 2 },
+    THB: { name: "Thai Baht", symbol: "฿", decimalPlaces: 2 },
+    VND: { name: "Vietnamese Dong", symbol: "₫", decimalPlaces: 0 },
+    IDR: { name: "Indonesian Rupiah", symbol: "Rp", decimalPlaces: 0 },
+    PHP: { name: "Philippine Peso", symbol: "₱", decimalPlaces: 2 },
+    AUD: { name: "Australian Dollar", symbol: "A$", decimalPlaces: 2 },
+    CAD: { name: "Canadian Dollar", symbol: "C$", decimalPlaces: 2 },
+    CHF: { name: "Swiss Franc", symbol: "CHF", decimalPlaces: 2 },
+    CNY: { name: "Chinese Yuan", symbol: "¥", decimalPlaces: 2 },
+    HKD: { name: "Hong Kong Dollar", symbol: "HK$", decimalPlaces: 2 },
+    TWD: { name: "Taiwan Dollar", symbol: "NT$", decimalPlaces: 2 },
+    KRW: { name: "South Korean Won", symbol: "₩", decimalPlaces: 0 },
+    INR: { name: "Indian Rupee", symbol: "₹", decimalPlaces: 2 },
   };
 
   for (const code of currencyCodes) {
     try {
-      const existing = await db
-        .select()
-        .from(currencies)
-        .where(eq(currencies.code, code))
-        .limit(1);
+      const existing = await db.select().from(currencies).where(eq(currencies.code, code)).limit(1);
 
       if (existing.length === 0) {
         const currencyInfo = currencyData[code] || {
           name: code,
           symbol: code,
-          decimalPlaces: 2
+          decimalPlaces: 2,
         };
 
         await db.insert(currencies).values({
@@ -311,7 +295,7 @@ export async function ensureCurrenciesExist(currencyCodes: string[]): Promise<vo
           name: currencyInfo.name,
           symbol: currencyInfo.symbol,
           decimalPlaces: currencyInfo.decimalPlaces.toString(),
-          isActive: true
+          isActive: true,
         });
       }
     } catch (error) {

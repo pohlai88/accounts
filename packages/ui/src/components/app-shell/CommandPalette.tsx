@@ -1,11 +1,11 @@
 /**
  * CommandPalette Component - Steve Jobs Inspired
- * 
+ *
  * Universal search and actions - the most powerful tool
  * Cmd/Ctrl + K to search for transactions, contacts, reports, and actions
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Search,
   FileText,
@@ -17,9 +17,9 @@ import {
   Lock,
   ArrowRight,
   Clock,
-  DollarSign
-} from 'lucide-react';
-import { cn } from '@aibos/ui/utils';
+  DollarSign,
+} from "lucide-react";
+import { cn } from "@aibos/ui/utils";
 
 export interface CommandPaletteProps {
   className?: string;
@@ -41,155 +41,155 @@ export interface Command {
 const commands: Command[] = [
   // Actions
   {
-    id: 'create-invoice',
-    label: 'Create Invoice',
-    description: 'Create a new invoice for a customer',
+    id: "create-invoice",
+    label: "Create Invoice",
+    description: "Create a new invoice for a customer",
     icon: FileText,
-    category: 'Actions',
-    shortcut: 'Cmd+N',
-    keywords: ['invoice', 'create', 'customer', 'bill']
+    category: "Actions",
+    shortcut: "Cmd+N",
+    keywords: ["invoice", "create", "customer", "bill"],
   },
   {
-    id: 'create-bill',
-    label: 'Create Bill',
-    description: 'Create a new bill from a vendor',
+    id: "create-bill",
+    label: "Create Bill",
+    description: "Create a new bill from a vendor",
     icon: Receipt,
-    category: 'Actions',
-    keywords: ['bill', 'create', 'vendor', 'expense']
+    category: "Actions",
+    keywords: ["bill", "create", "vendor", "expense"],
   },
   {
-    id: 'reconcile-bank',
-    label: 'Reconcile Bank',
-    description: 'Reconcile bank transactions',
+    id: "reconcile-bank",
+    label: "Reconcile Bank",
+    description: "Reconcile bank transactions",
     icon: CreditCard,
-    category: 'Actions',
-    keywords: ['reconcile', 'bank', 'transactions', 'match']
+    category: "Actions",
+    keywords: ["reconcile", "bank", "transactions", "match"],
   },
   {
-    id: 'add-customer',
-    label: 'Add Customer',
-    description: 'Add a new customer',
+    id: "add-customer",
+    label: "Add Customer",
+    description: "Add a new customer",
     icon: User,
-    category: 'Actions',
-    keywords: ['customer', 'add', 'contact', 'client']
+    category: "Actions",
+    keywords: ["customer", "add", "contact", "client"],
   },
   {
-    id: 'add-vendor',
-    label: 'Add Vendor',
-    description: 'Add a new vendor',
+    id: "add-vendor",
+    label: "Add Vendor",
+    description: "Add a new vendor",
     icon: User,
-    category: 'Actions',
-    keywords: ['vendor', 'add', 'supplier', 'contact']
+    category: "Actions",
+    keywords: ["vendor", "add", "supplier", "contact"],
   },
 
   // Navigation
   {
-    id: 'view-reports',
-    label: 'View Reports',
-    description: 'Open the reports section',
+    id: "view-reports",
+    label: "View Reports",
+    description: "Open the reports section",
     icon: BarChart3,
-    category: 'Navigation',
-    shortcut: 'g r',
-    keywords: ['reports', 'view', 'analytics', 'dashboard']
+    category: "Navigation",
+    shortcut: "g r",
+    keywords: ["reports", "view", "analytics", "dashboard"],
   },
   {
-    id: 'view-invoices',
-    label: 'View Invoices',
-    description: 'Go to invoices list',
+    id: "view-invoices",
+    label: "View Invoices",
+    description: "Go to invoices list",
     icon: FileText,
-    category: 'Navigation',
-    shortcut: 'g s',
-    keywords: ['invoices', 'view', 'list', 'sell']
+    category: "Navigation",
+    shortcut: "g s",
+    keywords: ["invoices", "view", "list", "sell"],
   },
   {
-    id: 'view-bills',
-    label: 'View Bills',
-    description: 'Go to bills list',
+    id: "view-bills",
+    label: "View Bills",
+    description: "Go to bills list",
     icon: Receipt,
-    category: 'Navigation',
-    shortcut: 'g b',
-    keywords: ['bills', 'view', 'list', 'buy']
+    category: "Navigation",
+    shortcut: "g b",
+    keywords: ["bills", "view", "list", "buy"],
   },
   {
-    id: 'view-cash',
-    label: 'View Cash',
-    description: 'Go to cash management',
+    id: "view-cash",
+    label: "View Cash",
+    description: "Go to cash management",
     icon: CreditCard,
-    category: 'Navigation',
-    shortcut: 'g c',
-    keywords: ['cash', 'bank', 'transactions', 'money']
+    category: "Navigation",
+    shortcut: "g c",
+    keywords: ["cash", "bank", "transactions", "money"],
   },
   {
-    id: 'view-close',
-    label: 'View Close',
-    description: 'Go to period close',
+    id: "view-close",
+    label: "View Close",
+    description: "Go to period close",
     icon: Lock,
-    category: 'Navigation',
-    shortcut: 'g l',
-    keywords: ['close', 'period', 'month-end', 'lock']
+    category: "Navigation",
+    shortcut: "g l",
+    keywords: ["close", "period", "month-end", "lock"],
   },
   {
-    id: 'view-settings',
-    label: 'View Settings',
-    description: 'Open application settings',
+    id: "view-settings",
+    label: "View Settings",
+    description: "Open application settings",
     icon: Settings,
-    category: 'Navigation',
-    shortcut: 'g t',
-    keywords: ['settings', 'preferences', 'config', 'setup']
+    category: "Navigation",
+    shortcut: "g t",
+    keywords: ["settings", "preferences", "config", "setup"],
   },
 
   // Quick Actions
   {
-    id: 'quick-payment',
-    label: 'Record Payment',
-    description: 'Record a payment received',
+    id: "quick-payment",
+    label: "Record Payment",
+    description: "Record a payment received",
     icon: DollarSign,
-    category: 'Quick Actions',
-    keywords: ['payment', 'received', 'cash', 'money']
+    category: "Quick Actions",
+    keywords: ["payment", "received", "cash", "money"],
   },
   {
-    id: 'quick-expense',
-    label: 'Record Expense',
-    description: 'Record a business expense',
+    id: "quick-expense",
+    label: "Record Expense",
+    description: "Record a business expense",
     icon: Receipt,
-    category: 'Quick Actions',
-    keywords: ['expense', 'cost', 'spend', 'outgoing']
+    category: "Quick Actions",
+    keywords: ["expense", "cost", "spend", "outgoing"],
   },
   {
-    id: 'quick-deposit',
-    label: 'Record Deposit',
-    description: 'Record a bank deposit',
+    id: "quick-deposit",
+    label: "Record Deposit",
+    description: "Record a bank deposit",
     icon: CreditCard,
-    category: 'Quick Actions',
-    keywords: ['deposit', 'bank', 'income', 'incoming']
-  }
+    category: "Quick Actions",
+    keywords: ["deposit", "bank", "income", "incoming"],
+  },
 ];
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   className,
   onCommand,
-  onSearch
+  onSearch,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcut: Cmd/Ctrl + K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsOpen(true);
       }
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // Focus input when opened
@@ -218,25 +218,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex(prev =>
-          prev < filteredCommands.length - 1 ? prev + 1 : 0
-        );
+        setSelectedIndex(prev => (prev < filteredCommands.length - 1 ? prev + 1 : 0));
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
-        setSelectedIndex(prev =>
-          prev > 0 ? prev - 1 : filteredCommands.length - 1
-        );
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : filteredCommands.length - 1));
         break;
-      case 'Enter':
+      case "Enter":
         e.preventDefault();
         if (filteredCommands[selectedIndex]) {
           handleCommand(filteredCommands[selectedIndex]);
         }
         break;
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         setIsOpen(false);
         break;
@@ -247,7 +243,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     onCommand?.(command);
     command.action?.();
     setIsOpen(false);
-    setQuery('');
+    setQuery("");
   };
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -274,10 +270,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       />
 
       {/* Command Palette */}
-      <div className={cn(
-        'relative w-full max-w-2xl mx-4 bg-sys-bg-raised rounded-lg border border-sys-border-hairline shadow-lg',
-        className
-      )}>
+      <div
+        className={cn(
+          "relative w-full max-w-2xl mx-4 bg-sys-bg-raised rounded-lg border border-sys-border-hairline shadow-lg",
+          className,
+        )}
+      >
         {/* Search Input */}
         <div className="flex items-center space-x-3 p-4 border-b border-sys-border-hairline">
           <Search className="h-5 w-5 text-sys-text-tertiary" aria-hidden="true" />
@@ -297,19 +295,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             aria-label="Search commands"
             aria-describedby="command-help"
           />
-          <kbd className="px-2 py-1 text-xs bg-sys-fill-low text-sys-text-tertiary rounded" aria-label="Escape key">
+          <kbd
+            className="px-2 py-1 text-xs bg-sys-fill-low text-sys-text-tertiary rounded"
+            aria-label="Escape key"
+          >
             ESC
           </kbd>
         </div>
 
         {/* Command List */}
-        <div
-          className="max-h-96 overflow-y-auto"
-          role="listbox"
-          aria-label="Available commands"
-        >
+        <div className="max-h-96 overflow-y-auto" role="listbox" aria-label="Available commands">
           {filteredCommands.length === 0 ? (
-            <div className="p-4 text-center text-sys-text-tertiary" role="status" aria-live="polite">
+            <div
+              className="p-4 text-center text-sys-text-tertiary"
+              role="status"
+              aria-live="polite"
+            >
               No commands found
             </div>
           ) : (
@@ -323,7 +324,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     key={command.id}
                     className={cn(
                       "w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors focus:outline-none focus:ring-2 focus:ring-sys-accent focus:ring-offset-2",
-                      isSelected ? "bg-sys-fill-low" : "hover:bg-sys-fill-low"
+                      isSelected ? "bg-sys-fill-low" : "hover:bg-sys-fill-low",
                     )}
                     onClick={() => handleCommand(command)}
                     role="option"
@@ -332,15 +333,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   >
                     <Icon className="h-5 w-5 text-sys-text-tertiary" aria-hidden="true" />
                     <div className="flex-1">
-                      <div className="text-sys-text-primary font-medium">
-                        {command.label}
-                      </div>
+                      <div className="text-sys-text-primary font-medium">{command.label}</div>
                       <div className="text-xs text-sys-text-tertiary">
                         {command.description || command.category}
                       </div>
                     </div>
                     {command.shortcut && (
-                      <kbd className="px-2 py-1 text-xs bg-sys-fill-low text-sys-text-tertiary rounded border border-sys-border-hairline" aria-label={`Shortcut: ${command.shortcut}`}>
+                      <kbd
+                        className="px-2 py-1 text-xs bg-sys-fill-low text-sys-text-tertiary rounded border border-sys-border-hairline"
+                        aria-label={`Shortcut: ${command.shortcut}`}
+                      >
                         {command.shortcut}
                       </kbd>
                     )}

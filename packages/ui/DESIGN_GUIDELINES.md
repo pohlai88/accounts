@@ -118,7 +118,7 @@ neutral-900: #FFFFFF  /* Pure white - primary text */
 
 ```css
 font-family:
-  -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial,
+  -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial,
   sans-serif;
 ```
 
@@ -126,9 +126,9 @@ font-family:
 
 ```css
 font-feature-settings:
-  'kern' 1,
-  'liga' 1,
-  'calt' 1;
+  "kern" 1,
+  "liga" 1,
+  "calt" 1;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
 ```
@@ -404,23 +404,23 @@ p-6 space-y-4
 
 ```tsx
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus',
+  "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus",
   {
     variants: {
       variant: {
-        primary: 'bg-ai-solid text-fg-inverted hover:bg-ai-muted',
-        secondary: 'border border-border-strong text-fg-default hover:bg-interactive-hover',
-        ghost: 'text-fg-default hover:bg-interactive-hover',
-        destructive: 'bg-danger text-fg-inverted hover:bg-danger/90',
+        primary: "bg-ai-solid text-fg-inverted hover:bg-ai-muted",
+        secondary: "border border-border-strong text-fg-default hover:bg-interactive-hover",
+        ghost: "text-fg-default hover:bg-interactive-hover",
+        destructive: "bg-danger text-fg-inverted hover:bg-danger/90",
       },
       size: {
-        sm: 'h-9 px-3 text-sm',
-        md: 'h-10 px-4',
-        lg: 'h-11 px-5',
+        sm: "h-9 px-3 text-sm",
+        md: "h-10 px-4",
+        lg: "h-11 px-5",
       },
     },
-    defaultVariants: { variant: 'primary', size: 'md' },
-  }
+    defaultVariants: { variant: "primary", size: "md" },
+  },
 );
 ```
 

@@ -8,7 +8,7 @@ export const JournalLine = z.object({
   debit: z.number().nonnegative().default(0),
   credit: z.number().nonnegative().default(0),
   description: z.string().max(200).optional(),
-  reference: z.string().max(100).optional()
+  reference: z.string().max(100).optional(),
 });
 
 export interface PostingContext {
@@ -31,10 +31,10 @@ export class PostingError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: Record<string, unknown>
+    public details?: Record<string, unknown>,
   ) {
     super(message);
-    this.name = 'PostingError';
+    this.name = "PostingError";
   }
 }
 
@@ -46,7 +46,7 @@ export function validateBalanced(lines: Array<z.infer<typeof JournalLine>>) {
     throw new PostingError(
       "Journal must be balanced: debits must equal credits",
       "UNBALANCED_JOURNAL",
-      { totalDebit: debit, totalCredit: credit, difference: Math.abs(debit - credit) }
+      { totalDebit: debit, totalCredit: credit, difference: Math.abs(debit - credit) },
     );
   }
 }
@@ -66,7 +66,7 @@ export function validateJournalLines(lines: Array<z.infer<typeof JournalLine>>) 
       throw new PostingError(
         `Line ${index + 1}: Cannot have both debit and credit amounts`,
         "INVALID_LINE_AMOUNTS",
-        { lineIndex: index, debit: line.debit, credit: line.credit }
+        { lineIndex: index, debit: line.debit, credit: line.credit },
       );
     }
 
@@ -74,20 +74,20 @@ export function validateJournalLines(lines: Array<z.infer<typeof JournalLine>>) 
       throw new PostingError(
         `Line ${index + 1}: Must have either debit or credit amount`,
         "ZERO_AMOUNTS",
-        { lineIndex: index }
+        { lineIndex: index },
       );
     }
   }
 }
 
 export function validateSoDCompliance(context: PostingContext) {
-  const sodCheck = checkSoDCompliance('journal:post', context.userRole);
+  const sodCheck = checkSoDCompliance("journal:post", context.userRole);
 
   if (!sodCheck.allowed) {
     throw new PostingError(
       `User role '${context.userRole}' is not authorized to post journal entries`,
       "SOD_VIOLATION",
-      { action: 'journal:post', userRole: context.userRole, reason: sodCheck.reason }
+      { action: "journal:post", userRole: context.userRole, reason: sodCheck.reason },
     );
   }
 
@@ -106,12 +106,16 @@ export async function validateJournalPosting(input: JournalPostingInput) {
 
   // 4. Validate currency format
   if (!input.currency || input.currency.length !== 3) {
-    throw new PostingError("Invalid currency code", "INVALID_CURRENCY", { currency: input.currency });
+    throw new PostingError("Invalid currency code", "INVALID_CURRENCY", {
+      currency: input.currency,
+    });
   }
 
   // 5. Validate journal date is not in the future
   if (input.journalDate > new Date()) {
-    throw new PostingError("Journal date cannot be in the future", "FUTURE_DATE", { journalDate: input.journalDate });
+    throw new PostingError("Journal date cannot be in the future", "FUTURE_DATE", {
+      journalDate: input.journalDate,
+    });
   }
 
   // 6. Validate COA flags and account rules
@@ -121,7 +125,7 @@ export async function validateJournalPosting(input: JournalPostingInput) {
     // Fetch account information
     const [accountsMap, allAccounts] = await Promise.all([
       getAccountsInfo(input.context, accountIds),
-      getAllAccountsInfo(input.context)
+      getAllAccountsInfo(input.context),
     ]);
 
     // Validate COA flags
@@ -129,26 +133,21 @@ export async function validateJournalPosting(input: JournalPostingInput) {
       input.lines,
       input.currency,
       accountsMap,
-      allAccounts
+      allAccounts,
     );
 
     return {
       validated: true,
       requiresApproval: sodCheck.requiresApproval,
-      approverRoles: sodCheck.requiresApproval ? ['manager', 'admin'] : undefined,
+      approverRoles: sodCheck.requiresApproval ? ["manager", "admin"] : undefined,
       coaWarnings: coaValidation.warnings,
       accountDetails: coaValidation.accountDetails,
       totalDebit: input.lines.reduce((s, l) => s + l.debit, 0),
-      totalCredit: input.lines.reduce((s, l) => s + l.credit, 0)
+      totalCredit: input.lines.reduce((s, l) => s + l.credit, 0),
     };
-
   } catch (error) {
     if (error instanceof COAValidationError) {
-      throw new PostingError(
-        error.message,
-        error.code,
-        error.details
-      );
+      throw new PostingError(error.message, error.code, error.details);
     }
     throw error;
   }
@@ -166,6 +165,6 @@ export async function postJournal(input: JournalPostingInput) {
     coaWarnings: validation.coaWarnings || [],
     accountDetails: validation.accountDetails,
     totalDebit: input.lines.reduce((s, l) => s + l.debit, 0),
-    totalCredit: input.lines.reduce((s, l) => s + l.credit, 0)
+    totalCredit: input.lines.reduce((s, l) => s + l.credit, 0),
   };
 }

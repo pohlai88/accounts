@@ -44,17 +44,17 @@ import {
   deleteFile,
   listFiles,
   getFileMetadata,
-} from '@aibos/utils/storage';
+} from "@aibos/utils/storage";
 
 // Upload file
 const uploadResult = await uploadFile({
   file: fileBuffer,
-  fileName: 'document.pdf',
-  contentType: 'application/pdf',
+  fileName: "document.pdf",
+  contentType: "application/pdf",
   metadata: {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    userId: 'user-789',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    userId: "user-789",
   },
 });
 
@@ -63,9 +63,9 @@ const fileData = await downloadFile(uploadResult.fileId);
 
 // List files
 const files = await listFiles({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
 });
 ```
 
@@ -170,63 +170,63 @@ pnpm --filter @aibos/utils typecheck
 ### Basic File Operations
 
 ```typescript
-import { uploadFile, downloadFile, deleteFile, listFiles } from '@aibos/utils/storage';
+import { uploadFile, downloadFile, deleteFile, listFiles } from "@aibos/utils/storage";
 
 // Upload file
 const uploadResult = await uploadFile({
   file: fileBuffer,
-  fileName: 'journal-entry.pdf',
-  contentType: 'application/pdf',
+  fileName: "journal-entry.pdf",
+  contentType: "application/pdf",
   metadata: {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    userId: 'user-789',
-    journalId: 'journal-123',
-    documentType: 'JOURNAL_ENTRY',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    userId: "user-789",
+    journalId: "journal-123",
+    documentType: "JOURNAL_ENTRY",
   },
 });
 
-console.log('File uploaded:', uploadResult.fileId);
-console.log('File URL:', uploadResult.url);
+console.log("File uploaded:", uploadResult.fileId);
+console.log("File URL:", uploadResult.url);
 
 // Download file
 const fileData = await downloadFile(uploadResult.fileId);
-console.log('File downloaded:', fileData.length, 'bytes');
+console.log("File downloaded:", fileData.length, "bytes");
 
 // List files
 const files = await listFiles({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  documentType: 'JOURNAL_ENTRY',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  documentType: "JOURNAL_ENTRY",
 });
 
-console.log('Files found:', files.length);
+console.log("Files found:", files.length);
 for (const file of files) {
   console.log(`- ${file.fileName} (${file.fileSize} bytes)`);
 }
 
 // Delete file
 await deleteFile(uploadResult.fileId);
-console.log('File deleted');
+console.log("File deleted");
 ```
 
 ### Advanced File Management
 
 ```typescript
-import { storageService } from '@aibos/utils/storage';
+import { storageService } from "@aibos/utils/storage";
 
 // Upload with advanced options
 const uploadResult = await storageService.uploadFile({
   file: fileBuffer,
-  fileName: 'financial-report.xlsx',
-  contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  fileName: "financial-report.xlsx",
+  contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   metadata: {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    userId: 'user-789',
-    reportType: 'BALANCE_SHEET',
-    reportDate: '2024-01-31',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    userId: "user-789",
+    reportType: "BALANCE_SHEET",
+    reportDate: "2024-01-31",
     isPublic: false,
     retentionDays: 2555, // 7 years
   },
@@ -239,80 +239,80 @@ const uploadResult = await storageService.uploadFile({
 
 // Get file metadata
 const metadata = await storageService.getFileMetadata(uploadResult.fileId);
-console.log('File metadata:', metadata);
-console.log('File size:', metadata.fileSize);
-console.log('Upload date:', metadata.uploadDate);
-console.log('Retention until:', metadata.retentionDate);
+console.log("File metadata:", metadata);
+console.log("File size:", metadata.fileSize);
+console.log("Upload date:", metadata.uploadDate);
+console.log("Retention until:", metadata.retentionDate);
 
 // Update file metadata
 await storageService.updateFileMetadata(uploadResult.fileId, {
-  description: 'Monthly Balance Sheet Report',
-  tags: ['financial', 'report', 'balance-sheet'],
+  description: "Monthly Balance Sheet Report",
+  tags: ["financial", "report", "balance-sheet"],
   isPublic: false,
 });
 
 // Search files
 const searchResults = await storageService.searchFiles({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  query: 'balance sheet',
-  fileTypes: ['xlsx', 'pdf'],
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  query: "balance sheet",
+  fileTypes: ["xlsx", "pdf"],
   dateRange: {
-    start: new Date('2024-01-01'),
-    end: new Date('2024-01-31'),
+    start: new Date("2024-01-01"),
+    end: new Date("2024-01-31"),
   },
 });
 
-console.log('Search results:', searchResults.length);
+console.log("Search results:", searchResults.length);
 ```
 
 ### File Access Control
 
 ```typescript
-import { storageService } from '@aibos/utils/storage';
+import { storageService } from "@aibos/utils/storage";
 
 // Set file permissions
 await storageService.setFilePermissions(uploadResult.fileId, {
-  owner: 'user-789',
+  owner: "user-789",
   permissions: {
-    read: ['user-789', 'manager-123'],
-    write: ['user-789'],
-    delete: ['admin-456'],
+    read: ["user-789", "manager-123"],
+    write: ["user-789"],
+    delete: ["admin-456"],
   },
 });
 
 // Check file access
-const hasAccess = await storageService.checkFileAccess(uploadResult.fileId, 'user-789', 'read');
-console.log('User has read access:', hasAccess);
+const hasAccess = await storageService.checkFileAccess(uploadResult.fileId, "user-789", "read");
+console.log("User has read access:", hasAccess);
 
 // Generate signed URL for secure access
 const signedUrl = await storageService.generateSignedUrl(uploadResult.fileId, {
   expiresIn: 3600, // 1 hour
-  permissions: ['read'],
+  permissions: ["read"],
 });
 
-console.log('Signed URL:', signedUrl);
+console.log("Signed URL:", signedUrl);
 ```
 
 ### File Processing and Validation
 
 ```typescript
-import { storageService } from '@aibos/utils/storage';
+import { storageService } from "@aibos/utils/storage";
 
 // Upload with validation
 const uploadResult = await storageService.uploadFile({
   file: fileBuffer,
-  fileName: 'invoice.pdf',
-  contentType: 'application/pdf',
+  fileName: "invoice.pdf",
+  contentType: "application/pdf",
   metadata: {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    userId: 'user-789',
-    documentType: 'INVOICE',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    userId: "user-789",
+    documentType: "INVOICE",
   },
   validation: {
     maxSize: 10 * 1024 * 1024, // 10MB
-    allowedTypes: ['application/pdf', 'image/jpeg', 'image/png'],
+    allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
     scanForViruses: true,
     validateContent: true,
   },
@@ -320,87 +320,87 @@ const uploadResult = await storageService.uploadFile({
 
 // Process file (OCR, text extraction, etc.)
 const processingResult = await storageService.processFile(uploadResult.fileId, {
-  operations: ['ocr', 'text-extraction', 'metadata-extraction'],
+  operations: ["ocr", "text-extraction", "metadata-extraction"],
   options: {
-    language: 'en',
+    language: "en",
     confidence: 0.8,
   },
 });
 
-console.log('Processing result:', processingResult);
-console.log('Extracted text:', processingResult.extractedText);
-console.log('OCR confidence:', processingResult.ocrConfidence);
+console.log("Processing result:", processingResult);
+console.log("Extracted text:", processingResult.extractedText);
+console.log("OCR confidence:", processingResult.ocrConfidence);
 ```
 
 ### Storage Analytics and Reporting
 
 ```typescript
-import { storageService } from '@aibos/utils/storage';
+import { storageService } from "@aibos/utils/storage";
 
 // Get storage usage statistics
 const usageStats = await storageService.getUsageStats({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
 });
 
-console.log('Storage usage:', usageStats);
-console.log('Total files:', usageStats.totalFiles);
-console.log('Total size:', usageStats.totalSize);
-console.log('Storage by type:', usageStats.byFileType);
+console.log("Storage usage:", usageStats);
+console.log("Total files:", usageStats.totalFiles);
+console.log("Total size:", usageStats.totalSize);
+console.log("Storage by type:", usageStats.byFileType);
 
 // Get file access analytics
 const accessAnalytics = await storageService.getAccessAnalytics({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  timeRange: '30d',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  timeRange: "30d",
 });
 
-console.log('Access analytics:', accessAnalytics);
-console.log('Most accessed files:', accessAnalytics.mostAccessed);
-console.log('Access patterns:', accessAnalytics.patterns);
+console.log("Access analytics:", accessAnalytics);
+console.log("Most accessed files:", accessAnalytics.mostAccessed);
+console.log("Access patterns:", accessAnalytics.patterns);
 
 // Generate storage report
 const storageReport = await storageService.generateStorageReport({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  reportType: 'COMPLIANCE',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  reportType: "COMPLIANCE",
   includeDeleted: false,
 });
 
-console.log('Storage report:', storageReport);
+console.log("Storage report:", storageReport);
 ```
 
 ### File Backup and Recovery
 
 ```typescript
-import { storageService } from '@aibos/utils/storage';
+import { storageService } from "@aibos/utils/storage";
 
 // Create file backup
 const backupResult = await storageService.createBackup(uploadResult.fileId, {
-  backupType: 'FULL',
+  backupType: "FULL",
   retentionDays: 2555, // 7 years
   encryption: true,
 });
 
-console.log('Backup created:', backupResult.backupId);
+console.log("Backup created:", backupResult.backupId);
 
 // Restore file from backup
 const restoreResult = await storageService.restoreFromBackup(backupResult.backupId, {
-  targetFileId: 'new-file-id',
+  targetFileId: "new-file-id",
   preserveMetadata: true,
 });
 
-console.log('File restored:', restoreResult.fileId);
+console.log("File restored:", restoreResult.fileId);
 
 // List file backups
 const backups = await storageService.listFileBackups(uploadResult.fileId);
-console.log('File backups:', backups.length);
+console.log("File backups:", backups.length);
 
 // Delete old backups
 await storageService.cleanupBackups({
-  olderThan: new Date('2023-01-01'),
+  olderThan: new Date("2023-01-01"),
   dryRun: false,
 });
 ```
@@ -418,7 +418,7 @@ await storageService.cleanupBackups({
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_STORAGE = 'true';
+process.env.DEBUG_STORAGE = "true";
 ```
 
 **Logs**: Check Axiom telemetry for storage operation logs

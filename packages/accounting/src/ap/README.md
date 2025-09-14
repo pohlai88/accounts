@@ -38,63 +38,63 @@
 ## 3) Getting Started
 
 ```typescript
-import { validateBillPosting, calculateBillTotals } from '@aibos/accounting/ap';
-import { validatePaymentProcessing } from '@aibos/accounting/ap';
+import { validateBillPosting, calculateBillTotals } from "@aibos/accounting/ap";
+import { validatePaymentProcessing } from "@aibos/accounting/ap";
 
 // Bill posting validation
 const billResult = await validateBillPosting(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    billId: 'bill-789',
-    billNumber: 'BILL-001',
-    supplierId: 'supplier-123',
-    supplierName: 'ABC Supplier',
-    billDate: '2024-01-15',
-    currency: 'MYR',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    billId: "bill-789",
+    billNumber: "BILL-001",
+    supplierId: "supplier-123",
+    supplierName: "ABC Supplier",
+    billDate: "2024-01-15",
+    currency: "MYR",
     exchangeRate: 1.0,
-    apAccountId: 'ap-account-id',
+    apAccountId: "ap-account-id",
     lines: [
       {
         lineNumber: 1,
-        description: 'Office Supplies',
+        description: "Office Supplies",
         quantity: 10,
         unitPrice: 50.0,
         lineAmount: 500.0,
-        expenseAccountId: 'expense-account-id',
+        expenseAccountId: "expense-account-id",
       },
     ],
   },
-  'user-123',
-  'accountant'
+  "user-123",
+  "accountant",
 );
 
 // Payment processing validation
 const paymentResult = await validatePaymentProcessing(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    paymentId: 'pay-001',
-    paymentNumber: 'PAY-001',
-    paymentDate: '2024-01-20',
-    paymentMethod: 'BANK_TRANSFER',
-    bankAccountId: 'bank-account-id',
-    currency: 'MYR',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    paymentId: "pay-001",
+    paymentNumber: "PAY-001",
+    paymentDate: "2024-01-20",
+    paymentMethod: "BANK_TRANSFER",
+    bankAccountId: "bank-account-id",
+    currency: "MYR",
     exchangeRate: 1.0,
     amount: 500.0,
     allocations: [
       {
-        type: 'BILL',
-        documentId: 'bill-789',
-        documentNumber: 'BILL-001',
-        supplierId: 'supplier-123',
+        type: "BILL",
+        documentId: "bill-789",
+        documentNumber: "BILL-001",
+        supplierId: "supplier-123",
         allocatedAmount: 500.0,
-        apAccountId: 'ap-account-id',
+        apAccountId: "ap-account-id",
       },
     ],
   },
-  'user-123',
-  'accountant'
+  "user-123",
+  "accountant",
 );
 ```
 
@@ -207,25 +207,25 @@ pnpm --filter @aibos/accounting typecheck
 ### Bill Posting Workflow
 
 ```typescript
-import { validateBillPosting, calculateBillTotals } from '@aibos/accounting/ap';
+import { validateBillPosting, calculateBillTotals } from "@aibos/accounting/ap";
 
 // 1. Calculate bill totals
 const billLines = [
   {
     lineNumber: 1,
-    description: 'Office Supplies',
+    description: "Office Supplies",
     quantity: 10,
     unitPrice: 50.0,
     lineAmount: 500.0,
-    expenseAccountId: 'expense-account-id',
+    expenseAccountId: "expense-account-id",
   },
   {
     lineNumber: 2,
-    description: 'Software License',
+    description: "Software License",
     quantity: 1,
     unitPrice: 200.0,
     lineAmount: 200.0,
-    expenseAccountId: 'software-expense-account-id',
+    expenseAccountId: "software-expense-account-id",
   },
 ];
 
@@ -234,52 +234,52 @@ const totals = calculateBillTotals(billLines);
 
 // 2. Validate bill posting
 const billInput = {
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  billId: 'bill-789',
-  billNumber: 'BILL-001',
-  supplierId: 'supplier-123',
-  supplierName: 'ABC Supplier',
-  billDate: '2024-01-15',
-  currency: 'MYR',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  billId: "bill-789",
+  billNumber: "BILL-001",
+  supplierId: "supplier-123",
+  supplierName: "ABC Supplier",
+  billDate: "2024-01-15",
+  currency: "MYR",
   exchangeRate: 1.0,
-  apAccountId: 'ap-account-id',
+  apAccountId: "ap-account-id",
   lines: billLines,
 };
 
-const result = await validateBillPosting(billInput, 'user-123', 'accountant');
+const result = await validateBillPosting(billInput, "user-123", "accountant");
 
 if (result.success) {
-  console.log('Bill validated successfully:', result.journalNumber);
-  console.log('Total amount:', result.totalAmount);
-  console.log('Journal lines:', result.lines);
+  console.log("Bill validated successfully:", result.journalNumber);
+  console.log("Total amount:", result.totalAmount);
+  console.log("Journal lines:", result.lines);
 } else {
-  console.error('Bill validation failed:', result.error);
+  console.error("Bill validation failed:", result.error);
 }
 ```
 
 ### Payment Processing Workflow
 
 ```typescript
-import { validatePaymentProcessing, calculatePaymentSummary } from '@aibos/accounting/ap';
+import { validatePaymentProcessing, calculatePaymentSummary } from "@aibos/accounting/ap";
 
 // 1. Prepare payment allocations
 const allocations = [
   {
-    type: 'BILL' as const,
-    documentId: 'bill-789',
-    documentNumber: 'BILL-001',
-    supplierId: 'supplier-123',
+    type: "BILL" as const,
+    documentId: "bill-789",
+    documentNumber: "BILL-001",
+    supplierId: "supplier-123",
     allocatedAmount: 500.0,
-    apAccountId: 'ap-account-id',
+    apAccountId: "ap-account-id",
   },
   {
-    type: 'BILL' as const,
-    documentId: 'bill-790',
-    documentNumber: 'BILL-002',
-    supplierId: 'supplier-456',
+    type: "BILL" as const,
+    documentId: "bill-790",
+    documentNumber: "BILL-002",
+    supplierId: "supplier-456",
     allocatedAmount: 300.0,
-    apAccountId: 'ap-account-id',
+    apAccountId: "ap-account-id",
   },
 ];
 
@@ -289,64 +289,64 @@ const summary = calculatePaymentSummary(allocations);
 
 // 3. Validate payment processing
 const paymentInput = {
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  paymentId: 'pay-001',
-  paymentNumber: 'PAY-001',
-  paymentDate: '2024-01-20',
-  paymentMethod: 'BANK_TRANSFER' as const,
-  bankAccountId: 'bank-account-id',
-  currency: 'MYR',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  paymentId: "pay-001",
+  paymentNumber: "PAY-001",
+  paymentDate: "2024-01-20",
+  paymentMethod: "BANK_TRANSFER" as const,
+  bankAccountId: "bank-account-id",
+  currency: "MYR",
   exchangeRate: 1.0,
   amount: 800.0,
   allocations,
 };
 
-const result = await validatePaymentProcessing(paymentInput, 'user-123', 'accountant');
+const result = await validatePaymentProcessing(paymentInput, "user-123", "accountant");
 
 if (result.success) {
-  console.log('Payment validated successfully:', result.journalNumber);
-  console.log('Total amount:', result.totalAmount);
-  console.log('Allocations processed:', result.allocationsProcessed);
+  console.log("Payment validated successfully:", result.journalNumber);
+  console.log("Total amount:", result.totalAmount);
+  console.log("Allocations processed:", result.allocationsProcessed);
 } else {
-  console.error('Payment validation failed:', result.error);
+  console.error("Payment validation failed:", result.error);
 }
 ```
 
 ### Multi-Currency Bill Processing
 
 ```typescript
-import { validateBillPosting } from '@aibos/accounting/ap';
+import { validateBillPosting } from "@aibos/accounting/ap";
 
 // USD bill with FX conversion
 const usdBillInput = {
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  billId: 'bill-usd-001',
-  billNumber: 'BILL-USD-001',
-  supplierId: 'us-supplier-123',
-  supplierName: 'US Supplier Inc',
-  billDate: '2024-01-15',
-  currency: 'USD',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  billId: "bill-usd-001",
+  billNumber: "BILL-USD-001",
+  supplierId: "us-supplier-123",
+  supplierName: "US Supplier Inc",
+  billDate: "2024-01-15",
+  currency: "USD",
   exchangeRate: 4.2, // USD to MYR
-  apAccountId: 'ap-account-id',
+  apAccountId: "ap-account-id",
   lines: [
     {
       lineNumber: 1,
-      description: 'Software License',
+      description: "Software License",
       quantity: 1,
       unitPrice: 100.0, // USD
       lineAmount: 100.0, // USD
-      expenseAccountId: 'software-expense-account-id',
+      expenseAccountId: "software-expense-account-id",
     },
   ],
 };
 
-const result = await validateBillPosting(usdBillInput, 'user-123', 'accountant');
+const result = await validateBillPosting(usdBillInput, "user-123", "accountant");
 
 if (result.success) {
   // Total amount will be converted to MYR: 100.00 * 4.20 = 420.00 MYR
-  console.log('USD bill converted to MYR:', result.totalAmount); // 420.00
+  console.log("USD bill converted to MYR:", result.totalAmount); // 420.00
 }
 ```
 
@@ -363,7 +363,7 @@ if (result.success) {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_AP = 'true';
+process.env.DEBUG_AP = "true";
 ```
 
 **Logs**: Check Axiom telemetry for AP operation logs

@@ -20,15 +20,12 @@ function findMarkdownFiles(dir) {
   return files;
 }
 
-const docFiles = [
-  ...findMarkdownFiles('docs'),
-  'README.md'
-].filter(f => fs.existsSync(f));
+const docFiles = [...findMarkdownFiles("docs"), "README.md"].filter(f => fs.existsSync(f));
 
 if (docFiles.length === 0) {
-  console.log('No markdown files found');
+  console.log("No markdown files found");
   process.exit(0);
 }
 
-const p = spawn('write-good', docFiles, { stdio: "inherit", shell: true });
-p.on("exit", (code) => process.exit(code ?? 0));
+const p = spawn("write-good", docFiles, { stdio: "inherit", shell: true });
+p.on("exit", code => process.exit(code ?? 0));

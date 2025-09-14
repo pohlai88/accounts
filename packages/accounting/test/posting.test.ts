@@ -3,29 +3,37 @@ import { postJournal, JournalPostingInput } from "../src/posting";
 
 // Mock the database functions
 vi.mock("@aibos/db", () => ({
-  getAccountsInfo: vi.fn().mockResolvedValue(new Map([
-    ["00000000-0000-0000-0000-000000000001", {
-      id: "00000000-0000-0000-0000-000000000001",
-      code: "1000",
-      name: "Cash",
-      accountType: "ASSET",
-      currency: "MYR",
-      isActive: true,
-      level: 1,
-      parentId: undefined
-    }],
-    ["00000000-0000-0000-0000-000000000002", {
-      id: "00000000-0000-0000-0000-000000000002",
-      code: "2000",
-      name: "Accounts Payable",
-      accountType: "LIABILITY",
-      currency: "MYR",
-      isActive: true,
-      level: 1,
-      parentId: undefined
-    }]
-  ])),
-  getAllAccountsInfo: vi.fn().mockResolvedValue([])
+  getAccountsInfo: vi.fn().mockResolvedValue(
+    new Map([
+      [
+        "00000000-0000-0000-0000-000000000001",
+        {
+          id: "00000000-0000-0000-0000-000000000001",
+          code: "1000",
+          name: "Cash",
+          accountType: "ASSET",
+          currency: "MYR",
+          isActive: true,
+          level: 1,
+          parentId: undefined,
+        },
+      ],
+      [
+        "00000000-0000-0000-0000-000000000002",
+        {
+          id: "00000000-0000-0000-0000-000000000002",
+          code: "2000",
+          name: "Accounts Payable",
+          accountType: "LIABILITY",
+          currency: "MYR",
+          isActive: true,
+          level: 1,
+          parentId: undefined,
+        },
+      ],
+    ]),
+  ),
+  getAllAccountsInfo: vi.fn().mockResolvedValue([]),
 }));
 
 describe("posting", () => {
@@ -37,22 +45,30 @@ describe("posting", () => {
     tenantId: "tenant-123",
     companyId: "company-456",
     userId: "user-789",
-    userRole: "manager"
+    userRole: "manager",
   };
 
-  const createTestInput = (lines: Array<{ accountId: string; debit: number; credit: number; description?: string; reference?: string }>): JournalPostingInput => ({
+  const createTestInput = (
+    lines: Array<{
+      accountId: string;
+      debit: number;
+      credit: number;
+      description?: string;
+      reference?: string;
+    }>,
+  ): JournalPostingInput => ({
     journalNumber: "JE-001",
     description: "Test journal entry",
     journalDate: new Date("2024-01-01"),
     currency: "MYR",
     lines,
-    context: mockContext
+    context: mockContext,
   });
 
   it("accepts balanced lines", async () => {
     const input = createTestInput([
       { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 },
-      { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 }
+      { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 },
     ]);
 
     const res = await postJournal(input);
@@ -63,7 +79,7 @@ describe("posting", () => {
 
   it("rejects unbalanced journal", async () => {
     const input = createTestInput([
-      { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 }
+      { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 },
     ]);
 
     await expect(postJournal(input)).rejects.toThrow("Journal must be balanced");
@@ -73,7 +89,7 @@ describe("posting", () => {
     const clerkContext = { ...mockContext, userRole: "clerk" };
     const input = createTestInput([
       { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 },
-      { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 }
+      { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 },
     ]);
     input.context = clerkContext;
 
@@ -83,7 +99,7 @@ describe("posting", () => {
   it("requires approval for manager role", async () => {
     const input = createTestInput([
       { accountId: "00000000-0000-0000-0000-000000000001", debit: 100, credit: 0 },
-      { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 }
+      { accountId: "00000000-0000-0000-0000-000000000002", debit: 0, credit: 100 },
     ]);
 
     const res = await postJournal(input);

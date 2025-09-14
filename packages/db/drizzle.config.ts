@@ -5,7 +5,9 @@ export default {
   out: "./migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "postgresql://postgres:Weepohlai88!@db.dsjxvwhuvnefduvjbmgk.supabase.co:5432/postgres",
+    url:
+      process.env.DATABASE_URL ||
+      "postgresql://postgres:Weepohlai88!@db.dsjxvwhuvnefduvjbmgk.supabase.co:5432/postgres",
   },
   verbose: true,
   strict: true,

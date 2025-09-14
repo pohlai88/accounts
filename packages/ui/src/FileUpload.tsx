@@ -8,7 +8,9 @@ export interface FileUploadProps {
   onFileSelect?: (files: File[]) => void;
   onUpload?: (files: File[]) => Promise<void>;
   onUploadProgress?: (progress: number) => void;
-  onUploadComplete?: (results: Array<{ success: boolean; filename: string; error?: string }>) => void;
+  onUploadComplete?: (
+    results: Array<{ success: boolean; filename: string; error?: string }>,
+  ) => void;
   accept?: string;
   multiple?: boolean;
   maxSize?: number; // in bytes
@@ -37,25 +39,25 @@ export function FileUpload({
   maxFiles = 10,
   disabled = false,
   className = "",
-  children
+  children,
 }: FileUploadProps) {
   const [state, setState] = React.useState<FileUploadState>({
     isDragOver: false,
     isUploading: false,
     uploadProgress: 0,
     selectedFiles: [],
-    errors: []
+    errors: [],
   });
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const dropZoneRef = React.useRef<HTMLDivElement>(null);
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const validateFiles = (files: FileList | File[]): { validFiles: File[]; errors: string[] } => {
@@ -78,15 +80,15 @@ export function FileUpload({
 
       // Check file type if accept is specified
       if (accept && accept !== "*/*") {
-        const acceptedTypes = accept.split(',').map(type => type.trim());
-        const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+        const acceptedTypes = accept.split(",").map(type => type.trim());
+        const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
         const mimeType = file.type;
 
         const isAccepted = acceptedTypes.some(acceptedType => {
-          if (acceptedType.startsWith('.')) {
+          if (acceptedType.startsWith(".")) {
             return fileExtension === acceptedType;
-          } else if (acceptedType.includes('*')) {
-            return mimeType.startsWith(acceptedType.replace('*', ''));
+          } else if (acceptedType.includes("*")) {
+            return mimeType.startsWith(acceptedType.replace("*", ""));
           } else {
             return mimeType === acceptedType;
           }
@@ -132,15 +134,17 @@ export function FileUpload({
         setState(prev => ({
           ...prev,
           isUploading: false,
-          errors: [`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`]
+          errors: [`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`],
         }));
 
         if (onUploadComplete) {
-          onUploadComplete(validFiles.map(file => ({
-            success: false,
-            filename: file.name,
-            error: error instanceof Error ? error.message : 'Unknown error'
-          })));
+          onUploadComplete(
+            validFiles.map(file => ({
+              success: false,
+              filename: file.name,
+              error: error instanceof Error ? error.message : "Unknown error",
+            })),
+          );
         }
       }
     }
@@ -188,7 +192,7 @@ export function FileUpload({
   const removeFile = (index: number) => {
     setState(prev => ({
       ...prev,
-      selectedFiles: prev.selectedFiles.filter((_, i) => i !== index)
+      selectedFiles: prev.selectedFiles.filter((_, i) => i !== index),
     }));
   };
 
@@ -196,7 +200,7 @@ export function FileUpload({
     setState(prev => ({
       ...prev,
       selectedFiles: [],
-      errors: []
+      errors: [],
     }));
   };
 
@@ -215,13 +219,13 @@ export function FileUpload({
             ? "border-[var(--sys-accent)] bg-[var(--sys-accent)]/10"
             : "border-[var(--sys-border-hairline)] hover:border-[var(--sys-accent)] hover:bg-[var(--sys-bg-subtle)]",
           disabled && "opacity-50 cursor-not-allowed",
-          state.isUploading && "pointer-events-none"
+          state.isUploading && "pointer-events-none",
         )}
         role="button"
         tabIndex={disabled ? -1 : 0}
         aria-label="File upload area"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+        onKeyDown={e => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             handleClick();
           }
@@ -259,9 +263,8 @@ export function FileUpload({
                 {children || "Drop files here or click to browse"}
               </div>
               <div className="text-sm text-[var(--sys-text-secondary)]">
-                {accept === "*/*" ? "Any file type" : `Accepted: ${accept}`} •
-                Max size: {formatFileSize(maxSize)} •
-                Max files: {maxFiles}
+                {accept === "*/*" ? "Any file type" : `Accepted: ${accept}`} • Max size:{" "}
+                {formatFileSize(maxSize)} • Max files: {maxFiles}
               </div>
             </div>
           </div>
@@ -286,7 +289,10 @@ export function FileUpload({
 
           <div className="space-y-2">
             {state.selectedFiles.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-[var(--sys-bg-subtle)] rounded">
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-[var(--sys-bg-subtle)] rounded"
+              >
                 <div className="flex items-center gap-3">
                   <div className="text-lg">📄</div>
                   <div>
@@ -294,7 +300,7 @@ export function FileUpload({
                       {file.name}
                     </div>
                     <div className="text-xs text-[var(--sys-text-secondary)]">
-                      {formatFileSize(file.size)} • {file.type || 'Unknown type'}
+                      {formatFileSize(file.size)} • {file.type || "Unknown type"}
                     </div>
                   </div>
                 </div>
@@ -315,7 +321,10 @@ export function FileUpload({
       {state.errors.length > 0 && (
         <div className="mt-4 space-y-2">
           {state.errors.map((error, index) => (
-            <div key={index} className="p-3 bg-[var(--sys-status-error)]/10 border border-[var(--sys-status-error)]/20 rounded text-sm text-[var(--sys-status-error)]">
+            <div
+              key={index}
+              className="p-3 bg-[var(--sys-status-error)]/10 border border-[var(--sys-status-error)]/20 rounded text-sm text-[var(--sys-status-error)]"
+            >
               {error}
             </div>
           ))}

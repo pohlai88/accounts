@@ -524,7 +524,7 @@ function AdvancedAppShell() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_APP_SHELL = 'true';
+process.env.DEBUG_APP_SHELL = "true";
 ```
 
 **Logs**: Check browser console for shell interaction logs

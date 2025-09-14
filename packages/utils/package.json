@@ -29,7 +29,10 @@
     "@types/react": "^18.3.5",
     "next": "^14.2.32",
     "typescript": "^5.6.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@aibos/eslint-config": "workspace:*",
+    "@aibos/vitest-config": "workspace:*",
+    "@aibos/prettier-config": "workspace:*"
   },
   "exports": {
     ".": {
@@ -43,17 +46,14 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p . --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
     "test:attachments": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts",
-    "test:attachments:unit": "vitest run test/attachment-service-working.test.ts --config vitest.config.attachments.ts",
-    "test:attachments:schema": "vitest run test/attachment-schema.test.ts --config vitest.config.attachments.ts",
-    "test:attachments:api": "vitest run test/attachment-api.test.ts --config vitest.config.attachments.ts",
-    "test:attachments:coverage": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts --coverage",
     "test:attachments:watch": "vitest test/attachment-*.test.ts --config vitest.config.attachments.ts --watch",
-    "test:attachments:verbose": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts --reporter=verbose",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -p . --noEmit",
+    "dev": "tsc -p . --watch",
+    "test:watch": "vitest"
   },
   "type": "module",
   "types": "dist/index.d.ts"

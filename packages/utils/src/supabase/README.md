@@ -42,7 +42,7 @@ import {
   createServerClient,
   createBrowserClient,
   createMiddlewareClient,
-} from '@aibos/utils/supabase';
+} from "@aibos/utils/supabase";
 
 // Server-side client
 const serverClient = createServerClient();
@@ -158,46 +158,46 @@ pnpm --filter @aibos/utils typecheck
 ### Server-Side Client
 
 ```typescript
-import { createServerClient, createServiceClient } from '@aibos/utils/supabase';
+import { createServerClient, createServiceClient } from "@aibos/utils/supabase";
 
 // Create server client for API routes
 const serverClient = createServerClient();
 
 // Use server client for database operations
 const { data: journals, error } = await serverClient
-  .from('gl_journal')
-  .select('*')
-  .eq('tenant_id', 'tenant-123')
-  .eq('company_id', 'company-456');
+  .from("gl_journal")
+  .select("*")
+  .eq("tenant_id", "tenant-123")
+  .eq("company_id", "company-456");
 
 if (error) {
-  console.error('Database error:', error);
-  throw new Error('Failed to fetch journals');
+  console.error("Database error:", error);
+  throw new Error("Failed to fetch journals");
 }
 
-console.log('Journals:', journals);
+console.log("Journals:", journals);
 
 // Create service client for admin operations
 const serviceClient = createServiceClient();
 
 // Use service client for admin operations
 const { data: users, error: userError } = await serviceClient
-  .from('users')
-  .select('*')
-  .eq('tenant_id', 'tenant-123');
+  .from("users")
+  .select("*")
+  .eq("tenant_id", "tenant-123");
 
 if (userError) {
-  console.error('User fetch error:', userError);
-  throw new Error('Failed to fetch users');
+  console.error("User fetch error:", userError);
+  throw new Error("Failed to fetch users");
 }
 
-console.log('Users:', users);
+console.log("Users:", users);
 ```
 
 ### Browser-Side Client
 
 ```typescript
-import { createBrowserClient } from '@aibos/utils/supabase';
+import { createBrowserClient } from "@aibos/utils/supabase";
 
 // Create browser client for frontend
 const browserClient = createBrowserClient();
@@ -209,31 +209,31 @@ const {
 } = await browserClient.auth.getUser();
 
 if (error) {
-  console.error('Auth error:', error);
+  console.error("Auth error:", error);
   return;
 }
 
-console.log('Current user:', user);
+console.log("Current user:", user);
 
 // Use browser client for database operations
 const { data: invoices, error: invoiceError } = await browserClient
-  .from('ar_invoices')
-  .select('*')
-  .eq('tenant_id', user.tenant_id)
-  .eq('company_id', user.company_id);
+  .from("ar_invoices")
+  .select("*")
+  .eq("tenant_id", user.tenant_id)
+  .eq("company_id", user.company_id);
 
 if (invoiceError) {
-  console.error('Invoice fetch error:', invoiceError);
+  console.error("Invoice fetch error:", invoiceError);
   return;
 }
 
-console.log('Invoices:', invoices);
+console.log("Invoices:", invoices);
 ```
 
 ### Middleware Client
 
 ```typescript
-import { createMiddlewareClient } from '@aibos/utils/supabase';
+import { createMiddlewareClient } from "@aibos/utils/supabase";
 
 // Express.js middleware
 function supabaseMiddleware(req: any, res: any, next: any) {
@@ -246,22 +246,22 @@ function supabaseMiddleware(req: any, res: any, next: any) {
 
     next();
   } catch (error) {
-    console.error('Supabase middleware error:', error);
-    res.status(500).json({ error: 'Supabase client creation failed' });
+    console.error("Supabase middleware error:", error);
+    res.status(500).json({ error: "Supabase client creation failed" });
   }
 }
 
 // Usage in Express app
 app.use(supabaseMiddleware);
 
-app.get('/api/journals', async (req, res) => {
+app.get("/api/journals", async (req, res) => {
   try {
     // Use middleware client
     const { data: journals, error } = await req.supabase
-      .from('gl_journal')
-      .select('*')
-      .eq('tenant_id', req.headers['x-tenant-id'])
-      .eq('company_id', req.headers['x-company-id']);
+      .from("gl_journal")
+      .select("*")
+      .eq("tenant_id", req.headers["x-tenant-id"])
+      .eq("company_id", req.headers["x-company-id"]);
 
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -277,7 +277,7 @@ app.get('/api/journals', async (req, res) => {
 ### Advanced Client Configuration
 
 ```typescript
-import { createServerClient, createBrowserClient } from '@aibos/utils/supabase';
+import { createServerClient, createBrowserClient } from "@aibos/utils/supabase";
 
 // Create server client with custom configuration
 const customServerClient = createServerClient({
@@ -289,11 +289,11 @@ const customServerClient = createServerClient({
       persistSession: false,
     },
     db: {
-      schema: 'public',
+      schema: "public",
     },
     global: {
       headers: {
-        'X-Client-Info': 'aibos-accounting/1.0',
+        "X-Client-Info": "aibos-accounting/1.0",
       },
     },
   },
@@ -310,7 +310,7 @@ const customBrowserClient = createBrowserClient({
       detectSessionInUrl: true,
     },
     db: {
-      schema: 'public',
+      schema: "public",
     },
   },
 });
@@ -319,57 +319,57 @@ const customBrowserClient = createBrowserClient({
 ### Client Error Handling
 
 ```typescript
-import { createServerClient } from '@aibos/utils/supabase';
+import { createServerClient } from "@aibos/utils/supabase";
 
 const serverClient = createServerClient();
 
 // Wrapper function for error handling
 async function safeSupabaseOperation<T>(
-  operation: () => Promise<{ data: T; error: any }>
+  operation: () => Promise<{ data: T; error: any }>,
 ): Promise<{ data: T | null; error: string | null }> {
   try {
     const result = await operation();
 
     if (result.error) {
-      console.error('Supabase error:', result.error);
+      console.error("Supabase error:", result.error);
       return { data: null, error: result.error.message };
     }
 
     return { data: result.data, error: null };
   } catch (error) {
-    console.error('Operation error:', error);
+    console.error("Operation error:", error);
     return {
       data: null,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
 
 // Usage with error handling
 const { data: journals, error } = await safeSupabaseOperation(() =>
-  serverClient.from('gl_journal').select('*').eq('tenant_id', 'tenant-123')
+  serverClient.from("gl_journal").select("*").eq("tenant_id", "tenant-123"),
 );
 
 if (error) {
-  console.error('Failed to fetch journals:', error);
+  console.error("Failed to fetch journals:", error);
   return;
 }
 
-console.log('Journals:', journals);
+console.log("Journals:", journals);
 ```
 
 ### Client Monitoring and Logging
 
 ```typescript
-import { createServerClient } from '@aibos/utils/supabase';
+import { createServerClient } from "@aibos/utils/supabase";
 
 // Create client with monitoring
 const monitoredClient = createServerClient({
   options: {
     global: {
       headers: {
-        'X-Client-Info': 'aibos-accounting/1.0',
-        'X-Request-ID': generateRequestId(),
+        "X-Client-Info": "aibos-accounting/1.0",
+        "X-Request-ID": generateRequestId(),
       },
     },
   },
@@ -404,7 +404,7 @@ async function monitoredOperation<T>(operation: string, fn: () => Promise<T>): P
       operation,
       duration,
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date(),
     });
 
@@ -413,11 +413,11 @@ async function monitoredOperation<T>(operation: string, fn: () => Promise<T>): P
 }
 
 // Usage with monitoring
-const journals = await monitoredOperation('fetch-journals', async () => {
+const journals = await monitoredOperation("fetch-journals", async () => {
   const { data, error } = await monitoredClient
-    .from('gl_journal')
-    .select('*')
-    .eq('tenant_id', 'tenant-123');
+    .from("gl_journal")
+    .select("*")
+    .eq("tenant_id", "tenant-123");
 
   if (error) throw error;
   return data;
@@ -437,7 +437,7 @@ const journals = await monitoredOperation('fetch-journals', async () => {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_SUPABASE = 'true';
+process.env.DEBUG_SUPABASE = "true";
 ```
 
 **Logs**: Check Axiom telemetry for Supabase operation logs

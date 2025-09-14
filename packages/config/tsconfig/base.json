@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "types": [],
+    "paths": {
+      "@aibos/contracts/*": [
+        "packages/contracts/src/*"
+      ],
+      "@aibos/db/*": [
+        "packages/db/src/*"
+      ],
+      "@aibos/accounting/*": [
+        "packages/accounting/src/*"
+      ],
+      "@aibos/auth/*": [
+        "packages/auth/src/*"
+      ],
+      "@aibos/ui/*": [
+        "packages/ui/src/*"
+      ],
+      "@aibos/utils/*": [
+        "packages/utils/src/*"
+      ],
+      "@aibos/realtime/*": [
+        "packages/realtime/src/*"
+      ],
+      "@aibos/monitoring/*": [
+        "packages/monitoring/src/*"
+      ],
+      "@aibos/security/*": [
+        "packages/security/src/*"
+      ],
+      "@aibos/cache/*": [
+        "packages/cache/src/*"
+      ],
+      "@aibos/tokens/*": [
+        "packages/tokens/src/*"
+      ],
+      "@aibos/api-gateway/*": [
+        "packages/api-gateway/src/*"
+      ],
+      "@aibos/deployment/*": [
+        "packages/deployment/src/*"
+      ]
+    }
+  }
+}

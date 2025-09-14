@@ -43,13 +43,13 @@ import {
   sanitizeRequest,
   errorHandler,
   requestLogger,
-} from '@aibos/utils/middleware';
+} from "@aibos/utils/middleware";
 
 // Create idempotency middleware
 const idempotencyMiddleware = createIdempotencyMiddleware({
-  keyGenerator: (req) => req.headers['x-idempotency-key'],
+  keyGenerator: req => req.headers["x-idempotency-key"],
   ttl: 3600, // 1 hour
-  storage: 'redis', // or 'memory'
+  storage: "redis", // or 'memory'
 });
 
 // Express.js middleware usage
@@ -165,24 +165,24 @@ pnpm --filter @aibos/utils typecheck
 ### Basic Idempotency Middleware
 
 ```typescript
-import { createIdempotencyMiddleware } from '@aibos/utils/middleware';
+import { createIdempotencyMiddleware } from "@aibos/utils/middleware";
 
 // Create idempotency middleware
 const idempotencyMiddleware = createIdempotencyMiddleware({
-  keyGenerator: (req) => req.headers['x-idempotency-key'],
+  keyGenerator: req => req.headers["x-idempotency-key"],
   ttl: 3600, // 1 hour
-  storage: 'redis',
+  storage: "redis",
   redisConfig: {
-    host: 'localhost',
+    host: "localhost",
     port: 6379,
-    password: 'password',
+    password: "password",
   },
 });
 
 // Express.js usage
-app.use('/api/journals', idempotencyMiddleware);
+app.use("/api/journals", idempotencyMiddleware);
 
-app.post('/api/journals', async (req, res) => {
+app.post("/api/journals", async (req, res) => {
   try {
     // Process journal creation
     const journal = await createJournal(req.body);
@@ -196,68 +196,68 @@ app.post('/api/journals', async (req, res) => {
 ### Request Validation Middleware
 
 ```typescript
-import { validateRequest } from '@aibos/utils/middleware';
+import { validateRequest } from "@aibos/utils/middleware";
 
 // Create validation middleware
 const validationMiddleware = validateRequest({
   rules: {
     body: {
-      journalNumber: { type: 'string', required: true },
-      description: { type: 'string', required: true },
-      lines: { type: 'array', required: true, minLength: 1 },
+      journalNumber: { type: "string", required: true },
+      description: { type: "string", required: true },
+      lines: { type: "array", required: true, minLength: 1 },
     },
     headers: {
-      'x-tenant-id': { type: 'string', required: true },
-      'x-company-id': { type: 'string', required: true },
+      "x-tenant-id": { type: "string", required: true },
+      "x-company-id": { type: "string", required: true },
     },
   },
   errorHandler: (errors, req, res, next) => {
     res.status(400).json({
-      error: 'Validation failed',
+      error: "Validation failed",
       details: errors,
     });
   },
 });
 
 // Usage
-app.use('/api/journals', validationMiddleware);
+app.use("/api/journals", validationMiddleware);
 ```
 
 ### Request Sanitization Middleware
 
 ```typescript
-import { sanitizeRequest } from '@aibos/utils/middleware';
+import { sanitizeRequest } from "@aibos/utils/middleware";
 
 // Create sanitization middleware
 const sanitizationMiddleware = sanitizeRequest({
   body: {
-    description: { type: 'string', sanitize: 'trim' },
-    journalNumber: { type: 'string', sanitize: 'uppercase' },
-    lines: { type: 'array', sanitize: 'deep' },
+    description: { type: "string", sanitize: "trim" },
+    journalNumber: { type: "string", sanitize: "uppercase" },
+    lines: { type: "array", sanitize: "deep" },
   },
   query: {
-    page: { type: 'number', default: 1, min: 1 },
-    limit: { type: 'number', default: 10, min: 1, max: 100 },
+    page: { type: "number", default: 1, min: 1 },
+    limit: { type: "number", default: 10, min: 1, max: 100 },
   },
 });
 
 // Usage
-app.use('/api/journals', sanitizationMiddleware);
+app.use("/api/journals", sanitizationMiddleware);
 ```
 
 ### Error Handling Middleware
 
 ```typescript
-import { errorHandler } from '@aibos/utils/middleware';
+import { errorHandler } from "@aibos/utils/middleware";
 
 // Create error handling middleware
 const errorMiddleware = errorHandler({
   logErrors: true,
-  logLevel: 'error',
-  includeStack: process.env.NODE_ENV === 'development',
+  logLevel: "error",
+  includeStack: process.env.NODE_ENV === "development",
   formatError: (error, req) => ({
     message: error.message,
-    code: error.code || 'INTERNAL_ERROR',
+    code: error.code || "INTERNAL_ERROR",
     timestamp: new Date().toISOString(),
     requestId: req.id,
     path: req.path,
@@ -272,15 +272,15 @@ app.use(errorMiddleware);
 ### Request Logging Middleware
 
 ```typescript
-import { requestLogger } from '@aibos/utils/middleware';
+import { requestLogger } from "@aibos/utils/middleware";
 
 // Create request logging middleware
 const loggingMiddleware = requestLogger({
-  level: 'info',
-  format: 'combined',
+  level: "info",
+  format: "combined",
   includeBody: false, // Don't log request body for security
-  includeHeaders: ['x-tenant-id', 'x-company-id', 'x-user-id'],
-  excludePaths: ['/health', '/metrics'],
+  includeHeaders: ["x-tenant-id", "x-company-id", "x-user-id"],
+  excludePaths: ["/health", "/metrics"],
 });
 
 // Usage
@@ -296,41 +296,41 @@ import {
   sanitizeRequest,
   errorHandler,
   requestLogger,
-} from '@aibos/utils/middleware';
+} from "@aibos/utils/middleware";
 
 // Create comprehensive middleware stack
 const createMiddlewareStack = () => {
   const idempotency = createIdempotencyMiddleware({
-    keyGenerator: (req) => req.headers['x-idempotency-key'],
+    keyGenerator: req => req.headers["x-idempotency-key"],
     ttl: 3600,
-    storage: 'redis',
+    storage: "redis",
   });
 
   const validation = validateRequest({
     rules: {
       body: {
-        journalNumber: { type: 'string', required: true },
-        description: { type: 'string', required: true },
-        lines: { type: 'array', required: true, minLength: 1 },
+        journalNumber: { type: "string", required: true },
+        description: { type: "string", required: true },
+        lines: { type: "array", required: true, minLength: 1 },
       },
     },
   });
 
   const sanitization = sanitizeRequest({
     body: {
-      description: { type: 'string', sanitize: 'trim' },
-      journalNumber: { type: 'string', sanitize: 'uppercase' },
+      description: { type: "string", sanitize: "trim" },
+      journalNumber: { type: "string", sanitize: "uppercase" },
     },
   });
 
   const logging = requestLogger({
-    level: 'info',
-    includeHeaders: ['x-tenant-id', 'x-company-id', 'x-user-id'],
+    level: "info",
+    includeHeaders: ["x-tenant-id", "x-company-id", "x-user-id"],
   });
 
   const error = errorHandler({
     logErrors: true,
-    includeStack: process.env.NODE_ENV === 'development',
+    includeStack: process.env.NODE_ENV === "development",
   });
 
   return [logging, idempotency, validation, sanitization, error];
@@ -338,20 +338,20 @@ const createMiddlewareStack = () => {
 
 // Apply middleware stack
 const middlewareStack = createMiddlewareStack();
-app.use('/api/journals', ...middlewareStack);
+app.use("/api/journals", ...middlewareStack);
 ```
 
 ### Custom Middleware Creation
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
 // Custom authentication middleware
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token = req.headers.authorization?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(401).json({ error: 'Authentication required' });
+    return res.status(401).json({ error: "Authentication required" });
   }
 
   try {
@@ -360,7 +360,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
+    return res.status(401).json({ error: "Invalid token" });
   }
 };
 
@@ -386,7 +386,7 @@ const rateLimitMiddleware = (windowMs: number, maxRequests: number) => {
     // Check current IP
     const ipRequests = requests.get(key) || [];
     if (ipRequests.length >= maxRequests) {
-      return res.status(429).json({ error: 'Rate limit exceeded' });
+      return res.status(429).json({ error: "Rate limit exceeded" });
     }
 
     // Add current request
@@ -415,7 +415,7 @@ app.use(rateLimitMiddleware(60000, 100)); // 100 requests per minute
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_MIDDLEWARE = 'true';
+process.env.DEBUG_MIDDLEWARE = "true";
 ```
 
 **Logs**: Check Axiom telemetry for middleware operation logs

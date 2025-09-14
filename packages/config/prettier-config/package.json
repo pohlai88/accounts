@@ -1,0 +1,20 @@
+{
+  "name": "@aibos/prettier-config",
+  "version": "0.1.0",
+  "description": "Centralized Prettier configuration for AI-BOS monorepo",
+  "main": "index.cjs",
+  "files": [
+    "index.cjs"
+  ],
+  "keywords": [
+    "prettier",
+    "config",
+    "formatting",
+    "aibos"
+  ],
+  "author": "AI-BOS",
+  "license": "MIT",
+  "peerDependencies": {
+    "prettier": ">=3.0.0"
+  }
+}

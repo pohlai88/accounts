@@ -38,32 +38,32 @@
 ## 3) Getting Started
 
 ```typescript
-import { AuditService, getAuditService } from '@aibos/utils/audit';
-import { createAuditContext, extractUserContext } from '@aibos/utils/context';
+import { AuditService, getAuditService } from "@aibos/utils/audit";
+import { createAuditContext, extractUserContext } from "@aibos/utils/context";
 
 // Initialize audit service
 const auditService = getAuditService();
 
 // Create audit context
 const auditContext = createAuditContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
 });
 
 // Log audit event
 await auditService.logEvent({
-  eventType: 'JOURNAL_POSTED',
-  entityType: 'GL_JOURNAL',
-  entityId: 'journal-123',
-  action: 'CREATE',
+  eventType: "JOURNAL_POSTED",
+  entityType: "GL_JOURNAL",
+  entityId: "journal-123",
+  action: "CREATE",
   details: {
-    journalNumber: 'JE-001',
+    journalNumber: "JE-001",
     totalAmount: 1000.0,
-    currency: 'MYR',
+    currency: "MYR",
   },
   context: auditContext,
 });
@@ -172,32 +172,32 @@ pnpm --filter @aibos/utils typecheck
 ### Basic Audit Logging
 
 ```typescript
-import { getAuditService } from '@aibos/utils/audit';
-import { createAuditContext } from '@aibos/utils/context';
+import { getAuditService } from "@aibos/utils/audit";
+import { createAuditContext } from "@aibos/utils/context";
 
 // Initialize audit service
 const auditService = getAuditService();
 
 // Create audit context
 const auditContext = createAuditContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
 });
 
 // Log journal posting event
 await auditService.logEvent({
-  eventType: 'JOURNAL_POSTED',
-  entityType: 'GL_JOURNAL',
-  entityId: 'journal-123',
-  action: 'CREATE',
+  eventType: "JOURNAL_POSTED",
+  entityType: "GL_JOURNAL",
+  entityId: "journal-123",
+  action: "CREATE",
   details: {
-    journalNumber: 'JE-001',
+    journalNumber: "JE-001",
     totalAmount: 1000.0,
-    currency: 'MYR',
+    currency: "MYR",
     lineCount: 2,
   },
   context: auditContext,
@@ -205,15 +205,15 @@ await auditService.logEvent({
 
 // Log invoice creation event
 await auditService.logEvent({
-  eventType: 'INVOICE_CREATED',
-  entityType: 'AR_INVOICE',
-  entityId: 'invoice-456',
-  action: 'CREATE',
+  eventType: "INVOICE_CREATED",
+  entityType: "AR_INVOICE",
+  entityId: "invoice-456",
+  action: "CREATE",
   details: {
-    invoiceNumber: 'INV-001',
-    customerId: 'customer-789',
+    invoiceNumber: "INV-001",
+    customerId: "customer-789",
     totalAmount: 500.0,
-    currency: 'MYR',
+    currency: "MYR",
   },
   context: auditContext,
 });
@@ -222,22 +222,22 @@ await auditService.logEvent({
 ### Advanced Audit Logging
 
 ```typescript
-import { getAuditService } from '@aibos/utils/audit';
-import { createAuditContext } from '@aibos/utils/context';
+import { getAuditService } from "@aibos/utils/audit";
+import { createAuditContext } from "@aibos/utils/context";
 
 const auditService = getAuditService();
 
 // Log complex business event
 await auditService.logEvent({
-  eventType: 'PERIOD_CLOSED',
-  entityType: 'FISCAL_PERIOD',
-  entityId: 'period-789',
-  action: 'UPDATE',
+  eventType: "PERIOD_CLOSED",
+  entityType: "FISCAL_PERIOD",
+  entityId: "period-789",
+  action: "UPDATE",
   details: {
-    periodId: 'period-789',
-    periodName: 'January 2024',
-    closeDate: '2024-01-31',
-    closedBy: 'user-789',
+    periodId: "period-789",
+    periodName: "January 2024",
+    closeDate: "2024-01-31",
+    closedBy: "user-789",
     reversingEntriesCreated: 5,
     validationResults: {
       allJournalsPosted: true,
@@ -250,14 +250,14 @@ await auditService.logEvent({
 
 // Log security event
 await auditService.logEvent({
-  eventType: 'LOGIN_ATTEMPT',
-  entityType: 'USER',
-  entityId: 'user-789',
-  action: 'AUTHENTICATE',
+  eventType: "LOGIN_ATTEMPT",
+  entityType: "USER",
+  entityId: "user-789",
+  action: "AUTHENTICATE",
   details: {
-    loginMethod: 'PASSWORD',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0...',
+    loginMethod: "PASSWORD",
+    ipAddress: "192.168.1.100",
+    userAgent: "Mozilla/5.0...",
     success: true,
   },
   context: auditContext,
@@ -265,14 +265,14 @@ await auditService.logEvent({
 
 // Log data access event
 await auditService.logEvent({
-  eventType: 'DATA_ACCESSED',
-  entityType: 'FINANCIAL_REPORT',
-  entityId: 'report-123',
-  action: 'READ',
+  eventType: "DATA_ACCESSED",
+  entityType: "FINANCIAL_REPORT",
+  entityId: "report-123",
+  action: "READ",
   details: {
-    reportType: 'BALANCE_SHEET',
-    reportDate: '2024-01-31',
-    accessMethod: 'API',
+    reportType: "BALANCE_SHEET",
+    reportDate: "2024-01-31",
+    accessMethod: "API",
     dataExported: false,
   },
   context: auditContext,
@@ -282,18 +282,18 @@ await auditService.logEvent({
 ### Audit Context Management
 
 ```typescript
-import { createAuditContext, extractUserContext } from '@aibos/utils/context';
+import { createAuditContext, extractUserContext } from "@aibos/utils/context";
 
 // Create audit context from request
 const auditContext = createAuditContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
-  ipAddress: '192.168.1.100',
-  userAgent: 'Mozilla/5.0...',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
+  ipAddress: "192.168.1.100",
+  userAgent: "Mozilla/5.0...",
   timestamp: new Date(),
 });
 
@@ -304,7 +304,7 @@ const userContext = extractUserContext(request);
 // Validate audit context
 const isValid = validateContext(auditContext);
 if (!isValid) {
-  throw new Error('Invalid audit context');
+  throw new Error("Invalid audit context");
 }
 
 // Sanitize audit context
@@ -315,71 +315,71 @@ const sanitizedContext = sanitizeContext(auditContext);
 ### Audit Event Filtering
 
 ```typescript
-import { getAuditService } from '@aibos/utils/audit';
+import { getAuditService } from "@aibos/utils/audit";
 
 const auditService = getAuditService();
 
 // Get audit events by type
 const journalEvents = await auditService.getEvents({
-  eventType: 'JOURNAL_POSTED',
-  entityType: 'GL_JOURNAL',
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
+  eventType: "JOURNAL_POSTED",
+  entityType: "GL_JOURNAL",
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
 });
 
 // Get audit events by user
 const userEvents = await auditService.getEvents({
-  userId: 'user-789',
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
+  userId: "user-789",
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
 });
 
 // Get audit events by entity
 const entityEvents = await auditService.getEvents({
-  entityType: 'AR_INVOICE',
-  entityId: 'invoice-456',
+  entityType: "AR_INVOICE",
+  entityId: "invoice-456",
 });
 
 // Get audit events with pagination
 const paginatedEvents = await auditService.getEvents({
-  eventType: 'DATA_ACCESSED',
+  eventType: "DATA_ACCESSED",
   page: 1,
   limit: 50,
-  sortBy: 'timestamp',
-  sortOrder: 'DESC',
+  sortBy: "timestamp",
+  sortOrder: "DESC",
 });
 ```
 
 ### Compliance Reporting
 
 ```typescript
-import { getAuditService } from '@aibos/utils/audit';
+import { getAuditService } from "@aibos/utils/audit";
 
 const auditService = getAuditService();
 
 // Generate compliance report
 const complianceReport = await auditService.generateComplianceReport({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
-  reportType: 'SOX_COMPLIANCE',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
+  reportType: "SOX_COMPLIANCE",
 });
 
-console.log('Compliance Report:');
-console.log('Total events:', complianceReport.totalEvents);
-console.log('Critical events:', complianceReport.criticalEvents);
-console.log('Compliance score:', complianceReport.complianceScore);
-console.log('Violations:', complianceReport.violations);
+console.log("Compliance Report:");
+console.log("Total events:", complianceReport.totalEvents);
+console.log("Critical events:", complianceReport.criticalEvents);
+console.log("Compliance score:", complianceReport.complianceScore);
+console.log("Violations:", complianceReport.violations);
 
 // Generate audit trail
 const auditTrail = await auditService.generateAuditTrail({
-  entityType: 'GL_JOURNAL',
-  entityId: 'journal-123',
+  entityType: "GL_JOURNAL",
+  entityId: "journal-123",
   includeDetails: true,
 });
 
-console.log('Audit Trail:');
+console.log("Audit Trail:");
 for (const event of auditTrail.events) {
   console.log(`${event.timestamp}: ${event.eventType} - ${event.action}`);
   console.log(`  User: ${event.context.userId} (${event.context.userRole})`);
@@ -400,7 +400,7 @@ for (const event of auditTrail.events) {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_AUDIT = 'true';
+process.env.DEBUG_AUDIT = "true";
 ```
 
 **Logs**: Check Axiom telemetry for audit operation logs

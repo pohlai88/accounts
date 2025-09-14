@@ -1,127 +1,127 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { 
-  FileText, 
-  TrendingUp, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  FileText,
+  TrendingUp,
   DollarSign,
   Globe,
   Download,
   RefreshCw,
   BarChart3,
   PieChart,
-  Table
-} from 'lucide-react'
-import { 
+  Table,
+} from "lucide-react";
+import {
   ReportCurrencyConversionService,
   ConvertedAmount,
-  ReportCurrencySettings
-} from '@/lib/report-currency-conversion'
-import { CurrencyCode } from '@/lib/currency-management'
+  ReportCurrencySettings,
+} from "@/lib/report-currency-conversion";
+import { CurrencyCode } from "@/lib/currency-management";
 
 interface CurrencyReportsProps {
-  companyId: string
+  companyId: string;
 }
 
 export function CurrencyReports({ companyId }: CurrencyReportsProps) {
   const [settings, setSettings] = useState<ReportCurrencySettings>({
-    baseCurrency: 'USD',
-    displayCurrency: 'USD',
+    baseCurrency: "USD",
+    displayCurrency: "USD",
     showOriginalCurrency: true,
     showExchangeRates: true,
-    conversionMethod: 'latest'
-  })
-  const [loading, setLoading] = useState(false)
-  const [trialBalance, setTrialBalance] = useState<any[]>([])
-  const [profitAndLoss, setProfitAndLoss] = useState<any>(null)
-  const [balanceSheet, setBalanceSheet] = useState<any>(null)
+    conversionMethod: "latest",
+  });
+  const [loading, setLoading] = useState(false);
+  const [trialBalance, setTrialBalance] = useState<any[]>([]);
+  const [profitAndLoss, setProfitAndLoss] = useState<any>(null);
+  const [balanceSheet, setBalanceSheet] = useState<any>(null);
 
   const loadTrialBalance = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const result = await ReportCurrencyConversionService.getTrialBalanceWithConversion(
         companyId,
-        new Date().toISOString().split('T')[0],
-        settings.displayCurrency
-      )
-      
+        new Date().toISOString().split("T")[0],
+        settings.displayCurrency,
+      );
+
       if (result.success && result.trialBalance) {
-        setTrialBalance(result.trialBalance)
+        setTrialBalance(result.trialBalance);
       }
     } catch (error) {
-      console.error('Error loading trial balance:', error)
+      console.error("Error loading trial balance:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadProfitAndLoss = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const startDate = new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]
-      const endDate = new Date().toISOString().split('T')[0]
-      
+      const startDate = new Date(new Date().getFullYear(), 0, 1).toISOString().split("T")[0];
+      const endDate = new Date().toISOString().split("T")[0];
+
       const result = await ReportCurrencyConversionService.getProfitAndLossWithConversion(
         companyId,
         startDate,
         endDate,
-        settings.displayCurrency
-      )
-      
+        settings.displayCurrency,
+      );
+
       if (result.success && result.profitAndLoss) {
-        setProfitAndLoss(result.profitAndLoss)
+        setProfitAndLoss(result.profitAndLoss);
       }
     } catch (error) {
-      console.error('Error loading profit and loss:', error)
+      console.error("Error loading profit and loss:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadBalanceSheet = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const result = await ReportCurrencyConversionService.getBalanceSheetWithConversion(
         companyId,
-        new Date().toISOString().split('T')[0],
-        settings.displayCurrency
-      )
-      
+        new Date().toISOString().split("T")[0],
+        settings.displayCurrency,
+      );
+
       if (result.success && result.balanceSheet) {
-        setBalanceSheet(result.balanceSheet)
+        setBalanceSheet(result.balanceSheet);
       }
     } catch (error) {
-      console.error('Error loading balance sheet:', error)
+      console.error("Error loading balance sheet:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    loadTrialBalance()
-  }, [settings.displayCurrency])
+    loadTrialBalance();
+  }, [settings.displayCurrency]);
 
   const formatCurrency = (amount: number, currency: CurrencyCode) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount)
-  }
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   return (
     <div className="space-y-6">
@@ -134,7 +134,7 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline" onClick={loadTrialBalance} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <Button>
@@ -151,17 +151,17 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
             <Globe className="h-5 w-5 mr-2" />
             Currency Settings
           </CardTitle>
-          <CardDescription>
-            Configure currency display and conversion settings
-          </CardDescription>
+          <CardDescription>Configure currency display and conversion settings</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="display_currency">Display Currency</Label>
-              <Select 
-                value={settings.displayCurrency} 
-                onValueChange={(value: CurrencyCode) => setSettings({ ...settings, displayCurrency: value })}
+              <Select
+                value={settings.displayCurrency}
+                onValueChange={(value: CurrencyCode) =>
+                  setSettings({ ...settings, displayCurrency: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -177,12 +177,14 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="conversion_method">Conversion Method</Label>
-              <Select 
-                value={settings.conversionMethod} 
-                onValueChange={(value: 'historical' | 'latest' | 'average') => setSettings({ ...settings, conversionMethod: value })}
+              <Select
+                value={settings.conversionMethod}
+                onValueChange={(value: "historical" | "latest" | "average") =>
+                  setSettings({ ...settings, conversionMethod: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -194,13 +196,15 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={settings.showOriginalCurrency}
-                  onChange={(e) => setSettings({ ...settings, showOriginalCurrency: e.target.checked })}
+                  onChange={e =>
+                    setSettings({ ...settings, showOriginalCurrency: e.target.checked })
+                  }
                   className="rounded"
                 />
                 <span className="text-sm">Show Original Currency</span>
@@ -209,7 +213,7 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                 <input
                   type="checkbox"
                   checked={settings.showExchangeRates}
-                  onChange={(e) => setSettings({ ...settings, showExchangeRates: e.target.checked })}
+                  onChange={e => setSettings({ ...settings, showExchangeRates: e.target.checked })}
                   className="rounded"
                 />
                 <span className="text-sm">Show Exchange Rates</span>
@@ -233,9 +237,7 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                 <Table className="h-5 w-5 mr-2" />
                 Trial Balance
               </CardTitle>
-              <CardDescription>
-                Chart of accounts with currency conversion
-              </CardDescription>
+              <CardDescription>Chart of accounts with currency conversion</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -260,7 +262,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                       </thead>
                       <tbody>
                         {trialBalance.map((account, index) => (
-                          <tr key={account.account_id} className={index % 2 === 0 ? 'bg-muted/50' : ''}>
+                          <tr
+                            key={account.account_id}
+                            className={index % 2 === 0 ? "bg-muted/50" : ""}
+                          >
                             <td className="p-2 font-medium">{account.account_name}</td>
                             <td className="p-2 text-muted-foreground">{account.account_code}</td>
                             <td className="p-2 text-right">
@@ -302,9 +307,7 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                 <TrendingUp className="h-5 w-5 mr-2" />
                 Profit & Loss Statement
               </CardTitle>
-              <CardDescription>
-                Revenue and expenses with currency conversion
-              </CardDescription>
+              <CardDescription>Revenue and expenses with currency conversion</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -316,7 +319,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                     <h3 className="text-lg font-semibold mb-3">Revenue</h3>
                     <div className="space-y-2">
                       {profitAndLoss.revenue.map((item: ConvertedAmount, index: number) => (
-                        <div key={index} className="flex justify-between items-center p-2 border rounded">
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-2 border rounded"
+                        >
                           <span>Revenue Item {index + 1}</span>
                           <div className="text-right">
                             <div className="font-medium">
@@ -332,7 +338,9 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                       ))}
                       <div className="flex justify-between items-center p-2 border-t-2 font-bold">
                         <span>Total Revenue</span>
-                        <span>{formatCurrency(profitAndLoss.totalRevenue, settings.displayCurrency)}</span>
+                        <span>
+                          {formatCurrency(profitAndLoss.totalRevenue, settings.displayCurrency)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -342,7 +350,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                     <h3 className="text-lg font-semibold mb-3">Expenses</h3>
                     <div className="space-y-2">
                       {profitAndLoss.expenses.map((item: ConvertedAmount, index: number) => (
-                        <div key={index} className="flex justify-between items-center p-2 border rounded">
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-2 border rounded"
+                        >
                           <span>Expense Item {index + 1}</span>
                           <div className="text-right">
                             <div className="font-medium">
@@ -358,7 +369,9 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                       ))}
                       <div className="flex justify-between items-center p-2 border-t-2 font-bold">
                         <span>Total Expenses</span>
-                        <span>{formatCurrency(profitAndLoss.totalExpenses, settings.displayCurrency)}</span>
+                        <span>
+                          {formatCurrency(profitAndLoss.totalExpenses, settings.displayCurrency)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -405,7 +418,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                     <h3 className="text-lg font-semibold mb-3">Assets</h3>
                     <div className="space-y-2">
                       {balanceSheet.assets.map((item: ConvertedAmount, index: number) => (
-                        <div key={index} className="flex justify-between items-center p-2 border rounded">
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-2 border rounded"
+                        >
                           <span>Asset {index + 1}</span>
                           <div className="text-right">
                             <div className="font-medium">
@@ -421,7 +437,9 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                       ))}
                       <div className="flex justify-between items-center p-2 border-t-2 font-bold">
                         <span>Total Assets</span>
-                        <span>{formatCurrency(balanceSheet.totalAssets, settings.displayCurrency)}</span>
+                        <span>
+                          {formatCurrency(balanceSheet.totalAssets, settings.displayCurrency)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -431,7 +449,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                     <h3 className="text-lg font-semibold mb-3">Liabilities</h3>
                     <div className="space-y-2">
                       {balanceSheet.liabilities.map((item: ConvertedAmount, index: number) => (
-                        <div key={index} className="flex justify-between items-center p-2 border rounded">
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-2 border rounded"
+                        >
                           <span>Liability {index + 1}</span>
                           <div className="text-right">
                             <div className="font-medium">
@@ -447,7 +468,9 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                       ))}
                       <div className="flex justify-between items-center p-2 border-t-2 font-bold">
                         <span>Total Liabilities</span>
-                        <span>{formatCurrency(balanceSheet.totalLiabilities, settings.displayCurrency)}</span>
+                        <span>
+                          {formatCurrency(balanceSheet.totalLiabilities, settings.displayCurrency)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -457,7 +480,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                     <h3 className="text-lg font-semibold mb-3">Equity</h3>
                     <div className="space-y-2">
                       {balanceSheet.equity.map((item: ConvertedAmount, index: number) => (
-                        <div key={index} className="flex justify-between items-center p-2 border rounded">
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-2 border rounded"
+                        >
                           <span>Equity {index + 1}</span>
                           <div className="text-right">
                             <div className="font-medium">
@@ -473,7 +499,9 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                       ))}
                       <div className="flex justify-between items-center p-2 border-t-2 font-bold">
                         <span>Total Equity</span>
-                        <span>{formatCurrency(balanceSheet.totalEquity, settings.displayCurrency)}</span>
+                        <span>
+                          {formatCurrency(balanceSheet.totalEquity, settings.displayCurrency)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -482,7 +510,10 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
                   <div className="flex justify-between items-center p-4 border-2 border-primary rounded-lg bg-primary/5">
                     <span className="text-lg font-bold">Total Liabilities + Equity</span>
                     <span className="text-lg font-bold">
-                      {formatCurrency(balanceSheet.totalLiabilities + balanceSheet.totalEquity, settings.displayCurrency)}
+                      {formatCurrency(
+                        balanceSheet.totalLiabilities + balanceSheet.totalEquity,
+                        settings.displayCurrency,
+                      )}
                     </span>
                   </div>
                 </div>
@@ -500,5 +531,5 @@ export function CurrencyReports({ companyId }: CurrencyReportsProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

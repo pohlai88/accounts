@@ -606,7 +606,7 @@ function AdvancedCloseManagement() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_CLOSE = 'true';
+process.env.DEBUG_CLOSE = "true";
 ```
 
 **Logs**: Check browser console for close operation logs

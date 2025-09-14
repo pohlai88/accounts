@@ -3,9 +3,20 @@ import { spawnSync } from "node:child_process";
 
 const steps = [
   { name: "Internal refs", cmd: "node", args: ["scripts/docs/validate-internal-refs.mjs"] },
-  { name: "Markdown lint", cmd: "markdownlint", args: ["-c", ".markdownlint.jsonc", "docs/**/*.md", "docs/**/*.mdx", "README.md"] },
+  {
+    name: "Markdown lint",
+    cmd: "markdownlint",
+    args: ["-c", ".markdownlint.jsonc", "docs/**/*.md", "docs/**/*.mdx", "README.md"],
+  },
   { name: "Grammar", cmd: "node", args: ["scripts/docs/grammar-check.mjs"] },
-  { name: "Build (CI policy)", cmd: "node", args: ["-e", "process.env.CI='true'; require('child_process').spawn('vitepress', ['build','docs'], {stdio:'inherit', shell:true}).on('exit', c=>process.exit(c||0))"] }
+  {
+    name: "Build (CI policy)",
+    cmd: "node",
+    args: [
+      "-e",
+      "process.env.CI='true'; require('child_process').spawn('vitepress', ['build','docs'], {stdio:'inherit', shell:true}).on('exit', c=>process.exit(c||0))",
+    ],
+  },
 ];
 
 let failures = 0;

@@ -38,28 +38,28 @@
 ## 3) Getting Started
 
 ```typescript
-import { generateTrialBalance, generateBalanceSheet } from '@aibos/accounting/reports';
+import { generateTrialBalance, generateBalanceSheet } from "@aibos/accounting/reports";
 
 // Generate Trial Balance
 const trialBalance = await generateTrialBalance(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
     includeZeroBalances: false,
   },
-  dbClient
+  dbClient,
 );
 
 // Generate Balance Sheet
 const balanceSheet = await generateBalanceSheet(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
-    reportFormat: 'STANDARD',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
+    reportFormat: "STANDARD",
   },
-  dbClient
+  dbClient,
 );
 ```
 
@@ -174,89 +174,89 @@ pnpm --filter @aibos/accounting typecheck
 ### Trial Balance Generation
 
 ```typescript
-import { generateTrialBalance, exportTrialBalance } from '@aibos/accounting/reports';
+import { generateTrialBalance, exportTrialBalance } from "@aibos/accounting/reports";
 
 // Generate trial balance
 const trialBalance = await generateTrialBalance(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
     includeZeroBalances: false,
     includePeriodActivity: true,
     accountFilter: {
-      accountTypes: ['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'],
+      accountTypes: ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"],
     },
-    currency: 'MYR',
+    currency: "MYR",
   },
-  dbClient
+  dbClient,
 );
 
 if (trialBalance.success) {
-  console.log('Trial Balance generated successfully');
-  console.log('As of date:', trialBalance.asOfDate);
-  console.log('Currency:', trialBalance.currency);
-  console.log('Total accounts:', trialBalance.accounts.length);
-  console.log('Is balanced:', trialBalance.isBalanced);
+  console.log("Trial Balance generated successfully");
+  console.log("As of date:", trialBalance.asOfDate);
+  console.log("Currency:", trialBalance.currency);
+  console.log("Total accounts:", trialBalance.accounts.length);
+  console.log("Is balanced:", trialBalance.isBalanced);
 
   // Check totals
-  console.log('Total debits:', trialBalance.totals.totalDebits);
-  console.log('Total credits:', trialBalance.totals.totalCredits);
-  console.log('Total assets:', trialBalance.totals.totalAssets);
-  console.log('Total liabilities:', trialBalance.totals.totalLiabilities);
-  console.log('Total equity:', trialBalance.totals.totalEquity);
-  console.log('Net income:', trialBalance.totals.netIncome);
+  console.log("Total debits:", trialBalance.totals.totalDebits);
+  console.log("Total credits:", trialBalance.totals.totalCredits);
+  console.log("Total assets:", trialBalance.totals.totalAssets);
+  console.log("Total liabilities:", trialBalance.totals.totalLiabilities);
+  console.log("Total equity:", trialBalance.totals.totalEquity);
+  console.log("Net income:", trialBalance.totals.netIncome);
 
   // Export to CSV
-  const csvData = exportTrialBalance(trialBalance, 'CSV');
-  console.log('CSV export ready');
+  const csvData = exportTrialBalance(trialBalance, "CSV");
+  console.log("CSV export ready");
 } else {
-  console.error('Trial Balance generation failed:', trialBalance.error);
+  console.error("Trial Balance generation failed:", trialBalance.error);
 }
 ```
 
 ### Balance Sheet Generation
 
 ```typescript
-import { generateBalanceSheet } from '@aibos/accounting/reports';
+import { generateBalanceSheet } from "@aibos/accounting/reports";
 
 // Generate balance sheet
 const balanceSheet = await generateBalanceSheet(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
-    comparativePeriod: new Date('2023-01-31'), // For comparative BS
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
+    comparativePeriod: new Date("2023-01-31"), // For comparative BS
     includeZeroBalances: false,
-    currency: 'MYR',
-    reportFormat: 'COMPARATIVE',
+    currency: "MYR",
+    reportFormat: "COMPARATIVE",
   },
-  dbClient
+  dbClient,
 );
 
 if (balanceSheet.success) {
-  console.log('Balance Sheet generated successfully');
-  console.log('As of date:', balanceSheet.asOfDate);
-  console.log('Comparative date:', balanceSheet.comparativeDate);
-  console.log('Report format:', balanceSheet.reportFormat);
-  console.log('Is balanced:', balanceSheet.isBalanced);
+  console.log("Balance Sheet generated successfully");
+  console.log("As of date:", balanceSheet.asOfDate);
+  console.log("Comparative date:", balanceSheet.comparativeDate);
+  console.log("Report format:", balanceSheet.reportFormat);
+  console.log("Is balanced:", balanceSheet.isBalanced);
 
   // Check balance equation
   console.log(
-    'Assets = Liabilities + Equity:',
-    balanceSheet.balanceCheck.assetsEqualsLiabilitiesPlusEquity
+    "Assets = Liabilities + Equity:",
+    balanceSheet.balanceCheck.assetsEqualsLiabilitiesPlusEquity,
   );
-  console.log('Difference:', balanceSheet.balanceCheck.difference);
+  console.log("Difference:", balanceSheet.balanceCheck.difference);
 
   // Check totals
-  console.log('Total assets:', balanceSheet.totals.totalAssets);
-  console.log('Total current assets:', balanceSheet.totals.totalCurrentAssets);
-  console.log('Total non-current assets:', balanceSheet.totals.totalNonCurrentAssets);
-  console.log('Total liabilities:', balanceSheet.totals.totalLiabilities);
-  console.log('Total current liabilities:', balanceSheet.totals.totalCurrentLiabilities);
-  console.log('Total non-current liabilities:', balanceSheet.totals.totalNonCurrentLiabilities);
-  console.log('Total equity:', balanceSheet.totals.totalEquity);
-  console.log('Retained earnings:', balanceSheet.totals.retainedEarnings);
+  console.log("Total assets:", balanceSheet.totals.totalAssets);
+  console.log("Total current assets:", balanceSheet.totals.totalCurrentAssets);
+  console.log("Total non-current assets:", balanceSheet.totals.totalNonCurrentAssets);
+  console.log("Total liabilities:", balanceSheet.totals.totalLiabilities);
+  console.log("Total current liabilities:", balanceSheet.totals.totalCurrentLiabilities);
+  console.log("Total non-current liabilities:", balanceSheet.totals.totalNonCurrentLiabilities);
+  console.log("Total equity:", balanceSheet.totals.totalEquity);
+  console.log("Retained earnings:", balanceSheet.totals.retainedEarnings);
 
   // Process asset sections
   for (const assetSection of balanceSheet.assets) {
@@ -266,41 +266,41 @@ if (balanceSheet.success) {
     }
   }
 } else {
-  console.error('Balance Sheet generation failed:', balanceSheet.error);
+  console.error("Balance Sheet generation failed:", balanceSheet.error);
 }
 ```
 
 ### Profit & Loss Generation
 
 ```typescript
-import { generateProfitLoss } from '@aibos/accounting/reports';
+import { generateProfitLoss } from "@aibos/accounting/reports";
 
 // Generate P&L statement
 const profitLoss = await generateProfitLoss(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
-    comparativePeriod: new Date('2023-01-31'), // For comparative P&L
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
+    comparativePeriod: new Date("2023-01-31"), // For comparative P&L
     includeZeroBalances: false,
-    currency: 'MYR',
-    reportFormat: 'COMPARATIVE',
+    currency: "MYR",
+    reportFormat: "COMPARATIVE",
   },
-  dbClient
+  dbClient,
 );
 
 if (profitLoss.success) {
-  console.log('P&L generated successfully');
-  console.log('As of date:', profitLoss.asOfDate);
-  console.log('Comparative date:', profitLoss.comparativeDate);
-  console.log('Report format:', profitLoss.reportFormat);
+  console.log("P&L generated successfully");
+  console.log("As of date:", profitLoss.asOfDate);
+  console.log("Comparative date:", profitLoss.comparativeDate);
+  console.log("Report format:", profitLoss.reportFormat);
 
   // Check totals
-  console.log('Total revenue:', profitLoss.totals.totalRevenue);
-  console.log('Total expenses:', profitLoss.totals.totalExpenses);
-  console.log('Gross profit:', profitLoss.totals.grossProfit);
-  console.log('Operating profit:', profitLoss.totals.operatingProfit);
-  console.log('Net profit:', profitLoss.totals.netProfit);
+  console.log("Total revenue:", profitLoss.totals.totalRevenue);
+  console.log("Total expenses:", profitLoss.totals.totalExpenses);
+  console.log("Gross profit:", profitLoss.totals.grossProfit);
+  console.log("Operating profit:", profitLoss.totals.operatingProfit);
+  console.log("Net profit:", profitLoss.totals.netProfit);
 
   // Process revenue sections
   for (const revenueSection of profitLoss.revenue) {
@@ -318,42 +318,42 @@ if (profitLoss.success) {
     }
   }
 } else {
-  console.error('P&L generation failed:', profitLoss.error);
+  console.error("P&L generation failed:", profitLoss.error);
 }
 ```
 
 ### Cash Flow Statement Generation
 
 ```typescript
-import { generateCashFlowStatement } from '@aibos/accounting/reports';
+import { generateCashFlowStatement } from "@aibos/accounting/reports";
 
 // Generate cash flow statement
 const cashFlow = await generateCashFlowStatement(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
-    comparativePeriod: new Date('2023-01-31'), // For comparative CF
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
+    comparativePeriod: new Date("2023-01-31"), // For comparative CF
     includeZeroBalances: false,
-    currency: 'MYR',
-    reportFormat: 'COMPARATIVE',
+    currency: "MYR",
+    reportFormat: "COMPARATIVE",
   },
-  dbClient
+  dbClient,
 );
 
 if (cashFlow.success) {
-  console.log('Cash Flow Statement generated successfully');
-  console.log('As of date:', cashFlow.asOfDate);
-  console.log('Comparative date:', cashFlow.comparativeDate);
-  console.log('Report format:', cashFlow.reportFormat);
+  console.log("Cash Flow Statement generated successfully");
+  console.log("As of date:", cashFlow.asOfDate);
+  console.log("Comparative date:", cashFlow.comparativeDate);
+  console.log("Report format:", cashFlow.reportFormat);
 
   // Check totals
-  console.log('Net cash from operations:', cashFlow.totals.netCashFromOperations);
-  console.log('Net cash from investing:', cashFlow.totals.netCashFromInvesting);
-  console.log('Net cash from financing:', cashFlow.totals.netCashFromFinancing);
-  console.log('Net change in cash:', cashFlow.totals.netChangeInCash);
-  console.log('Beginning cash:', cashFlow.totals.beginningCash);
-  console.log('Ending cash:', cashFlow.totals.endingCash);
+  console.log("Net cash from operations:", cashFlow.totals.netCashFromOperations);
+  console.log("Net cash from investing:", cashFlow.totals.netCashFromInvesting);
+  console.log("Net cash from financing:", cashFlow.totals.netCashFromFinancing);
+  console.log("Net change in cash:", cashFlow.totals.netChangeInCash);
+  console.log("Beginning cash:", cashFlow.totals.beginningCash);
+  console.log("Ending cash:", cashFlow.totals.endingCash);
 
   // Process operating activities
   for (const operatingSection of cashFlow.operating) {
@@ -379,44 +379,44 @@ if (cashFlow.success) {
     }
   }
 } else {
-  console.error('Cash Flow Statement generation failed:', cashFlow.error);
+  console.error("Cash Flow Statement generation failed:", cashFlow.error);
 }
 ```
 
 ### Report Export
 
 ```typescript
-import { exportTrialBalance } from '@aibos/accounting/reports';
+import { exportTrialBalance } from "@aibos/accounting/reports";
 
 // Export trial balance to different formats
 const trialBalance = await generateTrialBalance(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    asOfDate: new Date('2024-01-31'),
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    asOfDate: new Date("2024-01-31"),
   },
-  dbClient
+  dbClient,
 );
 
 if (trialBalance.success) {
   // Export to CSV
-  const csvData = exportTrialBalance(trialBalance, 'CSV');
-  console.log('CSV export:', csvData);
+  const csvData = exportTrialBalance(trialBalance, "CSV");
+  console.log("CSV export:", csvData);
 
   // Export to XLSX (when implemented)
   try {
-    const xlsxData = exportTrialBalance(trialBalance, 'XLSX');
-    console.log('XLSX export ready');
+    const xlsxData = exportTrialBalance(trialBalance, "XLSX");
+    console.log("XLSX export ready");
   } catch (error) {
-    console.log('XLSX export not yet implemented');
+    console.log("XLSX export not yet implemented");
   }
 
   // Export to PDF (when implemented)
   try {
-    const pdfData = exportTrialBalance(trialBalance, 'PDF');
-    console.log('PDF export ready');
+    const pdfData = exportTrialBalance(trialBalance, "PDF");
+    console.log("PDF export ready");
   } catch (error) {
-    console.log('PDF export not yet implemented');
+    console.log("PDF export not yet implemented");
   }
 }
 ```
@@ -435,7 +435,7 @@ if (trialBalance.success) {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_REPORTS = 'true';
+process.env.DEBUG_REPORTS = "true";
 ```
 
 **Logs**: Check Axiom telemetry for reporting operation logs

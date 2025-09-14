@@ -1,16 +1,16 @@
-import nextra from 'nextra'
+import nextra from "nextra";
 
 const withNextra = nextra({
-    theme: 'nextra-theme-docs',
-    themeConfig: './theme.config.tsx',
-    latex: true,
-    defaultShowCopyCode: true
-})
+  theme: "nextra-theme-docs",
+  themeConfig: "./theme.config.tsx",
+  latex: true,
+  defaultShowCopyCode: true,
+});
 
 export default withNextra({
-    output: 'export',
-    trailingSlash: true,
-    images: {
-        unoptimized: true
-    }
-})
+  output: "export",
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
+});

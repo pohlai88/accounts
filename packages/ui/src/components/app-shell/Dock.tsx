@@ -1,21 +1,13 @@
 /**
  * Dock Component - Steve Jobs Inspired
- * 
+ *
  * Verb-first navigation that feels natural and obvious
  * Flat navigation structure avoiding over-nesting
  */
 
-import React, { useEffect } from 'react';
-import {
-  FileText,
-  Receipt,
-  CreditCard,
-  Lock,
-  BarChart3,
-  Settings,
-  Plus
-} from 'lucide-react';
-import { cn } from '@aibos/ui/utils';
+import React, { useEffect } from "react";
+import { FileText, Receipt, CreditCard, Lock, BarChart3, Settings, Plus } from "lucide-react";
+import { cn } from "@aibos/ui/utils";
 
 export interface DockProps {
   className?: string;
@@ -25,19 +17,19 @@ export interface DockProps {
 }
 
 const navigationItems = [
-  { id: 'sell', label: 'Sell', icon: FileText, href: '/sell', shortcut: 'g s' },
-  { id: 'buy', label: 'Buy', icon: Receipt, href: '/buy', shortcut: 'g b' },
-  { id: 'cash', label: 'Cash', icon: CreditCard, href: '/cash', shortcut: 'g c' },
-  { id: 'close', label: 'Close', icon: Lock, href: '/close', shortcut: 'g l' },
-  { id: 'reports', label: 'Reports', icon: BarChart3, href: '/reports', shortcut: 'g r' },
-  { id: 'settings', label: 'Settings', icon: Settings, href: '/settings', shortcut: 'g t' },
+  { id: "sell", label: "Sell", icon: FileText, href: "/sell", shortcut: "g s" },
+  { id: "buy", label: "Buy", icon: Receipt, href: "/buy", shortcut: "g b" },
+  { id: "cash", label: "Cash", icon: CreditCard, href: "/cash", shortcut: "g c" },
+  { id: "close", label: "Close", icon: Lock, href: "/close", shortcut: "g l" },
+  { id: "reports", label: "Reports", icon: BarChart3, href: "/reports", shortcut: "g r" },
+  { id: "settings", label: "Settings", icon: Settings, href: "/settings", shortcut: "g t" },
 ];
 
 export const Dock: React.FC<DockProps> = ({
   className,
-  activeItem = 'sell',
+  activeItem = "sell",
   onNavigate,
-  onCreate
+  onCreate,
 }) => {
   // Handle keyboard shortcuts for navigation
   useEffect(() => {
@@ -48,41 +40,41 @@ export const Dock: React.FC<DockProps> = ({
       }
 
       // Handle 'g' + letter shortcuts
-      if (event.key === 'g' && !event.repeat) {
+      if (event.key === "g" && !event.repeat) {
         const nextKeyHandler = (e: KeyboardEvent) => {
           const shortcuts: Record<string, string> = {
-            's': 'sell',
-            'b': 'buy',
-            'c': 'cash',
-            'l': 'close',
-            'r': 'reports',
-            't': 'settings'
+            s: "sell",
+            b: "buy",
+            c: "cash",
+            l: "close",
+            r: "reports",
+            t: "settings",
           };
 
           if (shortcuts[e.key]) {
             e.preventDefault();
             onNavigate?.(shortcuts[e.key]!);
           }
-          document.removeEventListener('keydown', nextKeyHandler);
+          document.removeEventListener("keydown", nextKeyHandler);
         };
 
-        document.addEventListener('keydown', nextKeyHandler);
+        document.addEventListener("keydown", nextKeyHandler);
         // Clear handler after 1 second
         setTimeout(() => {
-          document.removeEventListener('keydown', nextKeyHandler);
+          document.removeEventListener("keydown", nextKeyHandler);
         }, 1000);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onNavigate]);
 
   return (
     <nav
       className={cn(
-        'w-64 bg-sys-bg-subtle border-r border-sys-border-hairline flex flex-col',
-        className
+        "w-64 bg-sys-bg-subtle border-r border-sys-border-hairline flex flex-col",
+        className,
       )}
       role="navigation"
       aria-label="Main navigation"
@@ -90,7 +82,10 @@ export const Dock: React.FC<DockProps> = ({
       {/* Logo */}
       <div className="p-6 border-b border-sys-border-hairline">
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-md bg-brand-primary flex items-center justify-center" aria-hidden="true">
+          <div
+            className="h-8 w-8 rounded-md bg-brand-primary flex items-center justify-center"
+            aria-hidden="true"
+          >
             <span className="text-sm font-semibold text-sys-text-primary">A</span>
           </div>
           <span className="text-lg font-semibold text-sys-text-primary">AI-BOS</span>
@@ -99,7 +94,7 @@ export const Dock: React.FC<DockProps> = ({
 
       {/* Navigation Items */}
       <div className="flex-1 p-4 space-y-2" role="list">
-        {navigationItems.map((item) => {
+        {navigationItems.map(item => {
           const Icon = item.icon;
           const isActive = activeItem === item.id;
 
@@ -108,13 +103,13 @@ export const Dock: React.FC<DockProps> = ({
               key={item.id}
               onClick={() => onNavigate?.(item.id)}
               className={cn(
-                'w-full flex items-center justify-between px-3 py-2 rounded-md text-left transition-colors focus:outline-none focus:ring-2 focus:ring-sys-accent focus:ring-offset-2',
+                "w-full flex items-center justify-between px-3 py-2 rounded-md text-left transition-colors focus:outline-none focus:ring-2 focus:ring-sys-accent focus:ring-offset-2",
                 isActive
-                  ? 'bg-brand-primary text-sys-text-primary'
-                  : 'text-sys-text-secondary hover:text-sys-text-primary hover:bg-sys-fill-low'
+                  ? "bg-brand-primary text-sys-text-primary"
+                  : "text-sys-text-secondary hover:text-sys-text-primary hover:bg-sys-fill-low",
               )}
               role="listitem"
-              aria-current={isActive ? 'page' : undefined}
+              aria-current={isActive ? "page" : undefined}
               aria-label={`Navigate to ${item.label} section. Shortcut: ${item.shortcut}`}
             >
               <div className="flex items-center space-x-3">
@@ -122,8 +117,11 @@ export const Dock: React.FC<DockProps> = ({
                 <span className="font-medium">{item.label}</span>
               </div>
               {/* Keyboard shortcut hint */}
-              <kbd className="px-1.5 py-0.5 text-xs bg-sys-fill-low text-sys-text-tertiary rounded border border-sys-border-hairline" aria-label={`Shortcut: ${item.shortcut}`}>
-                {item.shortcut?.split(' ')[1]?.toUpperCase()}
+              <kbd
+                className="px-1.5 py-0.5 text-xs bg-sys-fill-low text-sys-text-tertiary rounded border border-sys-border-hairline"
+                aria-label={`Shortcut: ${item.shortcut}`}
+              >
+                {item.shortcut?.split(" ")[1]?.toUpperCase()}
               </kbd>
             </button>
           );
@@ -139,7 +137,10 @@ export const Dock: React.FC<DockProps> = ({
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           <span>Create</span>
-          <kbd className="ml-2 px-1.5 py-0.5 text-xs bg-sys-fill-low text-sys-text-tertiary rounded border border-sys-border-hairline" aria-label="Shortcut: Cmd+N">
+          <kbd
+            className="ml-2 px-1.5 py-0.5 text-xs bg-sys-fill-low text-sys-text-tertiary rounded border border-sys-border-hairline"
+            aria-label="Shortcut: Cmd+N"
+          >
             ⌘N
           </kbd>
         </button>

@@ -328,7 +328,7 @@ pnpm typecheck
 ### **Basic Component Usage**
 
 ```tsx
-import { Button, Card, Input, Label } from '@aibos/ui';
+import { Button, Card, Input, Label } from "@aibos/ui";
 
 function MyComponent() {
   return (
@@ -353,7 +353,7 @@ function MyComponent() {
 ### **Theme Integration**
 
 ```tsx
-import { ThemeProvider, ThemeToggle } from '@aibos/ui';
+import { ThemeProvider, ThemeToggle } from "@aibos/ui";
 
 function App() {
   return (
@@ -373,7 +373,7 @@ function App() {
 ### **Workflow Component Usage**
 
 ```tsx
-import { InvoiceWorkflow, BillWorkflow, CashWorkflow } from '@aibos/ui';
+import { InvoiceWorkflow, BillWorkflow, CashWorkflow } from "@aibos/ui";
 
 function AccountingDashboard() {
   return (
@@ -389,7 +389,7 @@ function AccountingDashboard() {
 ### **Typography Usage**
 
 ```tsx
-import { H1, H2, Body, Caption, Link } from '@aibos/ui';
+import { H1, H2, Body, Caption, Link } from "@aibos/ui";
 
 function Document() {
   return (

@@ -23,15 +23,15 @@ pnpm add @aibos/accounting
 ## Usage
 
 ```typescript
-import { createJournalEntry, postTransaction, generateTrialBalance } from '@aibos/accounting';
+import { createJournalEntry, postTransaction, generateTrialBalance } from "@aibos/accounting";
 
 // Create a journal entry
 const entry = createJournalEntry({
   date: new Date(),
-  description: 'Invoice Payment',
+  description: "Invoice Payment",
   entries: [
-    { account: 'cash', debit: 1000 },
-    { account: 'accounts_receivable', credit: 1000 },
+    { account: "cash", debit: 1000 },
+    { account: "accounts_receivable", credit: 1000 },
   ],
 });
 
@@ -40,8 +40,8 @@ await postTransaction(entry);
 
 // Generate trial balance
 const trialBalance = await generateTrialBalance({
-  period: '2024-01',
-  tenantId: 'tenant-123',
+  period: "2024-01",
+  tenantId: "tenant-123",
 });
 ```
 

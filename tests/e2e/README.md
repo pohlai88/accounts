@@ -48,7 +48,7 @@ import {
   testJournalPosting,
   testRLSVerification,
   testAttachmentSystem,
-} from '@aibos/tests/e2e';
+} from "@aibos/tests/e2e";
 
 // Run D2 integration tests
 await testD2Integration();
@@ -178,26 +178,26 @@ pnpm typecheck
 ### D2 Integration Testing
 
 ```typescript
-import { testD2Integration } from '@aibos/tests/e2e';
+import { testD2Integration } from "@aibos/tests/e2e";
 
 // Test D2 AR integration
 async function testD2ARIntegration() {
   const testConfig = {
-    tenantId: 'test-tenant-123',
-    companyId: 'test-company-456',
+    tenantId: "test-tenant-123",
+    companyId: "test-company-456",
     testUser: {
-      id: 'test-user-789',
-      role: 'accountant',
-      permissions: ['ar:read', 'ar:write'],
+      id: "test-user-789",
+      role: "accountant",
+      permissions: ["ar:read", "ar:write"],
     },
   };
 
   const result = await testD2Integration(testConfig);
 
   if (result.success) {
-    console.log('D2 integration test passed');
+    console.log("D2 integration test passed");
   } else {
-    console.error('D2 integration test failed:', result.errors);
+    console.error("D2 integration test failed:", result.errors);
   }
 }
 ```
@@ -205,16 +205,16 @@ async function testD2ARIntegration() {
 ### D4 Financial Reporting Testing
 
 ```typescript
-import { testD4FinancialReporting } from '@aibos/tests/e2e';
+import { testD4FinancialReporting } from "@aibos/tests/e2e";
 
 // Test D4 financial reporting
 async function testD4FinancialReporting() {
   const testConfig = {
     period: {
-      startDate: '2024-01-01',
-      endDate: '2024-01-31',
+      startDate: "2024-01-01",
+      endDate: "2024-01-31",
     },
-    reports: ['trial-balance', 'balance-sheet', 'profit-loss'],
+    reports: ["trial-balance", "balance-sheet", "profit-loss"],
     testData: {
       journals: 100,
       invoices: 50,
@@ -225,9 +225,9 @@ async function testD4FinancialReporting() {
   const result = await testD4FinancialReporting(testConfig);
 
   if (result.success) {
-    console.log('D4 financial reporting test passed');
+    console.log("D4 financial reporting test passed");
   } else {
-    console.error('D4 financial reporting test failed:', result.errors);
+    console.error("D4 financial reporting test failed:", result.errors);
   }
 }
 ```
@@ -235,31 +235,31 @@ async function testD4FinancialReporting() {
 ### Journal Posting Testing
 
 ```typescript
-import { testJournalPosting } from '@aibos/tests/e2e';
+import { testJournalPosting } from "@aibos/tests/e2e";
 
 // Test journal posting workflow
 async function testJournalPostingWorkflow() {
   const testConfig = {
     journal: {
-      description: 'Test Journal Entry',
-      date: '2024-01-15',
+      description: "Test Journal Entry",
+      date: "2024-01-15",
       lines: [
-        { account: 'Cash', debit: 1000, credit: 0 },
-        { account: 'Revenue', debit: 0, credit: 1000 },
+        { account: "Cash", debit: 1000, credit: 0 },
+        { account: "Revenue", debit: 0, credit: 1000 },
       ],
     },
     workflow: {
-      steps: ['create', 'validate', 'approve', 'post'],
-      approver: 'test-approver-123',
+      steps: ["create", "validate", "approve", "post"],
+      approver: "test-approver-123",
     },
   };
 
   const result = await testJournalPosting(testConfig);
 
   if (result.success) {
-    console.log('Journal posting test passed');
+    console.log("Journal posting test passed");
   } else {
-    console.error('Journal posting test failed:', result.errors);
+    console.error("Journal posting test failed:", result.errors);
   }
 }
 ```
@@ -267,31 +267,31 @@ async function testJournalPostingWorkflow() {
 ### RLS Verification Testing
 
 ```typescript
-import { testRLSVerification } from '@aibos/tests/e2e';
+import { testRLSVerification } from "@aibos/tests/e2e";
 
 // Test RLS verification
 async function testRLSVerification() {
   const testConfig = {
     tenants: [
-      { id: 'tenant-1', name: 'Tenant 1' },
-      { id: 'tenant-2', name: 'Tenant 2' },
+      { id: "tenant-1", name: "Tenant 1" },
+      { id: "tenant-2", name: "Tenant 2" },
     ],
     companies: [
-      { id: 'company-1', tenantId: 'tenant-1' },
-      { id: 'company-2', tenantId: 'tenant-2' },
+      { id: "company-1", tenantId: "tenant-1" },
+      { id: "company-2", tenantId: "tenant-2" },
     ],
     testUsers: [
-      { id: 'user-1', tenantId: 'tenant-1', companyId: 'company-1' },
-      { id: 'user-2', tenantId: 'tenant-2', companyId: 'company-2' },
+      { id: "user-1", tenantId: "tenant-1", companyId: "company-1" },
+      { id: "user-2", tenantId: "tenant-2", companyId: "company-2" },
     ],
   };
 
   const result = await testRLSVerification(testConfig);
 
   if (result.success) {
-    console.log('RLS verification test passed');
+    console.log("RLS verification test passed");
   } else {
-    console.error('RLS verification test failed:', result.errors);
+    console.error("RLS verification test failed:", result.errors);
   }
 }
 ```
@@ -299,38 +299,38 @@ async function testRLSVerification() {
 ### Attachment System Testing
 
 ```typescript
-import { testAttachmentSystem } from '@aibos/tests/e2e';
+import { testAttachmentSystem } from "@aibos/tests/e2e";
 
 // Test attachment system
 async function testAttachmentSystem() {
   const testConfig = {
     attachments: [
       {
-        type: 'invoice',
-        file: 'test-invoice.pdf',
+        type: "invoice",
+        file: "test-invoice.pdf",
         size: 1024000,
-        mimeType: 'application/pdf',
+        mimeType: "application/pdf",
       },
       {
-        type: 'receipt',
-        file: 'test-receipt.jpg',
+        type: "receipt",
+        file: "test-receipt.jpg",
         size: 512000,
-        mimeType: 'image/jpeg',
+        mimeType: "image/jpeg",
       },
     ],
     processing: {
       ocr: true,
       validation: true,
-      storage: 's3',
+      storage: "s3",
     },
   };
 
   const result = await testAttachmentSystem(testConfig);
 
   if (result.success) {
-    console.log('Attachment system test passed');
+    console.log("Attachment system test passed");
   } else {
-    console.error('Attachment system test failed:', result.errors);
+    console.error("Attachment system test failed:", result.errors);
   }
 }
 ```
@@ -338,7 +338,7 @@ async function testAttachmentSystem() {
 ### Global Setup and Teardown
 
 ```typescript
-import { setupGlobalTestEnvironment, teardownGlobalTestEnvironment } from '@aibos/tests/e2e';
+import { setupGlobalTestEnvironment, teardownGlobalTestEnvironment } from "@aibos/tests/e2e";
 
 // Global test setup
 async function setupTests() {
@@ -346,7 +346,7 @@ async function setupTests() {
     database: {
       reset: true,
       seed: true,
-      testData: 'minimal',
+      testData: "minimal",
     },
     supabase: {
       reset: true,
@@ -373,20 +373,20 @@ async function teardownTests() {
 ### Supabase RLS Setup
 
 ```typescript
-import { setupSupabaseRLS } from '@aibos/tests/e2e';
+import { setupSupabaseRLS } from "@aibos/tests/e2e";
 
 // Setup Supabase RLS for testing
 async function setupSupabaseRLS() {
   await setupSupabaseRLS({
     policies: [
       {
-        table: 'gl_journal',
-        policy: 'tenant_isolation',
+        table: "gl_journal",
+        policy: "tenant_isolation",
         definition: "tenant_id = auth.jwt() ->> 'tenant_id'",
       },
       {
-        table: 'ar_invoices',
-        policy: 'company_isolation',
+        table: "ar_invoices",
+        policy: "company_isolation",
         definition: "company_id = auth.jwt() ->> 'company_id'",
       },
     ],
@@ -408,7 +408,7 @@ import {
   testJournalPosting,
   testRLSVerification,
   testAttachmentSystem,
-} from '@aibos/tests/e2e';
+} from "@aibos/tests/e2e";
 
 // Comprehensive E2E testing suite
 async function runE2ETests() {
@@ -423,40 +423,40 @@ async function runE2ETests() {
   try {
     // Test D2 integration
     results.d2 = await testD2Integration({
-      tenantId: 'test-tenant-123',
-      companyId: 'test-company-456',
+      tenantId: "test-tenant-123",
+      companyId: "test-company-456",
     });
 
     // Test D4 financial reporting
     results.d4 = await testD4FinancialReporting({
       period: {
-        startDate: '2024-01-01',
-        endDate: '2024-01-31',
+        startDate: "2024-01-01",
+        endDate: "2024-01-31",
       },
     });
 
     // Test journal posting
     results.journal = await testJournalPosting({
       journal: {
-        description: 'Test Journal Entry',
-        date: '2024-01-15',
+        description: "Test Journal Entry",
+        date: "2024-01-15",
       },
     });
 
     // Test RLS verification
     results.rls = await testRLSVerification({
-      tenants: ['tenant-1', 'tenant-2'],
-      companies: ['company-1', 'company-2'],
+      tenants: ["tenant-1", "tenant-2"],
+      companies: ["company-1", "company-2"],
     });
 
     // Test attachment system
     results.attachment = await testAttachmentSystem({
-      attachments: ['test-invoice.pdf', 'test-receipt.jpg'],
+      attachments: ["test-invoice.pdf", "test-receipt.jpg"],
     });
 
-    console.log('All E2E tests completed:', results);
+    console.log("All E2E tests completed:", results);
   } catch (error) {
-    console.error('E2E test suite failed:', error);
+    console.error("E2E test suite failed:", error);
     throw error;
   }
 
@@ -477,7 +477,7 @@ async function runE2ETests() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_E2E = 'true';
+process.env.DEBUG_E2E = "true";
 ```
 
 **Logs**: Check test logs for E2E test execution details

@@ -37,23 +37,23 @@
 ## 3) Getting Started
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Basic usage
-const className = cn('base-class', 'conditional-class', {
-  'active-class': isActive,
-  'disabled-class': isDisabled,
+const className = cn("base-class", "conditional-class", {
+  "active-class": isActive,
+  "disabled-class": isDisabled,
 });
 
 // With Tailwind classes
 const buttonClass = cn(
-  'px-4 py-2 rounded-md',
-  'bg-brand-solid text-fg-on-brand',
-  'hover:bg-brand-solid/90',
+  "px-4 py-2 rounded-md",
+  "bg-brand-solid text-fg-on-brand",
+  "hover:bg-brand-solid/90",
   {
-    'opacity-50 cursor-not-allowed': isDisabled,
-    'ring-2 ring-brand-solid': isActive,
-  }
+    "opacity-50 cursor-not-allowed": isDisabled,
+    "ring-2 ring-brand-solid": isActive,
+  },
 );
 ```
 
@@ -73,8 +73,8 @@ const buttonClass = cn(
 **Implementation**:
 
 ```typescript
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -86,33 +86,33 @@ export function cn(...inputs: ClassValue[]) {
 ### **Basic Class Combination**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Simple class combination
-const baseClass = cn('px-4', 'py-2', 'rounded-md');
+const baseClass = cn("px-4", "py-2", "rounded-md");
 // Result: 'px-4 py-2 rounded-md'
 
 // With conditional classes
-const buttonClass = cn('px-4 py-2 rounded-md', {
-  'bg-blue-500': variant === 'primary',
-  'bg-gray-500': variant === 'secondary',
-  'opacity-50': isDisabled,
+const buttonClass = cn("px-4 py-2 rounded-md", {
+  "bg-blue-500": variant === "primary",
+  "bg-gray-500": variant === "secondary",
+  "opacity-50": isDisabled,
 });
 ```
 
 ### **Tailwind Class Optimization**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Tailwind class merging and deduplication
 const optimizedClass = cn(
-  'px-4 py-2', // Base padding
-  'px-6', // Override padding-x
-  'bg-blue-500', // Base background
-  'bg-red-500', // Override background
-  'hover:bg-blue-600', // Hover state
-  'hover:bg-red-600' // Override hover state
+  "px-4 py-2", // Base padding
+  "px-6", // Override padding-x
+  "bg-blue-500", // Base background
+  "bg-red-500", // Override background
+  "hover:bg-blue-600", // Hover state
+  "hover:bg-red-600", // Override hover state
 );
 // Result: 'py-2 px-6 bg-red-500 hover:bg-red-600'
 ```
@@ -177,59 +177,59 @@ export const Button: React.FC<ButtonProps> = ({
 ### **Semantic Token Integration**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Using semantic tokens with cn
 const cardClass = cn(
-  'bg-bg-default', // Semantic background
-  'border-border-subtle', // Semantic border
-  'text-fg-default', // Semantic text color
-  'rounded-lg', // Semantic border radius
-  'shadow-sm', // Semantic shadow
-  'p-6', // Semantic padding
+  "bg-bg-default", // Semantic background
+  "border-border-subtle", // Semantic border
+  "text-fg-default", // Semantic text color
+  "rounded-lg", // Semantic border radius
+  "shadow-sm", // Semantic shadow
+  "p-6", // Semantic padding
   {
-    'border-brand-solid': isSelected,
-    'shadow-md': isHovered,
-    'opacity-75': isDisabled,
-  }
+    "border-brand-solid": isSelected,
+    "shadow-md": isHovered,
+    "opacity-75": isDisabled,
+  },
 );
 ```
 
 ### **Responsive Design**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Responsive classes with cn
 const responsiveClass = cn(
-  'grid grid-cols-1', // Mobile: 1 column
-  'md:grid-cols-2', // Tablet: 2 columns
-  'lg:grid-cols-3', // Desktop: 3 columns
-  'gap-4', // Base gap
-  'md:gap-6', // Larger gap on tablet+
-  'lg:gap-8', // Even larger gap on desktop
+  "grid grid-cols-1", // Mobile: 1 column
+  "md:grid-cols-2", // Tablet: 2 columns
+  "lg:grid-cols-3", // Desktop: 3 columns
+  "gap-4", // Base gap
+  "md:gap-6", // Larger gap on tablet+
+  "lg:gap-8", // Even larger gap on desktop
   {
-    'grid-cols-2': forceTwoColumns,
-    'grid-cols-4': forceFourColumns,
-  }
+    "grid-cols-2": forceTwoColumns,
+    "grid-cols-4": forceFourColumns,
+  },
 );
 ```
 
 ### **Dark Mode Support**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Dark mode classes with cn
 const themeClass = cn(
-  'bg-white text-gray-900', // Light mode
-  'dark:bg-gray-900 dark:text-white', // Dark mode
-  'border-gray-200', // Light mode border
-  'dark:border-gray-700', // Dark mode border
+  "bg-white text-gray-900", // Light mode
+  "dark:bg-gray-900 dark:text-white", // Dark mode
+  "border-gray-200", // Light mode border
+  "dark:border-gray-700", // Dark mode border
   {
-    'bg-blue-50 dark:bg-blue-900': isHighlighted,
-    'text-blue-600 dark:text-blue-400': isActive,
-  }
+    "bg-blue-50 dark:bg-blue-900": isHighlighted,
+    "text-blue-600 dark:text-blue-400": isActive,
+  },
 );
 ```
 
@@ -238,37 +238,37 @@ const themeClass = cn(
 ### **Component Variant System**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Advanced variant system with cn
 const getVariantClasses = (variant: string, size: string, state: string) => {
   return cn(
     // Base classes
-    'inline-flex items-center justify-center font-medium transition-colors',
-    'focus:outline-none focus:ring-2 focus:ring-offset-2',
+    "inline-flex items-center justify-center font-medium transition-colors",
+    "focus:outline-none focus:ring-2 focus:ring-offset-2",
 
     // Variant mapping
     {
-      'bg-brand-solid text-fg-on-brand': variant === 'primary',
-      'bg-gray-100 text-gray-900': variant === 'secondary',
-      'bg-transparent border border-gray-300': variant === 'outline',
-      'bg-red-500 text-white': variant === 'danger',
+      "bg-brand-solid text-fg-on-brand": variant === "primary",
+      "bg-gray-100 text-gray-900": variant === "secondary",
+      "bg-transparent border border-gray-300": variant === "outline",
+      "bg-red-500 text-white": variant === "danger",
     },
 
     // Size mapping
     {
-      'px-2 py-1 text-xs': size === 'xs',
-      'px-3 py-1.5 text-sm': size === 'sm',
-      'px-4 py-2 text-base': size === 'md',
-      'px-6 py-3 text-lg': size === 'lg',
+      "px-2 py-1 text-xs": size === "xs",
+      "px-3 py-1.5 text-sm": size === "sm",
+      "px-4 py-2 text-base": size === "md",
+      "px-6 py-3 text-lg": size === "lg",
     },
 
     // State mapping
     {
-      'opacity-50 cursor-not-allowed': state === 'disabled',
-      'cursor-pointer hover:opacity-90': state === 'enabled',
-      'animate-pulse': state === 'loading',
-    }
+      "opacity-50 cursor-not-allowed": state === "disabled",
+      "cursor-pointer hover:opacity-90": state === "enabled",
+      "animate-pulse": state === "loading",
+    },
   );
 };
 ```
@@ -276,7 +276,7 @@ const getVariantClasses = (variant: string, size: string, state: string) => {
 ### **Conditional Styling Logic**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Complex conditional styling
 const getComplexClasses = (props: {
@@ -284,39 +284,39 @@ const getComplexClasses = (props: {
   isDisabled: boolean;
   isError: boolean;
   isSuccess: boolean;
-  size: 'sm' | 'md' | 'lg';
-  variant: 'primary' | 'secondary';
+  size: "sm" | "md" | "lg";
+  variant: "primary" | "secondary";
 }) => {
   return cn(
     // Base classes
-    'px-4 py-2 rounded-md font-medium transition-all duration-200',
+    "px-4 py-2 rounded-md font-medium transition-all duration-200",
 
     // Size classes
     {
-      'px-2 py-1 text-sm': props.size === 'sm',
-      'px-4 py-2 text-base': props.size === 'md',
-      'px-6 py-3 text-lg': props.size === 'lg',
+      "px-2 py-1 text-sm": props.size === "sm",
+      "px-4 py-2 text-base": props.size === "md",
+      "px-6 py-3 text-lg": props.size === "lg",
     },
 
     // Variant classes
     {
-      'bg-brand-solid text-fg-on-brand': props.variant === 'primary',
-      'bg-gray-100 text-gray-900': props.variant === 'secondary',
+      "bg-brand-solid text-fg-on-brand": props.variant === "primary",
+      "bg-gray-100 text-gray-900": props.variant === "secondary",
     },
 
     // State classes (with priority)
     {
-      'opacity-50 cursor-not-allowed': props.isDisabled,
-      'bg-red-500 text-white': props.isError && !props.isDisabled,
-      'bg-green-500 text-white': props.isSuccess && !props.isDisabled,
-      'ring-2 ring-brand-solid': props.isActive && !props.isDisabled,
+      "opacity-50 cursor-not-allowed": props.isDisabled,
+      "bg-red-500 text-white": props.isError && !props.isDisabled,
+      "bg-green-500 text-white": props.isSuccess && !props.isDisabled,
+      "ring-2 ring-brand-solid": props.isActive && !props.isDisabled,
     },
 
     // Hover states (only when not disabled)
     !props.isDisabled && {
-      'hover:opacity-90': props.variant === 'primary',
-      'hover:bg-gray-200': props.variant === 'secondary',
-    }
+      "hover:opacity-90": props.variant === "primary",
+      "hover:bg-gray-200": props.variant === "secondary",
+    },
   );
 };
 ```
@@ -334,24 +334,24 @@ const getComplexClasses = (props: {
 
 ```typescript
 // ✅ Good: Use cn for complex conditional logic
-const className = cn('base-class', {
-  'conditional-class': condition,
-  'another-class': anotherCondition,
+const className = cn("base-class", {
+  "conditional-class": condition,
+  "another-class": anotherCondition,
 });
 
 // ✅ Good: Combine with semantic tokens
-const semanticClass = cn('bg-bg-default text-fg-default', 'border-border-subtle rounded-lg', {
-  'border-brand-solid': isSelected,
+const semanticClass = cn("bg-bg-default text-fg-default", "border-border-subtle rounded-lg", {
+  "border-brand-solid": isSelected,
 });
 
 // ❌ Avoid: Overusing cn for simple cases
-const simpleClass = cn('px-4', 'py-2'); // Just use 'px-4 py-2'
+const simpleClass = cn("px-4", "py-2"); // Just use 'px-4 py-2'
 
 // ❌ Avoid: Complex nested conditionals
 const complexClass = cn(
-  'base',
-  condition1 && condition2 && 'class1',
-  condition3 || condition4 ? 'class2' : 'class3'
+  "base",
+  condition1 && condition2 && "class1",
+  condition3 || condition4 ? "class2" : "class3",
 );
 ```
 
@@ -360,31 +360,31 @@ const complexClass = cn(
 ### **TypeScript Support**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
-import { type ClassValue } from 'clsx';
+import { cn } from "@aibos/ui/utils";
+import { type ClassValue } from "clsx";
 
 // Full TypeScript support
-const className: string = cn('px-4', 'py-2', { 'bg-blue-500': true });
+const className: string = cn("px-4", "py-2", { "bg-blue-500": true });
 
 // With custom types
 interface ButtonProps {
-  variant: 'primary' | 'secondary';
-  size: 'sm' | 'md' | 'lg';
+  variant: "primary" | "secondary";
+  size: "sm" | "md" | "lg";
   className?: ClassValue;
 }
 
 const getButtonClasses = (props: ButtonProps): string => {
   return cn(
-    'px-4 py-2 rounded-md',
+    "px-4 py-2 rounded-md",
     {
-      'bg-blue-500': props.variant === 'primary',
-      'bg-gray-500': props.variant === 'secondary',
+      "bg-blue-500": props.variant === "primary",
+      "bg-gray-500": props.variant === "secondary",
     },
     {
-      'px-2 py-1': props.size === 'sm',
-      'px-6 py-3': props.size === 'lg',
+      "px-2 py-1": props.size === "sm",
+      "px-6 py-3": props.size === "lg",
     },
-    props.className
+    props.className,
   );
 };
 ```
@@ -394,49 +394,49 @@ const getButtonClasses = (props: ButtonProps): string => {
 ### **Semantic Token Usage**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Using semantic tokens with cn
 const componentClass = cn(
   // Background tokens
-  'bg-bg-default',
-  'hover:bg-bg-hover',
+  "bg-bg-default",
+  "hover:bg-bg-hover",
 
   // Text tokens
-  'text-fg-default',
-  'text-fg-muted',
+  "text-fg-default",
+  "text-fg-muted",
 
   // Border tokens
-  'border-border-subtle',
-  'rounded-lg',
+  "border-border-subtle",
+  "rounded-lg",
 
   // Spacing tokens
-  'p-6',
-  'space-y-4',
+  "p-6",
+  "space-y-4",
 
   // Conditional semantic tokens
   {
-    'bg-brand-solid text-fg-on-brand': isPrimary,
-    'bg-danger-solid text-fg-on-danger': isDanger,
-    'border-brand-solid': isSelected,
-  }
+    "bg-brand-solid text-fg-on-brand": isPrimary,
+    "bg-danger-solid text-fg-on-danger": isDanger,
+    "border-brand-solid": isSelected,
+  },
 );
 ```
 
 ### **Accessibility Integration**
 
 ```typescript
-import { cn } from '@aibos/ui/utils';
+import { cn } from "@aibos/ui/utils";
 
 // Accessibility-focused class combination
 const accessibleClass = cn(
-  'focus:outline-none focus:ring-2 focus:ring-brand-solid',
-  'aria-disabled:opacity-50 aria-disabled:cursor-not-allowed',
-  'aria-selected:bg-brand-solid aria-selected:text-fg-on-brand',
+  "focus:outline-none focus:ring-2 focus:ring-brand-solid",
+  "aria-disabled:opacity-50 aria-disabled:cursor-not-allowed",
+  "aria-selected:bg-brand-solid aria-selected:text-fg-on-brand",
   {
-    'sr-only': isScreenReaderOnly,
-    'not-sr-only': !isScreenReaderOnly,
-  }
+    "sr-only": isScreenReaderOnly,
+    "not-sr-only": !isScreenReaderOnly,
+  },
 );
 ```
 
@@ -453,9 +453,9 @@ const accessibleClass = cn(
 
 ```typescript
 // Debug class generation
-const debugClass = cn('base-class', { 'conditional-class': someCondition }, 'another-class');
+const debugClass = cn("base-class", { "conditional-class": someCondition }, "another-class");
 
-console.log('Generated class:', debugClass);
+console.log("Generated class:", debugClass);
 // Output: 'base-class conditional-class another-class'
 ```
 

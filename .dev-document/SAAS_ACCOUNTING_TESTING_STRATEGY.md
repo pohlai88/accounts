@@ -66,7 +66,7 @@ pnpm add -D vitest @vitest/ui
 
 ```typescript
 // packages/utils/test/financial-testing-utils.ts
-import { FinancialTestUtils } from './financial-testing-utils';
+import { FinancialTestUtils } from "./financial-testing-utils";
 
 // Test decimal precision
 FinancialTestUtils.expectFinancialPrecision(actual, expected, 2);
@@ -82,7 +82,7 @@ FinancialTestUtils.expectBalancedBalanceSheet(assets, liabilities, equity);
 
 ```typescript
 // packages/utils/test/accounting-report-testing.ts
-import { ReportTestUtils } from './accounting-report-testing';
+import { ReportTestUtils } from "./accounting-report-testing";
 
 // Test P&L statement accuracy
 ReportTestUtils.expectValidProfitAndLoss(data);
@@ -147,8 +147,8 @@ pnpm add -D @lhci/cli
 #### **Financial Calculations**
 
 ```typescript
-describe('Financial Calculations', () => {
-  it('should calculate tax correctly', () => {
+describe("Financial Calculations", () => {
+  it("should calculate tax correctly", () => {
     const taxableAmount = 1000;
     const taxRate = 15;
     const expectedTax = 150;
@@ -156,7 +156,7 @@ describe('Financial Calculations', () => {
     FinancialTestUtils.expectCorrectTaxCalculation(taxableAmount, taxRate, expectedTax);
   });
 
-  it('should calculate depreciation correctly', () => {
+  it("should calculate depreciation correctly", () => {
     const assetCost = 10000;
     const salvageValue = 1000;
     const usefulLife = 5;
@@ -167,7 +167,7 @@ describe('Financial Calculations', () => {
       salvageValue,
       usefulLife,
       expectedDepreciation,
-      'straight-line'
+      "straight-line",
     );
   });
 });
@@ -176,8 +176,8 @@ describe('Financial Calculations', () => {
 #### **Business Logic**
 
 ```typescript
-describe('Journal Entry Validation', () => {
-  it('should validate balanced journal entries', () => {
+describe("Journal Entry Validation", () => {
+  it("should validate balanced journal entries", () => {
     const debits = [1000, 500, 200];
     const credits = [800, 900];
 
@@ -191,14 +191,14 @@ describe('Journal Entry Validation', () => {
 #### **API Endpoints**
 
 ```typescript
-describe('Accounting API', () => {
-  it('should create journal entry via API', async () => {
+describe("Accounting API", () => {
+  it("should create journal entry via API", async () => {
     const response = await request(app)
-      .post('/api/journal-entries')
+      .post("/api/journal-entries")
       .send({
         debits: [1000],
         credits: [1000],
-        description: 'Test entry',
+        description: "Test entry",
       });
 
     expect(response.status).toBe(201);
@@ -210,9 +210,9 @@ describe('Accounting API', () => {
 #### **Database Operations**
 
 ```typescript
-describe('Database Operations', () => {
-  it('should maintain referential integrity', async () => {
-    const account = await createAccount({ name: 'Test Account' });
+describe("Database Operations", () => {
+  it("should maintain referential integrity", async () => {
+    const account = await createAccount({ name: "Test Account" });
     const entry = await createJournalEntry({
       accountId: account.id,
       amount: 1000,
@@ -228,14 +228,14 @@ describe('Database Operations', () => {
 #### **Critical User Workflows**
 
 ```typescript
-describe('Accounting Workflows', () => {
-  it('should complete full accounting cycle', () => {
-    cy.visit('/dashboard');
+describe("Accounting Workflows", () => {
+  it("should complete full accounting cycle", () => {
+    cy.visit("/dashboard");
     cy.get('[data-testid="new-journal-entry"]').click();
-    cy.get('[data-testid="debit-amount"]').type('1000');
-    cy.get('[data-testid="credit-amount"]').type('1000');
+    cy.get('[data-testid="debit-amount"]').type("1000");
+    cy.get('[data-testid="credit-amount"]').type("1000");
     cy.get('[data-testid="save-entry"]').click();
-    cy.get('[data-testid="success-message"]').should('be.visible');
+    cy.get('[data-testid="success-message"]').should("be.visible");
   });
 });
 ```
@@ -268,16 +268,16 @@ pnpm add -D k6 @lhci/cli
 
 ```typescript
 // vitest.config.ts
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./test/setup.ts'],
+    environment: "jsdom",
+    setupFiles: ["./test/setup.ts"],
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
       thresholds: {
         global: {
           branches: 95,
@@ -295,9 +295,9 @@ export default defineConfig({
 
 ```typescript
 // test/setup.ts
-import '@testing-library/jest-dom';
-import { expect } from 'vitest';
-import { accountingMatchers } from './packages/utils/test/financial-testing-utils';
+import "@testing-library/jest-dom";
+import { expect } from "vitest";
+import { accountingMatchers } from "./packages/utils/test/financial-testing-utils";
 
 // Extend expect with custom matchers
 expect.extend(accountingMatchers);
@@ -331,12 +331,12 @@ tests/
 
 ```typescript
 // tests/unit/financial-calculations.test.ts
-import { describe, it, expect } from 'vitest';
-import { FinancialTestUtils } from '../../packages/utils/test/financial-testing-utils';
+import { describe, it, expect } from "vitest";
+import { FinancialTestUtils } from "../../packages/utils/test/financial-testing-utils";
 
-describe('Financial Calculations', () => {
-  describe('Tax Calculations', () => {
-    it('should calculate sales tax correctly', () => {
+describe("Financial Calculations", () => {
+  describe("Tax Calculations", () => {
+    it("should calculate sales tax correctly", () => {
       const taxableAmount = 1000;
       const taxRate = 8.25;
       const expectedTax = 82.5;
@@ -345,8 +345,8 @@ describe('Financial Calculations', () => {
     });
   });
 
-  describe('Depreciation Calculations', () => {
-    it('should calculate straight-line depreciation', () => {
+  describe("Depreciation Calculations", () => {
+    it("should calculate straight-line depreciation", () => {
       const assetCost = 10000;
       const salvageValue = 1000;
       const usefulLife = 5;
@@ -357,7 +357,7 @@ describe('Financial Calculations', () => {
         salvageValue,
         usefulLife,
         expectedDepreciation,
-        'straight-line'
+        "straight-line",
       );
     });
   });
@@ -368,22 +368,22 @@ describe('Financial Calculations', () => {
 
 ```typescript
 // tests/unit/reports.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 import {
   ReportTestUtils,
   ReportTestData,
-} from '../../packages/utils/test/accounting-report-testing';
+} from "../../packages/utils/test/accounting-report-testing";
 
-describe('Financial Reports', () => {
-  describe('Profit & Loss Statement', () => {
-    it('should generate valid P&L data', () => {
+describe("Financial Reports", () => {
+  describe("Profit & Loss Statement", () => {
+    it("should generate valid P&L data", () => {
       const data = ReportTestData.generateProfitAndLossData();
       ReportTestUtils.expectValidProfitAndLoss(data);
     });
   });
 
-  describe('Balance Sheet', () => {
-    it('should generate valid balance sheet data', () => {
+  describe("Balance Sheet", () => {
+    it("should generate valid balance sheet data", () => {
       const data = ReportTestData.generateBalanceSheetData();
       ReportTestUtils.expectValidBalanceSheet(data);
     });
@@ -445,12 +445,12 @@ expect(percentage).toBeValidPercentage();
 
 ```typescript
 // Load testing for report generation
-import { check } from 'k6';
+import { check } from "k6";
 
 export default function () {
-  check(http.get('/api/reports/balance-sheet'), {
-    'response time < 2s': (r) => r.timings.duration < 2000,
-    'status is 200': (r) => r.status === 200,
+  check(http.get("/api/reports/balance-sheet"), {
+    "response time < 2s": r => r.timings.duration < 2000,
+    "status is 200": r => r.status === 200,
   });
 }
 ```

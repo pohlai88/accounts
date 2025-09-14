@@ -52,14 +52,14 @@ import {
   ocrProcessing,
   pdfGeneration,
   dlqHandler,
-} from '@aibos/worker/workflows';
+} from "@aibos/worker/workflows";
 
 // Trigger FX rate ingestion
 await inngest.send({
-  name: 'fx/rates.ingest',
+  name: "fx/rates.ingest",
   data: {
-    currencyPairs: ['USD/MYR', 'EUR/MYR'],
-    source: 'primary',
+    currencyPairs: ["USD/MYR", "EUR/MYR"],
+    source: "primary",
   },
 });
 ```
@@ -207,218 +207,218 @@ pnpm --filter @aibos/worker typecheck
 ### FX Rate Ingestion
 
 ```typescript
-import { fxRateIngestion } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { fxRateIngestion } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger FX rate ingestion
 async function triggerFxRateIngestion() {
   await inngest.send({
-    name: 'fx/rates.ingest',
+    name: "fx/rates.ingest",
     data: {
-      currencyPairs: ['USD/MYR', 'EUR/MYR', 'GBP/MYR'],
-      source: 'primary',
+      currencyPairs: ["USD/MYR", "EUR/MYR", "GBP/MYR"],
+      source: "primary",
     },
   });
 }
 
 // Handle FX rate ingestion result
-fxRateIngestion.onSuccess((result) => {
-  console.log('FX rates ingested successfully:', result);
+fxRateIngestion.onSuccess(result => {
+  console.log("FX rates ingested successfully:", result);
 });
 
-fxRateIngestion.onFailure((error) => {
-  console.error('FX rate ingestion failed:', error);
+fxRateIngestion.onFailure(error => {
+  console.error("FX rate ingestion failed:", error);
 });
 ```
 
 ### Document Approval
 
 ```typescript
-import { documentApproval } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { documentApproval } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger document approval
 async function triggerDocumentApproval(documentId: string, approverId: string) {
   await inngest.send({
-    name: 'document/approval.requested',
+    name: "document/approval.requested",
     data: {
       documentId,
       approverId,
-      documentType: 'invoice',
-      priority: 'high',
+      documentType: "invoice",
+      priority: "high",
     },
   });
 }
 
 // Handle document approval result
-documentApproval.onSuccess((result) => {
-  console.log('Document approved:', result);
+documentApproval.onSuccess(result => {
+  console.log("Document approved:", result);
 });
 
-documentApproval.onFailure((error) => {
-  console.error('Document approval failed:', error);
+documentApproval.onFailure(error => {
+  console.error("Document approval failed:", error);
 });
 ```
 
 ### Email Workflow
 
 ```typescript
-import { emailWorkflow } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { emailWorkflow } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger email workflow
 async function triggerEmailWorkflow(recipient: string, template: string, data: any) {
   await inngest.send({
-    name: 'email/send',
+    name: "email/send",
     data: {
       recipient,
       template,
       data,
-      priority: 'normal',
+      priority: "normal",
     },
   });
 }
 
 // Handle email workflow result
-emailWorkflow.onSuccess((result) => {
-  console.log('Email sent successfully:', result);
+emailWorkflow.onSuccess(result => {
+  console.log("Email sent successfully:", result);
 });
 
-emailWorkflow.onFailure((error) => {
-  console.error('Email sending failed:', error);
+emailWorkflow.onFailure(error => {
+  console.error("Email sending failed:", error);
 });
 ```
 
 ### OCR Processing
 
 ```typescript
-import { ocrProcessing } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { ocrProcessing } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger OCR processing
 async function triggerOcrProcessing(documentId: string, fileUrl: string) {
   await inngest.send({
-    name: 'document/ocr.process',
+    name: "document/ocr.process",
     data: {
       documentId,
       fileUrl,
-      documentType: 'invoice',
-      language: 'en',
+      documentType: "invoice",
+      language: "en",
     },
   });
 }
 
 // Handle OCR processing result
-ocrProcessing.onSuccess((result) => {
-  console.log('OCR processing completed:', result);
+ocrProcessing.onSuccess(result => {
+  console.log("OCR processing completed:", result);
 });
 
-ocrProcessing.onFailure((error) => {
-  console.error('OCR processing failed:', error);
+ocrProcessing.onFailure(error => {
+  console.error("OCR processing failed:", error);
 });
 ```
 
 ### PDF Generation
 
 ```typescript
-import { pdfGeneration } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { pdfGeneration } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger PDF generation
 async function triggerPdfGeneration(documentId: string, template: string, data: any) {
   await inngest.send({
-    name: 'document/pdf.generate',
+    name: "document/pdf.generate",
     data: {
       documentId,
       template,
       data,
-      format: 'A4',
-      orientation: 'portrait',
+      format: "A4",
+      orientation: "portrait",
     },
   });
 }
 
 // Handle PDF generation result
-pdfGeneration.onSuccess((result) => {
-  console.log('PDF generated successfully:', result);
+pdfGeneration.onSuccess(result => {
+  console.log("PDF generated successfully:", result);
 });
 
-pdfGeneration.onFailure((error) => {
-  console.error('PDF generation failed:', error);
+pdfGeneration.onFailure(error => {
+  console.error("PDF generation failed:", error);
 });
 ```
 
 ### Document Retention
 
 ```typescript
-import { documentRetention } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { documentRetention } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger document retention
 async function triggerDocumentRetention(tenantId: string, retentionPolicy: string) {
   await inngest.send({
-    name: 'document/retention.process',
+    name: "document/retention.process",
     data: {
       tenantId,
       retentionPolicy,
-      documentTypes: ['invoice', 'bill', 'receipt'],
-      action: 'archive',
+      documentTypes: ["invoice", "bill", "receipt"],
+      action: "archive",
     },
   });
 }
 
 // Handle document retention result
-documentRetention.onSuccess((result) => {
-  console.log('Document retention completed:', result);
+documentRetention.onSuccess(result => {
+  console.log("Document retention completed:", result);
 });
 
-documentRetention.onFailure((error) => {
-  console.error('Document retention failed:', error);
+documentRetention.onFailure(error => {
+  console.error("Document retention failed:", error);
 });
 ```
 
 ### Invoice Approval
 
 ```typescript
-import { invoiceApproved } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { invoiceApproved } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Trigger invoice approval
 async function triggerInvoiceApproval(invoiceId: string, approverId: string) {
   await inngest.send({
-    name: 'invoice/approved',
+    name: "invoice/approved",
     data: {
       invoiceId,
       approverId,
-      approvalLevel: 'manager',
-      comments: 'Approved for payment',
+      approvalLevel: "manager",
+      comments: "Approved for payment",
     },
   });
 }
 
 // Handle invoice approval result
-invoiceApproved.onSuccess((result) => {
-  console.log('Invoice approval processed:', result);
+invoiceApproved.onSuccess(result => {
+  console.log("Invoice approval processed:", result);
 });
 
-invoiceApproved.onFailure((error) => {
-  console.error('Invoice approval failed:', error);
+invoiceApproved.onFailure(error => {
+  console.error("Invoice approval failed:", error);
 });
 ```
 
 ### Dead Letter Queue Handler
 
 ```typescript
-import { dlqHandler } from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+import { dlqHandler } from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // DLQ handler automatically processes failed workflows
-dlqHandler.onFailure((error) => {
-  console.error('DLQ handler failed:', error);
+dlqHandler.onFailure(error => {
+  console.error("DLQ handler failed:", error);
   // Send alert to monitoring system
   sendAlert({
-    type: 'workflow_failure',
-    message: 'DLQ handler failed',
+    type: "workflow_failure",
+    message: "DLQ handler failed",
     error: error.message,
   });
 });
@@ -431,7 +431,7 @@ async function processDLQ() {
     try {
       await dlqHandler.process(workflow);
     } catch (error) {
-      console.error('Failed to process DLQ item:', error);
+      console.error("Failed to process DLQ item:", error);
     }
   }
 }
@@ -445,45 +445,45 @@ import {
   documentApproval,
   emailWorkflow,
   pdfGeneration,
-} from '@aibos/worker/workflows';
-import { inngest } from '@aibos/worker/inngestClient';
+} from "@aibos/worker/workflows";
+import { inngest } from "@aibos/worker/inngestClient";
 
 // Complex workflow orchestration
 async function processInvoiceWorkflow(invoiceId: string) {
   try {
     // Step 1: Generate PDF
     await inngest.send({
-      name: 'document/pdf.generate',
+      name: "document/pdf.generate",
       data: {
         documentId: invoiceId,
-        template: 'invoice',
+        template: "invoice",
         data: { invoiceId },
       },
     });
 
     // Step 2: Send for approval
     await inngest.send({
-      name: 'document/approval.requested',
+      name: "document/approval.requested",
       data: {
         documentId: invoiceId,
-        approverId: 'manager-123',
-        documentType: 'invoice',
+        approverId: "manager-123",
+        documentType: "invoice",
       },
     });
 
     // Step 3: Send email notification
     await inngest.send({
-      name: 'email/send',
+      name: "email/send",
       data: {
-        recipient: 'manager@company.com',
-        template: 'invoice-approval',
+        recipient: "manager@company.com",
+        template: "invoice-approval",
         data: { invoiceId },
       },
     });
 
-    console.log('Invoice workflow triggered successfully');
+    console.log("Invoice workflow triggered successfully");
   } catch (error) {
-    console.error('Failed to trigger invoice workflow:', error);
+    console.error("Failed to trigger invoice workflow:", error);
     throw error;
   }
 }
@@ -493,16 +493,16 @@ function setupWorkflowMonitoring() {
   // Monitor all workflows
   const workflows = [fxRateIngestion, documentApproval, emailWorkflow, pdfGeneration];
 
-  workflows.forEach((workflow) => {
-    workflow.onSuccess((result) => {
+  workflows.forEach(workflow => {
+    workflow.onSuccess(result => {
       console.log(`Workflow ${workflow.id} succeeded:`, result);
     });
 
-    workflow.onFailure((error) => {
+    workflow.onFailure(error => {
       console.error(`Workflow ${workflow.id} failed:`, error);
       // Send alert
       sendAlert({
-        type: 'workflow_failure',
+        type: "workflow_failure",
         workflow: workflow.id,
         error: error.message,
       });
@@ -524,7 +524,7 @@ function setupWorkflowMonitoring() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_WORKFLOWS = 'true';
+process.env.DEBUG_WORKFLOWS = "true";
 ```
 
 **Logs**: Check Inngest dashboard and application logs

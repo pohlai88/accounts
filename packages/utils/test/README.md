@@ -224,7 +224,7 @@ const mockSupabase = {
 
 ```typescript
 // Mock file operations
-vi.mock('fs', () => ({
+vi.mock("fs", () => ({
   readFileSync: vi.fn(),
   writeFileSync: vi.fn(),
   existsSync: vi.fn(),
@@ -235,10 +235,10 @@ vi.mock('fs', () => ({
 
 ```typescript
 // Mock consistent hashing
-vi.mock('crypto', () => ({
+vi.mock("crypto", () => ({
   createHash: vi.fn().mockReturnValue({
     update: vi.fn().mockReturnThis(),
-    digest: vi.fn().mockReturnValue('mock-hash-123'),
+    digest: vi.fn().mockReturnValue("mock-hash-123"),
   }),
 }));
 ```
@@ -248,18 +248,18 @@ vi.mock('crypto', () => ({
 ### Mock File Creation
 
 ```typescript
-const mockFile = createMockFile('test.pdf', 'application/pdf', 'content');
+const mockFile = createMockFile("test.pdf", "application/pdf", "content");
 const mockBuffer = createMockBuffer(1024);
-const mockFormData = createMockFormData(mockFile, { category: 'invoice' });
+const mockFormData = createMockFormData(mockFile, { category: "invoice" });
 ```
 
 ### Mock Request Creation
 
 ```typescript
 const mockRequest = createMockRequest({
-  method: 'POST',
-  url: 'https://api.example.com/upload',
-  headers: { authorization: 'Bearer token' },
+  method: "POST",
+  url: "https://api.example.com/upload",
+  headers: { authorization: "Bearer token" },
   body: mockFormData,
 });
 ```
@@ -303,19 +303,19 @@ it('should handle memory efficiently', async () => {
 ### Network Errors
 
 ```typescript
-const networkError = simulateError('network', 'Connection timeout');
+const networkError = simulateError("network", "Connection timeout");
 ```
 
 ### Storage Errors
 
 ```typescript
-const storageError = simulateError('storage', 'Quota exceeded');
+const storageError = simulateError("storage", "Quota exceeded");
 ```
 
 ### Database Errors
 
 ```typescript
-const dbError = simulateError('database', 'Constraint violation');
+const dbError = simulateError("database", "Constraint violation");
 ```
 
 ## Coverage Reports

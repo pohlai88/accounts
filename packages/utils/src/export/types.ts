@@ -1,9 +1,9 @@
 // Export system types for V1 compliance
 
 export enum ExportFormat {
-  CSV = 'csv',
-  XLSX = 'xlsx',
-  JSONL = 'jsonl'
+  CSV = "csv",
+  XLSX = "xlsx",
+  JSONL = "jsonl",
 }
 
 export interface ExportOptions {
@@ -35,8 +35,8 @@ export interface ExcelCellStyle {
     bgColor?: { rgb: string };
   };
   alignment?: {
-    horizontal?: 'left' | 'center' | 'right';
-    vertical?: 'top' | 'center' | 'bottom';
+    horizontal?: "left" | "center" | "right";
+    vertical?: "top" | "center" | "bottom";
   };
   border?: {
     top?: { style: string; color?: { rgb: string } };
@@ -47,7 +47,7 @@ export interface ExcelCellStyle {
 }
 
 export interface ChartConfig {
-  type: 'bar' | 'line' | 'pie' | 'column';
+  type: "bar" | "line" | "pie" | "column";
   title: string;
   dataRange: string;
   position: {
@@ -77,7 +77,7 @@ export interface ExportableData {
 }
 
 export interface ReportExportRequest {
-  reportType: 'trial-balance' | 'balance-sheet' | 'profit-loss' | 'cash-flow';
+  reportType: "trial-balance" | "balance-sheet" | "profit-loss" | "cash-flow";
   format: ExportFormat;
   filters: {
     tenantId: string;

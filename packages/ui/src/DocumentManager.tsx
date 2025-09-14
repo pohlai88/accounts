@@ -60,7 +60,7 @@ interface DocumentManagerState {
   selectedStatus: string;
   selectedTags: string[];
   sortBy: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
   selectedDocuments: Set<string>;
   previewDocument: DocumentItem | null;
   showPreview: boolean;
@@ -77,18 +77,18 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
   showFilters = true,
   showUpload = true,
   showPreview = true,
-  className
+  className,
 }) => {
   const [state, setState] = React.useState<DocumentManagerState>({
-    searchQuery: '',
-    selectedCategory: 'all',
-    selectedStatus: 'all',
+    searchQuery: "",
+    selectedCategory: "all",
+    selectedStatus: "all",
     selectedTags: [],
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
+    sortBy: "createdAt",
+    sortOrder: "desc",
     selectedDocuments: new Set(),
     previewDocument: null,
-    showPreview: false
+    showPreview: false,
   });
 
   // Filter and sort documents
@@ -97,19 +97,21 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
       // Search filter
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase();
-        if (!doc.filename.toLowerCase().includes(query) &&
-          !doc.originalFilename.toLowerCase().includes(query)) {
+        if (
+          !doc.filename.toLowerCase().includes(query) &&
+          !doc.originalFilename.toLowerCase().includes(query)
+        ) {
           return false;
         }
       }
 
       // Category filter
-      if (state.selectedCategory !== 'all' && doc.category !== state.selectedCategory) {
+      if (state.selectedCategory !== "all" && doc.category !== state.selectedCategory) {
         return false;
       }
 
       // Status filter
-      if (state.selectedStatus !== 'all' && doc.status !== state.selectedStatus) {
+      if (state.selectedStatus !== "all" && doc.status !== state.selectedStatus) {
         return false;
       }
 
@@ -127,12 +129,12 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
       let aValue: any = a[state.sortBy as keyof DocumentItem];
       let bValue: any = b[state.sortBy as keyof DocumentItem];
 
-      if (typeof aValue === 'string') {
+      if (typeof aValue === "string") {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
 
-      if (state.sortOrder === 'asc') {
+      if (state.sortOrder === "asc") {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       } else {
         return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
@@ -199,33 +201,37 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
   const handleSelectAll = () => {
     setState(prev => ({
       ...prev,
-      selectedDocuments: prev.selectedDocuments.size === filteredDocuments.length
-        ? new Set()
-        : new Set(filteredDocuments.map(doc => doc.id))
+      selectedDocuments:
+        prev.selectedDocuments.size === filteredDocuments.length
+          ? new Set()
+          : new Set(filteredDocuments.map(doc => doc.id)),
     }));
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const getStatusBadge = (status: string) => {
     const statusClasses = {
-      'active': 'bg-[var(--sys-status-success)] text-white',
-      'pending': 'bg-[var(--sys-status-warning)] text-white',
-      'rejected': 'bg-[var(--sys-status-error)] text-white',
-      'archived': 'bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]'
+      active: "bg-[var(--sys-status-success)] text-white",
+      pending: "bg-[var(--sys-status-warning)] text-white",
+      rejected: "bg-[var(--sys-status-error)] text-white",
+      archived: "bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]",
     };
 
     return (
-      <span className={cn(
-        "px-2 py-1 text-xs font-medium rounded-full",
-        statusClasses[status as keyof typeof statusClasses] || "bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]"
-      )}>
+      <span
+        className={cn(
+          "px-2 py-1 text-xs font-medium rounded-full",
+          statusClasses[status as keyof typeof statusClasses] ||
+            "bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]",
+        )}
+      >
         {status}
       </span>
     );
@@ -244,7 +250,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
               type="text"
               placeholder="Search documents..."
               value={state.searchQuery}
-              onChange={(e) => setState(prev => ({ ...prev, searchQuery: e.target.value }))}
+              onChange={e => setState(prev => ({ ...prev, searchQuery: e.target.value }))}
               className="w-full px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Search documents"
             />
@@ -256,31 +262,35 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
           <div className="flex flex-wrap gap-4">
             <select
               value={state.selectedCategory}
-              onChange={(e) => setState(prev => ({ ...prev, selectedCategory: e.target.value }))}
+              onChange={e => setState(prev => ({ ...prev, selectedCategory: e.target.value }))}
               className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Filter by category"
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
 
             <select
               value={state.selectedStatus}
-              onChange={(e) => setState(prev => ({ ...prev, selectedStatus: e.target.value }))}
+              onChange={e => setState(prev => ({ ...prev, selectedStatus: e.target.value }))}
               className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Filter by status"
             >
               <option value="all">All Statuses</option>
               {statuses.map(status => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status}>
+                  {status}
+                </option>
               ))}
             </select>
 
             <select
               value={state.sortBy}
-              onChange={(e) => setState(prev => ({ ...prev, sortBy: e.target.value }))}
+              onChange={e => setState(prev => ({ ...prev, sortBy: e.target.value }))}
               className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
               aria-label="Sort by"
             >
@@ -291,11 +301,16 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             </select>
 
             <button
-              onClick={() => setState(prev => ({ ...prev, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' }))}
+              onClick={() =>
+                setState(prev => ({
+                  ...prev,
+                  sortOrder: prev.sortOrder === "asc" ? "desc" : "asc",
+                }))
+              }
               className="px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)]"
-              aria-label={`Sort ${state.sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+              aria-label={`Sort ${state.sortOrder === "asc" ? "descending" : "ascending"}`}
             >
-              {state.sortOrder === 'asc' ? '↑' : '↓'}
+              {state.sortOrder === "asc" ? "↑" : "↓"}
             </button>
           </div>
         )}
@@ -313,10 +328,9 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             No documents found
           </div>
           <div className="text-sm text-[var(--sys-text-secondary)]">
-            {state.searchQuery || state.selectedCategory !== 'all' || state.selectedStatus !== 'all'
-              ? 'Try adjusting your search or filters'
-              : 'Upload your first document to get started'
-            }
+            {state.searchQuery || state.selectedCategory !== "all" || state.selectedStatus !== "all"
+              ? "Try adjusting your search or filters"
+              : "Upload your first document to get started"}
           </div>
         </div>
       );
@@ -330,13 +344,16 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
             <div className="flex items-center gap-4">
               <input
                 type="checkbox"
-                checked={state.selectedDocuments.size === filteredDocuments.length && filteredDocuments.length > 0}
+                checked={
+                  state.selectedDocuments.size === filteredDocuments.length &&
+                  filteredDocuments.length > 0
+                }
                 onChange={handleSelectAll}
                 className="h-4 w-4 text-[var(--sys-accent)] border-[var(--sys-border-hairline)] rounded focus:ring-[var(--sys-accent)]"
                 aria-label="Select all documents"
               />
               <span className="text-sm font-medium text-[var(--sys-text-primary)]">
-                {filteredDocuments.length} document{filteredDocuments.length !== 1 ? 's' : ''}
+                {filteredDocuments.length} document{filteredDocuments.length !== 1 ? "s" : ""}
               </span>
             </div>
             {state.selectedDocuments.size > 0 && (
@@ -360,7 +377,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
         </div>
 
         {/* Document items */}
-        {filteredDocuments.map((document) => (
+        {filteredDocuments.map(document => (
           <div key={document.id} className="px-4 py-3 hover:bg-[var(--sys-bg-subtle)]">
             <div className="flex items-center gap-4">
               <input
@@ -387,7 +404,10 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
                   {document.tags.length > 0 && (
                     <div className="flex gap-1">
                       {document.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="px-2 py-1 bg-[var(--sys-bg-subtle)] rounded text-xs">
+                        <span
+                          key={tag}
+                          className="px-2 py-1 bg-[var(--sys-bg-subtle)] rounded text-xs"
+                        >
                           {tag}
                         </span>
                       ))}
@@ -432,13 +452,16 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
   };
 
   return (
-    <div className={cn("bg-[var(--sys-bg-primary)] border border-[var(--sys-border-hairline)] rounded-lg", className)}>
+    <div
+      className={cn(
+        "bg-[var(--sys-bg-primary)] border border-[var(--sys-border-hairline)] rounded-lg",
+        className,
+      )}
+    >
       {/* Header */}
       <div className="px-4 py-3 border-b border-[var(--sys-border-hairline)]">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-[var(--sys-text-primary)]">
-            Document Manager
-          </h2>
+          <h2 className="text-lg font-semibold text-[var(--sys-text-primary)]">Document Manager</h2>
           {showUpload && (
             <FileUpload
               onUpload={handleUpload}

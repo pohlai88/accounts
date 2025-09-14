@@ -66,7 +66,7 @@ export type SecurityContext = {
 
 ```typescript
 // packages/security/src/auth.ts
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { jwtVerify, createRemoteJWKSet } from "jose";
 
 const JWKS_URL = process.env.SUPABASE_JWKS_URL!;
 const ISSUER = process.env.SUPABASE_ISSUER!;
@@ -75,8 +75,8 @@ const AUDIENCE = process.env.SUPABASE_AUDIENCE!;
 const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
 
 export async function verifyAccessToken(authorization?: string) {
-  if (!authorization?.startsWith('Bearer ')) {
-    throw new Error('Missing token');
+  if (!authorization?.startsWith("Bearer ")) {
+    throw new Error("Missing token");
   }
 
   const token = authorization.slice(7);
@@ -90,13 +90,13 @@ export async function verifyAccessToken(authorization?: string) {
 
 export function buildSecurityContext(
   payload: Record<string, any>,
-  requestId: string
+  requestId: string,
 ): SecurityContext {
   return {
     userId: String(payload.sub),
-    email: String(payload.email ?? ''),
-    tenantId: String(payload['tenant_id'] ?? payload['tenantId'] ?? ''),
-    scopes: Array.isArray(payload['scp']) ? (payload['scp'] as string[]) : [],
+    email: String(payload.email ?? ""),
+    tenantId: String(payload["tenant_id"] ?? payload["tenantId"] ?? ""),
+    scopes: Array.isArray(payload["scp"]) ? (payload["scp"] as string[]) : [],
     requestId,
   };
 }
@@ -106,14 +106,14 @@ export function buildSecurityContext(
 
 ```typescript
 // apps/web-api/app/api/_lib/request.ts
-import { randomUUID } from 'crypto';
-import { NextRequest } from 'next/server';
-import { verifyAccessToken, buildSecurityContext } from '@aibos/security/auth';
-import type { SecurityContext } from '@aibos/security/auth';
+import { randomUUID } from "crypto";
+import { NextRequest } from "next/server";
+import { verifyAccessToken, buildSecurityContext } from "@aibos/security/auth";
+import type { SecurityContext } from "@aibos/security/auth";
 
 export async function getSecurityContext(req: NextRequest): Promise<SecurityContext> {
-  const requestId = req.headers.get('x-request-id') ?? randomUUID();
-  const authz = req.headers.get('authorization') ?? '';
+  const requestId = req.headers.get("x-request-id") ?? randomUUID();
+  const authz = req.headers.get("authorization") ?? "";
   const claims = await verifyAccessToken(authz);
   return buildSecurityContext(claims, requestId);
 }
@@ -127,13 +127,13 @@ export async function getSecurityContext(req: NextRequest): Promise<SecurityCont
 
 ```typescript
 // packages/security/src/rate-limit.ts
-import { redis } from '@aibos/cache/redis';
+import { redis } from "@aibos/cache/redis";
 
 export async function assertRateLimit(
   tenantId: string,
   route: string,
   limit = 300,
-  windowSec = 60
+  windowSec = 60,
 ) {
   const now = Date.now();
   const key = `rl:${tenantId}:${route}`;
@@ -148,9 +148,9 @@ export async function assertRateLimit(
   const count = Number(countRes);
 
   if (count > limit) {
-    const err: any = new Error('Too Many Requests');
+    const err: any = new Error("Too Many Requests");
     err.status = 429;
-    err.headers = { 'Retry-After': '5' };
+    err.headers = { "Retry-After": "5" };
     throw err;
   }
 }
@@ -161,10 +161,10 @@ export async function assertRateLimit(
 ```typescript
 // Rate limits per tenant + route
 const RATE_LIMITS = {
-  '/api/auth/login': { limit: 10, window: 60 }, // 10 requests per minute
-  '/api/rules': { limit: 300, window: 60 }, // 300 requests per minute
-  '/api/journals': { limit: 200, window: 60 }, // 200 requests per minute
-  '/api/invoices': { limit: 150, window: 60 }, // 150 requests per minute
+  "/api/auth/login": { limit: 10, window: 60 }, // 10 requests per minute
+  "/api/rules": { limit: 300, window: 60 }, // 300 requests per minute
+  "/api/journals": { limit: 200, window: 60 }, // 200 requests per minute
+  "/api/invoices": { limit: 150, window: 60 }, // 150 requests per minute
 };
 ```
 
@@ -176,7 +176,7 @@ const RATE_LIMITS = {
 
 ```typescript
 // packages/cache/src/redis.ts
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 
 export const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -192,7 +192,7 @@ export function multi() {
 
 ```typescript
 // packages/cache/src/cache.ts
-import { redis } from './redis';
+import { redis } from "./redis";
 
 export const cacheKey = (tenant: string, route: string, query?: Record<string, unknown>) =>
   `cache:${tenant}:${route}:${JSON.stringify(query ?? {})}`;
@@ -219,10 +219,10 @@ export async function cacheInvalidate(pattern: string) {
 ```typescript
 // Cache TTL per endpoint type
 const CACHE_TTL = {
-  'GET /api/rules': 300, // 5 minutes
-  'GET /api/journals': 180, // 3 minutes
-  'GET /api/invoices': 600, // 10 minutes
-  'GET /api/users': 900, // 15 minutes
+  "GET /api/rules": 300, // 5 minutes
+  "GET /api/journals": 180, // 3 minutes
+  "GET /api/invoices": 600, // 10 minutes
+  "GET /api/users": 900, // 15 minutes
 };
 ```
 
@@ -234,14 +234,14 @@ const CACHE_TTL = {
 
 ```typescript
 // packages/cache/src/idempotency.ts
-import { redis } from './redis';
+import { redis } from "./redis";
 
 export async function withIdempotency<T>(
   key: string,
   tenantId: string,
   route: string,
   compute: () => Promise<T>,
-  ttlSec = 3600
+  ttlSec = 3600,
 ): Promise<T> {
   const slot = `idem:${tenantId}:${route}:${key}`;
   const hit = await redis.get<string>(slot);
@@ -275,9 +275,9 @@ export function validateIdempotencyKey(key: string): boolean {
 
 ```typescript
 // apps/web-api/app/api/health/route.ts
-import { NextResponse } from 'next/server';
-import { redis } from '@aibos/cache/redis';
-import { sql } from '@aibos/db';
+import { NextResponse } from "next/server";
+import { redis } from "@aibos/cache/redis";
+import { sql } from "@aibos/db";
 
 export async function GET() {
   const start = Date.now();
@@ -286,35 +286,35 @@ export async function GET() {
   // Database check
   try {
     await sql`SELECT 1`;
-    checks.database = 'ok';
+    checks.database = "ok";
   } catch (error) {
-    checks.database = 'fail';
+    checks.database = "fail";
   }
 
   // Redis check
   try {
     await redis.ping();
-    checks.redis = 'ok';
+    checks.redis = "ok";
   } catch (error) {
-    checks.redis = 'fail';
+    checks.redis = "fail";
   }
 
   // Application check
-  checks.application = 'ok';
+  checks.application = "ok";
 
   const latency = Date.now() - start;
-  const allOk = Object.values(checks).every((v) => v === 'ok');
+  const allOk = Object.values(checks).every(v => v === "ok");
   const status = allOk ? 200 : 503;
 
   return NextResponse.json(
     {
-      status: allOk ? 'ok' : 'degraded',
+      status: allOk ? "ok" : "degraded",
       checks,
       latency,
-      version: process.env.APP_VERSION ?? 'unknown',
+      version: process.env.APP_VERSION ?? "unknown",
       timestamp: new Date().toISOString(),
     },
-    { status }
+    { status },
   );
 }
 ```
@@ -323,11 +323,11 @@ export async function GET() {
 
 ```typescript
 interface HealthResponse {
-  status: 'ok' | 'degraded' | 'fail';
+  status: "ok" | "degraded" | "fail";
   checks: {
-    database: 'ok' | 'fail';
-    redis: 'ok' | 'fail';
-    application: 'ok' | 'fail';
+    database: "ok" | "fail";
+    redis: "ok" | "fail";
+    application: "ok" | "fail";
   };
   latency: number;
   version: string;
@@ -343,13 +343,13 @@ interface HealthResponse {
 
 ```typescript
 // packages/api-gateway/src/gateway.ts
-import type { ApiResponse } from '@aibos/contracts/types/api';
-import { isSuccess } from '@aibos/contracts/types/api';
-import type { SecurityContext } from '@aibos/security/auth';
-import { assertRateLimit } from '@aibos/security/rate-limit';
-import { cacheGet, cacheKey, cacheSet } from '@aibos/cache/cache';
+import type { ApiResponse } from "@aibos/contracts/types/api";
+import { isSuccess } from "@aibos/contracts/types/api";
+import type { SecurityContext } from "@aibos/security/auth";
+import { assertRateLimit } from "@aibos/security/rate-limit";
+import { cacheGet, cacheKey, cacheSet } from "@aibos/cache/cache";
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface RequestOptions {
   token?: string;
@@ -366,35 +366,35 @@ export class ApiGateway {
     private readonly cache: {
       get<T>(k: string): Promise<T | null>;
       set(k: string, v: any, ttl?: number): Promise<void>;
-    }
+    },
   ) {}
 
   async handleRequest<T>(
     route: string,
     method: HttpMethod,
     body?: unknown,
-    opts: RequestOptions = {}
+    opts: RequestOptions = {},
   ): Promise<ApiResponse<T>> {
     // 1. Rate limiting
     await assertRateLimit(opts.tenantId!, route);
 
     // 2. GET caching
-    if (method === 'GET') {
+    if (method === "GET") {
       const key = cacheKey(opts.tenantId!, route, opts.query);
       const cached = await cacheGet<ApiResponse<T>>(key);
       if (cached) return cached;
     }
 
     // 3. Idempotency for mutations
-    if (method !== 'GET' && !opts.idempotencyKey) {
-      return this.createErrorResponse('IDEMPOTENCY_REQUIRED', 400, opts.requestId!);
+    if (method !== "GET" && !opts.idempotencyKey) {
+      return this.createErrorResponse("IDEMPOTENCY_REQUIRED", 400, opts.requestId!);
     }
 
     // 4. Execute request
     const result = await this.dispatch<T>(route, method, body, opts);
 
     // 5. Cache successful GETs
-    if (method === 'GET' && isSuccess(result)) {
+    if (method === "GET" && isSuccess(result)) {
       const key = cacheKey(opts.tenantId!, route, opts.query);
       await cacheSet(key, result, 60);
     }
@@ -454,7 +454,7 @@ export function ok<T>(data: T, requestId: string, status = 200) {
       timestamp: new Date().toISOString(),
       requestId,
     },
-    { status }
+    { status },
   );
 }
 
@@ -477,14 +477,14 @@ export function problem({
       timestamp: new Date().toISOString(),
       requestId,
       error: {
-        type: 'about:blank',
+        type: "about:blank",
         title,
         status,
         code,
         detail,
       },
     },
-    { status }
+    { status },
   );
 }
 ```
@@ -535,39 +535,39 @@ CREATE INDEX idx_users_company_id ON users(company_id);
 
 ```typescript
 // packages/security/src/__tests__/auth.test.ts
-import { describe, it, expect, vi } from 'vitest';
-import { verifyAccessToken, buildSecurityContext } from '../auth';
+import { describe, it, expect, vi } from "vitest";
+import { verifyAccessToken, buildSecurityContext } from "../auth";
 
-describe('Authentication', () => {
-  it('should verify valid JWT token', async () => {
+describe("Authentication", () => {
+  it("should verify valid JWT token", async () => {
     const mockPayload = {
-      sub: 'user123',
-      email: 'test@example.com',
-      tenant_id: 'tenant123',
-      scp: ['read', 'write'],
+      sub: "user123",
+      email: "test@example.com",
+      tenant_id: "tenant123",
+      scp: ["read", "write"],
     };
 
     vi.mocked(jwtVerify).mockResolvedValue({ payload: mockPayload });
 
-    const result = await verifyAccessToken('Bearer valid-token');
+    const result = await verifyAccessToken("Bearer valid-token");
     expect(result).toEqual(mockPayload);
   });
 
-  it('should build security context correctly', () => {
+  it("should build security context correctly", () => {
     const payload = {
-      sub: 'user123',
-      email: 'test@example.com',
-      tenant_id: 'tenant123',
-      scp: ['read', 'write'],
+      sub: "user123",
+      email: "test@example.com",
+      tenant_id: "tenant123",
+      scp: ["read", "write"],
     };
 
-    const context = buildSecurityContext(payload, 'req123');
+    const context = buildSecurityContext(payload, "req123");
     expect(context).toEqual({
-      userId: 'user123',
-      email: 'test@example.com',
-      tenantId: 'tenant123',
-      scopes: ['read', 'write'],
-      requestId: 'req123',
+      userId: "user123",
+      email: "test@example.com",
+      tenantId: "tenant123",
+      scopes: ["read", "write"],
+      requestId: "req123",
     });
   });
 });
@@ -577,15 +577,15 @@ describe('Authentication', () => {
 
 ```typescript
 // apps/web-api/app/api/__tests__/rules.test.ts
-import { describe, it, expect } from 'vitest';
-import { GET, POST } from '../rules/route';
+import { describe, it, expect } from "vitest";
+import { GET, POST } from "../rules/route";
 
-describe('Rules API', () => {
-  it('should return rules for authenticated user', async () => {
-    const request = new Request('http://localhost/api/rules', {
+describe("Rules API", () => {
+  it("should return rules for authenticated user", async () => {
+    const request = new Request("http://localhost/api/rules", {
       headers: {
-        Authorization: 'Bearer valid-token',
-        'X-Request-ID': 'test-123',
+        Authorization: "Bearer valid-token",
+        "X-Request-ID": "test-123",
       },
     });
 
@@ -613,10 +613,10 @@ export class MetricsCollector {
     method: string,
     statusCode: number,
     duration: number,
-    tenantId: string
+    tenantId: string,
   ) {
     // Record to Axiom
-    this.axiomClient.ingest('api-metrics', {
+    this.axiomClient.ingest("api-metrics", {
       endpoint,
       method,
       statusCode,
@@ -627,7 +627,7 @@ export class MetricsCollector {
   }
 
   recordCacheHit(key: string, tenantId: string) {
-    this.axiomClient.ingest('cache-metrics', {
+    this.axiomClient.ingest("cache-metrics", {
       key,
       tenantId,
       hit: true,
@@ -645,7 +645,7 @@ export class PerformanceMonitor {
   async measureAPICall<T>(
     operation: () => Promise<T>,
     endpoint: string,
-    tenantId: string
+    tenantId: string,
   ): Promise<T> {
     const start = Date.now();
 
@@ -653,11 +653,11 @@ export class PerformanceMonitor {
       const result = await operation();
       const duration = Date.now() - start;
 
-      this.metrics.recordAPICall(endpoint, 'GET', 200, duration, tenantId);
+      this.metrics.recordAPICall(endpoint, "GET", 200, duration, tenantId);
       return result;
     } catch (error) {
       const duration = Date.now() - start;
-      this.metrics.recordAPICall(endpoint, 'GET', 500, duration, tenantId);
+      this.metrics.recordAPICall(endpoint, "GET", 500, duration, tenantId);
       throw error;
     }
   }
@@ -720,7 +720,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
       - run: pnpm install
       - run: pnpm test
       - run: pnpm lint

@@ -148,9 +148,9 @@
 
 ```typescript
 // Test environment setup
-process.env.NODE_ENV = 'test';
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321';
-process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:54322/postgres';
+process.env.NODE_ENV = "test";
+process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
+process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:54322/postgres";
 
 // Global mocks
 global.fetch = vi.fn();
@@ -383,18 +383,18 @@ pnpm test:all
 ```typescript
 // Tenant factory
 export const createMockTenant = () => ({
-  id: 'test-tenant-id',
-  name: 'Test Tenant',
+  id: "test-tenant-id",
+  name: "Test Tenant",
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 });
 
 // Company factory
 export const createMockCompany = () => ({
-  id: 'test-company-id',
-  tenant_id: 'test-tenant-id',
-  name: 'Test Company',
-  currency: 'MYR',
+  id: "test-company-id",
+  tenant_id: "test-tenant-id",
+  name: "Test Company",
+  currency: "MYR",
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 });

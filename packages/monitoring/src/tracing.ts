@@ -1,5 +1,5 @@
-import { EventEmitter } from 'events';
-import { randomBytes } from 'crypto';
+import { EventEmitter } from "events";
+import { randomBytes } from "crypto";
 
 export interface TraceConfig {
   enableTracing: boolean;
@@ -19,11 +19,11 @@ export interface TraceSpan {
   traceId: string;
   parentId?: string;
   name: string;
-  kind: 'client' | 'server' | 'producer' | 'consumer' | 'internal';
+  kind: "client" | "server" | "producer" | "consumer" | "internal";
   startTime: number;
   endTime?: number;
   duration?: number;
-  status: 'ok' | 'error' | 'unset';
+  status: "ok" | "error" | "unset";
   attributes: Record<string, string | number | boolean>;
   events: TraceEvent[];
   links: TraceLink[];
@@ -64,7 +64,7 @@ export interface TraceData {
   serviceName: string;
   tenantId?: string;
   userId?: string;
-  status: 'ok' | 'error' | 'partial';
+  status: "ok" | "error" | "partial";
   attributes: Record<string, string | number | boolean>;
 }
 
@@ -86,7 +86,7 @@ export class TracingManager extends EventEmitter {
       enableW3CTraceContext: true,
       enableJaeger: false,
       enableZipkin: false,
-      ...config
+      ...config,
     };
 
     this.startCleanup();
@@ -97,11 +97,11 @@ export class TracingManager extends EventEmitter {
    */
   startSpan(
     name: string,
-    kind: TraceSpan['kind'] = 'internal',
+    kind: TraceSpan["kind"] = "internal",
     parentContext?: TraceContext,
     attributes: Record<string, string | number | boolean> = {},
     tenantId?: string,
-    userId?: string
+    userId?: string,
   ): TraceSpan {
     if (!this.config.enableTracing) {
       return this.createDummySpan(name, kind);
@@ -123,11 +123,11 @@ export class TracingManager extends EventEmitter {
       name,
       kind,
       startTime: now,
-      status: 'unset',
+      status: "unset",
       attributes: {
-        'service.name': this.getServiceName(),
-        'service.version': this.getServiceVersion(),
-        ...attributes
+        "service.name": this.getServiceName(),
+        "service.version": this.getServiceVersion(),
+        ...attributes,
       },
       events: [],
       links: [],
@@ -135,11 +135,11 @@ export class TracingManager extends EventEmitter {
       userId,
       serviceName: this.getServiceName(),
       serviceVersion: this.getServiceVersion(),
-      resource: this.getResourceAttributes()
+      resource: this.getResourceAttributes(),
     };
 
     this.activeSpans.set(spanId, span);
-    this.emit('spanStarted', span);
+    this.emit("spanStarted", span);
 
     return span;
   }
@@ -149,9 +149,9 @@ export class TracingManager extends EventEmitter {
    */
   endSpan(
     spanId: string,
-    status: TraceSpan['status'] = 'ok',
+    status: TraceSpan["status"] = "ok",
     attributes: Record<string, string | number | boolean> = {},
-    events: TraceEvent[] = []
+    events: TraceEvent[] = [],
   ): TraceSpan | null {
     const span = this.activeSpans.get(spanId);
     if (!span) {
@@ -167,7 +167,7 @@ export class TracingManager extends EventEmitter {
     span.events = [...span.events, ...events];
 
     this.activeSpans.delete(spanId);
-    this.emit('spanEnded', span);
+    this.emit("spanEnded", span);
 
     // Check if this completes a trace
     this.checkTraceCompletion(span);
@@ -181,7 +181,7 @@ export class TracingManager extends EventEmitter {
   addSpanEvent(
     spanId: string,
     name: string,
-    attributes: Record<string, string | number | boolean> = {}
+    attributes: Record<string, string | number | boolean> = {},
   ): boolean {
     const span = this.activeSpans.get(spanId);
     if (!span) return false;
@@ -189,11 +189,11 @@ export class TracingManager extends EventEmitter {
     const event: TraceEvent = {
       name,
       timestamp: Date.now(),
-      attributes
+      attributes,
     };
 
     span.events.push(event);
-    this.emit('spanEvent', { spanId, event });
+    this.emit("spanEvent", { spanId, event });
 
     return true;
   }
@@ -203,13 +203,13 @@ export class TracingManager extends EventEmitter {
    */
   addSpanAttributes(
     spanId: string,
-    attributes: Record<string, string | number | boolean>
+    attributes: Record<string, string | number | boolean>,
   ): boolean {
     const span = this.activeSpans.get(spanId);
     if (!span) return false;
 
     span.attributes = { ...span.attributes, ...attributes };
-    this.emit('spanAttributes', { spanId, attributes });
+    this.emit("spanAttributes", { spanId, attributes });
 
     return true;
   }
@@ -221,7 +221,7 @@ export class TracingManager extends EventEmitter {
     spanId: string,
     traceId: string,
     linkedSpanId: string,
-    attributes: Record<string, string | number | boolean> = {}
+    attributes: Record<string, string | number | boolean> = {},
   ): boolean {
     const span = this.activeSpans.get(spanId);
     if (!span) return false;
@@ -229,11 +229,11 @@ export class TracingManager extends EventEmitter {
     const link: TraceLink = {
       traceId,
       spanId: linkedSpanId,
-      attributes
+      attributes,
     };
 
     span.links.push(link);
-    this.emit('spanLink', { spanId, link });
+    this.emit("spanLink", { spanId, link });
 
     return true;
   }
@@ -244,7 +244,7 @@ export class TracingManager extends EventEmitter {
   extractTraceContext(headers: Record<string, string>): TraceContext | null {
     // Try W3C Trace Context first
     if (this.config.enableW3CTraceContext) {
-      const traceparent = headers['traceparent'];
+      const traceparent = headers["traceparent"];
       if (traceparent) {
         return this.parseW3CTraceContext(traceparent);
       }
@@ -252,19 +252,19 @@ export class TracingManager extends EventEmitter {
 
     // Try B3 headers
     if (this.config.enableB3Headers) {
-      const traceId = headers['x-b3-traceid'];
-      const spanId = headers['x-b3-spanid'];
-      const parentId = headers['x-b3-parentspanid'];
-      const sampled = headers['x-b3-sampled'];
+      const traceId = headers["x-b3-traceid"];
+      const spanId = headers["x-b3-spanid"];
+      const parentId = headers["x-b3-parentspanid"];
+      const sampled = headers["x-b3-sampled"];
 
       if (traceId && spanId) {
         return {
           traceId,
           spanId,
           parentId,
-          sampled: sampled === '1' || sampled === 'true',
+          sampled: sampled === "1" || sampled === "true",
           flags: 0,
-          baggage: {}
+          baggage: {},
         };
       }
     }
@@ -280,18 +280,18 @@ export class TracingManager extends EventEmitter {
 
     // W3C Trace Context
     if (this.config.enableW3CTraceContext) {
-      const sampled = context.sampled ? '01' : '00';
-      headers['traceparent'] = `00-${context.traceId}-${context.spanId}-${sampled}`;
+      const sampled = context.sampled ? "01" : "00";
+      headers["traceparent"] = `00-${context.traceId}-${context.spanId}-${sampled}`;
     }
 
     // B3 headers
     if (this.config.enableB3Headers) {
-      headers['x-b3-traceid'] = context.traceId;
-      headers['x-b3-spanid'] = context.spanId;
+      headers["x-b3-traceid"] = context.traceId;
+      headers["x-b3-spanid"] = context.spanId;
       if (context.parentId) {
-        headers['x-b3-parentspanid'] = context.parentId;
+        headers["x-b3-parentspanid"] = context.parentId;
       }
-      headers['x-b3-sampled'] = context.sampled ? '1' : '0';
+      headers["x-b3-sampled"] = context.sampled ? "1" : "0";
     }
 
     return headers;
@@ -307,15 +307,17 @@ export class TracingManager extends EventEmitter {
   /**
    * Get all traces with filtering
    */
-  getTraces(filters: {
-    tenantId?: string;
-    userId?: string;
-    serviceName?: string;
-    startTime?: number;
-    endTime?: number;
-    status?: string;
-    limit?: number;
-  } = {}): TraceData[] {
+  getTraces(
+    filters: {
+      tenantId?: string;
+      userId?: string;
+      serviceName?: string;
+      startTime?: number;
+      endTime?: number;
+      status?: string;
+      limit?: number;
+    } = {},
+  ): TraceData[] {
     let traces = Array.from(this.completedTraces.values());
 
     if (filters.tenantId) {
@@ -377,7 +379,7 @@ export class TracingManager extends EventEmitter {
       tracesByService[trace.serviceName] = (tracesByService[trace.serviceName] || 0) + 1;
     }
 
-    const errorTraces = traces.filter(t => t.status === 'error').length;
+    const errorTraces = traces.filter(t => t.status === "error").length;
     const errorRate = traces.length > 0 ? errorTraces / traces.length : 0;
 
     return {
@@ -385,10 +387,11 @@ export class TracingManager extends EventEmitter {
       activeSpans: this.activeSpans.size,
       tracesByStatus,
       tracesByService,
-      averageDuration: durations.length > 0 ? durations.reduce((sum, d) => sum + d, 0) / durations.length : 0,
+      averageDuration:
+        durations.length > 0 ? durations.reduce((sum, d) => sum + d, 0) / durations.length : 0,
       p95Duration: this.calculatePercentile(durations, 95),
       p99Duration: this.calculatePercentile(durations, 99),
-      errorRate
+      errorRate,
     };
   }
 
@@ -404,8 +407,9 @@ export class TracingManager extends EventEmitter {
    */
   private checkTraceCompletion(span: TraceSpan): void {
     const traceId = span.traceId;
-    const activeSpansForTrace = Array.from(this.activeSpans.values())
-      .filter(s => s.traceId === traceId);
+    const activeSpansForTrace = Array.from(this.activeSpans.values()).filter(
+      s => s.traceId === traceId,
+    );
 
     // If no active spans for this trace, it's complete
     if (activeSpansForTrace.length === 0) {
@@ -417,8 +421,8 @@ export class TracingManager extends EventEmitter {
    * Complete a trace
    */
   private completeTrace(traceId: string): void {
-    const spans = Array.from(this.completedTraces.values())
-      .find(t => t.traceId === traceId)?.spans || [];
+    const spans =
+      Array.from(this.completedTraces.values()).find(t => t.traceId === traceId)?.spans || [];
 
     if (spans.length === 0) return;
 
@@ -426,9 +430,9 @@ export class TracingManager extends EventEmitter {
     const endTime = Math.max(...spans.map(s => s.endTime || s.startTime));
     const duration = endTime - startTime;
 
-    const errorSpans = spans.filter(s => s.status === 'error');
-    const status = errorSpans.length === 0 ? 'ok' :
-      errorSpans.length === spans.length ? 'error' : 'partial';
+    const errorSpans = spans.filter(s => s.status === "error");
+    const status =
+      errorSpans.length === 0 ? "ok" : errorSpans.length === spans.length ? "error" : "partial";
 
     const traceData: TraceData = {
       traceId,
@@ -436,15 +440,15 @@ export class TracingManager extends EventEmitter {
       startTime,
       endTime,
       duration,
-      serviceName: spans[0]?.serviceName || 'unknown',
+      serviceName: spans[0]?.serviceName || "unknown",
       tenantId: spans[0]?.tenantId,
       userId: spans[0]?.userId,
       status,
-      attributes: this.mergeSpanAttributes(spans)
+      attributes: this.mergeSpanAttributes(spans),
     };
 
     this.completedTraces.set(traceId, traceData);
-    this.emit('traceCompleted', traceData);
+    this.emit("traceCompleted", traceData);
   }
 
   /**
@@ -464,38 +468,38 @@ export class TracingManager extends EventEmitter {
    * Parse W3C Trace Context header
    */
   private parseW3CTraceContext(traceparent: string): TraceContext | null {
-    const parts = traceparent.split('-');
+    const parts = traceparent.split("-");
     if (parts.length !== 4) return null;
 
     const [version, traceId, parentId, flags] = parts;
-    if (version !== '00') return null;
+    if (version !== "00") return null;
 
     return {
-      traceId: traceId || '',
-      spanId: parentId || '', // In W3C, parentId is actually the current span ID
-      sampled: flags === '01',
+      traceId: traceId || "",
+      spanId: parentId || "", // In W3C, parentId is actually the current span ID
+      sampled: flags === "01",
       flags: flags ? parseInt(flags, 16) : 0,
-      baggage: {}
+      baggage: {},
     };
   }
 
   /**
    * Create a dummy span for non-sampled traces
    */
-  private createDummySpan(name: string, kind: TraceSpan['kind']): TraceSpan {
+  private createDummySpan(name: string, kind: TraceSpan["kind"]): TraceSpan {
     return {
-      id: 'dummy',
-      traceId: 'dummy',
+      id: "dummy",
+      traceId: "dummy",
       name,
       kind,
       startTime: Date.now(),
-      status: 'unset',
+      status: "unset",
       attributes: {},
       events: [],
       links: [],
       serviceName: this.getServiceName(),
       serviceVersion: this.getServiceVersion(),
-      resource: {}
+      resource: {},
     };
   }
 
@@ -503,14 +507,14 @@ export class TracingManager extends EventEmitter {
    * Get service name
    */
   private getServiceName(): string {
-    return process.env.SERVICE_NAME || 'aibos-accounts';
+    return process.env.SERVICE_NAME || "aibos-accounts";
   }
 
   /**
    * Get service version
    */
   private getServiceVersion(): string {
-    return process.env.SERVICE_VERSION || '1.0.0';
+    return process.env.SERVICE_VERSION || "1.0.0";
   }
 
   /**
@@ -518,9 +522,9 @@ export class TracingManager extends EventEmitter {
    */
   private getResourceAttributes(): Record<string, string> {
     return {
-      'service.name': this.getServiceName(),
-      'service.version': this.getServiceVersion(),
-      'deployment.environment': process.env.NODE_ENV || 'development'
+      "service.name": this.getServiceName(),
+      "service.version": this.getServiceVersion(),
+      "deployment.environment": process.env.NODE_ENV || "development",
     };
   }
 
@@ -528,14 +532,14 @@ export class TracingManager extends EventEmitter {
    * Generate trace ID
    */
   private generateTraceId(): string {
-    return randomBytes(16).toString('hex');
+    return randomBytes(16).toString("hex");
   }
 
   /**
    * Generate span ID
    */
   private generateSpanId(): string {
-    return randomBytes(8).toString('hex');
+    return randomBytes(8).toString("hex");
   }
 
   /**
@@ -553,15 +557,18 @@ export class TracingManager extends EventEmitter {
    * Start cleanup process
    */
   private startCleanup(): void {
-    setInterval(() => {
-      const cutoff = Date.now() - (this.config.retentionPeriod * 24 * 60 * 60 * 1000);
+    setInterval(
+      () => {
+        const cutoff = Date.now() - this.config.retentionPeriod * 24 * 60 * 60 * 1000;
 
-      // Clean up completed traces
-      for (const [traceId, trace] of this.completedTraces) {
-        if (trace.startTime < cutoff) {
-          this.completedTraces.delete(traceId);
+        // Clean up completed traces
+        for (const [traceId, trace] of this.completedTraces) {
+          if (trace.startTime < cutoff) {
+            this.completedTraces.delete(traceId);
+          }
         }
-      }
-    }, 24 * 60 * 60 * 1000); // Daily cleanup
+      },
+      24 * 60 * 60 * 1000,
+    ); // Daily cleanup
   }
 }

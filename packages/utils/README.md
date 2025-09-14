@@ -310,27 +310,27 @@ pnpm typecheck
 ### **Basic Utilities**
 
 ```typescript
-import { createJournalId, createInvoiceId, logger } from '@aibos/utils';
+import { createJournalId, createInvoiceId, logger } from "@aibos/utils";
 
 // Create branded IDs
-const journalId = createJournalId('uuid-string');
-const invoiceId = createInvoiceId('uuid-string');
+const journalId = createJournalId("uuid-string");
+const invoiceId = createInvoiceId("uuid-string");
 
 // Use logger
-logger.info('Operation completed', { journalId, invoiceId });
+logger.info("Operation completed", { journalId, invoiceId });
 ```
 
 ### **Export Management**
 
 ```typescript
-import { createExportService, ExportFormat } from '@aibos/utils';
+import { createExportService, ExportFormat } from "@aibos/utils";
 
 const exportService = createExportService();
 
 // Export data to CSV
 const result = await exportService.exportToCsv({
   data: reportData,
-  filename: 'trial-balance.csv',
+  filename: "trial-balance.csv",
   format: ExportFormat.CSV,
 });
 ```
@@ -338,21 +338,21 @@ const result = await exportService.exportToCsv({
 ### **Audit Logging**
 
 ```typescript
-import { V1AuditService, createV1AuditContext } from '@aibos/utils';
+import { V1AuditService, createV1AuditContext } from "@aibos/utils";
 
 const auditService = new V1AuditService();
 
 // Log audit event
 await auditService.logEvent({
-  eventType: 'INVOICE_CREATED',
-  entityType: 'INVOICE',
+  eventType: "INVOICE_CREATED",
+  entityType: "INVOICE",
   entityId: invoiceId,
-  action: 'CREATE',
-  details: { invoiceNumber: 'INV-001' },
+  action: "CREATE",
+  details: { invoiceNumber: "INV-001" },
   context: createV1AuditContext({
-    userId: 'user-123',
-    tenantId: 'tenant-456',
-    companyId: 'company-789',
+    userId: "user-123",
+    tenantId: "tenant-456",
+    companyId: "company-789",
   }),
 });
 ```
@@ -360,31 +360,31 @@ await auditService.logEvent({
 ### **Email Service**
 
 ```typescript
-import { sendEmail } from '@aibos/utils';
+import { sendEmail } from "@aibos/utils";
 
 // Send email
 await sendEmail({
-  to: 'customer@example.com',
-  subject: 'Invoice Created',
-  html: '<h1>Your invoice has been created</h1>',
-  text: 'Your invoice has been created',
+  to: "customer@example.com",
+  subject: "Invoice Created",
+  html: "<h1>Your invoice has been created</h1>",
+  text: "Your invoice has been created",
 });
 ```
 
 ### **Performance Monitoring**
 
 ```typescript
-import { performanceMonitor, errorTracker } from '@aibos/utils';
+import { performanceMonitor, errorTracker } from "@aibos/utils";
 
 // Track performance
-const metrics = performanceMonitor.startTimer('api-request');
+const metrics = performanceMonitor.startTimer("api-request");
 // ... perform operation
 metrics.endTimer();
 
 // Track errors
-errorTracker.captureError(new Error('Something went wrong'), {
-  context: 'invoice-creation',
-  userId: 'user-123',
+errorTracker.captureError(new Error("Something went wrong"), {
+  context: "invoice-creation",
+  userId: "user-123",
 });
 ```
 

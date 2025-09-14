@@ -17,7 +17,7 @@ export const fxRateIngestion = inngest.createFunction(
       if (!currencyPairs || !Array.isArray(currencyPairs)) {
         throw new Error("Invalid currency pairs provided");
       }
-      
+
       logger.info("FX ingestion started", {
         pairs: currencyPairs.length,
         source,
@@ -32,7 +32,7 @@ export const fxRateIngestion = inngest.createFunction(
       try {
         // Simulate primary FX API call (replace with actual API)
         const rates = await fetchFromPrimarySource(validatedPairs);
-        
+
         logger.info("Primary FX rates fetched", {
           ratesCount: rates.length,
           source: "primary",
@@ -40,7 +40,9 @@ export const fxRateIngestion = inngest.createFunction(
 
         return rates;
       } catch (error) {
-        logger.error("Primary FX source failed", { error: error instanceof Error ? error.message : String(error) });
+        logger.error("Primary FX source failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         throw error;
       }
     });
@@ -52,10 +54,10 @@ export const fxRateIngestion = inngest.createFunction(
       }
 
       logger.warn("Falling back to secondary FX source");
-      
+
       try {
         const fallbackRates = await fetchFromFallbackSource(validatedPairs);
-        
+
         logger.info("Fallback FX rates fetched", {
           ratesCount: fallbackRates.length,
           source: "fallback",
@@ -63,7 +65,9 @@ export const fxRateIngestion = inngest.createFunction(
 
         return fallbackRates.map(rate => ({ ...rate, source: "fallback" }));
       } catch (error) {
-        logger.error("Both FX sources failed", { error: error instanceof Error ? error.message : String(error) });
+        logger.error("Both FX sources failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         throw new Error("All FX rate sources unavailable");
       }
     });
@@ -75,16 +79,14 @@ export const fxRateIngestion = inngest.createFunction(
 
       for (const rate of finalRates as any[]) {
         try {
-          const { error } = await supabase
-            .from("fx_rates")
-            .insert({
-              from_currency: rate.from,
-              to_currency: rate.to,
-              rate: rate.rate,
-              source: rate.source || source,
-              valid_from: new Date().toISOString(),
-              valid_to: null, // Current rate
-            });
+          const { error } = await supabase.from("fx_rates").insert({
+            from_currency: rate.from,
+            to_currency: rate.to,
+            rate: rate.rate,
+            source: rate.source || source,
+            valid_from: new Date().toISOString(),
+            valid_to: null, // Current rate
+          });
 
           if (error) {
             logger.error("Failed to store FX rate", {
@@ -127,7 +129,7 @@ export const fxRateIngestion = inngest.createFunction(
       ratesIngested: storedRates.length,
       source: (finalRates[0] as any)?.source || source,
     };
-  }
+  },
 );
 
 // Primary FX rate source (replace with actual API)

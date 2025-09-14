@@ -27,7 +27,7 @@ export function DocumentPreview({
   onDownload,
   className = "",
   maxWidth = "800px",
-  maxHeight = "600px"
+  maxHeight = "600px",
 }: DocumentPreviewProps) {
   const [previewUrl, setPreviewUrl] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -49,33 +49,27 @@ export function DocumentPreview({
   const displayFileSize = fileSize || file?.size || 0;
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const getFileIcon = (mimeType: string) => {
-    if (mimeType.startsWith('image/')) return '🖼️';
-    if (mimeType.startsWith('video/')) return '🎥';
-    if (mimeType.startsWith('audio/')) return '🎵';
-    if (mimeType.includes('pdf')) return '📄';
-    if (mimeType.includes('word') || mimeType.includes('document')) return '📝';
-    if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
-    if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return '📽️';
-    if (mimeType.includes('zip') || mimeType.includes('archive')) return '📦';
-    return '📄';
+    if (mimeType.startsWith("image/")) return "🖼️";
+    if (mimeType.startsWith("video/")) return "🎥";
+    if (mimeType.startsWith("audio/")) return "🎵";
+    if (mimeType.includes("pdf")) return "📄";
+    if (mimeType.includes("word") || mimeType.includes("document")) return "📝";
+    if (mimeType.includes("excel") || mimeType.includes("spreadsheet")) return "📊";
+    if (mimeType.includes("powerpoint") || mimeType.includes("presentation")) return "📽️";
+    if (mimeType.includes("zip") || mimeType.includes("archive")) return "📦";
+    return "📄";
   };
 
   const canPreview = () => {
-    const previewableTypes = [
-      'image/',
-      'video/',
-      'audio/',
-      'application/pdf',
-      'text/'
-    ];
+    const previewableTypes = ["image/", "video/", "audio/", "application/pdf", "text/"];
     return previewableTypes.some(type => displayMimeType.startsWith(type));
   };
 
@@ -84,12 +78,8 @@ export function DocumentPreview({
       return (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="text-4xl mb-2">❌</div>
-          <div className="text-[var(--sys-text-primary)] font-medium mb-1">
-            Preview Error
-          </div>
-          <div className="text-sm text-[var(--sys-text-secondary)]">
-            {error}
-          </div>
+          <div className="text-[var(--sys-text-primary)] font-medium mb-1">Preview Error</div>
+          <div className="text-sm text-[var(--sys-text-secondary)]">{error}</div>
         </div>
       );
     }
@@ -98,9 +88,7 @@ export function DocumentPreview({
       return (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--sys-accent)] mb-2"></div>
-          <div className="text-[var(--sys-text-primary)] font-medium">
-            Loading preview...
-          </div>
+          <div className="text-[var(--sys-text-primary)] font-medium">Loading preview...</div>
         </div>
       );
     }
@@ -109,9 +97,7 @@ export function DocumentPreview({
       return (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="text-6xl mb-4">{getFileIcon(displayMimeType)}</div>
-          <div className="text-[var(--sys-text-primary)] font-medium mb-2">
-            {displayFilename}
-          </div>
+          <div className="text-[var(--sys-text-primary)] font-medium mb-2">{displayFilename}</div>
           <div className="text-sm text-[var(--sys-text-secondary)]">
             Preview not available for this file type
           </div>
@@ -120,7 +106,7 @@ export function DocumentPreview({
     }
 
     // Image preview
-    if (displayMimeType.startsWith('image/')) {
+    if (displayMimeType.startsWith("image/")) {
       return (
         <img
           src={previewUrl}
@@ -129,14 +115,14 @@ export function DocumentPreview({
           onLoad={() => setIsLoading(false)}
           onError={() => {
             setIsLoading(false);
-            setError('Failed to load image');
+            setError("Failed to load image");
           }}
         />
       );
     }
 
     // Video preview
-    if (displayMimeType.startsWith('video/')) {
+    if (displayMimeType.startsWith("video/")) {
       return (
         <video
           src={previewUrl}
@@ -145,7 +131,7 @@ export function DocumentPreview({
           onLoadStart={() => setIsLoading(false)}
           onError={() => {
             setIsLoading(false);
-            setError('Failed to load video');
+            setError("Failed to load video");
           }}
         >
           Your browser does not support the video tag.
@@ -154,7 +140,7 @@ export function DocumentPreview({
     }
 
     // Audio preview
-    if (displayMimeType.startsWith('audio/')) {
+    if (displayMimeType.startsWith("audio/")) {
       return (
         <div className="flex flex-col items-center justify-center h-64">
           <div className="text-6xl mb-4">🎵</div>
@@ -165,7 +151,7 @@ export function DocumentPreview({
             onLoadStart={() => setIsLoading(false)}
             onError={() => {
               setIsLoading(false);
-              setError('Failed to load audio');
+              setError("Failed to load audio");
             }}
           >
             Your browser does not support the audio tag.
@@ -175,7 +161,7 @@ export function DocumentPreview({
     }
 
     // PDF preview (iframe)
-    if (displayMimeType === 'application/pdf') {
+    if (displayMimeType === "application/pdf") {
       return (
         <iframe
           src={previewUrl}
@@ -184,14 +170,14 @@ export function DocumentPreview({
           onLoad={() => setIsLoading(false)}
           onError={() => {
             setIsLoading(false);
-            setError('Failed to load PDF');
+            setError("Failed to load PDF");
           }}
         />
       );
     }
 
     // Text preview
-    if (displayMimeType.startsWith('text/')) {
+    if (displayMimeType.startsWith("text/")) {
       return (
         <iframe
           src={previewUrl}
@@ -200,7 +186,7 @@ export function DocumentPreview({
           onLoad={() => setIsLoading(false)}
           onError={() => {
             setIsLoading(false);
-            setError('Failed to load text file');
+            setError("Failed to load text file");
           }}
         />
       );
@@ -210,10 +196,12 @@ export function DocumentPreview({
   };
 
   return (
-    <div className={cn(
-      "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50",
-      className
-    )}>
+    <div
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50",
+        className,
+      )}
+    >
       <div
         className="bg-[var(--sys-bg-primary)] border border-[var(--sys-border-hairline)] rounded-lg shadow-lg max-w-4xl max-h-screen w-full mx-4 flex flex-col"
         style={{ maxWidth, maxHeight }}
@@ -226,7 +214,10 @@ export function DocumentPreview({
           <div className="flex items-center gap-3">
             <div className="text-2xl">{getFileIcon(displayMimeType)}</div>
             <div>
-              <h2 id="preview-title" className="text-lg font-semibold text-[var(--sys-text-primary)]">
+              <h2
+                id="preview-title"
+                className="text-lg font-semibold text-[var(--sys-text-primary)]"
+              >
                 {displayFilename}
               </h2>
               <div className="text-sm text-[var(--sys-text-secondary)]">
@@ -259,17 +250,13 @@ export function DocumentPreview({
 
         {/* Preview Content */}
         <div className="flex-1 p-4 overflow-auto">
-          <div className="flex items-center justify-center min-h-96">
-            {renderPreview()}
-          </div>
+          <div className="flex items-center justify-center min-h-96">{renderPreview()}</div>
         </div>
 
         {/* Footer */}
         <div className="p-4 border-t border-[var(--sys-border-hairline)] bg-[var(--sys-bg-subtle)]">
           <div className="flex items-center justify-between text-sm text-[var(--sys-text-secondary)]">
-            <div>
-              File: {displayFilename}
-            </div>
+            <div>File: {displayFilename}</div>
             <div>
               Size: {formatFileSize(displayFileSize)} • Type: {displayMimeType}
             </div>

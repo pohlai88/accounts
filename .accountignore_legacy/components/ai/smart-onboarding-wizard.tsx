@@ -1,145 +1,142 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog'
-import { 
-  CheckCircle, 
-  Circle, 
-  ArrowRight, 
-  ArrowLeft, 
-  Clock, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  CheckCircle,
+  Circle,
+  ArrowRight,
+  ArrowLeft,
+  Clock,
   Star,
   Building2,
   DollarSign,
   FileText,
   CreditCard,
-  TrendingUp
-} from 'lucide-react'
-import { 
-  AIEngine,
-  AIOnboardingStep,
-  AIProgress,
-  AIContext
-} from '@/lib/ai-engine'
+  TrendingUp,
+} from "lucide-react";
+import { AIEngine, AIOnboardingStep, AIProgress, AIContext } from "@/lib/ai-engine";
 
 interface SmartOnboardingWizardProps {
-  companyId: string
-  userId: string
-  onComplete: () => void
-  onSkip: () => void
+  companyId: string;
+  userId: string;
+  onComplete: () => void;
+  onSkip: () => void;
 }
 
-export function SmartOnboardingWizard({ 
-  companyId, 
-  userId, 
-  onComplete, 
-  onSkip 
+export function SmartOnboardingWizard({
+  companyId,
+  userId,
+  onComplete,
+  onSkip,
 }: SmartOnboardingWizardProps) {
-  const [steps, setSteps] = useState<AIOnboardingStep[]>([])
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
-  const [progress, setProgress] = useState<AIProgress | null>(null)
-  const [stepData, setStepData] = useState<Record<string, any>>({})
-  const [loading, setLoading] = useState(true)
-  const [isOpen, setIsOpen] = useState(true)
+  const [steps, setSteps] = useState<AIOnboardingStep[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [progress, setProgress] = useState<AIProgress | null>(null);
+  const [stepData, setStepData] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
-    loadOnboardingData()
-  }, [companyId])
+    loadOnboardingData();
+  }, [companyId]);
 
   const loadOnboardingData = async () => {
     try {
       const [stepsResult, progressResult] = await Promise.all([
         AIEngine.getOnboardingSteps(companyId),
-        AIEngine.getProgress(userId, companyId)
-      ])
+        AIEngine.getProgress(userId, companyId),
+      ]);
 
       if (stepsResult.success && stepsResult.steps) {
-        setSteps(stepsResult.steps)
+        setSteps(stepsResult.steps);
       }
 
       if (progressResult.success && progressResult.progress) {
-        setProgress(progressResult.progress)
-        setCurrentStepIndex(stepsResult.steps?.findIndex(s => s.id === progressResult.progress?.currentStep) || 0)
+        setProgress(progressResult.progress);
+        setCurrentStepIndex(
+          stepsResult.steps?.findIndex(s => s.id === progressResult.progress?.currentStep) || 0,
+        );
       }
     } catch (error) {
-      console.error('Error loading onboarding data:', error)
+      console.error("Error loading onboarding data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const currentStep = steps[currentStepIndex]
-  const isFirstStep = currentStepIndex === 0
-  const isLastStep = currentStepIndex === steps.length - 1
-  const completionPercentage = progress ? progress.completionPercentage : 0
+  const currentStep = steps[currentStepIndex];
+  const isFirstStep = currentStepIndex === 0;
+  const isLastStep = currentStepIndex === steps.length - 1;
+  const completionPercentage = progress ? progress.completionPercentage : 0;
 
   const handleNext = () => {
     if (currentStep && validateStep(currentStep)) {
-      const nextIndex = currentStepIndex + 1
+      const nextIndex = currentStepIndex + 1;
       if (nextIndex < steps.length) {
-        setCurrentStepIndex(nextIndex)
+        setCurrentStepIndex(nextIndex);
       } else {
-        handleComplete()
+        handleComplete();
       }
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1)
+      setCurrentStepIndex(currentStepIndex - 1);
     }
-  }
+  };
 
   const handleComplete = () => {
-    setIsOpen(false)
-    onComplete()
-  }
+    setIsOpen(false);
+    onComplete();
+  };
 
   const handleSkip = () => {
-    setIsOpen(false)
-    onSkip()
-  }
+    setIsOpen(false);
+    onSkip();
+  };
 
   const validateStep = (step: AIOnboardingStep): boolean => {
-    if (!step.required) return true
-    return step.validation(stepData[step.id] || {})
-  }
+    if (!step.required) return true;
+    return step.validation(stepData[step.id] || {});
+  };
 
   const updateStepData = (stepId: string, data: any) => {
     setStepData(prev => ({
       ...prev,
-      [stepId]: { ...prev[stepId], ...data }
-    }))
-  }
+      [stepId]: { ...prev[stepId], ...data },
+    }));
+  };
 
   const getStepIcon = (stepId: string) => {
     switch (stepId) {
-      case 'company-info':
-        return <Building2 className="h-5 w-5" />
-      case 'chart-of-accounts':
-        return <FileText className="h-5 w-5" />
-      case 'first-transaction':
-        return <DollarSign className="h-5 w-5" />
-      case 'bank-account':
-        return <CreditCard className="h-5 w-5" />
-      case 'first-invoice':
-        return <TrendingUp className="h-5 w-5" />
+      case "company-info":
+        return <Building2 className="h-5 w-5" />;
+      case "chart-of-accounts":
+        return <FileText className="h-5 w-5" />;
+      case "first-transaction":
+        return <DollarSign className="h-5 w-5" />;
+      case "bank-account":
+        return <CreditCard className="h-5 w-5" />;
+      case "first-invoice":
+        return <TrendingUp className="h-5 w-5" />;
       default:
-        return <Circle className="h-5 w-5" />
+        return <Circle className="h-5 w-5" />;
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -151,7 +148,7 @@ export function SmartOnboardingWizard({
           </div>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -163,7 +160,8 @@ export function SmartOnboardingWizard({
             <span>Welcome to Your Accounting System!</span>
           </DialogTitle>
           <DialogDescription>
-            Let's get you set up in just 5 minutes. Follow these simple steps to start managing your finances.
+            Let's get you set up in just 5 minutes. Follow these simple steps to start managing your
+            finances.
           </DialogDescription>
         </DialogHeader>
 
@@ -176,7 +174,9 @@ export function SmartOnboardingWizard({
             </div>
             <Progress value={completionPercentage} className="h-2" />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Step {currentStepIndex + 1} of {steps.length}</span>
+              <span>
+                Step {currentStepIndex + 1} of {steps.length}
+              </span>
               <span className="flex items-center space-x-1">
                 <Clock className="h-3 w-3" />
                 <span>{progress?.estimatedTimeRemaining || 0} min remaining</span>
@@ -191,10 +191,10 @@ export function SmartOnboardingWizard({
                 key={step.id}
                 className={`p-2 rounded-lg border text-center ${
                   index === currentStepIndex
-                    ? 'border-primary bg-primary/5'
+                    ? "border-primary bg-primary/5"
                     : index < currentStepIndex
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200'
+                      ? "border-green-500 bg-green-50"
+                      : "border-gray-200"
                 }`}
               >
                 <div className="flex justify-center mb-1">
@@ -205,9 +205,7 @@ export function SmartOnboardingWizard({
                   )}
                 </div>
                 <div className="text-xs font-medium">{step.title}</div>
-                <div className="text-xs text-muted-foreground">
-                  {step.estimatedTime}min
-                </div>
+                <div className="text-xs text-muted-foreground">{step.estimatedTime}min</div>
               </div>
             ))}
           </div>
@@ -220,7 +218,9 @@ export function SmartOnboardingWizard({
                   {getStepIcon(currentStep.id)}
                   <span>{currentStep.title}</span>
                   {currentStep.required && (
-                    <Badge variant="destructive" className="text-xs">Required</Badge>
+                    <Badge variant="destructive" className="text-xs">
+                      Required
+                    </Badge>
                   )}
                 </CardTitle>
                 <CardDescription>{currentStep.description}</CardDescription>
@@ -229,7 +229,7 @@ export function SmartOnboardingWizard({
                 <StepContent
                   step={currentStep}
                   data={stepData[currentStep.id] || {}}
-                  onUpdate={(data) => updateStepData(currentStep.id, data)}
+                  onUpdate={data => updateStepData(currentStep.id, data)}
                 />
               </CardContent>
             </Card>
@@ -249,11 +249,11 @@ export function SmartOnboardingWizard({
               <Button variant="outline" onClick={handleSkip}>
                 Skip Setup
               </Button>
-              <Button 
+              <Button
                 onClick={handleNext}
                 disabled={currentStep?.required && !validateStep(currentStep)}
               >
-                {isLastStep ? 'Complete Setup' : 'Next'}
+                {isLastStep ? "Complete Setup" : "Next"}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
@@ -261,29 +261,29 @@ export function SmartOnboardingWizard({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 interface StepContentProps {
-  step: AIOnboardingStep
-  data: any
-  onUpdate: (data: any) => void
+  step: AIOnboardingStep;
+  data: any;
+  onUpdate: (data: any) => void;
 }
 
 function StepContent({ step, data, onUpdate }: StepContentProps) {
   switch (step.id) {
-    case 'company-info':
-      return <CompanyInfoStep data={data} onUpdate={onUpdate} />
-    case 'chart-of-accounts':
-      return <CoASetupStep data={data} onUpdate={onUpdate} />
-    case 'first-transaction':
-      return <FirstTransactionStep data={data} onUpdate={onUpdate} />
-    case 'bank-account':
-      return <BankAccountStep data={data} onUpdate={onUpdate} />
-    case 'first-invoice':
-      return <FirstInvoiceStep data={data} onUpdate={onUpdate} />
+    case "company-info":
+      return <CompanyInfoStep data={data} onUpdate={onUpdate} />;
+    case "chart-of-accounts":
+      return <CoASetupStep data={data} onUpdate={onUpdate} />;
+    case "first-transaction":
+      return <FirstTransactionStep data={data} onUpdate={onUpdate} />;
+    case "bank-account":
+      return <BankAccountStep data={data} onUpdate={onUpdate} />;
+    case "first-invoice":
+      return <FirstInvoiceStep data={data} onUpdate={onUpdate} />;
     default:
-      return <div>Step content not implemented</div>
+      return <div>Step content not implemented</div>;
   }
 }
 
@@ -294,8 +294,8 @@ function CompanyInfoStep({ data, onUpdate }: { data: any; onUpdate: (data: any) 
         <Label htmlFor="companyName">Company Name</Label>
         <Input
           id="companyName"
-          value={data.companyName || ''}
-          onChange={(e) => onUpdate({ companyName: e.target.value })}
+          value={data.companyName || ""}
+          onChange={e => onUpdate({ companyName: e.target.value })}
           placeholder="Enter your company name"
         />
       </div>
@@ -303,8 +303,8 @@ function CompanyInfoStep({ data, onUpdate }: { data: any; onUpdate: (data: any) 
         <Label htmlFor="currency">Default Currency</Label>
         <Input
           id="currency"
-          value={data.currency || 'USD'}
-          onChange={(e) => onUpdate({ currency: e.target.value })}
+          value={data.currency || "USD"}
+          onChange={e => onUpdate({ currency: e.target.value })}
           placeholder="USD"
         />
       </div>
@@ -313,12 +313,12 @@ function CompanyInfoStep({ data, onUpdate }: { data: any; onUpdate: (data: any) 
         <Input
           id="fiscalYear"
           type="date"
-          value={data.fiscalYear || ''}
-          onChange={(e) => onUpdate({ fiscalYear: e.target.value })}
+          value={data.fiscalYear || ""}
+          onChange={e => onUpdate({ fiscalYear: e.target.value })}
         />
       </div>
     </div>
-  )
+  );
 }
 
 function CoASetupStep({ data, onUpdate }: { data: any; onUpdate: (data: any) => void }) {
@@ -329,15 +329,12 @@ function CoASetupStep({ data, onUpdate }: { data: any; onUpdate: (data: any) => 
         <p className="text-muted-foreground">
           Chart of Accounts setup will be handled by the CoA Setup Wizard
         </p>
-        <Button 
-          className="mt-4"
-          onClick={() => onUpdate({ accounts: ['placeholder'] })}
-        >
+        <Button className="mt-4" onClick={() => onUpdate({ accounts: ["placeholder"] })}>
           Open CoA Setup Wizard
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 function FirstTransactionStep({ data, onUpdate }: { data: any; onUpdate: (data: any) => void }) {
@@ -347,8 +344,8 @@ function FirstTransactionStep({ data, onUpdate }: { data: any; onUpdate: (data: 
         <Label htmlFor="transactionType">Transaction Type</Label>
         <Input
           id="transactionType"
-          value={data.transactionType || ''}
-          onChange={(e) => onUpdate({ transactionType: e.target.value })}
+          value={data.transactionType || ""}
+          onChange={e => onUpdate({ transactionType: e.target.value })}
           placeholder="e.g., Office Supplies"
         />
       </div>
@@ -357,13 +354,13 @@ function FirstTransactionStep({ data, onUpdate }: { data: any; onUpdate: (data: 
         <Input
           id="amount"
           type="number"
-          value={data.amount || ''}
-          onChange={(e) => onUpdate({ amount: parseFloat(e.target.value) })}
+          value={data.amount || ""}
+          onChange={e => onUpdate({ amount: parseFloat(e.target.value) })}
           placeholder="0.00"
         />
       </div>
     </div>
-  )
+  );
 }
 
 function BankAccountStep({ data, onUpdate }: { data: any; onUpdate: (data: any) => void }) {
@@ -373,8 +370,8 @@ function BankAccountStep({ data, onUpdate }: { data: any; onUpdate: (data: any) 
         <Label htmlFor="bankName">Bank Name</Label>
         <Input
           id="bankName"
-          value={data.bankName || ''}
-          onChange={(e) => onUpdate({ bankName: e.target.value })}
+          value={data.bankName || ""}
+          onChange={e => onUpdate({ bankName: e.target.value })}
           placeholder="Enter bank name"
         />
       </div>
@@ -382,13 +379,13 @@ function BankAccountStep({ data, onUpdate }: { data: any; onUpdate: (data: any) 
         <Label htmlFor="accountNumber">Account Number</Label>
         <Input
           id="accountNumber"
-          value={data.accountNumber || ''}
-          onChange={(e) => onUpdate({ accountNumber: e.target.value })}
+          value={data.accountNumber || ""}
+          onChange={e => onUpdate({ accountNumber: e.target.value })}
           placeholder="Enter account number"
         />
       </div>
     </div>
-  )
+  );
 }
 
 function FirstInvoiceStep({ data, onUpdate }: { data: any; onUpdate: (data: any) => void }) {
@@ -398,8 +395,8 @@ function FirstInvoiceStep({ data, onUpdate }: { data: any; onUpdate: (data: any)
         <Label htmlFor="customerName">Customer Name</Label>
         <Input
           id="customerName"
-          value={data.customerName || ''}
-          onChange={(e) => onUpdate({ customerName: e.target.value })}
+          value={data.customerName || ""}
+          onChange={e => onUpdate({ customerName: e.target.value })}
           placeholder="Enter customer name"
         />
       </div>
@@ -408,11 +405,11 @@ function FirstInvoiceStep({ data, onUpdate }: { data: any; onUpdate: (data: any)
         <Input
           id="amount"
           type="number"
-          value={data.amount || ''}
-          onChange={(e) => onUpdate({ amount: parseFloat(e.target.value) })}
+          value={data.amount || ""}
+          onChange={e => onUpdate({ amount: parseFloat(e.target.value) })}
           placeholder="0.00"
         />
       </div>
     </div>
-  )
+  );
 }

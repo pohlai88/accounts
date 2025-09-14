@@ -1,11 +1,6 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true
-  },
+  "extends": "../../packages/config/tsconfig/node-lib.json",
   "include": [
-    "src",
-    "test"
+    "src"
   ]
 }

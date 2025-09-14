@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // ---------- Shared validators & helpers ----------
-const ISO_DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
+const ISO_DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD");
 const ISO_DATETIME = z.string().datetime();
 const NonNeg = () => z.number().min(0).finite();
 const Finite = () => z.number().finite();
@@ -10,31 +10,67 @@ const near = (a: number, b: number, eps = EPS) => Math.abs(a - b) <= eps;
 
 // Core accounting types based on industry standards
 export const CurrencyCodeSchema = z.enum([
-    'USD', 'EUR', 'GBP', 'MYR', 'JPY', 'CAD', 'AUD', 'SGD', 'CNY', 'INR'
+  "USD",
+  "EUR",
+  "GBP",
+  "MYR",
+  "JPY",
+  "CAD",
+  "AUD",
+  "SGD",
+  "CNY",
+  "INR",
 ]);
 
 // ERPNext-level account types for specialized business logic
 export const AccountTypeSchema = z.enum([
-    // Basic types
-    'Asset', 'Liability', 'Equity', 'Income', 'Expense',
-    // ERPNext specialized types
-    'Bank', 'Cash', 'Receivable', 'Payable',
-    'Current Asset', 'Fixed Asset', 'Current Liability',
-    'Direct Income', 'Indirect Income', 'Direct Expense', 'Indirect Expense',
-    'Cost of Goods Sold', 'Stock', 'Tax', 'Round Off',
-    'Accumulated Depreciation', 'Depreciation', 'Temporary'
+  // Basic types
+  "Asset",
+  "Liability",
+  "Equity",
+  "Income",
+  "Expense",
+  // ERPNext specialized types
+  "Bank",
+  "Cash",
+  "Receivable",
+  "Payable",
+  "Current Asset",
+  "Fixed Asset",
+  "Current Liability",
+  "Direct Income",
+  "Indirect Income",
+  "Direct Expense",
+  "Indirect Expense",
+  "Cost of Goods Sold",
+  "Stock",
+  "Tax",
+  "Round Off",
+  "Accumulated Depreciation",
+  "Depreciation",
+  "Temporary",
 ]);
 
 // ERPNext-level voucher types
 export const VoucherTypeSchema = z.enum([
-    'Sales Invoice', 'Purchase Invoice', 'Payment Entry', 'Journal Entry',
-    'Period Closing Voucher', 'Opening Entry', 'Bank Reconciliation',
-    'Asset Depreciation', 'Deferred Revenue', 'Deferred Expense',
-    'Exchange Rate Revaluation', 'Stock Entry', 'Landed Cost Voucher'
+  "Sales Invoice",
+  "Purchase Invoice",
+  "Payment Entry",
+  "Journal Entry",
+  "Period Closing Voucher",
+  "Opening Entry",
+  "Bank Reconciliation",
+  "Asset Depreciation",
+  "Deferred Revenue",
+  "Deferred Expense",
+  "Exchange Rate Revaluation",
+  "Stock Entry",
+  "Landed Cost Voucher",
 ]);
 
 // ERPNext-level GL Entry schema with comprehensive fields
-export const GLEntrySchema = z.object({
+export const GLEntrySchema = z
+  .object({
     // Core identification
     id: z.string().uuid(),
     account_id: z.string().uuid(),
@@ -65,7 +101,7 @@ export const GLEntrySchema = z.object({
     against_voucher_type: VoucherTypeSchema.optional(),
 
     // Party information
-    party_type: z.enum(['Customer', 'Supplier', 'Employee', 'Other']).optional(),
+    party_type: z.enum(["Customer", "Supplier", "Employee", "Other"]).optional(),
     party: z.string().optional(),
 
     // Dimensions (ERPNext accounting dimensions)
@@ -89,49 +125,82 @@ export const GLEntrySchema = z.object({
     created_at: ISO_DATETIME,
     created_by: z.string().uuid().optional(),
     modified_at: ISO_DATETIME.optional(),
-    modified_by: z.string().uuid().optional()
-}).strict().superRefine((e, ctx) => {
+    modified_by: z.string().uuid().optional(),
+  })
+  .strict()
+  .superRefine((e, ctx) => {
     // XOR rule: one side positive, the other zero
     const hasDebit = e.debit > 0;
     const hasCredit = e.credit > 0;
     if ((hasDebit && hasCredit) || (!hasDebit && !hasCredit)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['debit'], message: 'Each GL entry must have debit XOR credit' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["debit"],
+        message: "Each GL entry must have debit XOR credit",
+      });
     }
     // transaction fields must be complete and reconcile when provided
     const txAmt = (e.debit_in_transaction_currency ?? 0) + (e.credit_in_transaction_currency ?? 0);
     if (txAmt > 0) {
-        if (!e.transaction_currency) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['transaction_currency'], message: 'transaction_currency required when transaction amounts are present' });
+      if (!e.transaction_currency) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transaction_currency"],
+          message: "transaction_currency required when transaction amounts are present",
+        });
+      }
+      if (!e.transaction_exchange_rate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["transaction_exchange_rate"],
+          message: "transaction_exchange_rate required when transaction amounts are present",
+        });
+      }
+      // Reconcile: txn * rate ~= account-currency amount (per side if present)
+      if (e.debit_in_transaction_currency != null) {
+        const expected = e.debit_in_transaction_currency * (e.transaction_exchange_rate ?? 1);
+        if (!near(expected, e.debit_in_account_currency)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["debit_in_account_currency"],
+            message:
+              "debit_in_account_currency must equal debit_in_transaction_currency * transaction_exchange_rate (±ε)",
+          });
         }
-        if (!e.transaction_exchange_rate) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['transaction_exchange_rate'], message: 'transaction_exchange_rate required when transaction amounts are present' });
+      }
+      if (e.credit_in_transaction_currency != null) {
+        const expected = e.credit_in_transaction_currency * (e.transaction_exchange_rate ?? 1);
+        if (!near(expected, e.credit_in_account_currency)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["credit_in_account_currency"],
+            message:
+              "credit_in_account_currency must equal credit_in_transaction_currency * transaction_exchange_rate (±ε)",
+          });
         }
-        // Reconcile: txn * rate ~= account-currency amount (per side if present)
-        if (e.debit_in_transaction_currency != null) {
-            const expected = e.debit_in_transaction_currency * (e.transaction_exchange_rate ?? 1);
-            if (!near(expected, e.debit_in_account_currency)) {
-                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['debit_in_account_currency'], message: 'debit_in_account_currency must equal debit_in_transaction_currency * transaction_exchange_rate (±ε)' });
-            }
-        }
-        if (e.credit_in_transaction_currency != null) {
-            const expected = e.credit_in_transaction_currency * (e.transaction_exchange_rate ?? 1);
-            if (!near(expected, e.credit_in_account_currency)) {
-                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['credit_in_account_currency'], message: 'credit_in_account_currency must equal credit_in_transaction_currency * transaction_exchange_rate (±ε)' });
-            }
-        }
+      }
     }
     // If against_voucher_type is provided, id must be provided
     if (e.against_voucher_type && !e.against_voucher) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['against_voucher'], message: 'against_voucher is required when against_voucher_type is provided' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["against_voucher"],
+        message: "against_voucher is required when against_voucher_type is provided",
+      });
     }
     // due_date >= posting_date
     if (e.due_date && e.due_date < e.posting_date) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['due_date'], message: 'due_date cannot be before posting_date' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["due_date"],
+        message: "due_date cannot be before posting_date",
+      });
     }
-});
+  });
 
 // ERPNext-level Account schema with nested set and advanced features
-export const AccountSchema = z.object({
+export const AccountSchema = z
+  .object({
     // Core identification
     id: z.string().uuid(),
     name: z.string().min(1),
@@ -146,8 +215,8 @@ export const AccountSchema = z.object({
 
     // Account classification
     account_type: AccountTypeSchema,
-    root_type: z.enum(['Asset', 'Liability', 'Equity', 'Income', 'Expense']),
-    report_type: z.enum(['Balance Sheet', 'Profit and Loss']),
+    root_type: z.enum(["Asset", "Liability", "Equity", "Income", "Expense"]),
+    report_type: z.enum(["Balance Sheet", "Profit and Loss"]),
 
     // Currency and company
     account_currency: CurrencyCodeSchema,
@@ -160,21 +229,28 @@ export const AccountSchema = z.object({
 
     // ERPNext advanced features
     freeze_account: z.boolean().default(false),
-    balance_must_be: z.enum(['Debit', 'Credit', '']).optional(),
+    balance_must_be: z.enum(["Debit", "Credit", ""]).optional(),
     include_in_gross: z.boolean().default(false),
     tax_rate: z.number().min(0).max(100).finite().optional(),
 
     // Audit trail
     created_at: ISO_DATETIME,
-    updated_at: ISO_DATETIME
-}).strict().superRefine((a, ctx) => {
+    updated_at: ISO_DATETIME,
+  })
+  .strict()
+  .superRefine((a, ctx) => {
     if (a.lft != null && a.rgt != null && !(a.lft < a.rgt)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rgt'], message: 'rgt must be greater than lft' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rgt"],
+        message: "rgt must be greater than lft",
+      });
     }
-});
+  });
 
 // ERPNext-level Company schema with fiscal year and multi-currency support
-export const CompanySchema = z.object({
+export const CompanySchema = z
+  .object({
     // Core identification
     id: z.string().uuid(),
     name: z.string().min(1),
@@ -217,15 +293,22 @@ export const CompanySchema = z.object({
 
     // Audit trail
     created_at: ISO_DATETIME,
-    updated_at: ISO_DATETIME
-}).strict().superRefine((c, ctx) => {
+    updated_at: ISO_DATETIME,
+  })
+  .strict()
+  .superRefine((c, ctx) => {
     if (c.fiscal_year_start > c.fiscal_year_end) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['fiscal_year_end'], message: 'fiscal_year_end must be on/after fiscal_year_start' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["fiscal_year_end"],
+        message: "fiscal_year_end must be on/after fiscal_year_start",
+      });
     }
-});
+  });
 
 // Additional ERPNext-inspired schemas
-export const FiscalYearSchema = z.object({
+export const FiscalYearSchema = z
+  .object({
     id: z.string().uuid(),
     name: z.string().min(1), // e.g., "2024-2025"
     year_start_date: ISO_DATE,
@@ -233,14 +316,21 @@ export const FiscalYearSchema = z.object({
     is_short_year: z.boolean().default(false),
     disabled: z.boolean().default(false),
     created_at: ISO_DATETIME,
-    updated_at: ISO_DATETIME
-}).strict().superRefine((f, ctx) => {
+    updated_at: ISO_DATETIME,
+  })
+  .strict()
+  .superRefine((f, ctx) => {
     if (f.year_start_date > f.year_end_date) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['year_end_date'], message: 'year_end_date must be on/after year_start_date' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["year_end_date"],
+        message: "year_end_date must be on/after year_start_date",
+      });
     }
-});
+  });
 
-export const CostCenterSchema = z.object({
+export const CostCenterSchema = z
+  .object({
     id: z.string().uuid(),
     name: z.string().min(1),
     cost_center_name: z.string().min(1),
@@ -252,21 +342,28 @@ export const CostCenterSchema = z.object({
     lft: z.number().int().positive().optional(),
     rgt: z.number().int().positive().optional(),
     created_at: ISO_DATETIME,
-    updated_at: ISO_DATETIME
-}).strict().superRefine((c, ctx) => {
+    updated_at: ISO_DATETIME,
+  })
+  .strict()
+  .superRefine((c, ctx) => {
     if (c.lft != null && c.rgt != null && !(c.lft < c.rgt)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rgt'], message: 'rgt must be greater than lft' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rgt"],
+        message: "rgt must be greater than lft",
+      });
     }
-});
+  });
 
-export const ProjectSchema = z.object({
+export const ProjectSchema = z
+  .object({
     id: z.string().uuid(),
     name: z.string().min(1),
     project_name: z.string().min(1),
     company_id: z.string().uuid(),
     customer: z.string().optional(),
     project_type: z.string().optional(),
-    status: z.enum(['Open', 'Completed', 'Cancelled']).default('Open'),
+    status: z.enum(["Open", "Completed", "Cancelled"]).default("Open"),
     expected_start_date: ISO_DATE.optional(),
     expected_end_date: ISO_DATE.optional(),
     actual_start_date: ISO_DATE.optional(),
@@ -275,15 +372,29 @@ export const ProjectSchema = z.object({
     total_costing_amount: Finite().optional(),
     total_billed_amount: Finite().optional(),
     created_at: ISO_DATETIME,
-    updated_at: ISO_DATETIME
-}).strict().superRefine((p, ctx) => {
-    if (p.expected_start_date && p.expected_end_date && p.expected_start_date > p.expected_end_date) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expected_end_date'], message: 'expected_end_date must be on/after expected_start_date' });
+    updated_at: ISO_DATETIME,
+  })
+  .strict()
+  .superRefine((p, ctx) => {
+    if (
+      p.expected_start_date &&
+      p.expected_end_date &&
+      p.expected_start_date > p.expected_end_date
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["expected_end_date"],
+        message: "expected_end_date must be on/after expected_start_date",
+      });
     }
     if (p.actual_start_date && p.actual_end_date && p.actual_start_date > p.actual_end_date) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['actual_end_date'], message: 'actual_end_date must be on/after actual_start_date' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["actual_end_date"],
+        message: "actual_end_date must be on/after actual_start_date",
+      });
     }
-});
+  });
 
 // Export all types - SINGLE SOURCE OF TRUTH
 export type CurrencyCode = z.infer<typeof CurrencyCodeSchema>;

@@ -1,6 +1,6 @@
 /**
  * @aibos/tokens - Main export file
- * 
+ *
  * This package provides the single source of truth for all design decisions
  * in the AI-BOS monorepo. All apps and components should consume these tokens.
  */
@@ -16,7 +16,7 @@ export {
   initializeDesignMode,
   type DesignModes,
   type SemanticTokens,
-  type AccessibilityCssVars
+  type AccessibilityCssVars,
 } from "./tokens";
 
 // Export Tailwind preset for easy consumption

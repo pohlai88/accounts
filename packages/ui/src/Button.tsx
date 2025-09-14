@@ -13,14 +13,20 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // Aesthetic Mode - Beautiful, subtle design
-        primary: "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-pressed)] focus-visible:ring-[var(--brand-primary)]",
-        secondary: "border border-[var(--sys-border-hairline)] text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus-visible:ring-[var(--sys-accent)]",
-        ghost: "text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus-visible:ring-[var(--sys-accent)]",
-        destructive: "bg-[var(--sys-status-error)] text-white hover:bg-[var(--sys-status-error)]/90 focus-visible:ring-[var(--sys-status-error)]",
+        primary:
+          "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-pressed)] focus-visible:ring-[var(--brand-primary)]",
+        secondary:
+          "border border-[var(--sys-border-hairline)] text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus-visible:ring-[var(--sys-accent)]",
+        ghost:
+          "text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus-visible:ring-[var(--sys-accent)]",
+        destructive:
+          "bg-[var(--sys-status-error)] text-white hover:bg-[var(--sys-status-error)]/90 focus-visible:ring-[var(--sys-status-error)]",
 
         // Legacy variants for backward compatibility
-        solid: "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-pressed)] focus-visible:ring-[var(--brand-primary)]",
-        outline: "border border-[var(--sys-border-hairline)] text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus-visible:ring-[var(--sys-accent)]",
+        solid:
+          "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-pressed)] focus-visible:ring-[var(--brand-primary)]",
+        outline:
+          "border border-[var(--sys-border-hairline)] text-[var(--sys-text-primary)] hover:bg-[var(--sys-bg-subtle)] focus-visible:ring-[var(--sys-accent)]",
       },
       size: {
         sm: "h-9 px-3 text-sm",
@@ -30,15 +36,15 @@ const buttonVariants = cva(
       },
       mode: {
         aesthetic: "",
-        accessibility: "border-2 border-[var(--sys-border-hairline)] font-semibold"
-      }
+        accessibility: "border-2 border-[var(--sys-border-hairline)] font-semibold",
+      },
     },
     defaultVariants: {
       variant: "primary",
       size: "md",
       mode: "aesthetic",
     },
-  }
+  },
 );
 
 // ============================================================================
@@ -47,7 +53,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof buttonVariants> {
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   mode?: DesignMode;
 }
@@ -56,14 +62,7 @@ export interface ButtonProps
 // BUTTON COMPONENT
 // ============================================================================
 
-export function Button({
-  className,
-  variant,
-  size,
-  mode,
-  asChild = false,
-  ...props
-}: ButtonProps) {
+export function Button({ className, variant, size, mode, asChild = false, ...props }: ButtonProps) {
   const { mode: currentMode } = useAccessibility();
   const effectiveMode = mode || currentMode;
 
@@ -82,14 +81,14 @@ export function Button({
 /**
  * Button that always renders in aesthetic mode
  */
-export function AestheticButton(props: Omit<ButtonProps, 'mode'>) {
+export function AestheticButton(props: Omit<ButtonProps, "mode">) {
   return <Button {...props} mode="aesthetic" />;
 }
 
 /**
  * Button that always renders in accessibility mode (WCAG 2.2 AAA)
  */
-export function AccessibilityButton(props: Omit<ButtonProps, 'mode'>) {
+export function AccessibilityButton(props: Omit<ButtonProps, "mode">) {
   return <Button {...props} mode="accessibility" />;
 }
 

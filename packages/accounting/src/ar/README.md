@@ -37,34 +37,34 @@
 ## 3) Getting Started
 
 ```typescript
-import { validateInvoicePosting, calculateInvoiceTotals } from '@aibos/accounting/ar';
+import { validateInvoicePosting, calculateInvoiceTotals } from "@aibos/accounting/ar";
 
 // Invoice posting validation
 const invoiceResult = await validateInvoicePosting(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    invoiceId: 'inv-789',
-    invoiceNumber: 'INV-001',
-    customerId: 'customer-123',
-    customerName: 'ABC Customer',
-    invoiceDate: '2024-01-15',
-    currency: 'MYR',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    invoiceId: "inv-789",
+    invoiceNumber: "INV-001",
+    customerId: "customer-123",
+    customerName: "ABC Customer",
+    invoiceDate: "2024-01-15",
+    currency: "MYR",
     exchangeRate: 1.0,
-    arAccountId: 'ar-account-id',
+    arAccountId: "ar-account-id",
     lines: [
       {
         lineNumber: 1,
-        description: 'Consulting Services',
+        description: "Consulting Services",
         quantity: 10,
         unitPrice: 100.0,
         lineAmount: 1000.0,
-        revenueAccountId: 'revenue-account-id',
+        revenueAccountId: "revenue-account-id",
       },
     ],
   },
-  'user-123',
-  'accountant'
+  "user-123",
+  "accountant",
 );
 
 // Calculate invoice totals
@@ -169,36 +169,36 @@ pnpm --filter @aibos/accounting typecheck
 ### Basic Invoice Posting
 
 ```typescript
-import { validateInvoicePosting, calculateInvoiceTotals } from '@aibos/accounting/ar';
+import { validateInvoicePosting, calculateInvoiceTotals } from "@aibos/accounting/ar";
 
 // 1. Prepare invoice data
 const invoiceInput = {
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  invoiceId: 'inv-789',
-  invoiceNumber: 'INV-001',
-  customerId: 'customer-123',
-  customerName: 'ABC Customer',
-  invoiceDate: '2024-01-15',
-  currency: 'MYR',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  invoiceId: "inv-789",
+  invoiceNumber: "INV-001",
+  customerId: "customer-123",
+  customerName: "ABC Customer",
+  invoiceDate: "2024-01-15",
+  currency: "MYR",
   exchangeRate: 1.0,
-  arAccountId: 'ar-account-id',
+  arAccountId: "ar-account-id",
   lines: [
     {
       lineNumber: 1,
-      description: 'Consulting Services',
+      description: "Consulting Services",
       quantity: 10,
       unitPrice: 100.0,
       lineAmount: 1000.0,
-      revenueAccountId: 'revenue-account-id',
+      revenueAccountId: "revenue-account-id",
     },
     {
       lineNumber: 2,
-      description: 'Software License',
+      description: "Software License",
       quantity: 1,
       unitPrice: 500.0,
       lineAmount: 500.0,
-      revenueAccountId: 'software-revenue-account-id',
+      revenueAccountId: "software-revenue-account-id",
     },
   ],
 };
@@ -208,129 +208,129 @@ const totals = calculateInvoiceTotals(invoiceInput.lines);
 // Result: { subtotal: 1500.00, taxAmount: 0, totalAmount: 1500.00 }
 
 // 3. Validate invoice posting
-const result = await validateInvoicePosting(invoiceInput, 'user-123', 'accountant');
+const result = await validateInvoicePosting(invoiceInput, "user-123", "accountant");
 
 if (result.validated) {
-  console.log('Invoice validated successfully');
-  console.log('Total revenue:', result.totalRevenue);
-  console.log('Total amount:', result.totalAmount);
-  console.log('Requires approval:', result.requiresApproval);
+  console.log("Invoice validated successfully");
+  console.log("Total revenue:", result.totalRevenue);
+  console.log("Total amount:", result.totalAmount);
+  console.log("Requires approval:", result.requiresApproval);
 } else {
-  console.error('Invoice validation failed:', result.error);
+  console.error("Invoice validation failed:", result.error);
 }
 ```
 
 ### Invoice with Tax Lines
 
 ```typescript
-import { validateInvoicePosting } from '@aibos/accounting/ar';
+import { validateInvoicePosting } from "@aibos/accounting/ar";
 
 // Invoice with tax
 const invoiceWithTax = {
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  invoiceId: 'inv-790',
-  invoiceNumber: 'INV-002',
-  customerId: 'customer-456',
-  customerName: 'XYZ Customer',
-  invoiceDate: '2024-01-15',
-  currency: 'MYR',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  invoiceId: "inv-790",
+  invoiceNumber: "INV-002",
+  customerId: "customer-456",
+  customerName: "XYZ Customer",
+  invoiceDate: "2024-01-15",
+  currency: "MYR",
   exchangeRate: 1.0,
-  arAccountId: 'ar-account-id',
+  arAccountId: "ar-account-id",
   lines: [
     {
       lineNumber: 1,
-      description: 'Professional Services',
+      description: "Professional Services",
       quantity: 20,
       unitPrice: 75.0,
       lineAmount: 1500.0,
-      revenueAccountId: 'revenue-account-id',
-      taxCode: 'SST',
+      revenueAccountId: "revenue-account-id",
+      taxCode: "SST",
       taxRate: 0.06,
       taxAmount: 90.0,
     },
   ],
   taxLines: [
     {
-      taxCode: 'SST',
-      taxAccountId: 'sst-liability-account-id',
+      taxCode: "SST",
+      taxAccountId: "sst-liability-account-id",
       taxAmount: 90.0,
-      taxType: 'OUTPUT',
+      taxType: "OUTPUT",
     },
   ],
 };
 
-const result = await validateInvoicePosting(invoiceWithTax, 'user-123', 'accountant');
+const result = await validateInvoicePosting(invoiceWithTax, "user-123", "accountant");
 
 if (result.validated) {
-  console.log('Invoice with tax validated');
-  console.log('Total revenue:', result.totalRevenue); // 1500.00
-  console.log('Total tax:', result.totalTax); // 90.00
-  console.log('Total amount:', result.totalAmount); // 1590.00
+  console.log("Invoice with tax validated");
+  console.log("Total revenue:", result.totalRevenue); // 1500.00
+  console.log("Total tax:", result.totalTax); // 90.00
+  console.log("Total amount:", result.totalAmount); // 1590.00
 }
 ```
 
 ### Multi-Currency Invoice
 
 ```typescript
-import { validateInvoicePosting } from '@aibos/accounting/ar';
+import { validateInvoicePosting } from "@aibos/accounting/ar";
 
 // USD invoice with FX conversion
 const usdInvoice = {
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  invoiceId: 'inv-usd-001',
-  invoiceNumber: 'INV-USD-001',
-  customerId: 'us-customer-123',
-  customerName: 'US Customer Inc',
-  invoiceDate: '2024-01-15',
-  currency: 'USD',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  invoiceId: "inv-usd-001",
+  invoiceNumber: "INV-USD-001",
+  customerId: "us-customer-123",
+  customerName: "US Customer Inc",
+  invoiceDate: "2024-01-15",
+  currency: "USD",
   exchangeRate: 4.2, // USD to MYR
-  arAccountId: 'ar-account-id',
+  arAccountId: "ar-account-id",
   lines: [
     {
       lineNumber: 1,
-      description: 'Software Development',
+      description: "Software Development",
       quantity: 1,
       unitPrice: 2000.0, // USD
       lineAmount: 2000.0, // USD
-      revenueAccountId: 'revenue-account-id',
+      revenueAccountId: "revenue-account-id",
     },
   ],
 };
 
-const result = await validateInvoicePosting(usdInvoice, 'user-123', 'accountant');
+const result = await validateInvoicePosting(usdInvoice, "user-123", "accountant");
 
 if (result.validated) {
   // Amounts will be converted to MYR: 2000.00 * 4.20 = 8400.00 MYR
-  console.log('USD invoice converted to MYR');
-  console.log('Total revenue (MYR):', result.totalRevenue); // 8400.00
-  console.log('Total amount (MYR):', result.totalAmount); // 8400.00
+  console.log("USD invoice converted to MYR");
+  console.log("Total revenue (MYR):", result.totalRevenue); // 8400.00
+  console.log("Total amount (MYR):", result.totalAmount); // 8400.00
 }
 ```
 
 ### Invoice Line Validation
 
 ```typescript
-import { validateInvoiceLines } from '@aibos/accounting/ar';
+import { validateInvoiceLines } from "@aibos/accounting/ar";
 
 // Validate invoice lines
 const invoiceLines = [
   {
     lineNumber: 1,
-    description: 'Consulting Services',
+    description: "Consulting Services",
     quantity: 10,
     unitPrice: 100.0,
     lineAmount: 1000.0,
-    revenueAccountId: 'revenue-account-id',
+    revenueAccountId: "revenue-account-id",
   },
   {
     lineNumber: 2,
-    description: 'Software License',
+    description: "Software License",
     quantity: 1,
     unitPrice: 500.0,
     lineAmount: 500.0,
-    revenueAccountId: 'software-revenue-account-id',
+    revenueAccountId: "software-revenue-account-id",
     taxRate: 0.06,
     taxAmount: 30.0,
   },
@@ -339,9 +339,9 @@ const invoiceLines = [
 const validation = validateInvoiceLines(invoiceLines);
 
 if (validation.valid) {
-  console.log('All invoice lines are valid');
+  console.log("All invoice lines are valid");
 } else {
-  console.error('Invoice line validation errors:', validation.errors);
+  console.error("Invoice line validation errors:", validation.errors);
   // Example errors:
   // - "Line 2: Tax amount 30.00 does not match line amount × tax rate 30.00"
   // - "Line 1: Quantity must be positive"
@@ -362,7 +362,7 @@ if (validation.valid) {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_AR = 'true';
+process.env.DEBUG_AR = "true";
 ```
 
 **Logs**: Check Axiom telemetry for AR operation logs

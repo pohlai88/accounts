@@ -11,10 +11,7 @@
       "name": "V1 Governance - No Direct DB in UI",
       "description": "Block direct database imports in UI components",
       "pattern": "from\\s+[\"']@aibos/db[\"']",
-      "files": [
-        "apps/web/**/*.tsx",
-        "apps/web/**/*.ts"
-      ],
+      "files": ["apps/web/**/*.tsx", "apps/web/**/*.ts"],
       "severity": "error",
       "message": "❌ V1 VIOLATION: No direct DB access in UI. Use typed hooks only."
     },
@@ -22,9 +19,7 @@
       "name": "V1 Governance - Zod Parse Mandatory",
       "description": "All API routes must use Zod validation",
       "pattern": "export\\s+async\\s+function\\s+(GET|POST|PUT|DELETE|PATCH)",
-      "files": [
-        "apps/web-api/app/api/**/*.ts"
-      ],
+      "files": ["apps/web-api/app/api/**/*.ts"],
       "requiresPattern": "z\\.(object|string|number|boolean|array)",
       "severity": "error",
       "message": "❌ V1 VIOLATION: All API routes must use Zod validation for req/res."
@@ -33,10 +28,7 @@
       "name": "V1 Governance - RLS + SoD Required",
       "description": "All mutations must include RLS and SoD checks",
       "pattern": "(insert|update|delete)\\s*\\(",
-      "files": [
-        "packages/db/**/*.ts",
-        "apps/web-api/**/*.ts"
-      ],
+      "files": ["packages/db/**/*.ts", "apps/web-api/**/*.ts"],
       "requiresPattern": "(tenantId|companyId).*checkSoDCompliance",
       "severity": "error",
       "message": "❌ V1 VIOLATION: All mutations must be scoped with RLS + SoD compliance."
@@ -52,9 +44,7 @@
       "name": "V1 Governance - Audit Logging Required",
       "description": "All mutations must include audit logging",
       "pattern": "(insert|update|delete)\\s*\\(",
-      "files": [
-        "apps/web-api/**/*.ts"
-      ],
+      "files": ["apps/web-api/**/*.ts"],
       "requiresPattern": "(auditService|logOperation|logError)",
       "severity": "error",
       "message": "❌ V1 VIOLATION: All mutations must include audit logging with requestId + tenantId."
@@ -70,10 +60,7 @@
       "name": "V1 Governance - No Server Direct DB Access",
       "description": "Block direct database access bypassing repos",
       "pattern": "from\\s+[\"']drizzle-orm[\"']",
-      "files": [
-        "apps/web/**/*.ts",
-        "apps/web/**/*.tsx"
-      ],
+      "files": ["apps/web/**/*.ts", "apps/web/**/*.tsx"],
       "severity": "error",
       "message": "❌ V1 VIOLATION: No direct Drizzle imports in UI. Use repos only."
     },
@@ -81,9 +68,7 @@
       "name": "V1 Governance - Posting Rules Testing",
       "description": "All posting rules must have unit tests",
       "pattern": "function\\s+\\w*[Pp]ost\\w*\\s*\\(",
-      "files": [
-        "packages/accounting/**/*.ts"
-      ],
+      "files": ["packages/accounting/**/*.ts"],
       "requiresCorrespondingFile": ".test.ts",
       "severity": "error",
       "message": "❌ V1 VIOLATION: All posting rules require unit tests."
@@ -99,9 +84,7 @@
       "name": "V1 Governance - Idempotency Required",
       "description": "Payment and posting endpoints must have idempotency",
       "pattern": "(payment|posting|journal).*route\\.ts",
-      "files": [
-        "apps/web-api/app/api/**/*.ts"
-      ],
+      "files": ["apps/web-api/app/api/**/*.ts"],
       "requiresPattern": "X-Idempotency-Key",
       "severity": "error",
       "message": "❌ V1 VIOLATION: Payment/posting endpoints must support X-Idempotency-Key."
@@ -110,20 +93,12 @@
       "name": "V1 Governance - No Fetch in UI",
       "description": "Block direct fetch calls in UI components",
       "pattern": "fetch\\s*\\(",
-      "files": [
-        "apps/web/**/*.tsx",
-        "apps/web/**/*.ts"
-      ],
+      "files": ["apps/web/**/*.tsx", "apps/web/**/*.ts"],
       "severity": "error",
       "message": "❌ V1 VIOLATION: No direct fetch in UI. Use typed API hooks only."
     }
   ],
-  "allowedDirectories": [
-    "apps/**",
-    "services/**",
-    "packages/**",
-    "tests/**"
-  ],
+  "allowedDirectories": ["apps/**", "services/**", "packages/**", "tests/**"],
   "forbiddenDirectories": [
     "**/*.css",
     "apps/web/**/styles/**",

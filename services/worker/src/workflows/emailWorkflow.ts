@@ -10,15 +10,15 @@ export const emailWorkflow = inngest.createFunction(
   },
   { event: "email/send" },
   async ({ event, step }) => {
-    const { 
-      to, 
-      subject, 
-      template, 
-      data, 
-      tenantId, 
+    const {
+      to,
+      subject,
+      template,
+      data,
+      tenantId,
       companyId,
       priority = "normal",
-      attachments = []
+      attachments = [],
     } = event.data;
 
     // Step 1: Validate email parameters
@@ -49,8 +49,8 @@ export const emailWorkflow = inngest.createFunction(
     const emailContent = await step.run("generate-email-content", async () => {
       try {
         const { html, text } = await generateEmailTemplate(
-          validatedParams.template, 
-          validatedParams.data
+          validatedParams.template,
+          validatedParams.data,
         );
 
         logger.info("Email content generated", {
@@ -76,7 +76,7 @@ export const emailWorkflow = inngest.createFunction(
       }
 
       const processed: unknown[] = [];
-      
+
       for (const attachment of validatedParams.attachments) {
         try {
           // If attachment is a file path, fetch from storage
@@ -174,11 +174,14 @@ export const emailWorkflow = inngest.createFunction(
       to: validatedParams.to,
       subject: validatedParams.subject,
     };
-  }
+  },
 );
 
 // Email template generator
-async function generateEmailTemplate(template: string, data: any): Promise<{ html: string; text: string }> {
+async function generateEmailTemplate(
+  template: string,
+  data: any,
+): Promise<{ html: string; text: string }> {
   switch (template) {
     case "invoice_created":
       return generateInvoiceCreatedTemplate(data);
@@ -216,7 +219,7 @@ function generateInvoiceCreatedTemplate(data: any): { html: string; text: string
           <h2>Invoice Created</h2>
         </div>
         <div class="content">
-          <p>Dear ${data.customerName || 'Customer'},</p>
+          <p>Dear ${data.customerName || "Customer"},</p>
           <p>A new invoice has been created for your account:</p>
           <ul>
             <li><strong>Invoice Number:</strong> ${data.invoiceNumber}</li>
@@ -227,7 +230,7 @@ function generateInvoiceCreatedTemplate(data: any): { html: string; text: string
           <p>Thank you for your business!</p>
         </div>
         <div class="footer">
-          <p>This is an automated message from ${data.companyName || 'AIBOS'}.</p>
+          <p>This is an automated message from ${data.companyName || "AIBOS"}.</p>
         </div>
       </div>
     </body>
@@ -237,7 +240,7 @@ function generateInvoiceCreatedTemplate(data: any): { html: string; text: string
   const text = `
 Invoice Created
 
-Dear ${data.customerName || 'Customer'},
+Dear ${data.customerName || "Customer"},
 
 A new invoice has been created for your account:
 
@@ -250,7 +253,7 @@ Please review the attached invoice and process payment by the due date.
 Thank you for your business!
 
 ---
-This is an automated message from ${data.companyName || 'AIBOS'}.
+This is an automated message from ${data.companyName || "AIBOS"}.
   `;
 
   return { html, text };
@@ -264,9 +267,9 @@ function generateInvoiceApprovedTemplate(data: any): { html: string; text: strin
       <p>Amount: ${data.currency} ${data.amount}</p>
     </body></html>
   `;
-  
+
   const text = `Invoice Approved\n\nInvoice ${data.invoiceNumber} has been approved and is ready for processing.\nAmount: ${data.currency} ${data.amount}`;
-  
+
   return { html, text };
 }
 
@@ -278,9 +281,9 @@ function generatePaymentReceivedTemplate(data: any): { html: string; text: strin
       <p>Thank you for your payment!</p>
     </body></html>
   `;
-  
+
   const text = `Payment Received\n\nPayment of ${data.currency} ${data.amount} has been received for invoice ${data.invoiceNumber}.\nThank you for your payment!`;
-  
+
   return { html, text };
 }
 
@@ -292,22 +295,22 @@ function generateJournalPostedTemplate(data: any): { html: string; text: string 
       <p>Total Amount: ${data.currency} ${data.totalAmount}</p>
     </body></html>
   `;
-  
+
   const text = `Journal Entry Posted\n\nJournal entry ${data.journalNumber} has been posted successfully.\nTotal Amount: ${data.currency} ${data.totalAmount}`;
-  
+
   return { html, text };
 }
 
 function generateSystemNotificationTemplate(data: any): { html: string; text: string } {
   const html = `
     <html><body>
-      <h2>${data.title || 'System Notification'}</h2>
+      <h2>${data.title || "System Notification"}</h2>
       <p>${data.message}</p>
     </body></html>
   `;
-  
-  const text = `${data.title || 'System Notification'}\n\n${data.message}`;
-  
+
+  const text = `${data.title || "System Notification"}\n\n${data.message}`;
+
   return { html, text };
 }
 

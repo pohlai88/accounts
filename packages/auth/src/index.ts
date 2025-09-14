@@ -1,5 +1,5 @@
-export * from './types';
-export * from './sod';
+export * from "./types";
+export * from "./sod";
 
 // Re-export key functions for easy access
 export {
@@ -7,8 +7,8 @@ export {
   isFeatureEnabled,
   checkSoDCompliance,
   getApproverRoles,
-  SOD_MATRIX
-} from './sod';
+  SOD_MATRIX,
+} from "./sod";
 
 // Re-export governance packs
 export {
@@ -19,9 +19,9 @@ export {
   REGULATED_FINANCE_PACK,
   FRANCHISE_PACK,
   applyGovernancePack,
-  getRecommendedPack
-} from './governance-packs';
-export type { GovernancePack } from './governance-packs';
+  getRecommendedPack,
+} from "./governance-packs";
+export type { GovernancePack } from "./governance-packs";
 
 // Note: React context moved to @aibos/ui package to avoid React dependency
 
@@ -29,5 +29,5 @@ export const auth = {
   login: async (_email: string, _password: string) => {
     // TODO: Implement Supabase auth
     return { user: null, error: null };
-  }
+  },
 };

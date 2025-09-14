@@ -1,13 +1,20 @@
-'use client'
+"use client";
 
-import { useAuth, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Alert, AlertDescription, useAccessibility } from '@aibos/ui'
 import {
-  useInvoices,
-  useCustomers,
-  useTrialBalance,
-  useInvalidateQueries
-} from '@aibos/utils/state-management'
-import { useState, useEffect } from 'react'
+  useAuth,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Alert,
+  AlertDescription,
+  useAccessibility,
+} from "@aibos/ui";
+import { useInvoices, useCustomers, useTrialBalance, useInvalidateQueries } from "@aibos/utils";
+import { useState, useEffect } from "react";
 
 // Type definitions for data structures
 interface Invoice {
@@ -34,11 +41,11 @@ interface TrialBalance {
 }
 
 export default function Home() {
-  const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
   // Don't render anything until we're on the client side
   if (!isClient) {
@@ -49,76 +56,79 @@ export default function Home() {
           <p className="mt-2 text-[var(--sys-text-secondary)]">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const { session, login, logout, isLoading, error } = useAuth()
-  const { mode, toggleMode } = useAccessibility()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const { session, login, logout, isLoading, error } = useAuth();
+  const { mode, toggleMode } = useAccessibility();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Get request context for API calls - ensure it's serializable
-  const requestContext = session ? {
-    tenantId: session.user.companyId,
-    companyId: session.user.companyId,
-    userId: session.user.id,
-    userRole: session.user.role,
-    requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  } : null
+  const requestContext = session
+    ? {
+        tenantId: session.user.companyId,
+        companyId: session.user.companyId,
+        userId: session.user.id,
+        userRole: session.user.role,
+        requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      }
+    : null;
 
   // Fetch data when authenticated - only on client side
-  const shouldFetchData = typeof window !== 'undefined' && !!requestContext;
+  const shouldFetchData = typeof window !== "undefined" && !!requestContext;
 
   const { data: invoices, isLoading: invoicesLoading } = useInvoices(
     requestContext!,
     { limit: 5 },
-    { enabled: shouldFetchData }
-  )
+    { enabled: shouldFetchData },
+  );
 
   const { data: customers, isLoading: customersLoading } = useCustomers(
     requestContext!,
     { limit: 5 },
-    { enabled: shouldFetchData }
-  )
+    { enabled: shouldFetchData },
+  );
 
   const { data: trialBalance, isLoading: trialBalanceLoading } = useTrialBalance(
     requestContext!,
     {
-      fromDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0] || '2024-01-01',
-      toDate: new Date().toISOString().split('T')[0] || '2024-12-31',
-      companyId: (session?.user as any)?.companyId || 'default-company',
-      tenantId: (session?.user as any)?.tenantId || 'default-tenant'
+      fromDate:
+        new Date(new Date().getFullYear(), 0, 1).toISOString().split("T")[0] || "2024-01-01",
+      toDate: new Date().toISOString().split("T")[0] || "2024-12-31",
+      companyId: (session?.user as any)?.companyId || "default-company",
+      tenantId: (session?.user as any)?.tenantId || "default-tenant",
     },
-    { enabled: shouldFetchData && !!(session?.user as any)?.companyId }
-  )
+    { enabled: shouldFetchData && !!(session?.user as any)?.companyId },
+  );
 
-  const { invalidateAll } = useInvalidateQueries()
+  const { invalidateAll } = useInvalidateQueries();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || !password || !isClient) return
+    e.preventDefault();
+    if (!email || !password || !isClient) return;
 
-    setIsLoggingIn(true)
+    setIsLoggingIn(true);
     try {
-      await login(email, password)
+      await login(email, password);
       // Refresh all data after successful login
-      invalidateAll()
+      invalidateAll();
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error("Login failed:", error);
     } finally {
-      setIsLoggingIn(false)
+      setIsLoggingIn(false);
     }
-  }
+  };
 
   const handleLogout = async () => {
-    if (!isClient) return
+    if (!isClient) return;
     try {
-      await logout()
+      await logout();
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error("Logout failed:", error);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -128,7 +138,7 @@ export default function Home() {
           <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session?.isAuthenticated) {
@@ -136,7 +146,9 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--sys-bg-primary)]">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-[var(--sys-text-primary)]">Welcome to AIBOS Accounting</CardTitle>
+            <CardTitle className="text-2xl font-bold text-[var(--sys-text-primary)]">
+              Welcome to AIBOS Accounting
+            </CardTitle>
             <CardDescription className="text-[var(--sys-text-secondary)]">
               Sign in to access your cloud accounting platform
             </CardDescription>
@@ -149,45 +161,47 @@ export default function Home() {
             )}
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-2 text-[var(--sys-text-primary)]">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium mb-2 text-[var(--sys-text-primary)]"
+                >
                   Email
                 </label>
                 <input
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   className="w-full px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)] placeholder-[var(--sys-text-secondary)]"
                   placeholder="Enter your email"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-2 text-[var(--sys-text-primary)]">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium mb-2 text-[var(--sys-text-primary)]"
+                >
                   Password
                 </label>
                 <input
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-[var(--sys-border-hairline)] rounded-md bg-[var(--sys-bg-primary)] text-[var(--sys-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--sys-accent)] placeholder-[var(--sys-text-secondary)]"
                   placeholder="Enter your password"
                   required
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoggingIn}
-              >
-                {isLoggingIn ? 'Signing in...' : 'Sign In'}
+              <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                {isLoggingIn ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -197,7 +211,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[var(--sys-text-primary)]">AIBOS Accounting</h1>
+              <h1 className="text-2xl font-bold text-[var(--sys-text-primary)]">
+                AIBOS Accounting
+              </h1>
               <p className="text-sm text-[var(--sys-text-secondary)]">
                 Welcome back, {session.user.name || session.user.email}
               </p>
@@ -210,15 +226,10 @@ export default function Home() {
                 className="text-[var(--sys-text-secondary)] hover:text-[var(--sys-text-primary)]"
                 disabled={!isClient}
               >
-                {mode === 'aesthetic' ? '♿ Accessibility' : '🎨 Aesthetic'}
+                {mode === "aesthetic" ? "♿ Accessibility" : "🎨 Aesthetic"}
               </Button>
-              <Badge variant="outline">
-                {session.user.role}
-              </Badge>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-              >
+              <Badge variant="outline">{session.user.role}</Badge>
+              <Button variant="outline" onClick={handleLogout}>
                 Sign Out
               </Button>
             </div>
@@ -234,13 +245,9 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Recent Invoices
-                <Badge variant="secondary">
-                  {invoices?.invoices?.length || 0}
-                </Badge>
+                <Badge variant="secondary">{invoices?.invoices?.length || 0}</Badge>
               </CardTitle>
-              <CardDescription>
-                Latest invoice activity
-              </CardDescription>
+              <CardDescription>Latest invoice activity</CardDescription>
             </CardHeader>
             <CardContent>
               {invoicesLoading ? (
@@ -249,22 +256,33 @@ export default function Home() {
                     <div key={i} className="h-4 bg-[var(--sys-bg-subtle)] animate-pulse rounded" />
                   ))}
                 </div>
-              ) : invoices?.invoices?.length > 0 ? (
+              ) : invoices?.invoices && invoices.invoices.length > 0 ? (
                 <div className="space-y-2">
-                  {(invoices as { invoices: Invoice[] }).invoices.slice(0, 3).map((invoice: Invoice) => (
-                    <div key={invoice.id} className="flex justify-between items-center py-2 border-b border-[var(--sys-border-hairline)] last:border-b-0">
-                      <div>
-                        <p className="font-medium text-[var(--sys-text-primary)]">{invoice.invoiceNumber}</p>
-                        <p className="text-sm text-[var(--sys-text-secondary)]">{invoice.customerName}</p>
+                  {(invoices as { invoices: Invoice[] }).invoices
+                    .slice(0, 3)
+                    .map((invoice: Invoice) => (
+                      <div
+                        key={invoice.id}
+                        className="flex justify-between items-center py-2 border-b border-[var(--sys-border-hairline)] last:border-b-0"
+                      >
+                        <div>
+                          <p className="font-medium text-[var(--sys-text-primary)]">
+                            {invoice.invoiceNumber}
+                          </p>
+                          <p className="text-sm text-[var(--sys-text-secondary)]">
+                            {invoice.customerName}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-[var(--sys-text-primary)]">
+                            {invoice.currency} {Number(invoice.totalAmount).toFixed(2)}
+                          </p>
+                          <Badge variant={invoice.status === "paid" ? "success" : "secondary"}>
+                            {invoice.status}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium text-[var(--sys-text-primary)]">{invoice.currency} {Number(invoice.totalAmount).toFixed(2)}</p>
-                        <Badge variant={invoice.status === 'paid' ? 'success' : 'secondary'}>
-                          {invoice.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <p className="text-[var(--sys-text-secondary)] text-sm">No invoices found</p>
@@ -277,13 +295,9 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Recent Customers
-                <Badge variant="secondary">
-                  {customers?.customers?.length || 0}
-                </Badge>
+                <Badge variant="secondary">{customers?.customers?.length || 0}</Badge>
               </CardTitle>
-              <CardDescription>
-                Customer management
-              </CardDescription>
+              <CardDescription>Customer management</CardDescription>
             </CardHeader>
             <CardContent>
               {customersLoading ? (
@@ -292,19 +306,26 @@ export default function Home() {
                     <div key={i} className="h-4 bg-[var(--sys-bg-subtle)] animate-pulse rounded" />
                   ))}
                 </div>
-              ) : customers?.customers?.length > 0 ? (
+              ) : customers?.customers && customers.customers.length > 0 ? (
                 <div className="space-y-2">
-                  {(customers as { customers: Customer[] }).customers.slice(0, 3).map((customer: Customer) => (
-                    <div key={customer.id} className="flex justify-between items-center py-2 border-b border-[var(--sys-border-hairline)] last:border-b-0">
-                      <div>
-                        <p className="font-medium text-[var(--sys-text-primary)]">{customer.name}</p>
-                        <p className="text-sm text-[var(--sys-text-secondary)]">{customer.customerNumber}</p>
+                  {(customers as { customers: Customer[] }).customers
+                    .slice(0, 3)
+                    .map((customer: Customer) => (
+                      <div
+                        key={customer.id}
+                        className="flex justify-between items-center py-2 border-b border-[var(--sys-border-hairline)] last:border-b-0"
+                      >
+                        <div>
+                          <p className="font-medium text-[var(--sys-text-primary)]">
+                            {customer.name}
+                          </p>
+                          <p className="text-sm text-[var(--sys-text-secondary)]">
+                            {customer.customerNumber}
+                          </p>
+                        </div>
+                        <Badge variant="outline">{customer.currency}</Badge>
                       </div>
-                      <Badge variant="outline">
-                        {customer.currency}
-                      </Badge>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <p className="text-[var(--sys-text-secondary)] text-sm">No customers found</p>
@@ -316,9 +337,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>Quick Stats</CardTitle>
-              <CardDescription>
-                Financial overview
-              </CardDescription>
+              <CardDescription>Financial overview</CardDescription>
             </CardHeader>
             <CardContent>
               {trialBalanceLoading ? (
@@ -332,30 +351,34 @@ export default function Home() {
                   <div className="flex justify-between">
                     <span className="text-sm text-[var(--sys-text-secondary)]">Total Assets</span>
                     <span className="font-medium text-[var(--sys-text-primary)]">
-                      {(trialBalance as TrialBalance).assets?.toFixed(2) || '0.00'}
+                      {(trialBalance as TrialBalance).assets?.toFixed(2) || "0.00"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-[var(--sys-text-secondary)]">Total Liabilities</span>
+                    <span className="text-sm text-[var(--sys-text-secondary)]">
+                      Total Liabilities
+                    </span>
                     <span className="font-medium text-[var(--sys-text-primary)]">
-                      {(trialBalance as TrialBalance).liabilities?.toFixed(2) || '0.00'}
+                      {(trialBalance as TrialBalance).liabilities?.toFixed(2) || "0.00"}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-[var(--sys-text-secondary)]">Total Equity</span>
                     <span className="font-medium text-[var(--sys-text-primary)]">
-                      {(trialBalance as TrialBalance).equity?.toFixed(2) || '0.00'}
+                      {(trialBalance as TrialBalance).equity?.toFixed(2) || "0.00"}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-[var(--sys-text-secondary)]">Net Income</span>
                     <span className="font-medium text-[var(--sys-text-primary)]">
-                      {(trialBalance as TrialBalance).netIncome?.toFixed(2) || '0.00'}
+                      {(trialBalance as TrialBalance).netIncome?.toFixed(2) || "0.00"}
                     </span>
                   </div>
                 </div>
               ) : (
-                <p className="text-[var(--sys-text-secondary)] text-sm">No financial data available</p>
+                <p className="text-[var(--sys-text-secondary)] text-sm">
+                  No financial data available
+                </p>
               )}
             </CardContent>
           </Card>
@@ -378,16 +401,20 @@ export default function Home() {
               </div>
               <div>
                 <p className="text-sm text-[var(--sys-text-secondary)]">Company</p>
-                <p className="font-medium text-[var(--sys-text-primary)]">{session.user.companyName || 'N/A'}</p>
+                <p className="font-medium text-[var(--sys-text-primary)]">
+                  {session.user.companyName || "N/A"}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-[var(--sys-text-secondary)]">Permissions</p>
-                <p className="font-medium text-[var(--sys-text-primary)]">{session.user.permissions.length} granted</p>
+                <p className="font-medium text-[var(--sys-text-primary)]">
+                  {session.user.permissions.length} granted
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </main>
     </div>
-  )
+  );
 }

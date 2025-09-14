@@ -1,169 +1,188 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { 
-  FileText, 
-  Download, 
-  RefreshCw, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  FileText,
+  Download,
+  RefreshCw,
   Calendar,
   DollarSign,
   TrendingUp,
   TrendingDown,
   BarChart3,
-  Filter
-} from 'lucide-react'
-import { ReportCurrencyConversionService } from '@/lib/report-currency-conversion'
-import { format } from 'date-fns'
+  Filter,
+} from "lucide-react";
+import { ReportCurrencyConversionService } from "@/lib/report-currency-conversion";
+import { format } from "date-fns";
 
 interface ProfitLossData {
   revenue: Array<{
-    account_name: string
-    amount: number
-    original_amount: number
-    currency: string
-    percentage: number
-  }>
+    account_name: string;
+    amount: number;
+    original_amount: number;
+    currency: string;
+    percentage: number;
+  }>;
   expenses: Array<{
-    account_name: string
-    amount: number
-    original_amount: number
-    currency: string
-    percentage: number
-  }>
-  totalRevenue: number
-  totalExpenses: number
-  grossProfit: number
-  netIncomeAmount: number
-  currency: string
+    account_name: string;
+    amount: number;
+    original_amount: number;
+    currency: string;
+    percentage: number;
+  }>;
+  totalRevenue: number;
+  totalExpenses: number;
+  grossProfit: number;
+  netIncomeAmount: number;
+  currency: string;
   period: {
-    from: string
-    to: string
-  }
+    from: string;
+    to: string;
+  };
 }
 
 export default function ProfitLossPage() {
-  const [profitLossData, setProfitLossData] = useState<ProfitLossData | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [profitLossData, setProfitLossData] = useState<ProfitLossData | null>(null);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
-    fromDate: format(new Date(new Date().getFullYear(), 0, 1), 'yyyy-MM-dd'), // Start of year
-    toDate: format(new Date(), 'yyyy-MM-dd'), // Today
-    currency: 'USD',
-    comparisonPeriod: 'none' as 'none' | 'previous' | 'previous_year'
-  })
-  const [comparisonData, setComparisonData] = useState<ProfitLossData | null>(null)
+    fromDate: format(new Date(new Date().getFullYear(), 0, 1), "yyyy-MM-dd"), // Start of year
+    toDate: format(new Date(), "yyyy-MM-dd"), // Today
+    currency: "USD",
+    comparisonPeriod: "none" as "none" | "previous" | "previous_year",
+  });
+  const [comparisonData, setComparisonData] = useState<ProfitLossData | null>(null);
 
-  const companyId = 'default-company' // In a real app, this would come from context
+  const companyId = "default-company"; // In a real app, this would come from context
 
   useEffect(() => {
-    loadProfitLossData()
-  }, [filters])
+    loadProfitLossData();
+  }, [filters]);
 
   const loadProfitLossData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const result = await ReportCurrencyConversionService.getProfitAndLossWithConversion(
         companyId,
         filters.fromDate,
         filters.toDate,
-        filters.currency
-      )
+        filters.currency,
+      );
 
       if (result.success && result.profitAndLoss) {
-        setProfitLossData(result.profitAndLoss as ProfitLossData)
+        setProfitLossData(result.profitAndLoss as ProfitLossData);
       }
 
       // Load comparison data if needed
-      if (filters.comparisonPeriod !== 'none') {
-        await loadComparisonData()
+      if (filters.comparisonPeriod !== "none") {
+        await loadComparisonData();
       }
     } catch (error) {
-      console.error('Error loading profit & loss data:', error)
+      console.error("Error loading profit & loss data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadComparisonData = async () => {
     try {
-      let fromDate: string
-      let toDate: string
+      let fromDate: string;
+      let toDate: string;
 
-      if (filters.comparisonPeriod === 'previous') {
+      if (filters.comparisonPeriod === "previous") {
         // Previous period (same length as current period)
-        const currentFrom = new Date(filters.fromDate)
-        const currentTo = new Date(filters.toDate)
-        const periodLength = currentTo.getTime() - currentFrom.getTime()
-        
-        toDate = format(new Date(currentFrom.getTime() - 1), 'yyyy-MM-dd')
-        fromDate = format(new Date(currentFrom.getTime() - periodLength - 1), 'yyyy-MM-dd')
-      } else if (filters.comparisonPeriod === 'previous_year') {
+        const currentFrom = new Date(filters.fromDate);
+        const currentTo = new Date(filters.toDate);
+        const periodLength = currentTo.getTime() - currentFrom.getTime();
+
+        toDate = format(new Date(currentFrom.getTime() - 1), "yyyy-MM-dd");
+        fromDate = format(new Date(currentFrom.getTime() - periodLength - 1), "yyyy-MM-dd");
+      } else if (filters.comparisonPeriod === "previous_year") {
         // Same period previous year
-        const currentFrom = new Date(filters.fromDate)
-        const currentTo = new Date(filters.toDate)
-        
-        fromDate = format(new Date(currentFrom.getFullYear() - 1, currentFrom.getMonth(), currentFrom.getDate()), 'yyyy-MM-dd')
-        toDate = format(new Date(currentTo.getFullYear() - 1, currentTo.getMonth(), currentTo.getDate()), 'yyyy-MM-dd')
+        const currentFrom = new Date(filters.fromDate);
+        const currentTo = new Date(filters.toDate);
+
+        fromDate = format(
+          new Date(currentFrom.getFullYear() - 1, currentFrom.getMonth(), currentFrom.getDate()),
+          "yyyy-MM-dd",
+        );
+        toDate = format(
+          new Date(currentTo.getFullYear() - 1, currentTo.getMonth(), currentTo.getDate()),
+          "yyyy-MM-dd",
+        );
       } else {
-        return
+        return;
       }
 
       const result = await ReportCurrencyConversionService.getProfitAndLossWithConversion(
         companyId,
         fromDate,
         toDate,
-        filters.currency
-      )
+        filters.currency,
+      );
 
       if (result.success && result.profitAndLoss) {
-        setComparisonData(result.profitAndLoss as ProfitLossData)
+        setComparisonData(result.profitAndLoss as ProfitLossData);
       }
     } catch (error) {
-      console.error('Error loading comparison data:', error)
+      console.error("Error loading comparison data:", error);
     }
-  }
+  };
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount)
-  }
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   const calculateChange = (current: number, previous: number) => {
-    if (previous === 0) return current > 0 ? 100 : 0
-    return ((current - previous) / Math.abs(previous)) * 100
-  }
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / Math.abs(previous)) * 100;
+  };
 
   const getChangeIcon = (change: number) => {
-    if (change > 0) return <TrendingUp className="h-4 w-4 text-green-500" />
-    if (change < 0) return <TrendingDown className="h-4 w-4 text-red-500" />
-    return <BarChart3 className="h-4 w-4 text-gray-500" />
-  }
+    if (change > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
+    if (change < 0) return <TrendingDown className="h-4 w-4 text-red-500" />;
+    return <BarChart3 className="h-4 w-4 text-gray-500" />;
+  };
 
   const getChangeColor = (change: number) => {
-    if (change > 0) return 'text-green-600'
-    if (change < 0) return 'text-red-600'
-    return 'text-gray-600'
-  }
+    if (change > 0) return "text-green-600";
+    if (change < 0) return "text-red-600";
+    return "text-gray-600";
+  };
 
   const exportToPDF = () => {
     // TODO: Implement PDF export
-    console.log('Export to PDF functionality will be implemented')
-  }
+    console.log("Export to PDF functionality will be implemented");
+  };
 
   const exportToExcel = () => {
     // TODO: Implement Excel export
-    console.log('Export to Excel functionality will be implemented')
-  }
+    console.log("Export to Excel functionality will be implemented");
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -171,9 +190,7 @@ export default function ProfitLossPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Profit & Loss Statement</h1>
-          <p className="text-muted-foreground">
-            Revenue and expense analysis for your business
-          </p>
+          <p className="text-muted-foreground">Revenue and expense analysis for your business</p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={exportToExcel}>
@@ -203,7 +220,7 @@ export default function ProfitLossPage() {
                 id="fromDate"
                 type="date"
                 value={filters.fromDate}
-                onChange={(e) => setFilters(prev => ({ ...prev, fromDate: e.target.value }))}
+                onChange={e => setFilters(prev => ({ ...prev, fromDate: e.target.value }))}
               />
             </div>
             <div>
@@ -212,14 +229,14 @@ export default function ProfitLossPage() {
                 id="toDate"
                 type="date"
                 value={filters.toDate}
-                onChange={(e) => setFilters(prev => ({ ...prev, toDate: e.target.value }))}
+                onChange={e => setFilters(prev => ({ ...prev, toDate: e.target.value }))}
               />
             </div>
             <div>
               <Label htmlFor="currency">Currency</Label>
               <Select
                 value={filters.currency}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, currency: value }))}
+                onValueChange={value => setFilters(prev => ({ ...prev, currency: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -237,7 +254,9 @@ export default function ProfitLossPage() {
               <Label htmlFor="comparison">Comparison</Label>
               <Select
                 value={filters.comparisonPeriod}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, comparisonPeriod: value as any }))}
+                onValueChange={value =>
+                  setFilters(prev => ({ ...prev, comparisonPeriod: value as any }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -251,8 +270,8 @@ export default function ProfitLossPage() {
             </div>
             <div className="flex items-end">
               <Button onClick={loadProfitLossData} disabled={loading} className="w-full">
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? 'Loading...' : 'Refresh'}
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                {loading ? "Loading..." : "Refresh"}
               </Button>
             </div>
           </div>
@@ -321,7 +340,9 @@ export default function ProfitLossPage() {
                   <BarChart3 className="h-4 w-4 text-purple-500" />
                   <div>
                     <p className="text-sm font-medium">Net Income</p>
-                    <p className={`text-2xl font-bold ${profitLossData.netIncomeAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <p
+                      className={`text-2xl font-bold ${profitLossData.netIncomeAmount >= 0 ? "text-green-600" : "text-red-600"}`}
+                    >
                       {formatCurrency(profitLossData.netIncomeAmount, filters.currency)}
                     </p>
                   </div>
@@ -356,8 +377,12 @@ export default function ProfitLossPage() {
                   </TableHeader>
                   <TableBody>
                     {profitLossData.revenue.map((item, index) => {
-                      const comparisonItem = comparisonData?.revenue.find(c => c.account_name === item.account_name)
-                      const change = comparisonItem ? calculateChange(item.amount, comparisonItem.amount) : 0
+                      const comparisonItem = comparisonData?.revenue.find(
+                        c => c.account_name === item.account_name,
+                      );
+                      const change = comparisonItem
+                        ? calculateChange(item.amount, comparisonItem.amount)
+                        : 0;
 
                       return (
                         <TableRow key={index}>
@@ -371,20 +396,23 @@ export default function ProfitLossPage() {
                           {comparisonData && (
                             <>
                               <TableCell className="text-right text-muted-foreground">
-                                {comparisonItem ? formatCurrency(comparisonItem.amount, filters.currency) : '-'}
+                                {comparisonItem
+                                  ? formatCurrency(comparisonItem.amount, filters.currency)
+                                  : "-"}
                               </TableCell>
                               <TableCell className="text-right">
                                 <div className="flex items-center justify-end space-x-1">
                                   {getChangeIcon(change)}
                                   <span className={getChangeColor(change)}>
-                                    {change > 0 ? '+' : ''}{change.toFixed(1)}%
+                                    {change > 0 ? "+" : ""}
+                                    {change.toFixed(1)}%
                                   </span>
                                 </div>
                               </TableCell>
                             </>
                           )}
                         </TableRow>
-                      )
+                      );
                     })}
                     <TableRow className="border-t-2 font-bold">
                       <TableCell>Total Revenue</TableCell>
@@ -399,9 +427,31 @@ export default function ProfitLossPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end space-x-1">
-                              {getChangeIcon(calculateChange(profitLossData.totalRevenue, comparisonData.totalRevenue))}
-                              <span className={getChangeColor(calculateChange(profitLossData.totalRevenue, comparisonData.totalRevenue))}>
-                                {calculateChange(profitLossData.totalRevenue, comparisonData.totalRevenue) > 0 ? '+' : ''}{calculateChange(profitLossData.totalRevenue, comparisonData.totalRevenue).toFixed(1)}%
+                              {getChangeIcon(
+                                calculateChange(
+                                  profitLossData.totalRevenue,
+                                  comparisonData.totalRevenue,
+                                ),
+                              )}
+                              <span
+                                className={getChangeColor(
+                                  calculateChange(
+                                    profitLossData.totalRevenue,
+                                    comparisonData.totalRevenue,
+                                  ),
+                                )}
+                              >
+                                {calculateChange(
+                                  profitLossData.totalRevenue,
+                                  comparisonData.totalRevenue,
+                                ) > 0
+                                  ? "+"
+                                  : ""}
+                                {calculateChange(
+                                  profitLossData.totalRevenue,
+                                  comparisonData.totalRevenue,
+                                ).toFixed(1)}
+                                %
                               </span>
                             </div>
                           </TableCell>
@@ -440,8 +490,12 @@ export default function ProfitLossPage() {
                   </TableHeader>
                   <TableBody>
                     {profitLossData.expenses.map((item, index) => {
-                      const comparisonItem = comparisonData?.expenses.find(c => c.account_name === item.account_name)
-                      const change = comparisonItem ? calculateChange(item.amount, comparisonItem.amount) : 0
+                      const comparisonItem = comparisonData?.expenses.find(
+                        c => c.account_name === item.account_name,
+                      );
+                      const change = comparisonItem
+                        ? calculateChange(item.amount, comparisonItem.amount)
+                        : 0;
 
                       return (
                         <TableRow key={index}>
@@ -455,20 +509,23 @@ export default function ProfitLossPage() {
                           {comparisonData && (
                             <>
                               <TableCell className="text-right text-muted-foreground">
-                                {comparisonItem ? formatCurrency(comparisonItem.amount, filters.currency) : '-'}
+                                {comparisonItem
+                                  ? formatCurrency(comparisonItem.amount, filters.currency)
+                                  : "-"}
                               </TableCell>
                               <TableCell className="text-right">
                                 <div className="flex items-center justify-end space-x-1">
                                   {getChangeIcon(change)}
                                   <span className={getChangeColor(change)}>
-                                    {change > 0 ? '+' : ''}{change.toFixed(1)}%
+                                    {change > 0 ? "+" : ""}
+                                    {change.toFixed(1)}%
                                   </span>
                                 </div>
                               </TableCell>
                             </>
                           )}
                         </TableRow>
-                      )
+                      );
                     })}
                     <TableRow className="border-t-2 font-bold">
                       <TableCell>Total Expenses</TableCell>
@@ -483,9 +540,31 @@ export default function ProfitLossPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end space-x-1">
-                              {getChangeIcon(calculateChange(profitLossData.totalExpenses, comparisonData.totalExpenses))}
-                              <span className={getChangeColor(calculateChange(profitLossData.totalExpenses, comparisonData.totalExpenses))}>
-                                {calculateChange(profitLossData.totalExpenses, comparisonData.totalExpenses) > 0 ? '+' : ''}{calculateChange(profitLossData.totalExpenses, comparisonData.totalExpenses).toFixed(1)}%
+                              {getChangeIcon(
+                                calculateChange(
+                                  profitLossData.totalExpenses,
+                                  comparisonData.totalExpenses,
+                                ),
+                              )}
+                              <span
+                                className={getChangeColor(
+                                  calculateChange(
+                                    profitLossData.totalExpenses,
+                                    comparisonData.totalExpenses,
+                                  ),
+                                )}
+                              >
+                                {calculateChange(
+                                  profitLossData.totalExpenses,
+                                  comparisonData.totalExpenses,
+                                ) > 0
+                                  ? "+"
+                                  : ""}
+                                {calculateChange(
+                                  profitLossData.totalExpenses,
+                                  comparisonData.totalExpenses,
+                                ).toFixed(1)}
+                                %
                               </span>
                             </div>
                           </TableCell>
@@ -505,18 +584,43 @@ export default function ProfitLossPage() {
                 <div>
                   <h3 className="text-lg font-semibold">Net Income</h3>
                   <p className="text-muted-foreground">
-                    Period: {format(new Date(profitLossData.period.from), 'MMM dd, yyyy')} - {format(new Date(profitLossData.period.to), 'MMM dd, yyyy')}
+                    Period: {format(new Date(profitLossData.period.from), "MMM dd, yyyy")} -{" "}
+                    {format(new Date(profitLossData.period.to), "MMM dd, yyyy")}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-3xl font-bold ${profitLossData.netIncomeAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p
+                    className={`text-3xl font-bold ${profitLossData.netIncomeAmount >= 0 ? "text-green-600" : "text-red-600"}`}
+                  >
                     {formatCurrency(profitLossData.netIncomeAmount, filters.currency)}
                   </p>
                   {comparisonData && (
                     <div className="flex items-center justify-end space-x-1 mt-1">
-                      {getChangeIcon(calculateChange(profitLossData.netIncomeAmount, comparisonData.netIncomeAmount))}
-                      <span className={getChangeColor(calculateChange(profitLossData.netIncomeAmount, comparisonData.netIncomeAmount))}>
-                        {calculateChange(profitLossData.netIncomeAmount, comparisonData.netIncomeAmount) > 0 ? '+' : ''}{calculateChange(profitLossData.netIncomeAmount, comparisonData.netIncomeAmount).toFixed(1)}%
+                      {getChangeIcon(
+                        calculateChange(
+                          profitLossData.netIncomeAmount,
+                          comparisonData.netIncomeAmount,
+                        ),
+                      )}
+                      <span
+                        className={getChangeColor(
+                          calculateChange(
+                            profitLossData.netIncomeAmount,
+                            comparisonData.netIncomeAmount,
+                          ),
+                        )}
+                      >
+                        {calculateChange(
+                          profitLossData.netIncomeAmount,
+                          comparisonData.netIncomeAmount,
+                        ) > 0
+                          ? "+"
+                          : ""}
+                        {calculateChange(
+                          profitLossData.netIncomeAmount,
+                          comparisonData.netIncomeAmount,
+                        ).toFixed(1)}
+                        %
                       </span>
                     </div>
                   )}
@@ -543,5 +647,5 @@ export default function ProfitLossPage() {
         </Card>
       )}
     </div>
-  )
+  );
 }

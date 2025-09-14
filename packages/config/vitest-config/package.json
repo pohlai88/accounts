@@ -1,0 +1,24 @@
+{
+  "name": "@aibos/vitest-config",
+  "version": "0.1.0",
+  "description": "SSOT Vitest configuration for AI-BOS monorepo",
+  "main": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "require": "./index.ts"
+    }
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4"
+  },
+  "peerDependencies": {
+    "vitest": "^3.2.4"
+  },
+  "files": [
+    "index.ts"
+  ],
+  "type": "module"
+}

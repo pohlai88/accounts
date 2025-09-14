@@ -330,19 +330,19 @@ and policy enforcement
 ```typescript
 // Trigger FX rate ingestion
 await inngest.send({
-  name: 'fx/rates.ingest',
+  name: "fx/rates.ingest",
   data: {
-    currencyPairs: ['USD/MYR', 'EUR/MYR', 'SGD/MYR'],
-    source: 'primary',
+    currencyPairs: ["USD/MYR", "EUR/MYR", "SGD/MYR"],
+    source: "primary",
   },
 });
 
 // Manual FX rate ingestion
 await inngest.send({
-  name: 'fx/rates.ingest.manual',
+  name: "fx/rates.ingest.manual",
   data: {
-    baseCurrency: 'MYR',
-    targetCurrencies: ['USD', 'EUR', 'SGD'],
+    baseCurrency: "MYR",
+    targetCurrencies: ["USD", "EUR", "SGD"],
   },
 });
 ```
@@ -352,19 +352,19 @@ await inngest.send({
 ```typescript
 // Generate invoice PDF
 await inngest.send({
-  name: 'pdf/generate',
+  name: "pdf/generate",
   data: {
-    templateType: 'invoice',
+    templateType: "invoice",
     data: {
-      invoiceNumber: 'INV-001',
-      customerName: 'Acme Corp',
+      invoiceNumber: "INV-001",
+      customerName: "Acme Corp",
       amount: 1000.0,
-      currency: 'MYR',
+      currency: "MYR",
     },
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    entityId: 'invoice-789',
-    entityType: 'invoice',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    entityId: "invoice-789",
+    entityType: "invoice",
   },
 });
 ```
@@ -374,20 +374,20 @@ await inngest.send({
 ```typescript
 // Send invoice email
 await inngest.send({
-  name: 'email/send',
+  name: "email/send",
   data: {
-    to: 'customer@example.com',
-    subject: 'Invoice INV-001',
-    template: 'invoice-notification',
+    to: "customer@example.com",
+    subject: "Invoice INV-001",
+    template: "invoice-notification",
     data: {
-      invoiceNumber: 'INV-001',
+      invoiceNumber: "INV-001",
       amount: 1000.0,
-      dueDate: '2024-12-31',
+      dueDate: "2024-12-31",
     },
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    priority: 'normal',
-    attachments: ['invoice-001.pdf'],
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    priority: "normal",
+    attachments: ["invoice-001.pdf"],
   },
 });
 ```
@@ -397,16 +397,16 @@ await inngest.send({
 ```typescript
 // Process document OCR
 await inngest.send({
-  name: 'ocr/process',
+  name: "ocr/process",
   data: {
-    tenantId: 'tenant-123',
-    attachmentId: 'attachment-456',
+    tenantId: "tenant-123",
+    attachmentId: "attachment-456",
     extractText: true,
     extractTables: true,
     extractMetadata: true,
-    documentType: 'invoice',
-    languages: ['en', 'ms'],
-    priority: 'normal',
+    documentType: "invoice",
+    languages: ["en", "ms"],
+    priority: "normal",
   },
 });
 ```

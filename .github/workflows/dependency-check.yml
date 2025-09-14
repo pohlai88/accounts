@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: 'package.json'
+          node-version-file: "package.json"
 
       - name: Enable Corepack
         run: corepack enable

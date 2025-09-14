@@ -471,7 +471,7 @@ function ErrorEmptyState() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_EMPTY_STATES = 'true';
+process.env.DEBUG_EMPTY_STATES = "true";
 ```
 
 **Logs**: Check browser console for empty state interaction logs

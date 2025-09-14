@@ -43,16 +43,16 @@ import {
   createAuditContext,
   validateContext,
   sanitizeContext,
-} from '@aibos/utils/context';
+} from "@aibos/utils/context";
 
 // Create request context
 const requestContext = createRequestContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
 });
 
 // Extract user context from request
@@ -64,7 +64,7 @@ const auditContext = createAuditContext(requestContext);
 // Validate context
 const isValid = validateContext(requestContext);
 if (!isValid) {
-  throw new Error('Invalid request context');
+  throw new Error("Invalid request context");
 }
 
 // Sanitize context for logging
@@ -170,61 +170,61 @@ pnpm --filter @aibos/utils typecheck
 ### Basic Context Creation
 
 ```typescript
-import { createRequestContext, validateContext } from '@aibos/utils/context';
+import { createRequestContext, validateContext } from "@aibos/utils/context";
 
 // Create request context
 const requestContext = createRequestContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
-  ipAddress: '192.168.1.100',
-  userAgent: 'Mozilla/5.0...',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
+  ipAddress: "192.168.1.100",
+  userAgent: "Mozilla/5.0...",
   timestamp: new Date(),
 });
 
 // Validate context
 const validation = validateContext(requestContext);
 if (!validation.isValid) {
-  console.error('Context validation failed:', validation.errors);
-  throw new Error('Invalid request context');
+  console.error("Context validation failed:", validation.errors);
+  throw new Error("Invalid request context");
 }
 
-console.log('Request context created successfully');
-console.log('Tenant ID:', requestContext.tenantId);
-console.log('Company ID:', requestContext.companyId);
-console.log('User ID:', requestContext.userId);
-console.log('User Role:', requestContext.userRole);
+console.log("Request context created successfully");
+console.log("Tenant ID:", requestContext.tenantId);
+console.log("Company ID:", requestContext.companyId);
+console.log("User ID:", requestContext.userId);
+console.log("User Role:", requestContext.userRole);
 ```
 
 ### User Context Extraction
 
 ```typescript
-import { extractUserContext, createRequestContext } from '@aibos/utils/context';
+import { extractUserContext, createRequestContext } from "@aibos/utils/context";
 
 // Simulate request object
 const request = {
   headers: {
-    'x-user-id': 'user-789',
-    'x-user-role': 'accountant',
-    'x-tenant-id': 'tenant-123',
-    'x-company-id': 'company-456',
-    'x-session-id': 'session-abc',
+    "x-user-id": "user-789",
+    "x-user-role": "accountant",
+    "x-tenant-id": "tenant-123",
+    "x-company-id": "company-456",
+    "x-session-id": "session-abc",
   },
-  ip: '192.168.1.100',
-  userAgent: 'Mozilla/5.0...',
+  ip: "192.168.1.100",
+  userAgent: "Mozilla/5.0...",
 };
 
 // Extract user context
 const userContext = extractUserContext(request);
-console.log('User context extracted:', userContext);
+console.log("User context extracted:", userContext);
 
 // Create full request context
 const requestContext = createRequestContext({
   ...userContext,
-  requestId: 'req-xyz',
+  requestId: "req-xyz",
   ipAddress: request.ip,
   userAgent: request.userAgent,
   timestamp: new Date(),
@@ -234,59 +234,59 @@ const requestContext = createRequestContext({
 ### Audit Context Creation
 
 ```typescript
-import { createAuditContext, sanitizeContext } from '@aibos/utils/context';
+import { createAuditContext, sanitizeContext } from "@aibos/utils/context";
 
 // Create request context
 const requestContext = createRequestContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
-  ipAddress: '192.168.1.100',
-  userAgent: 'Mozilla/5.0...',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
+  ipAddress: "192.168.1.100",
+  userAgent: "Mozilla/5.0...",
   timestamp: new Date(),
 });
 
 // Create audit context
 const auditContext = createAuditContext(requestContext);
-console.log('Audit context created:', auditContext);
+console.log("Audit context created:", auditContext);
 
 // Sanitize context for logging
 const sanitizedContext = sanitizeContext(requestContext);
-console.log('Sanitized context:', sanitizedContext);
+console.log("Sanitized context:", sanitizedContext);
 // Sensitive information removed, safe for logging
 ```
 
 ### Context Validation
 
 ```typescript
-import { createRequestContext, validateContext } from '@aibos/utils/context';
+import { createRequestContext, validateContext } from "@aibos/utils/context";
 
 // Create valid context
 const validContext = createRequestContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
 });
 
 const validValidation = validateContext(validContext);
-console.log('Valid context:', validValidation.isValid); // true
-console.log('Errors:', validValidation.errors); // []
+console.log("Valid context:", validValidation.isValid); // true
+console.log("Errors:", validValidation.errors); // []
 
 // Create invalid context (missing required fields)
 const invalidContext = createRequestContext({
-  tenantId: 'tenant-123',
+  tenantId: "tenant-123",
   // Missing companyId, userId, userRole, sessionId, requestId
 });
 
 const invalidValidation = validateContext(invalidContext);
-console.log('Invalid context:', invalidValidation.isValid); // false
-console.log('Errors:', invalidValidation.errors);
+console.log("Invalid context:", invalidValidation.isValid); // false
+console.log("Errors:", invalidValidation.errors);
 // ['Company ID is required', 'User ID is required', 'User role is required', ...]
 ```
 
@@ -299,23 +299,23 @@ import {
   createAuditContext,
   validateContext,
   sanitizeContext,
-} from '@aibos/utils/context';
+} from "@aibos/utils/context";
 
 // Advanced context creation with additional metadata
 const requestContext = createRequestContext({
-  tenantId: 'tenant-123',
-  companyId: 'company-456',
-  userId: 'user-789',
-  userRole: 'accountant',
-  sessionId: 'session-abc',
-  requestId: 'req-xyz',
-  ipAddress: '192.168.1.100',
-  userAgent: 'Mozilla/5.0...',
+  tenantId: "tenant-123",
+  companyId: "company-456",
+  userId: "user-789",
+  userRole: "accountant",
+  sessionId: "session-abc",
+  requestId: "req-xyz",
+  ipAddress: "192.168.1.100",
+  userAgent: "Mozilla/5.0...",
   timestamp: new Date(),
   metadata: {
-    source: 'web-api',
-    version: '1.0.0',
-    environment: 'production',
+    source: "web-api",
+    version: "1.0.0",
+    environment: "production",
   },
 });
 
@@ -327,18 +327,18 @@ const validation = validateContext(requestContext, {
 });
 
 if (!validation.isValid) {
-  console.error('Context validation failed:', validation.errors);
-  throw new Error('Invalid request context');
+  console.error("Context validation failed:", validation.errors);
+  throw new Error("Invalid request context");
 }
 
 // Create audit context with additional audit metadata
 const auditContext = createAuditContext(requestContext, {
-  auditLevel: 'DETAILED',
+  auditLevel: "DETAILED",
   includeMetadata: true,
   includeHeaders: true,
 });
 
-console.log('Audit context with metadata:', auditContext);
+console.log("Audit context with metadata:", auditContext);
 
 // Sanitize context with custom sanitization rules
 const sanitizedContext = sanitizeContext(requestContext, {
@@ -347,13 +347,13 @@ const sanitizedContext = sanitizeContext(requestContext, {
   removeMetadata: false,
 });
 
-console.log('Sanitized context:', sanitizedContext);
+console.log("Sanitized context:", sanitizedContext);
 ```
 
 ### Context Middleware Integration
 
 ```typescript
-import { createRequestContext, extractUserContext, validateContext } from '@aibos/utils/context';
+import { createRequestContext, extractUserContext, validateContext } from "@aibos/utils/context";
 
 // Express.js middleware example
 function contextMiddleware(req: any, res: any, next: any) {
@@ -366,7 +366,7 @@ function contextMiddleware(req: any, res: any, next: any) {
       ...userContext,
       requestId: req.id || `req-${Date.now()}`,
       ipAddress: req.ip || req.connection.remoteAddress,
-      userAgent: req.get('User-Agent'),
+      userAgent: req.get("User-Agent"),
       timestamp: new Date(),
     });
 
@@ -374,7 +374,7 @@ function contextMiddleware(req: any, res: any, next: any) {
     const validation = validateContext(requestContext);
     if (!validation.isValid) {
       return res.status(400).json({
-        error: 'Invalid request context',
+        error: "Invalid request context",
         details: validation.errors,
       });
     }
@@ -384,17 +384,17 @@ function contextMiddleware(req: any, res: any, next: any) {
 
     next();
   } catch (error) {
-    console.error('Context middleware error:', error);
-    res.status(500).json({ error: 'Context creation failed' });
+    console.error("Context middleware error:", error);
+    res.status(500).json({ error: "Context creation failed" });
   }
 }
 
 // Usage in Express app
 app.use(contextMiddleware);
 
-app.post('/api/journals', (req, res) => {
+app.post("/api/journals", (req, res) => {
   const context = req.context;
-  console.log('Processing journal with context:', context);
+  console.log("Processing journal with context:", context);
 
   // Use context for business logic
   // ...
@@ -414,7 +414,7 @@ app.post('/api/journals', (req, res) => {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_CONTEXT = 'true';
+process.env.DEBUG_CONTEXT = "true";
 ```
 
 **Logs**: Check Axiom telemetry for context operation logs

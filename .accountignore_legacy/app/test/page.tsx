@@ -7,5 +7,5 @@ export default function TestPage() {
         <p className="mt-2 text-sm text-gray-600">Server is running on port 3002</p>
       </div>
     </div>
-  )
+  );
 }

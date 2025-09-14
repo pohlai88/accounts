@@ -346,7 +346,7 @@
 ### **Basic Component Usage**
 
 ```tsx
-import { Button, Card, Input, Label } from '@aibos/ui';
+import { Button, Card, Input, Label } from "@aibos/ui";
 
 function MyComponent() {
   return (
@@ -362,7 +362,7 @@ function MyComponent() {
 ### **Workflow Component Usage**
 
 ```tsx
-import { InvoiceWorkflow, BillWorkflow, CashWorkflow } from '@aibos/ui';
+import { InvoiceWorkflow, BillWorkflow, CashWorkflow } from "@aibos/ui";
 
 function AccountingDashboard() {
   return (
@@ -378,7 +378,7 @@ function AccountingDashboard() {
 ### **Theme Integration**
 
 ```tsx
-import { ThemeProvider, ThemeToggle } from '@aibos/ui';
+import { ThemeProvider, ThemeToggle } from "@aibos/ui";
 
 function App() {
   return (
@@ -395,7 +395,7 @@ function App() {
 ### **Typography Usage**
 
 ```tsx
-import { H1, H2, Body, Caption, Link } from '@aibos/ui';
+import { H1, H2, Body, Caption, Link } from "@aibos/ui";
 
 function Document() {
   return (
@@ -425,7 +425,7 @@ export const Component: React.FC<ComponentProps> = ({
   className,
   // Other props
 }) => {
-  return <div className={cn('base-styles', className)}>{/* Component content */}</div>;
+  return <div className={cn("base-styles", className)}>{/* Component content */}</div>;
 };
 ```
 

@@ -43,7 +43,7 @@ import {
   testD4ReportsPerformance,
   testJournalApiPerformance,
   runLoadTests,
-} from '@aibos/tests/performance';
+} from "@aibos/tests/performance";
 
 // Run D2 API performance tests
 await testD2ApiPerformance();
@@ -165,43 +165,43 @@ pnpm --filter @aibos/tests typecheck
 ### D2 API Performance Testing
 
 ```javascript
-import { testD2ApiPerformance } from '@aibos/tests/performance';
+import { testD2ApiPerformance } from "@aibos/tests/performance";
 
 // Test D2 API performance
 async function testD2ApiPerformance() {
   const testConfig = {
     api: {
-      baseUrl: 'http://localhost:3001/api/v1',
+      baseUrl: "http://localhost:3001/api/v1",
       timeout: 10000,
     },
     scenarios: [
       {
-        name: 'invoice-creation',
-        endpoint: '/invoices',
-        method: 'POST',
+        name: "invoice-creation",
+        endpoint: "/invoices",
+        method: "POST",
         payload: {
-          customerId: 'customer-123',
+          customerId: "customer-123",
           amount: 1000,
-          dueDate: '2024-02-15',
+          dueDate: "2024-02-15",
         },
         expectedResponseTime: 2000,
         expectedThroughput: 100,
       },
       {
-        name: 'payment-processing',
-        endpoint: '/payments',
-        method: 'POST',
+        name: "payment-processing",
+        endpoint: "/payments",
+        method: "POST",
         payload: {
-          invoiceId: 'invoice-123',
+          invoiceId: "invoice-123",
           amount: 1000,
-          paymentMethod: 'bank_transfer',
+          paymentMethod: "bank_transfer",
         },
         expectedResponseTime: 1500,
         expectedThroughput: 150,
       },
     ],
     load: {
-      duration: '5m',
+      duration: "5m",
       vus: 50,
     },
   };
@@ -209,9 +209,9 @@ async function testD2ApiPerformance() {
   const result = await testD2ApiPerformance(testConfig);
 
   if (result.success) {
-    console.log('D2 API performance test passed');
+    console.log("D2 API performance test passed");
   } else {
-    console.error('D2 API performance test failed:', result.errors);
+    console.error("D2 API performance test failed:", result.errors);
   }
 }
 ```
@@ -219,52 +219,52 @@ async function testD2ApiPerformance() {
 ### D4 Reports Performance Testing
 
 ```javascript
-import { testD4ReportsPerformance } from '@aibos/tests/performance';
+import { testD4ReportsPerformance } from "@aibos/tests/performance";
 
 // Test D4 reports performance
 async function testD4ReportsPerformance() {
   const testConfig = {
     api: {
-      baseUrl: 'http://localhost:3001/api/v1',
+      baseUrl: "http://localhost:3001/api/v1",
       timeout: 30000,
     },
     reports: [
       {
-        name: 'trial-balance',
-        endpoint: '/reports/trial-balance',
-        method: 'GET',
+        name: "trial-balance",
+        endpoint: "/reports/trial-balance",
+        method: "GET",
         params: {
-          period: '2024-01',
-          format: 'json',
+          period: "2024-01",
+          format: "json",
         },
         expectedResponseTime: 5000,
         expectedThroughput: 20,
       },
       {
-        name: 'balance-sheet',
-        endpoint: '/reports/balance-sheet',
-        method: 'GET',
+        name: "balance-sheet",
+        endpoint: "/reports/balance-sheet",
+        method: "GET",
         params: {
-          period: '2024-01',
-          format: 'pdf',
+          period: "2024-01",
+          format: "pdf",
         },
         expectedResponseTime: 8000,
         expectedThroughput: 10,
       },
       {
-        name: 'profit-loss',
-        endpoint: '/reports/profit-loss',
-        method: 'GET',
+        name: "profit-loss",
+        endpoint: "/reports/profit-loss",
+        method: "GET",
         params: {
-          period: '2024-01',
-          format: 'xlsx',
+          period: "2024-01",
+          format: "xlsx",
         },
         expectedResponseTime: 6000,
         expectedThroughput: 15,
       },
     ],
     load: {
-      duration: '10m',
+      duration: "10m",
       vus: 30,
     },
   };
@@ -272,9 +272,9 @@ async function testD4ReportsPerformance() {
   const result = await testD4ReportsPerformance(testConfig);
 
   if (result.success) {
-    console.log('D4 reports performance test passed');
+    console.log("D4 reports performance test passed");
   } else {
-    console.error('D4 reports performance test failed:', result.errors);
+    console.error("D4 reports performance test failed:", result.errors);
   }
 }
 ```
@@ -282,55 +282,55 @@ async function testD4ReportsPerformance() {
 ### Journal API Performance Testing
 
 ```javascript
-import { testJournalApiPerformance } from '@aibos/tests/performance';
+import { testJournalApiPerformance } from "@aibos/tests/performance";
 
 // Test journal API performance
 async function testJournalApiPerformance() {
   const testConfig = {
     api: {
-      baseUrl: 'http://localhost:3001/api/v1',
+      baseUrl: "http://localhost:3001/api/v1",
       timeout: 15000,
     },
     scenarios: [
       {
-        name: 'journal-posting',
-        endpoint: '/journals',
-        method: 'POST',
+        name: "journal-posting",
+        endpoint: "/journals",
+        method: "POST",
         payload: {
-          description: 'Test Journal Entry',
-          date: '2024-01-15',
+          description: "Test Journal Entry",
+          date: "2024-01-15",
           lines: [
-            { account: 'Cash', debit: 1000, credit: 0 },
-            { account: 'Revenue', debit: 0, credit: 1000 },
+            { account: "Cash", debit: 1000, credit: 0 },
+            { account: "Revenue", debit: 0, credit: 1000 },
           ],
         },
         expectedResponseTime: 3000,
         expectedThroughput: 80,
       },
       {
-        name: 'journal-validation',
-        endpoint: '/journals/validate',
-        method: 'POST',
+        name: "journal-validation",
+        endpoint: "/journals/validate",
+        method: "POST",
         payload: {
-          journalId: 'journal-123',
+          journalId: "journal-123",
         },
         expectedResponseTime: 1000,
         expectedThroughput: 200,
       },
       {
-        name: 'journal-approval',
-        endpoint: '/journals/approve',
-        method: 'POST',
+        name: "journal-approval",
+        endpoint: "/journals/approve",
+        method: "POST",
         payload: {
-          journalId: 'journal-123',
-          approverId: 'approver-456',
+          journalId: "journal-123",
+          approverId: "approver-456",
         },
         expectedResponseTime: 2000,
         expectedThroughput: 120,
       },
     ],
     load: {
-      duration: '8m',
+      duration: "8m",
       vus: 40,
     },
   };
@@ -338,9 +338,9 @@ async function testJournalApiPerformance() {
   const result = await testJournalApiPerformance(testConfig);
 
   if (result.success) {
-    console.log('Journal API performance test passed');
+    console.log("Journal API performance test passed");
   } else {
-    console.error('Journal API performance test failed:', result.errors);
+    console.error("Journal API performance test failed:", result.errors);
   }
 }
 ```
@@ -348,48 +348,48 @@ async function testJournalApiPerformance() {
 ### Load Testing
 
 ```javascript
-import { runLoadTests } from '@aibos/tests/performance';
+import { runLoadTests } from "@aibos/tests/performance";
 
 // Run comprehensive load tests
 async function runLoadTests() {
   const testConfig = {
     scenarios: [
       {
-        name: 'normal-load',
-        duration: '10m',
+        name: "normal-load",
+        duration: "10m",
         vus: 100,
-        description: 'Normal expected load',
+        description: "Normal expected load",
       },
       {
-        name: 'peak-load',
-        duration: '5m',
+        name: "peak-load",
+        duration: "5m",
         vus: 500,
-        description: 'Peak expected load',
+        description: "Peak expected load",
       },
       {
-        name: 'stress-load',
-        duration: '3m',
+        name: "stress-load",
+        duration: "3m",
         vus: 1000,
-        description: 'Stress test load',
+        description: "Stress test load",
       },
     ],
     thresholds: {
-      http_req_duration: ['p(95)<2000'],
-      http_req_failed: ['rate<0.1'],
-      http_reqs: ['rate>100'],
+      http_req_duration: ["p(95)<2000"],
+      http_req_failed: ["rate<0.1"],
+      http_reqs: ["rate>100"],
     },
     monitoring: {
       enabled: true,
-      endpoint: 'https://monitoring.example.com/metrics',
+      endpoint: "https://monitoring.example.com/metrics",
     },
   };
 
   const result = await runLoadTests(testConfig);
 
   if (result.success) {
-    console.log('Load tests passed');
+    console.log("Load tests passed");
   } else {
-    console.error('Load tests failed:', result.errors);
+    console.error("Load tests failed:", result.errors);
   }
 }
 ```
@@ -397,50 +397,50 @@ async function runLoadTests() {
 ### Stress Testing
 
 ```javascript
-import { runStressTests } from '@aibos/tests/performance';
+import { runStressTests } from "@aibos/tests/performance";
 
 // Run stress tests
 async function runStressTests() {
   const testConfig = {
     scenarios: [
       {
-        name: 'gradual-increase',
-        duration: '15m',
+        name: "gradual-increase",
+        duration: "15m",
         vus: 0,
         maxVUs: 1000,
         stages: [
-          { duration: '2m', target: 100 },
-          { duration: '5m', target: 500 },
-          { duration: '5m', target: 1000 },
-          { duration: '3m', target: 0 },
+          { duration: "2m", target: 100 },
+          { duration: "5m", target: 500 },
+          { duration: "5m", target: 1000 },
+          { duration: "3m", target: 0 },
         ],
       },
       {
-        name: 'spike-test',
-        duration: '10m',
+        name: "spike-test",
+        duration: "10m",
         vus: 0,
         maxVUs: 2000,
         stages: [
-          { duration: '1m', target: 0 },
-          { duration: '1m', target: 2000 },
-          { duration: '1m', target: 0 },
-          { duration: '7m', target: 0 },
+          { duration: "1m", target: 0 },
+          { duration: "1m", target: 2000 },
+          { duration: "1m", target: 0 },
+          { duration: "7m", target: 0 },
         ],
       },
     ],
     thresholds: {
-      http_req_duration: ['p(95)<5000'],
-      http_req_failed: ['rate<0.2'],
-      http_reqs: ['rate>50'],
+      http_req_duration: ["p(95)<5000"],
+      http_req_failed: ["rate<0.2"],
+      http_reqs: ["rate>50"],
     },
   };
 
   const result = await runStressTests(testConfig);
 
   if (result.success) {
-    console.log('Stress tests passed');
+    console.log("Stress tests passed");
   } else {
-    console.error('Stress tests failed:', result.errors);
+    console.error("Stress tests failed:", result.errors);
   }
 }
 ```
@@ -448,33 +448,33 @@ async function runStressTests() {
 ### Capacity Testing
 
 ```javascript
-import { runCapacityTests } from '@aibos/tests/performance';
+import { runCapacityTests } from "@aibos/tests/performance";
 
 // Run capacity tests
 async function runCapacityTests() {
   const testConfig = {
     scenarios: [
       {
-        name: 'capacity-test',
-        duration: '30m',
+        name: "capacity-test",
+        duration: "30m",
         vus: 0,
         maxVUs: 5000,
         stages: [
-          { duration: '5m', target: 1000 },
-          { duration: '10m', target: 2000 },
-          { duration: '10m', target: 3000 },
-          { duration: '5m', target: 0 },
+          { duration: "5m", target: 1000 },
+          { duration: "10m", target: 2000 },
+          { duration: "10m", target: 3000 },
+          { duration: "5m", target: 0 },
         ],
       },
     ],
     thresholds: {
-      http_req_duration: ['p(95)<10000'],
-      http_req_failed: ['rate<0.5'],
-      http_reqs: ['rate>10'],
+      http_req_duration: ["p(95)<10000"],
+      http_req_failed: ["rate<0.5"],
+      http_reqs: ["rate>10"],
     },
     monitoring: {
       enabled: true,
-      endpoint: 'https://monitoring.example.com/metrics',
+      endpoint: "https://monitoring.example.com/metrics",
       alerting: {
         enabled: true,
         thresholds: {
@@ -489,9 +489,9 @@ async function runCapacityTests() {
   const result = await runCapacityTests(testConfig);
 
   if (result.success) {
-    console.log('Capacity tests passed');
+    console.log("Capacity tests passed");
   } else {
-    console.error('Capacity tests failed:', result.errors);
+    console.error("Capacity tests failed:", result.errors);
   }
 }
 ```
@@ -506,7 +506,7 @@ import {
   runLoadTests,
   runStressTests,
   runCapacityTests,
-} from '@aibos/tests/performance';
+} from "@aibos/tests/performance";
 
 // Comprehensive performance testing suite
 async function runPerformanceTests() {
@@ -522,31 +522,31 @@ async function runPerformanceTests() {
   try {
     // Test D2 API performance
     results.d2 = await testD2ApiPerformance({
-      api: { baseUrl: 'http://localhost:3001/api/v1' },
+      api: { baseUrl: "http://localhost:3001/api/v1" },
       scenarios: [
-        { name: 'invoice-creation', endpoint: '/invoices', method: 'POST' },
-        { name: 'payment-processing', endpoint: '/payments', method: 'POST' },
+        { name: "invoice-creation", endpoint: "/invoices", method: "POST" },
+        { name: "payment-processing", endpoint: "/payments", method: "POST" },
       ],
     });
 
     // Test D4 reports performance
     results.d4 = await testD4ReportsPerformance({
-      api: { baseUrl: 'http://localhost:3001/api/v1' },
+      api: { baseUrl: "http://localhost:3001/api/v1" },
       reports: [
-        { name: 'trial-balance', endpoint: '/reports/trial-balance' },
-        { name: 'balance-sheet', endpoint: '/reports/balance-sheet' },
+        { name: "trial-balance", endpoint: "/reports/trial-balance" },
+        { name: "balance-sheet", endpoint: "/reports/balance-sheet" },
       ],
     });
 
     // Test journal API performance
     results.journal = await testJournalApiPerformance({
-      api: { baseUrl: 'http://localhost:3001/api/v1' },
+      api: { baseUrl: "http://localhost:3001/api/v1" },
       scenarios: [
-        { name: 'journal-posting', endpoint: '/journals', method: 'POST' },
+        { name: "journal-posting", endpoint: "/journals", method: "POST" },
         {
-          name: 'journal-validation',
-          endpoint: '/journals/validate',
-          method: 'POST',
+          name: "journal-validation",
+          endpoint: "/journals/validate",
+          method: "POST",
         },
       ],
     });
@@ -554,27 +554,27 @@ async function runPerformanceTests() {
     // Run load tests
     results.load = await runLoadTests({
       scenarios: [
-        { name: 'normal-load', duration: '10m', vus: 100 },
-        { name: 'peak-load', duration: '5m', vus: 500 },
+        { name: "normal-load", duration: "10m", vus: 100 },
+        { name: "peak-load", duration: "5m", vus: 500 },
       ],
     });
 
     // Run stress tests
     results.stress = await runStressTests({
       scenarios: [
-        { name: 'gradual-increase', duration: '15m', maxVUs: 1000 },
-        { name: 'spike-test', duration: '10m', maxVUs: 2000 },
+        { name: "gradual-increase", duration: "15m", maxVUs: 1000 },
+        { name: "spike-test", duration: "10m", maxVUs: 2000 },
       ],
     });
 
     // Run capacity tests
     results.capacity = await runCapacityTests({
-      scenarios: [{ name: 'capacity-test', duration: '30m', maxVUs: 5000 }],
+      scenarios: [{ name: "capacity-test", duration: "30m", maxVUs: 5000 }],
     });
 
-    console.log('All performance tests completed:', results);
+    console.log("All performance tests completed:", results);
   } catch (error) {
-    console.error('Performance test suite failed:', error);
+    console.error("Performance test suite failed:", error);
     throw error;
   }
 
@@ -595,7 +595,7 @@ async function runPerformanceTests() {
 
 ```javascript
 // Enable detailed logging
-process.env.DEBUG_PERFORMANCE = 'true';
+process.env.DEBUG_PERFORMANCE = "true";
 ```
 
 **Logs**: Check test logs for performance test execution details

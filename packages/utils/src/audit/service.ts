@@ -22,36 +22,36 @@ interface AuditLogDbRow {
 
 // Audit action types for business operations
 export type AuditAction =
-  | 'CREATE'
-  | 'UPDATE'
-  | 'DELETE'
-  | 'POST'
-  | 'REVERSE'
-  | 'APPROVE'
-  | 'REJECT'
-  | 'SUBMIT'
-  | 'CANCEL'
-  | 'VALIDATE'
-  | 'EXPORT'
-  | 'IMPORT'
-  | 'HIT'
-  | 'EXPIRE';
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "POST"
+  | "REVERSE"
+  | "APPROVE"
+  | "REJECT"
+  | "SUBMIT"
+  | "CANCEL"
+  | "VALIDATE"
+  | "EXPORT"
+  | "IMPORT"
+  | "HIT"
+  | "EXPIRE";
 
 // Entity types for audit logging
 export type AuditEntityType =
-  | 'JOURNAL'
-  | 'JOURNAL_LINE'
-  | 'INVOICE'
-  | 'PAYMENT'
-  | 'ACCOUNT'
-  | 'TENANT'
-  | 'COMPANY'
-  | 'USER'
-  | 'CUSTOMER'
-  | 'MEMBERSHIP'
-  | 'CURRENCY'
-  | 'FX_RATE'
-  | 'IDEMPOTENCY_KEY';
+  | "JOURNAL"
+  | "JOURNAL_LINE"
+  | "INVOICE"
+  | "PAYMENT"
+  | "ACCOUNT"
+  | "TENANT"
+  | "COMPANY"
+  | "USER"
+  | "CUSTOMER"
+  | "MEMBERSHIP"
+  | "CURRENCY"
+  | "FX_RATE"
+  | "IDEMPOTENCY_KEY";
 
 // Audit context for tracking request information
 export interface AuditContext {
@@ -60,7 +60,7 @@ export interface AuditContext {
   userAgent?: string;
   sessionId?: string;
   correlationId?: string;
-  source?: 'API' | 'UI' | 'SYSTEM' | 'BATCH' | 'WEBHOOK';
+  source?: "API" | "UI" | "SYSTEM" | "BATCH" | "WEBHOOK";
   version?: string;
 }
 
@@ -160,17 +160,21 @@ export class AuditService {
         entityId: entry.entityId,
         oldValues: entry.oldValues ? JSON.stringify(entry.oldValues) : null,
         newValues: entry.newValues ? JSON.stringify(entry.newValues) : null,
-        metadata: entry.metadata ? JSON.stringify({
-          ...entry.metadata,
-          context: entry.context
-        }) : entry.context ? JSON.stringify({ context: entry.context }) : null,
+        metadata: entry.metadata
+          ? JSON.stringify({
+              ...entry.metadata,
+              context: entry.context,
+            })
+          : entry.context
+            ? JSON.stringify({ context: entry.context })
+            : null,
         requestId: entry.context?.requestId,
         ipAddress: entry.context?.ipAddress,
-        userAgent: entry.context?.userAgent
+        userAgent: entry.context?.userAgent,
       });
     } catch (error) {
       // Log audit failures but don't fail the main operation
-      console.error('Audit logging failed:', error);
+      console.error("Audit logging failed:", error);
       // In production, you might want to send this to a monitoring service
     }
   }
@@ -182,28 +186,28 @@ export class AuditService {
     scope: Scope,
     journalId: string,
     journalData: Record<string, unknown>,
-    action: 'CREATE' | 'POST' | 'REVERSE' | 'APPROVE',
+    action: "CREATE" | "POST" | "REVERSE" | "APPROVE",
     context?: AuditContext,
-    oldValues?: Record<string, unknown>
+    oldValues?: Record<string, unknown>,
   ): Promise<void> {
     await this.logOperation({
       scope,
       action,
-      entityType: 'JOURNAL',
+      entityType: "JOURNAL",
       entityId: journalId,
       oldValues,
       newValues: journalData,
       metadata: {
-        operation: 'journal_posting',
+        operation: "journal_posting",
         journalNumber: journalData.journalNumber,
         currency: journalData.currency,
         totalDebit: journalData.totalDebit,
         totalCredit: journalData.totalCredit,
         lineCount: Array.isArray(journalData.lines) ? journalData.lines.length : 0,
         requiresApproval: journalData.requiresApproval,
-        status: journalData.status
+        status: journalData.status,
       },
-      context
+      context,
     });
   }
 
@@ -213,27 +217,27 @@ export class AuditService {
   async logCOAValidation(
     scope: Scope,
     accountIds: string[],
-    validationResult: 'SUCCESS' | 'FAILURE',
+    validationResult: "SUCCESS" | "FAILURE",
     warnings: Array<{ accountId: string; warning: string }> = [],
     errors: Array<{ code: string; message: string }> = [],
-    context?: AuditContext
+    context?: AuditContext,
   ): Promise<void> {
     await this.logOperation({
       scope,
-      action: 'VALIDATE',
-      entityType: 'ACCOUNT',
-      entityId: accountIds[0] || 'multiple', // Use first account or 'multiple'
+      action: "VALIDATE",
+      entityType: "ACCOUNT",
+      entityId: accountIds[0] || "multiple", // Use first account or 'multiple'
       metadata: {
-        operation: 'coa_validation',
+        operation: "coa_validation",
         result: validationResult,
         accountIds,
         accountCount: accountIds.length,
         warningCount: warnings.length,
         errorCount: errors.length,
         warnings: warnings.slice(0, 10), // Limit to first 10 warnings
-        errors: errors.slice(0, 10) // Limit to first 10 errors
+        errors: errors.slice(0, 10), // Limit to first 10 errors
       },
-      context
+      context,
     });
   }
 
@@ -243,23 +247,23 @@ export class AuditService {
   async logIdempotencyUsage(
     scope: Scope,
     idempotencyKey: string,
-    action: 'CREATE' | 'HIT' | 'EXPIRE',
+    action: "CREATE" | "HIT" | "EXPIRE",
     entityType: AuditEntityType,
     entityId?: string,
-    context?: AuditContext
+    context?: AuditContext,
   ): Promise<void> {
     await this.logOperation({
       scope,
       action,
-      entityType: 'IDEMPOTENCY_KEY',
+      entityType: "IDEMPOTENCY_KEY",
       entityId: idempotencyKey,
       metadata: {
-        operation: 'idempotency',
+        operation: "idempotency",
         targetEntityType: entityType,
         targetEntityId: entityId,
-        keyUsage: action
+        keyUsage: action,
       },
-      context
+      context,
     });
   }
 
@@ -269,33 +273,30 @@ export class AuditService {
   async logSoDCompliance(
     scope: Scope,
     operation: string,
-    result: 'ALLOWED' | 'DENIED' | 'REQUIRES_APPROVAL',
+    result: "ALLOWED" | "DENIED" | "REQUIRES_APPROVAL",
     reason?: string,
-    context?: AuditContext
+    context?: AuditContext,
   ): Promise<void> {
     await this.logOperation({
       scope,
-      action: 'VALIDATE',
-      entityType: 'USER',
+      action: "VALIDATE",
+      entityType: "USER",
       entityId: scope.userId,
       metadata: {
-        operation: 'sod_compliance',
+        operation: "sod_compliance",
         targetOperation: operation,
         result,
         reason,
-        userRole: scope.userRole
+        userRole: scope.userRole,
       },
-      context
+      context,
     });
   }
 
   /**
    * Query audit logs with filters
    */
-  async queryAuditLogs(
-    scope: Scope,
-    filters: AuditQueryFilters = {}
-  ): Promise<AuditLogResult[]> {
+  async queryAuditLogs(scope: Scope, filters: AuditQueryFilters = {}): Promise<AuditLogResult[]> {
     // Build where conditions array
     const whereConditions = [eq(auditLogs.tenantId, scope.tenantId)];
 
@@ -338,14 +339,14 @@ export class AuditService {
       userId: row.userId || undefined,
       action: row.action,
       entityType: row.entityType,
-      entityId: row.entityId || '',
+      entityId: row.entityId || "",
       oldValues: row.oldValues ? JSON.parse(row.oldValues as string) : undefined,
       newValues: row.newValues ? JSON.parse(row.newValues as string) : undefined,
       metadata: row.metadata ? JSON.parse(row.metadata as string) : undefined,
       requestId: row.requestId || undefined,
       ipAddress: row.ipAddress || undefined,
       userAgent: row.userAgent || undefined,
-      createdAt: row.createdAt!
+      createdAt: row.createdAt!,
     }));
   }
 
@@ -356,12 +357,12 @@ export class AuditService {
     scope: Scope,
     entityType: AuditEntityType,
     entityId: string,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<AuditLogResult[]> {
     return this.queryAuditLogs(scope, {
       entityType,
       entityId,
-      limit
+      limit,
     });
   }
 
@@ -371,11 +372,11 @@ export class AuditService {
   async getUserAuditActivity(
     scope: Scope,
     userId: string,
-    limit: number = 100
+    limit: number = 100,
   ): Promise<AuditLogResult[]> {
     return this.queryAuditLogs(scope, {
       userId,
-      limit
+      limit,
     });
   }
 
@@ -384,22 +385,22 @@ export class AuditService {
    */
   async logSecurityEvent(
     scope: Scope,
-    event: 'AUTH_FAILURE' | 'AUTHZ_FAILURE' | 'SUSPICIOUS_ACTIVITY' | 'RATE_LIMIT',
+    event: "AUTH_FAILURE" | "AUTHZ_FAILURE" | "SUSPICIOUS_ACTIVITY" | "RATE_LIMIT",
     details: Record<string, unknown>,
-    context?: AuditContext
+    context?: AuditContext,
   ): Promise<void> {
     await this.logOperation({
       scope,
-      action: 'VALIDATE',
-      entityType: 'USER',
+      action: "VALIDATE",
+      entityType: "USER",
       entityId: scope.userId,
       metadata: {
-        operation: 'security_event',
+        operation: "security_event",
         event,
         details,
-        severity: event === 'SUSPICIOUS_ACTIVITY' ? 'HIGH' : 'MEDIUM'
+        severity: event === "SUSPICIOUS_ACTIVITY" ? "HIGH" : "MEDIUM",
       },
-      context
+      context,
     });
   }
 }
@@ -431,13 +432,13 @@ export function createAuditContext(
   requestId?: string,
   ipAddress?: string,
   userAgent?: string,
-  source: AuditContext['source'] = 'API'
+  source: AuditContext["source"] = "API",
 ): AuditContext {
   return {
     requestId,
     ipAddress,
     userAgent,
     source,
-    version: process.env.APP_VERSION || '1.0.0'
+    version: process.env.APP_VERSION || "1.0.0",
   };
 }

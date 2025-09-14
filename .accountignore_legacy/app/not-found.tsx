@@ -2,9 +2,9 @@
  * 404 Not Found Page
  */
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Sparkles, ArrowLeft } from 'lucide-react'
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Sparkles, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -18,7 +18,7 @@ export default function NotFound() {
             The page you're looking for doesn't exist or has been moved.
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <Button asChild size="lg">
             <Link href="/">
@@ -26,7 +26,7 @@ export default function NotFound() {
               Back to Home
             </Link>
           </Button>
-          
+
           <div className="text-sm text-muted-foreground">
             <p>Try these popular pages:</p>
             <div className="flex justify-center space-x-4 mt-2">
@@ -41,5 +41,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -273,82 +273,82 @@ function JournalEntryForm() {
 ### Enhanced Auth Context
 
 ```typescript
-import { createEnhancedAuthContext, validateUserPermissions } from '@aibos/utils/auth';
+import { createEnhancedAuthContext, validateUserPermissions } from "@aibos/utils/auth";
 
 // Create enhanced auth context
 const authContext = createEnhancedAuthContext({
-  userId: 'user-123',
-  userRole: 'accountant',
-  tenantId: 'tenant-456',
-  companyId: 'company-789',
-  permissions: ['journal:post', 'journal:view', 'report:view', 'customer:view'],
-  sessionId: 'session-abc',
+  userId: "user-123",
+  userRole: "accountant",
+  tenantId: "tenant-456",
+  companyId: "company-789",
+  permissions: ["journal:post", "journal:view", "report:view", "customer:view"],
+  sessionId: "session-abc",
   lastLogin: new Date(),
-  ipAddress: '192.168.1.100',
-  userAgent: 'Mozilla/5.0...',
+  ipAddress: "192.168.1.100",
+  userAgent: "Mozilla/5.0...",
 });
 
 // Validate user permissions
-const canPostJournals = validateUserPermissions(authContext, 'journal:post');
-const canManageUsers = validateUserPermissions(authContext, 'user:manage');
+const canPostJournals = validateUserPermissions(authContext, "journal:post");
+const canManageUsers = validateUserPermissions(authContext, "user:manage");
 
-console.log('Can post journals:', canPostJournals); // true
-console.log('Can manage users:', canManageUsers); // false
+console.log("Can post journals:", canPostJournals); // true
+console.log("Can manage users:", canManageUsers); // false
 
 // Check role access
-const roleAccess = checkRoleAccess(authContext, 'accountant');
-console.log('Has accountant role:', roleAccess); // true
+const roleAccess = checkRoleAccess(authContext, "accountant");
+console.log("Has accountant role:", roleAccess); // true
 
 // Get user permissions
 const permissions = getUserPermissions(authContext);
-console.log('User permissions:', permissions);
+console.log("User permissions:", permissions);
 // ['journal:post', 'journal:view', 'report:view', 'customer:view']
 ```
 
 ### Advanced Permission Management
 
 ```typescript
-import { createEnhancedAuthContext, validateUserPermissions } from '@aibos/utils/auth';
+import { createEnhancedAuthContext, validateUserPermissions } from "@aibos/utils/auth";
 
 // Create context with complex permissions
 const authContext = createEnhancedAuthContext({
-  userId: 'user-123',
-  userRole: 'manager',
-  tenantId: 'tenant-456',
-  companyId: 'company-789',
+  userId: "user-123",
+  userRole: "manager",
+  tenantId: "tenant-456",
+  companyId: "company-789",
   permissions: [
-    'journal:post',
-    'journal:view',
-    'journal:edit',
-    'journal:delete',
-    'report:view',
-    'report:export',
-    'customer:view',
-    'customer:edit',
-    'user:view',
-    'user:edit',
+    "journal:post",
+    "journal:view",
+    "journal:edit",
+    "journal:delete",
+    "report:view",
+    "report:export",
+    "customer:view",
+    "customer:edit",
+    "user:view",
+    "user:edit",
   ],
-  sessionId: 'session-abc',
+  sessionId: "session-abc",
 });
 
 // Check multiple permissions
 const canManageJournals = validateUserPermissions(authContext, [
-  'journal:post',
-  'journal:edit',
-  'journal:delete',
+  "journal:post",
+  "journal:edit",
+  "journal:delete",
 ]);
 
-const canManageUsers = validateUserPermissions(authContext, ['user:view', 'user:edit']);
+const canManageUsers = validateUserPermissions(authContext, ["user:view", "user:edit"]);
 
-const canExportReports = validateUserPermissions(authContext, ['report:view', 'report:export']);
+const canExportReports = validateUserPermissions(authContext, ["report:view", "report:export"]);
 
-console.log('Can manage journals:', canManageJournals); // true
-console.log('Can manage users:', canManageUsers); // true
-console.log('Can export reports:', canExportReports); // true
+console.log("Can manage journals:", canManageJournals); // true
+console.log("Can manage users:", canManageUsers); // true
+console.log("Can export reports:", canExportReports); // true
 
 // Check specific permission
-const canDeleteJournals = validateUserPermissions(authContext, 'journal:delete');
-console.log('Can delete journals:', canDeleteJournals); // true
+const canDeleteJournals = validateUserPermissions(authContext, "journal:delete");
+console.log("Can delete journals:", canDeleteJournals); // true
 ```
 
 ### Auth State Management
@@ -446,7 +446,7 @@ function AuthProvider() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_AUTH = 'true';
+process.env.DEBUG_AUTH = "true";
 ```
 
 **Logs**: Check Axiom telemetry for auth operation logs

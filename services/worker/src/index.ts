@@ -9,8 +9,16 @@ import { emailWorkflow } from "./workflows/emailWorkflow";
 import { dlqHandler, dlqRetryHandler } from "./workflows/dlqHandler";
 import { invoiceApproved } from "./workflows/invoiceApproved";
 import { ocrProcessing } from "./workflows/ocrProcessing";
-import { documentApprovalWorkflow, documentApprovalDecision, documentApprovalReminder } from "./workflows/documentApproval";
-import { documentRetentionPolicy, documentRetentionMonitor, documentLegalHold } from "./workflows/documentRetention";
+import {
+  documentApprovalWorkflow,
+  documentApprovalDecision,
+  documentApprovalReminder,
+} from "./workflows/documentApproval";
+import {
+  documentRetentionPolicy,
+  documentRetentionMonitor,
+  documentLegalHold,
+} from "./workflows/documentRetention";
 import { fxRateIngestJob, fxRateIngestManual, fxRateStalnessAlert } from "./fx-ingest";
 
 // V1 Inngest Functions Registry
@@ -41,5 +49,8 @@ export const { GET, POST, PUT } = serve({
 
 // For standalone server deployment
 if (process.env.NODE_ENV === "production") {
-  console.log("🚀 AIBOS Worker started with functions:", inngestFunctions.map(f => f.name));
+  console.log(
+    "🚀 AIBOS Worker started with functions:",
+    inngestFunctions.map(f => f.name),
+  );
 }

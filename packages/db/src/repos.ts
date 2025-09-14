@@ -1,6 +1,15 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { journals, journalLines, idempotencyKeys, chartOfAccounts, customers, invoices, invoiceLines, taxCodes } from "./schema";
+import {
+  journals,
+  journalLines,
+  idempotencyKeys,
+  chartOfAccounts,
+  customers,
+  invoices,
+  invoiceLines,
+  taxCodes,
+} from "./schema";
 import { eq, and, inArray, desc, asc, gte, lte, count } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -34,9 +43,9 @@ export interface JournalInput {
     debit: number;
     credit: number;
     description?: string;
-    reference?: string
+    reference?: string;
   }>;
-  status?: 'draft' | 'posted' | 'pending_approval';
+  status?: "draft" | "posted" | "pending_approval";
   idempotencyKey?: string;
 }
 
@@ -44,10 +53,10 @@ export class DatabaseError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: Record<string, unknown>
+    public details?: Record<string, unknown>,
   ) {
     super(message);
-    this.name = 'DatabaseError';
+    this.name = "DatabaseError";
   }
 }
 
@@ -57,10 +66,7 @@ export async function checkIdempotency(scope: Scope, idempotencyKey: string) {
     .select()
     .from(idempotencyKeys)
     .where(
-      and(
-        eq(idempotencyKeys.tenantId, scope.tenantId),
-        eq(idempotencyKeys.key, idempotencyKey)
-      )
+      and(eq(idempotencyKeys.tenantId, scope.tenantId), eq(idempotencyKeys.key, idempotencyKey)),
     )
     .limit(1);
 
@@ -74,11 +80,10 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
   if (input.idempotencyKey) {
     const existing = await checkIdempotency(scope, input.idempotencyKey);
     if (existing) {
-      throw new DatabaseError(
-        "Duplicate request detected",
-        "DUPLICATE_REQUEST",
-        { idempotencyKey: input.idempotencyKey, existingResult: existing.response }
-      );
+      throw new DatabaseError("Duplicate request detected", "DUPLICATE_REQUEST", {
+        idempotencyKey: input.idempotencyKey,
+        existingResult: existing.response,
+      });
     }
   }
 
@@ -90,7 +95,7 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
     throw new DatabaseError(
       "Journal must be balanced: debits must equal credits",
       "UNBALANCED_JOURNAL",
-      { totalDebit, totalCredit, difference: Math.abs(totalDebit - totalCredit) }
+      { totalDebit, totalCredit, difference: Math.abs(totalDebit - totalCredit) },
     );
   }
 
@@ -103,8 +108,8 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
       and(
         eq(journals.tenantId, scope.tenantId),
         eq(journals.companyId, scope.companyId),
-        eq(journals.journalNumber, input.journalNumber)
-      )
+        eq(journals.journalNumber, input.journalNumber),
+      ),
     )
     .limit(1);
 
@@ -112,28 +117,31 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
     throw new DatabaseError(
       `Journal number '${input.journalNumber}' already exists`,
       "DUPLICATE_JOURNAL_NUMBER",
-      { journalNumber: input.journalNumber }
+      { journalNumber: input.journalNumber },
     );
   }
 
   // 3. Insert journal entry
-  const j = await db.insert(journals).values({
-    tenantId: scope.tenantId,
-    companyId: scope.companyId,
-    journalNumber: input.journalNumber,
-    description: input.description,
-    journalDate: input.journalDate,
-    currency: input.currency,
-    totalDebit: totalDebit.toString(),
-    totalCredit: totalCredit.toString(),
-    status: input.status || 'draft',
-    createdBy: scope.userId,
-    postedAt: input.status === 'posted' ? new Date() : null
-  }).returning({ id: journals.id });
+  const j = await db
+    .insert(journals)
+    .values({
+      tenantId: scope.tenantId,
+      companyId: scope.companyId,
+      journalNumber: input.journalNumber,
+      description: input.description,
+      journalDate: input.journalDate,
+      currency: input.currency,
+      totalDebit: totalDebit.toString(),
+      totalCredit: totalCredit.toString(),
+      status: input.status || "draft",
+      createdBy: scope.userId,
+      postedAt: input.status === "posted" ? new Date() : null,
+    })
+    .returning({ id: journals.id });
 
   const jid = j[0]?.id;
   if (!jid) {
-    throw new DatabaseError('Failed to create journal entry', 'INSERT_FAILED');
+    throw new DatabaseError("Failed to create journal entry", "INSERT_FAILED");
   }
 
   // 4. Insert journal lines
@@ -145,14 +153,14 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
         debit: line.debit.toString(),
         credit: line.credit.toString(),
         description: line.description,
-        reference: line.reference
+        reference: line.reference,
       });
     } catch (error) {
-      throw new DatabaseError(
-        `Failed to insert journal line ${index + 1}`,
-        'LINE_INSERT_FAILED',
-        { lineIndex: index, accountId: line.accountId, error: String(error) }
-      );
+      throw new DatabaseError(`Failed to insert journal line ${index + 1}`, "LINE_INSERT_FAILED", {
+        lineIndex: index,
+        accountId: line.accountId,
+        error: String(error),
+      });
     }
   }
 
@@ -163,17 +171,17 @@ export async function insertJournal(scope: Scope, input: JournalInput) {
       key: input.idempotencyKey,
       requestHash: input.idempotencyKey, // Use the key as hash for simplicity in D0
       response: { id: jid, journalNumber: input.journalNumber },
-      status: 'completed',
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+      status: "completed",
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
     });
   }
 
   return {
     id: jid,
     journalNumber: input.journalNumber,
-    status: input.status || 'draft',
+    status: input.status || "draft",
     totalDebit,
-    totalCredit
+    totalCredit,
   };
 }
 
@@ -186,27 +194,22 @@ export async function getJournal(scope: Scope, journalId: string) {
       and(
         eq(journals.id, journalId),
         eq(journals.tenantId, scope.tenantId),
-        eq(journals.companyId, scope.companyId)
-      )
+        eq(journals.companyId, scope.companyId),
+      ),
     )
     .limit(1);
 
   if (journal.length === 0) {
-    throw new DatabaseError(
-      "Journal not found or access denied",
-      "JOURNAL_NOT_FOUND",
-      { journalId }
-    );
+    throw new DatabaseError("Journal not found or access denied", "JOURNAL_NOT_FOUND", {
+      journalId,
+    });
   }
 
-  const lines = await db
-    .select()
-    .from(journalLines)
-    .where(eq(journalLines.journalId, journalId));
+  const lines = await db.select().from(journalLines).where(eq(journalLines.journalId, journalId));
 
   return {
     ...journal[0],
-    lines
+    lines,
   };
 }
 
@@ -227,7 +230,7 @@ export interface AccountInfo {
  */
 export async function getAccountsInfo(
   scope: Scope,
-  accountIds: string[]
+  accountIds: string[],
 ): Promise<Map<string, AccountInfo>> {
   const db = getDb();
 
@@ -240,15 +243,15 @@ export async function getAccountsInfo(
       currency: chartOfAccounts.currency,
       isActive: chartOfAccounts.isActive,
       level: chartOfAccounts.level,
-      parentId: chartOfAccounts.parentId
+      parentId: chartOfAccounts.parentId,
     })
     .from(chartOfAccounts)
     .where(
       and(
         eq(chartOfAccounts.tenantId, scope.tenantId),
         eq(chartOfAccounts.companyId, scope.companyId),
-        inArray(chartOfAccounts.id, accountIds)
-      )
+        inArray(chartOfAccounts.id, accountIds),
+      ),
     );
 
   const accountMap = new Map<string, AccountInfo>();
@@ -262,7 +265,7 @@ export async function getAccountsInfo(
       currency: account.currency,
       isActive: account.isActive,
       level: Number(account.level),
-      parentId: account.parentId || undefined
+      parentId: account.parentId || undefined,
     });
   }
 
@@ -284,14 +287,14 @@ export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {
       currency: chartOfAccounts.currency,
       isActive: chartOfAccounts.isActive,
       level: chartOfAccounts.level,
-      parentId: chartOfAccounts.parentId
+      parentId: chartOfAccounts.parentId,
     })
     .from(chartOfAccounts)
     .where(
       and(
         eq(chartOfAccounts.tenantId, scope.tenantId),
-        eq(chartOfAccounts.companyId, scope.companyId)
-      )
+        eq(chartOfAccounts.companyId, scope.companyId),
+      ),
     );
 
   return accounts.map(account => ({
@@ -302,7 +305,7 @@ export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {
     currency: account.currency,
     isActive: account.isActive,
     level: Number(account.level),
-    parentId: account.parentId || undefined
+    parentId: account.parentId || undefined,
   }));
 }
 
@@ -313,7 +316,7 @@ export async function storeIdempotencyResult(
   scope: Scope,
   idempotencyKey: string,
   response: Record<string, unknown>,
-  status: 'processing' | 'draft' | 'posted' | 'failed'
+  status: "processing" | "draft" | "posted" | "failed",
 ): Promise<void> {
   const db = getDb();
 
@@ -328,15 +331,15 @@ export async function storeIdempotencyResult(
       requestHash: JSON.stringify(response), // Store response as hash for now
       response: response,
       status,
-      expiresAt
+      expiresAt,
     })
     .onConflictDoUpdate({
       target: idempotencyKeys.key,
       set: {
         response: response,
         status,
-        expiresAt
-      }
+        expiresAt,
+      },
     });
 }
 
@@ -400,8 +403,8 @@ export async function insertCustomer(scope: Scope, input: CustomerInput) {
       and(
         eq(customers.tenantId, scope.tenantId),
         eq(customers.companyId, scope.companyId),
-        eq(customers.customerNumber, input.customerNumber)
-      )
+        eq(customers.customerNumber, input.customerNumber),
+      ),
     )
     .limit(1);
 
@@ -409,31 +412,34 @@ export async function insertCustomer(scope: Scope, input: CustomerInput) {
     throw new DatabaseError(
       `Customer number '${input.customerNumber}' already exists`,
       "DUPLICATE_CUSTOMER_NUMBER",
-      { customerNumber: input.customerNumber }
+      { customerNumber: input.customerNumber },
     );
   }
 
-  const result = await db.insert(customers).values({
-    tenantId: scope.tenantId,
-    companyId: scope.companyId,
-    customerNumber: input.customerNumber,
-    name: input.name,
-    email: input.email,
-    phone: input.phone,
-    billingAddress: input.billingAddress,
-    shippingAddress: input.shippingAddress,
-    currency: input.currency,
-    paymentTerms: input.paymentTerms,
-    creditLimit: input.creditLimit?.toString() || "0"
-  }).returning({
-    id: customers.id,
-    customerNumber: customers.customerNumber,
-    name: customers.name,
-    currency: customers.currency,
-    paymentTerms: customers.paymentTerms,
-    creditLimit: customers.creditLimit,
-    createdAt: customers.createdAt
-  });
+  const result = await db
+    .insert(customers)
+    .values({
+      tenantId: scope.tenantId,
+      companyId: scope.companyId,
+      customerNumber: input.customerNumber,
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      billingAddress: input.billingAddress,
+      shippingAddress: input.shippingAddress,
+      currency: input.currency,
+      paymentTerms: input.paymentTerms,
+      creditLimit: input.creditLimit?.toString() || "0",
+    })
+    .returning({
+      id: customers.id,
+      customerNumber: customers.customerNumber,
+      name: customers.name,
+      currency: customers.currency,
+      paymentTerms: customers.paymentTerms,
+      creditLimit: customers.creditLimit,
+      createdAt: customers.createdAt,
+    });
 
   return result[0];
 }
@@ -451,17 +457,15 @@ export async function getCustomer(scope: Scope, customerId: string) {
       and(
         eq(customers.id, customerId),
         eq(customers.tenantId, scope.tenantId),
-        eq(customers.companyId, scope.companyId)
-      )
+        eq(customers.companyId, scope.companyId),
+      ),
     )
     .limit(1);
 
   if (result.length === 0) {
-    throw new DatabaseError(
-      "Customer not found or access denied",
-      "CUSTOMER_NOT_FOUND",
-      { customerId }
-    );
+    throw new DatabaseError("Customer not found or access denied", "CUSTOMER_NOT_FOUND", {
+      customerId,
+    });
   }
 
   return result[0];
@@ -481,7 +485,7 @@ export async function getTaxCode(scope: Scope, taxCodeString: string) {
       rate: taxCodes.rate,
       taxType: taxCodes.taxType,
       taxAccountId: taxCodes.taxAccountId,
-      isActive: taxCodes.isActive
+      isActive: taxCodes.isActive,
     })
     .from(taxCodes)
     .where(
@@ -489,17 +493,15 @@ export async function getTaxCode(scope: Scope, taxCodeString: string) {
         eq(taxCodes.tenantId, scope.tenantId),
         eq(taxCodes.companyId, scope.companyId),
         eq(taxCodes.code, taxCodeString),
-        eq(taxCodes.isActive, true)
-      )
+        eq(taxCodes.isActive, true),
+      ),
     )
     .limit(1);
 
   if (result.length === 0) {
-    throw new DatabaseError(
-      `Tax code not found: ${taxCodeString}`,
-      "TAX_CODE_NOT_FOUND",
-      { taxCode: taxCodeString }
-    );
+    throw new DatabaseError(`Tax code not found: ${taxCodeString}`, "TAX_CODE_NOT_FOUND", {
+      taxCode: taxCodeString,
+    });
   }
 
   return result[0];
@@ -523,7 +525,7 @@ export async function getTaxCodes(scope: Scope, taxCodeStrings: string[]) {
       rate: taxCodes.rate,
       taxType: taxCodes.taxType,
       taxAccountId: taxCodes.taxAccountId,
-      isActive: taxCodes.isActive
+      isActive: taxCodes.isActive,
     })
     .from(taxCodes)
     .where(
@@ -531,8 +533,8 @@ export async function getTaxCodes(scope: Scope, taxCodeStrings: string[]) {
         eq(taxCodes.tenantId, scope.tenantId),
         eq(taxCodes.companyId, scope.companyId),
         inArray(taxCodes.code, taxCodeStrings),
-        eq(taxCodes.isActive, true)
-      )
+        eq(taxCodes.isActive, true),
+      ),
     );
 
   return result;
@@ -552,8 +554,8 @@ export async function insertInvoice(scope: Scope, input: InvoiceInput) {
       and(
         eq(invoices.tenantId, scope.tenantId),
         eq(invoices.companyId, scope.companyId),
-        eq(invoices.invoiceNumber, input.invoiceNumber)
-      )
+        eq(invoices.invoiceNumber, input.invoiceNumber),
+      ),
     )
     .limit(1);
 
@@ -561,7 +563,7 @@ export async function insertInvoice(scope: Scope, input: InvoiceInput) {
     throw new DatabaseError(
       `Invoice number '${input.invoiceNumber}' already exists`,
       "DUPLICATE_INVOICE_NUMBER",
-      { invoiceNumber: input.invoiceNumber }
+      { invoiceNumber: input.invoiceNumber },
     );
   }
 
@@ -571,71 +573,77 @@ export async function insertInvoice(scope: Scope, input: InvoiceInput) {
   const totalAmount = subtotal + taxAmount;
 
   // Insert invoice
-  const invoiceResult = await db.insert(invoices).values({
-    tenantId: scope.tenantId,
-    companyId: scope.companyId,
-    customerId: input.customerId,
-    invoiceNumber: input.invoiceNumber,
-    invoiceDate: input.invoiceDate,
-    dueDate: input.dueDate,
-    currency: input.currency,
-    exchangeRate: input.exchangeRate?.toString() || "1",
-    subtotal: subtotal.toString(),
-    taxAmount: taxAmount.toString(),
-    totalAmount: totalAmount.toString(),
-    balanceAmount: totalAmount.toString(), // Initially equals total amount
-    description: input.description,
-    notes: input.notes,
-    createdBy: scope.userId
-  }).returning({
-    id: invoices.id,
-    invoiceNumber: invoices.invoiceNumber,
-    invoiceDate: invoices.invoiceDate,
-    dueDate: invoices.dueDate,
-    currency: invoices.currency,
-    subtotal: invoices.subtotal,
-    taxAmount: invoices.taxAmount,
-    totalAmount: invoices.totalAmount,
-    status: invoices.status,
-    createdAt: invoices.createdAt
-  });
+  const invoiceResult = await db
+    .insert(invoices)
+    .values({
+      tenantId: scope.tenantId,
+      companyId: scope.companyId,
+      customerId: input.customerId,
+      invoiceNumber: input.invoiceNumber,
+      invoiceDate: input.invoiceDate,
+      dueDate: input.dueDate,
+      currency: input.currency,
+      exchangeRate: input.exchangeRate?.toString() || "1",
+      subtotal: subtotal.toString(),
+      taxAmount: taxAmount.toString(),
+      totalAmount: totalAmount.toString(),
+      balanceAmount: totalAmount.toString(), // Initially equals total amount
+      description: input.description,
+      notes: input.notes,
+      createdBy: scope.userId,
+    })
+    .returning({
+      id: invoices.id,
+      invoiceNumber: invoices.invoiceNumber,
+      invoiceDate: invoices.invoiceDate,
+      dueDate: invoices.dueDate,
+      currency: invoices.currency,
+      subtotal: invoices.subtotal,
+      taxAmount: invoices.taxAmount,
+      totalAmount: invoices.totalAmount,
+      status: invoices.status,
+      createdAt: invoices.createdAt,
+    });
 
   const invoice = invoiceResult[0];
   if (!invoice) {
-    throw new DatabaseError('Failed to create invoice', 'INSERT_FAILED');
+    throw new DatabaseError("Failed to create invoice", "INSERT_FAILED");
   }
 
   // Insert invoice lines
   const lineResults = [];
   for (const line of input.lines) {
-    const lineResult = await db.insert(invoiceLines).values({
-      invoiceId: invoice.id,
-      lineNumber: line.lineNumber.toString(),
-      description: line.description,
-      quantity: line.quantity.toString(),
-      unitPrice: line.unitPrice.toString(),
-      lineAmount: line.lineAmount.toString(),
-      taxCode: line.taxCode,
-      taxRate: line.taxRate?.toString() || "0",
-      taxAmount: (line.taxAmount || 0).toString(),
-      revenueAccountId: line.revenueAccountId
-    }).returning({
-      id: invoiceLines.id,
-      lineNumber: invoiceLines.lineNumber,
-      description: invoiceLines.description,
-      quantity: invoiceLines.quantity,
-      unitPrice: invoiceLines.unitPrice,
-      lineAmount: invoiceLines.lineAmount,
-      taxAmount: invoiceLines.taxAmount,
-      revenueAccountId: invoiceLines.revenueAccountId
-    });
+    const lineResult = await db
+      .insert(invoiceLines)
+      .values({
+        invoiceId: invoice.id,
+        lineNumber: line.lineNumber.toString(),
+        description: line.description,
+        quantity: line.quantity.toString(),
+        unitPrice: line.unitPrice.toString(),
+        lineAmount: line.lineAmount.toString(),
+        taxCode: line.taxCode,
+        taxRate: line.taxRate?.toString() || "0",
+        taxAmount: (line.taxAmount || 0).toString(),
+        revenueAccountId: line.revenueAccountId,
+      })
+      .returning({
+        id: invoiceLines.id,
+        lineNumber: invoiceLines.lineNumber,
+        description: invoiceLines.description,
+        quantity: invoiceLines.quantity,
+        unitPrice: invoiceLines.unitPrice,
+        lineAmount: invoiceLines.lineAmount,
+        taxAmount: invoiceLines.taxAmount,
+        revenueAccountId: invoiceLines.revenueAccountId,
+      });
 
     lineResults.push(lineResult[0]);
   }
 
   return {
     ...invoice,
-    lines: lineResults
+    lines: lineResults,
   };
 }
 
@@ -721,7 +729,7 @@ export async function getInvoice(scope: Scope, invoiceId: string): Promise<Invoi
       createdAt: invoices.createdAt,
       updatedAt: invoices.updatedAt,
       customerName: customers.name,
-      customerEmail: customers.email
+      customerEmail: customers.email,
     })
     .from(invoices)
     .leftJoin(customers, eq(invoices.customerId, customers.id))
@@ -729,17 +737,15 @@ export async function getInvoice(scope: Scope, invoiceId: string): Promise<Invoi
       and(
         eq(invoices.id, invoiceId),
         eq(invoices.tenantId, scope.tenantId),
-        eq(invoices.companyId, scope.companyId)
-      )
+        eq(invoices.companyId, scope.companyId),
+      ),
     )
     .limit(1);
 
   if (invoiceResult.length === 0) {
-    throw new DatabaseError(
-      "Invoice not found or access denied",
-      "INVOICE_NOT_FOUND",
-      { invoiceId }
-    );
+    throw new DatabaseError("Invoice not found or access denied", "INVOICE_NOT_FOUND", {
+      invoiceId,
+    });
   }
 
   // Get invoice lines
@@ -755,7 +761,7 @@ export async function getInvoice(scope: Scope, invoiceId: string): Promise<Invoi
       taxRate: invoiceLines.taxRate,
       taxAmount: invoiceLines.taxAmount,
       revenueAccountId: invoiceLines.revenueAccountId,
-      revenueAccountName: chartOfAccounts.name
+      revenueAccountName: chartOfAccounts.name,
     })
     .from(invoiceLines)
     .leftJoin(chartOfAccounts, eq(invoiceLines.revenueAccountId, chartOfAccounts.id))
@@ -798,7 +804,7 @@ export async function getInvoice(scope: Scope, invoiceId: string): Promise<Invoi
     customerEmail: invoice.customerEmail,
 
     // Lines
-    lines: linesResult
+    lines: linesResult,
   };
 }
 
@@ -809,7 +815,7 @@ export async function updateInvoicePosting(
   scope: Scope,
   invoiceId: string,
   journalId: string,
-  status: 'posted' = 'posted'
+  status: "posted" = "posted",
 ) {
   const db = getDb();
 
@@ -820,28 +826,26 @@ export async function updateInvoicePosting(
       status,
       postedBy: scope.userId,
       postedAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     })
     .where(
       and(
         eq(invoices.id, invoiceId),
         eq(invoices.tenantId, scope.tenantId),
-        eq(invoices.companyId, scope.companyId)
-      )
+        eq(invoices.companyId, scope.companyId),
+      ),
     )
     .returning({
       id: invoices.id,
       status: invoices.status,
       journalId: invoices.journalId,
-      postedAt: invoices.postedAt
+      postedAt: invoices.postedAt,
     });
 
   if (result.length === 0) {
-    throw new DatabaseError(
-      "Invoice not found or access denied",
-      "INVOICE_NOT_FOUND",
-      { invoiceId }
-    );
+    throw new DatabaseError("Invoice not found or access denied", "INVOICE_NOT_FOUND", {
+      invoiceId,
+    });
   }
 
   return result[0];
@@ -859,7 +863,7 @@ export async function listInvoices(
     toDate?: Date;
     limit?: number;
     offset?: number;
-  } = {}
+  } = {},
 ) {
   const db = getDb();
   const { customerId, status, fromDate, toDate, limit = 20, offset = 0 } = filters;
@@ -867,7 +871,7 @@ export async function listInvoices(
   // Build where conditions
   const conditions = [
     eq(invoices.tenantId, scope.tenantId),
-    eq(invoices.companyId, scope.companyId)
+    eq(invoices.companyId, scope.companyId),
   ];
 
   if (customerId) {
@@ -908,7 +912,7 @@ export async function listInvoices(
       paidAmount: invoices.paidAmount,
       balanceAmount: invoices.balanceAmount,
       status: invoices.status,
-      createdAt: invoices.createdAt
+      createdAt: invoices.createdAt,
     })
     .from(invoices)
     .leftJoin(customers, eq(invoices.customerId, customers.id))
@@ -920,6 +924,6 @@ export async function listInvoices(
   return {
     invoices: invoicesResult,
     total: Number(total),
-    hasMore: offset + limit < Number(total)
+    hasMore: offset + limit < Number(total),
   };
 }

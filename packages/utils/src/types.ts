@@ -9,8 +9,8 @@ export type {
   TenantId,
   CompanyId,
   UserId,
-  AttachmentId
-} from '@aibos/contracts';
+  AttachmentId,
+} from "@aibos/contracts";
 
 export {
   createJournalId,
@@ -18,8 +18,8 @@ export {
   createTenantId,
   createCompanyId,
   createUserId,
-  createAttachmentId
-} from '@aibos/contracts';
+  createAttachmentId,
+} from "@aibos/contracts";
 
 // JSON value types for API boundaries
 export type JsonPrimitive = string | number | boolean | null;
@@ -29,7 +29,7 @@ export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 // Type guard helpers
 export function isJsonObject(value: JsonValue): value is JsonObject {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function isJsonArray(value: JsonValue): value is JsonArray {
@@ -38,7 +38,12 @@ export function isJsonArray(value: JsonValue): value is JsonArray {
 
 // Safe parsing helper for unknown data
 export function parseUnknownAsJson(data: unknown): JsonValue {
-  if (data === null || typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean') {
+  if (
+    data === null ||
+    typeof data === "string" ||
+    typeof data === "number" ||
+    typeof data === "boolean"
+  ) {
     return data;
   }
 
@@ -46,7 +51,7 @@ export function parseUnknownAsJson(data: unknown): JsonValue {
     return data.map(parseUnknownAsJson);
   }
 
-  if (typeof data === 'object' && data !== null) {
+  if (typeof data === "object" && data !== null) {
     const result: JsonObject = {};
     for (const [key, value] of Object.entries(data)) {
       result[key] = parseUnknownAsJson(value);

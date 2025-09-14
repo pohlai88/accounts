@@ -45,15 +45,15 @@ import {
   createExportService,
   createExportManagerService,
   createExportScheduleService,
-} from '@aibos/utils/export';
+} from "@aibos/utils/export";
 
 // Basic CSV export
 const csvData = exportToCsv(
   [
-    { name: 'John', age: 30, city: 'New York' },
-    { name: 'Jane', age: 25, city: 'Los Angeles' },
+    { name: "John", age: 30, city: "New York" },
+    { name: "Jane", age: 25, city: "Los Angeles" },
   ],
-  { includeHeaders: true }
+  { includeHeaders: true },
 );
 
 // Create export service
@@ -62,12 +62,12 @@ const exportService = createExportService();
 // Export to XLSX
 const xlsxBuffer = await exportService.exportToXlsx({
   data: [
-    { name: 'John', age: 30, city: 'New York' },
-    { name: 'Jane', age: 25, city: 'Los Angeles' },
+    { name: "John", age: 30, city: "New York" },
+    { name: "Jane", age: 25, city: "Los Angeles" },
   ],
-  format: 'XLSX',
+  format: "XLSX",
   options: {
-    sheetName: 'Users',
+    sheetName: "Users",
     includeHeaders: true,
   },
 });
@@ -187,31 +187,31 @@ pnpm --filter @aibos/utils typecheck
 ### Basic Export Functions
 
 ```typescript
-import { exportToCsv, exportToXlsx, exportToJsonl } from '@aibos/utils/export';
+import { exportToCsv, exportToXlsx, exportToJsonl } from "@aibos/utils/export";
 
 // Sample data
 const data = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', age: 30 },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25 },
-  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', age: 35 },
+  { id: 1, name: "John Doe", email: "john@example.com", age: 30 },
+  { id: 2, name: "Jane Smith", email: "jane@example.com", age: 25 },
+  { id: 3, name: "Bob Johnson", email: "bob@example.com", age: 35 },
 ];
 
 // Export to CSV
 const csvData = exportToCsv(data, {
   includeHeaders: true,
-  delimiter: ',',
+  delimiter: ",",
   quote: '"',
   escape: '"',
 });
-console.log('CSV export:', csvData);
+console.log("CSV export:", csvData);
 
 // Export to XLSX
 const xlsxBuffer = await exportToXlsx(data, {
-  sheetName: 'Users',
+  sheetName: "Users",
   includeHeaders: true,
   columnWidths: { A: 10, B: 20, C: 30, D: 10 },
 });
-console.log('XLSX export buffer size:', xlsxBuffer.length);
+console.log("XLSX export buffer size:", xlsxBuffer.length);
 
 // Export to JSONL
 const jsonlData = exportToJsonl(data, {
@@ -221,44 +221,44 @@ const jsonlData = exportToJsonl(data, {
     recordCount: data.length,
   },
 });
-console.log('JSONL export:', jsonlData);
+console.log("JSONL export:", jsonlData);
 ```
 
 ### Export Service Usage
 
 ```typescript
-import { createExportService } from '@aibos/utils/export';
+import { createExportService } from "@aibos/utils/export";
 
 // Create export service
 const exportService = createExportService();
 
 // Export financial data
 const financialData = [
-  { account: '1000', name: 'Cash', balance: 10000.0, type: 'ASSET' },
+  { account: "1000", name: "Cash", balance: 10000.0, type: "ASSET" },
   {
-    account: '2000',
-    name: 'Accounts Payable',
+    account: "2000",
+    name: "Accounts Payable",
     balance: 5000.0,
-    type: 'LIABILITY',
+    type: "LIABILITY",
   },
-  { account: '3000', name: 'Revenue', balance: 15000.0, type: 'REVENUE' },
+  { account: "3000", name: "Revenue", balance: 15000.0, type: "REVENUE" },
 ];
 
 // Export to different formats
 const csvResult = await exportService.exportToCsv({
   data: financialData,
-  format: 'CSV',
+  format: "CSV",
   options: {
     includeHeaders: true,
-    delimiter: ',',
+    delimiter: ",",
   },
 });
 
 const xlsxResult = await exportService.exportToXlsx({
   data: financialData,
-  format: 'XLSX',
+  format: "XLSX",
   options: {
-    sheetName: 'Chart of Accounts',
+    sheetName: "Chart of Accounts",
     includeHeaders: true,
     columnWidths: { A: 10, B: 30, C: 15, D: 15 },
   },
@@ -266,139 +266,139 @@ const xlsxResult = await exportService.exportToXlsx({
 
 const jsonlResult = await exportService.exportToJsonl({
   data: financialData,
-  format: 'JSONL',
+  format: "JSONL",
   options: {
     includeMetadata: true,
     metadata: {
       exportDate: new Date().toISOString(),
-      reportType: 'Chart of Accounts',
+      reportType: "Chart of Accounts",
     },
   },
 });
 
-console.log('Export results:', { csvResult, xlsxResult, jsonlResult });
+console.log("Export results:", { csvResult, xlsxResult, jsonlResult });
 ```
 
 ### Export Manager Service
 
 ```typescript
-import { createExportManagerService } from '@aibos/utils/export';
+import { createExportManagerService } from "@aibos/utils/export";
 
 // Create export manager service
 const exportManager = createExportManagerService();
 
 // Track export history
 const exportHistory = await exportManager.trackExport({
-  exportId: 'exp-123',
-  userId: 'user-789',
-  format: 'XLSX',
+  exportId: "exp-123",
+  userId: "user-789",
+  format: "XLSX",
   recordCount: 1000,
   fileSize: 50000,
-  status: 'COMPLETED',
+  status: "COMPLETED",
   metadata: {
-    reportType: 'Trial Balance',
-    asOfDate: '2024-01-31',
+    reportType: "Trial Balance",
+    asOfDate: "2024-01-31",
   },
 });
 
 // Get export statistics
 const stats = await exportManager.getExportStats({
-  userId: 'user-789',
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-01-31'),
+  userId: "user-789",
+  startDate: new Date("2024-01-01"),
+  endDate: new Date("2024-01-31"),
 });
 
-console.log('Export statistics:', stats);
-console.log('Total exports:', stats.totalExports);
-console.log('Total records:', stats.totalRecords);
-console.log('Total file size:', stats.totalFileSize);
+console.log("Export statistics:", stats);
+console.log("Total exports:", stats.totalExports);
+console.log("Total records:", stats.totalRecords);
+console.log("Total file size:", stats.totalFileSize);
 
 // Get export history
 const history = await exportManager.getExportHistory({
-  userId: 'user-789',
+  userId: "user-789",
   limit: 10,
   offset: 0,
 });
 
-console.log('Export history:', history);
+console.log("Export history:", history);
 ```
 
 ### Export Scheduler Service
 
 ```typescript
-import { createExportScheduleService } from '@aibos/utils/export';
+import { createExportScheduleService } from "@aibos/utils/export";
 
 // Create export scheduler service
 const exportScheduler = createExportScheduleService();
 
 // Schedule recurring export
 const scheduledExport = await exportScheduler.scheduleExport({
-  name: 'Monthly Trial Balance',
-  description: 'Monthly trial balance export',
-  format: 'XLSX',
+  name: "Monthly Trial Balance",
+  description: "Monthly trial balance export",
+  format: "XLSX",
   schedule: {
-    type: 'RECURRING',
-    cron: '0 0 1 * *', // First day of every month at midnight
-    timezone: 'UTC',
+    type: "RECURRING",
+    cron: "0 0 1 * *", // First day of every month at midnight
+    timezone: "UTC",
   },
   dataSource: {
-    type: 'TRIAL_BALANCE',
+    type: "TRIAL_BALANCE",
     parameters: {
-      tenantId: 'tenant-123',
-      companyId: 'company-456',
-      asOfDate: 'LAST_DAY_OF_MONTH',
+      tenantId: "tenant-123",
+      companyId: "company-456",
+      asOfDate: "LAST_DAY_OF_MONTH",
     },
   },
   options: {
     includeHeaders: true,
     includeZeroBalances: false,
   },
-  createdBy: 'user-789',
+  createdBy: "user-789",
 });
 
-console.log('Scheduled export created:', scheduledExport.id);
+console.log("Scheduled export created:", scheduledExport.id);
 
 // Process scheduled exports
 const processedExports = await exportScheduler.processScheduledExports();
-console.log('Processed exports:', processedExports.length);
+console.log("Processed exports:", processedExports.length);
 
 // Get scheduled exports
 const scheduledExports = await exportScheduler.getScheduledExports({
-  userId: 'user-789',
-  status: 'ACTIVE',
+  userId: "user-789",
+  status: "ACTIVE",
 });
 
-console.log('Active scheduled exports:', scheduledExports);
+console.log("Active scheduled exports:", scheduledExports);
 ```
 
 ### Advanced Export Configuration
 
 ```typescript
-import { createExportService } from '@aibos/utils/export';
+import { createExportService } from "@aibos/utils/export";
 
 const exportService = createExportService();
 
 // Advanced XLSX export with multiple sheets
 const multiSheetData = {
-  'Trial Balance': [
-    { account: '1000', name: 'Cash', balance: 10000.0 },
-    { account: '2000', name: 'AP', balance: 5000.0 },
+  "Trial Balance": [
+    { account: "1000", name: "Cash", balance: 10000.0 },
+    { account: "2000", name: "AP", balance: 5000.0 },
   ],
-  'Balance Sheet': [
-    { section: 'Assets', total: 10000.0 },
-    { section: 'Liabilities', total: 5000.0 },
+  "Balance Sheet": [
+    { section: "Assets", total: 10000.0 },
+    { section: "Liabilities", total: 5000.0 },
   ],
 };
 
 const multiSheetResult = await exportService.exportToXlsx({
   data: multiSheetData,
-  format: 'XLSX',
+  format: "XLSX",
   options: {
     includeHeaders: true,
     columnWidths: { A: 15, B: 30, C: 15 },
     styles: {
-      header: { bold: true, backgroundColor: '#f0f0f0' },
-      currency: { numFmt: '#,##0.00' },
+      header: { bold: true, backgroundColor: "#f0f0f0" },
+      currency: { numFmt: "#,##0.00" },
     },
   },
 });
@@ -406,28 +406,28 @@ const multiSheetResult = await exportService.exportToXlsx({
 // CSV export with custom formatting
 const csvResult = await exportService.exportToCsv({
   data: financialData,
-  format: 'CSV',
+  format: "CSV",
   options: {
     includeHeaders: true,
-    delimiter: ';', // Semicolon delimiter
+    delimiter: ";", // Semicolon delimiter
     quote: "'", // Single quote
     escape: "'",
-    encoding: 'utf-8',
-    lineEnding: '\r\n',
+    encoding: "utf-8",
+    lineEnding: "\r\n",
   },
 });
 
 // JSONL export with custom metadata
 const jsonlResult = await exportService.exportToJsonl({
   data: financialData,
-  format: 'JSONL',
+  format: "JSONL",
   options: {
     includeMetadata: true,
     metadata: {
       exportDate: new Date().toISOString(),
-      reportType: 'Trial Balance',
-      version: '1.0.0',
-      generatedBy: 'AIBOS Accounting System',
+      reportType: "Trial Balance",
+      version: "1.0.0",
+      generatedBy: "AIBOS Accounting System",
     },
     prettyPrint: false,
   },
@@ -447,7 +447,7 @@ const jsonlResult = await exportService.exportToJsonl({
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_EXPORT = 'true';
+process.env.DEBUG_EXPORT = "true";
 ```
 
 **Logs**: Check Axiom telemetry for export operation logs

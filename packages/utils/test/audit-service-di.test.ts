@@ -5,7 +5,7 @@ import {
   resetAuditService,
   type AuditEntry,
   type AuditContext,
-  type AuditDatabase
+  type AuditDatabase,
 } from "../src/audit/service";
 import type { Scope } from "@aibos/db";
 
@@ -14,7 +14,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
     tenantId: "tenant-123",
     companyId: "company-456",
     userId: "user-789",
-    userRole: "manager"
+    userRole: "manager",
   };
 
   const mockAuditContext: AuditContext = {
@@ -22,7 +22,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
     ipAddress: "192.168.1.1",
     userAgent: "Mozilla/5.0 Test Browser",
     source: "API",
-    version: "1.0.0"
+    version: "1.0.0",
   };
 
   let mockDatabase: AuditDatabase;
@@ -53,8 +53,8 @@ describe("Audit Service - Dependency Injection Tests", () => {
         requestId: "req-123",
         ipAddress: "192.168.1.1",
         userAgent: "test-agent",
-        createdAt: new Date()
-      }
+        createdAt: new Date(),
+      },
     ];
 
     // Create a proper mock chain that resolves to the results
@@ -67,7 +67,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
 
     mockDatabase = {
       insert: mockInsert,
-      select: mockSelect
+      select: mockSelect,
     };
   });
 
@@ -125,7 +125,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
         scope: mockScope,
         action: "CREATE",
         entityType: "JOURNAL",
-        entityId: "journal-123"
+        entityId: "journal-123",
       };
 
       await auditService.logOperation(entry);
@@ -143,7 +143,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
         metadata: null,
         requestId: undefined,
         ipAddress: undefined,
-        userAgent: undefined
+        userAgent: undefined,
       });
     });
 
@@ -156,7 +156,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
         oldValues: { status: "draft" },
         newValues: { status: "posted" },
         metadata: { reason: "approved" },
-        context: mockAuditContext
+        context: mockAuditContext,
       };
 
       await auditService.logOperation(entry);
@@ -172,30 +172,30 @@ describe("Audit Service - Dependency Injection Tests", () => {
         newValues: JSON.stringify({ status: "posted" }),
         metadata: JSON.stringify({
           reason: "approved",
-          context: mockAuditContext
+          context: mockAuditContext,
         }),
         requestId: mockAuditContext.requestId,
         ipAddress: mockAuditContext.ipAddress,
-        userAgent: mockAuditContext.userAgent
+        userAgent: mockAuditContext.userAgent,
       });
     });
 
     it("should handle database errors gracefully", async () => {
       mockValues.mockRejectedValue(new Error("Database error"));
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const entry: AuditEntry = {
         scope: mockScope,
         action: "CREATE",
         entityType: "JOURNAL",
-        entityId: "journal-123"
+        entityId: "journal-123",
       };
 
       // Should not throw
       await expect(auditService.logOperation(entry)).resolves.toBeUndefined();
 
-      expect(consoleSpy).toHaveBeenCalledWith('Audit logging failed:', expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith("Audit logging failed:", expect.any(Error));
 
       consoleSpy.mockRestore();
     });
@@ -216,10 +216,10 @@ describe("Audit Service - Dependency Injection Tests", () => {
         totalCredit: 1000,
         lines: [
           { accountId: "acc1", debit: 1000, credit: 0 },
-          { accountId: "acc2", debit: 0, credit: 1000 }
+          { accountId: "acc2", debit: 0, credit: 1000 },
         ],
         requiresApproval: false,
-        status: "posted"
+        status: "posted",
       };
 
       await auditService.logJournalPosting(
@@ -227,7 +227,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
         "journal-123",
         journalData,
         "POST",
-        mockAuditContext
+        mockAuditContext,
       );
 
       expect(mockValues).toHaveBeenCalledWith(
@@ -246,9 +246,9 @@ describe("Audit Service - Dependency Injection Tests", () => {
             lineCount: 2,
             requiresApproval: false,
             status: "posted",
-            context: mockAuditContext
-          })
-        })
+            context: mockAuditContext,
+          }),
+        }),
       );
     });
   });
@@ -263,7 +263,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
     it("should query audit logs with filters", async () => {
       const results = await auditService.queryAuditLogs(mockScope, {
         entityType: "JOURNAL",
-        limit: 10
+        limit: 10,
       });
 
       expect(mockSelect).toHaveBeenCalled();
@@ -272,16 +272,12 @@ describe("Audit Service - Dependency Injection Tests", () => {
         id: "audit-1",
         tenantId: "tenant-123",
         action: "CREATE",
-        entityType: "JOURNAL"
+        entityType: "JOURNAL",
       });
     });
 
     it("should get entity audit trail", async () => {
-      const results = await auditService.getEntityAuditTrail(
-        mockScope,
-        "JOURNAL",
-        "journal-123"
-      );
+      const results = await auditService.getEntityAuditTrail(mockScope, "JOURNAL", "journal-123");
 
       expect(results).toHaveLength(1);
       expect(results[0].entityId).toBe("journal-123");
@@ -302,15 +298,15 @@ describe("Audit Service - Dependency Injection Tests", () => {
         "SUCCESS",
         [{ accountId: "acc1", warning: "Unusual balance" }],
         [],
-        mockAuditContext
+        mockAuditContext,
       );
 
       expect(mockValues).toHaveBeenCalledWith(
         expect.objectContaining({
           action: "VALIDATE",
           entityType: "ACCOUNT",
-          metadata: expect.stringContaining("coa_validation")
-        })
+          metadata: expect.stringContaining("coa_validation"),
+        }),
       );
     });
 
@@ -321,15 +317,15 @@ describe("Audit Service - Dependency Injection Tests", () => {
         "CREATE",
         "JOURNAL",
         "journal-456",
-        mockAuditContext
+        mockAuditContext,
       );
 
       expect(mockValues).toHaveBeenCalledWith(
         expect.objectContaining({
           action: "CREATE",
           entityType: "IDEMPOTENCY_KEY",
-          entityId: "idem-key-123"
-        })
+          entityId: "idem-key-123",
+        }),
       );
     });
 
@@ -339,15 +335,15 @@ describe("Audit Service - Dependency Injection Tests", () => {
         "journal:post",
         "ALLOWED",
         undefined,
-        mockAuditContext
+        mockAuditContext,
       );
 
       expect(mockValues).toHaveBeenCalledWith(
         expect.objectContaining({
           action: "VALIDATE",
           entityType: "USER",
-          entityId: mockScope.userId
-        })
+          entityId: mockScope.userId,
+        }),
       );
     });
 
@@ -356,15 +352,15 @@ describe("Audit Service - Dependency Injection Tests", () => {
         mockScope,
         "AUTH_FAILURE",
         { reason: "invalid_token" },
-        mockAuditContext
+        mockAuditContext,
       );
 
       expect(mockValues).toHaveBeenCalledWith(
         expect.objectContaining({
           action: "VALIDATE",
           entityType: "USER",
-          metadata: expect.stringContaining("security_event")
-        })
+          metadata: expect.stringContaining("security_event"),
+        }),
       );
     });
   });
@@ -385,7 +381,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
         oldValues: null,
         newValues: null,
         metadata: null,
-        context: undefined
+        context: undefined,
       };
 
       await expect(auditService.logOperation(entry)).resolves.toBeUndefined();
@@ -394,7 +390,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
     it("should handle large metadata objects", async () => {
       const largeMetadata = {
         data: "x".repeat(10000),
-        nested: { deep: { object: { value: "test" } } }
+        nested: { deep: { object: { value: "test" } } },
       };
 
       const entry: AuditEntry = {
@@ -402,7 +398,7 @@ describe("Audit Service - Dependency Injection Tests", () => {
         action: "CREATE",
         entityType: "JOURNAL",
         entityId: "journal-123",
-        metadata: largeMetadata
+        metadata: largeMetadata,
       };
 
       await expect(auditService.logOperation(entry)).resolves.toBeUndefined();

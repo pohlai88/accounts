@@ -6,7 +6,10 @@
   },
   "devDependencies": {
     "@types/node": "^24.3.3",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "@aibos/eslint-config": "workspace:*",
+    "@aibos/vitest-config": "workspace:*",
+    "@aibos/prettier-config": "workspace:*"
   },
   "exports": {
     ".": {
@@ -22,9 +25,12 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/build-preset.cjs",
+    "build": "tsc -p . --noEmit && node scripts/build-preset.cjs",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -p . --noEmit",
+    "dev": "tsc -p . --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "type": "module",
   "types": "dist/index.d.ts"

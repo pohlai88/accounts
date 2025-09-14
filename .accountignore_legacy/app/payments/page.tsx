@@ -1,131 +1,151 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog'
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Download, 
-  Eye, 
-  Edit, 
-  Trash2, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
+  Trash2,
   DollarSign,
   TrendingUp,
   TrendingDown,
   Calendar,
   User,
   CreditCard,
-  Banknote
-} from 'lucide-react'
-import { TransactionService, Payment, PaymentType } from '@/lib/transaction-service'
-import { PaymentEntryForm } from '@/components/transactions/payment-entry-form'
-import { format } from 'date-fns'
+  Banknote,
+} from "lucide-react";
+import { TransactionService, Payment, PaymentType } from "@/lib/transaction-service";
+import { PaymentEntryForm } from "@/components/transactions/payment-entry-form";
+import { format } from "date-fns";
 
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState<Payment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false)
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [filters, setFilters] = useState({
-    payment_type: 'All' as 'All' | PaymentType,
-    status: 'All' as 'All' | 'Draft' | 'Submitted' | 'Cancelled',
-    search: ''
-  })
+    payment_type: "All" as "All" | PaymentType,
+    status: "All" as "All" | "Draft" | "Submitted" | "Cancelled",
+    search: "",
+  });
 
-  const companyId = 'default-company' // In a real app, this would come from context
+  const companyId = "default-company"; // In a real app, this would come from context
 
   useEffect(() => {
-    loadPayments()
-  }, [companyId, filters])
+    loadPayments();
+  }, [companyId, filters]);
 
   const loadPayments = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const result = await TransactionService.getPayments({
         company_id: companyId,
-        payment_type: filters.payment_type === 'All' ? undefined : filters.payment_type,
-        status: filters.status === 'All' ? undefined : filters.status,
-        limit: 50
-      })
+        payment_type: filters.payment_type === "All" ? undefined : filters.payment_type,
+        status: filters.status === "All" ? undefined : filters.status,
+        limit: 50,
+      });
 
       if (result.success && result.payments) {
-        let filteredPayments = result.payments
+        let filteredPayments = result.payments;
 
         if (filters.search) {
-          filteredPayments = filteredPayments.filter(payment =>
-            payment.payment_no.toLowerCase().includes(filters.search.toLowerCase()) ||
-            payment.party_name.toLowerCase().includes(filters.search.toLowerCase()) ||
-            payment.mode_of_payment.toLowerCase().includes(filters.search.toLowerCase())
-          )
+          filteredPayments = filteredPayments.filter(
+            payment =>
+              payment.payment_no.toLowerCase().includes(filters.search.toLowerCase()) ||
+              payment.party_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+              payment.mode_of_payment.toLowerCase().includes(filters.search.toLowerCase()),
+          );
         }
 
-        setPayments(filteredPayments)
+        setPayments(filteredPayments);
       }
     } catch (error) {
-      console.error('Error loading payments:', error)
+      console.error("Error loading payments:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCreatePayment = (payment: Payment) => {
-    setPayments(prev => [payment, ...prev])
-    setShowCreateDialog(false)
-  }
+    setPayments(prev => [payment, ...prev]);
+    setShowCreateDialog(false);
+  };
 
   const handleViewPayment = (payment: Payment) => {
-    setSelectedPayment(payment)
-    setShowPaymentDialog(true)
-  }
+    setSelectedPayment(payment);
+    setShowPaymentDialog(true);
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      Draft: { variant: 'secondary' as const, label: 'Draft' },
-      Submitted: { variant: 'default' as const, label: 'Submitted' },
-      Cancelled: { variant: 'outline' as const, label: 'Cancelled' }
-    }
+      Draft: { variant: "secondary" as const, label: "Draft" },
+      Submitted: { variant: "default" as const, label: "Submitted" },
+      Cancelled: { variant: "outline" as const, label: "Cancelled" },
+    };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.Draft
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.Draft;
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
 
   const getPaymentTypeIcon = (type: PaymentType) => {
-    return type === 'Received' ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />
-  }
+    return type === "Received" ? (
+      <TrendingUp className="h-4 w-4" />
+    ) : (
+      <TrendingDown className="h-4 w-4" />
+    );
+  };
 
   const getModeOfPaymentIcon = (mode: string) => {
     switch (mode.toLowerCase()) {
-      case 'cash':
-        return <Banknote className="h-4 w-4" />
-      case 'bank transfer':
-      case 'credit card':
-      case 'debit card':
-      case 'online payment':
-        return <CreditCard className="h-4 w-4" />
+      case "cash":
+        return <Banknote className="h-4 w-4" />;
+      case "bank transfer":
+      case "credit card":
+      case "debit card":
+      case "online payment":
+        return <CreditCard className="h-4 w-4" />;
       default:
-        return <DollarSign className="h-4 w-4" />
+        return <DollarSign className="h-4 w-4" />;
     }
-  }
+  };
 
-  const getTotalPayments = () => payments.length
-  const getTotalAmount = () => payments.reduce((sum, payment) => sum + payment.paid_amount + payment.received_amount, 0)
-  const getReceivedAmount = () => payments.reduce((sum, payment) => sum + payment.received_amount, 0)
-  const getPaidAmount = () => payments.reduce((sum, payment) => sum + payment.paid_amount, 0)
+  const getTotalPayments = () => payments.length;
+  const getTotalAmount = () =>
+    payments.reduce((sum, payment) => sum + payment.paid_amount + payment.received_amount, 0);
+  const getReceivedAmount = () =>
+    payments.reduce((sum, payment) => sum + payment.received_amount, 0);
+  const getPaidAmount = () => payments.reduce((sum, payment) => sum + payment.paid_amount, 0);
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -133,9 +153,7 @@ export default function PaymentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Payments</h1>
-          <p className="text-muted-foreground">
-            Manage your payment entries and allocations
-          </p>
+          <p className="text-muted-foreground">Manage your payment entries and allocations</p>
         </div>
         <Button onClick={() => setShowCreateDialog(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -163,7 +181,9 @@ export default function PaymentsPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Received</p>
-                <p className="text-2xl font-bold text-green-600">${getReceivedAmount().toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  ${getReceivedAmount().toFixed(2)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -207,7 +227,7 @@ export default function PaymentsPage() {
                   placeholder="Search payments..."
                   className="pl-10"
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 />
               </div>
             </div>
@@ -216,7 +236,9 @@ export default function PaymentsPage() {
               <Label htmlFor="payment_type">Payment Type</Label>
               <Select
                 value={filters.payment_type}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, payment_type: value as any }))}
+                onValueChange={value =>
+                  setFilters(prev => ({ ...prev, payment_type: value as any }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -233,7 +255,7 @@ export default function PaymentsPage() {
               <Label htmlFor="status">Status</Label>
               <Select
                 value={filters.status}
-                onValueChange={(value) => setFilters(prev => ({ ...prev, status: value as any }))}
+                onValueChange={value => setFilters(prev => ({ ...prev, status: value as any }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -254,9 +276,7 @@ export default function PaymentsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Payments</CardTitle>
-          <CardDescription>
-            {payments.length} payments found
-          </CardDescription>
+          <CardDescription>{payments.length} payments found</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -291,11 +311,9 @@ export default function PaymentsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payments.map((payment) => (
+                  {payments.map(payment => (
                     <TableRow key={payment.id}>
-                      <TableCell className="font-medium">
-                        {payment.payment_no}
-                      </TableCell>
+                      <TableCell className="font-medium">{payment.payment_no}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           {getPaymentTypeIcon(payment.payment_type)}
@@ -315,23 +333,23 @@ export default function PaymentsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {format(new Date(payment.payment_date), 'MMM dd, yyyy')}
+                        {format(new Date(payment.payment_date), "MMM dd, yyyy")}
                       </TableCell>
                       <TableCell>
                         <div className="text-right">
                           <div className="font-medium">
-                            {payment.currency} {(payment.paid_amount + payment.received_amount).toFixed(2)}
+                            {payment.currency}{" "}
+                            {(payment.paid_amount + payment.received_amount).toFixed(2)}
                           </div>
                           {payment.total_allocated_amount > 0 && (
                             <div className="text-xs text-muted-foreground">
-                              Allocated: {payment.currency} {payment.total_allocated_amount.toFixed(2)}
+                              Allocated: {payment.currency}{" "}
+                              {payment.total_allocated_amount.toFixed(2)}
                             </div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {getStatusBadge(payment.status)}
-                      </TableCell>
+                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
                       <TableCell>
                         <div className="flex space-x-1">
                           <Button
@@ -341,16 +359,10 @@ export default function PaymentsPage() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                          >
+                          <Button variant="outline" size="sm">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                          >
+                          <Button variant="outline" size="sm">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -368,12 +380,8 @@ export default function PaymentsPage() {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              Create Payment Entry
-            </DialogTitle>
-            <DialogDescription>
-              Record a payment received or made
-            </DialogDescription>
+            <DialogTitle>Create Payment Entry</DialogTitle>
+            <DialogDescription>Record a payment received or made</DialogDescription>
           </DialogHeader>
           <PaymentEntryForm
             companyId={companyId}
@@ -387,12 +395,8 @@ export default function PaymentsPage() {
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              Payment Details - {selectedPayment?.payment_no}
-            </DialogTitle>
-            <DialogDescription>
-              View and manage payment details
-            </DialogDescription>
+            <DialogTitle>Payment Details - {selectedPayment?.payment_no}</DialogTitle>
+            <DialogDescription>View and manage payment details</DialogDescription>
           </DialogHeader>
           {selectedPayment && (
             <div className="space-y-6">
@@ -401,20 +405,41 @@ export default function PaymentsPage() {
                 <div>
                   <h3 className="font-medium mb-2">Payment Information</h3>
                   <div className="space-y-1 text-sm">
-                    <p><span className="font-medium">Payment No:</span> {selectedPayment.payment_no}</p>
-                    <p><span className="font-medium">Type:</span> {selectedPayment.payment_type}</p>
-                    <p><span className="font-medium">Date:</span> {format(new Date(selectedPayment.payment_date), 'MMM dd, yyyy')}</p>
-                    <p><span className="font-medium">Mode:</span> {selectedPayment.mode_of_payment}</p>
-                    <p><span className="font-medium">Status:</span> {getStatusBadge(selectedPayment.status)}</p>
+                    <p>
+                      <span className="font-medium">Payment No:</span> {selectedPayment.payment_no}
+                    </p>
+                    <p>
+                      <span className="font-medium">Type:</span> {selectedPayment.payment_type}
+                    </p>
+                    <p>
+                      <span className="font-medium">Date:</span>{" "}
+                      {format(new Date(selectedPayment.payment_date), "MMM dd, yyyy")}
+                    </p>
+                    <p>
+                      <span className="font-medium">Mode:</span> {selectedPayment.mode_of_payment}
+                    </p>
+                    <p>
+                      <span className="font-medium">Status:</span>{" "}
+                      {getStatusBadge(selectedPayment.status)}
+                    </p>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">Party Information</h3>
                   <div className="space-y-1 text-sm">
-                    <p><span className="font-medium">Party:</span> {selectedPayment.party_name}</p>
-                    <p><span className="font-medium">Type:</span> {selectedPayment.party_type}</p>
-                    <p><span className="font-medium">Currency:</span> {selectedPayment.currency}</p>
-                    <p><span className="font-medium">Exchange Rate:</span> {selectedPayment.exchange_rate}</p>
+                    <p>
+                      <span className="font-medium">Party:</span> {selectedPayment.party_name}
+                    </p>
+                    <p>
+                      <span className="font-medium">Type:</span> {selectedPayment.party_type}
+                    </p>
+                    <p>
+                      <span className="font-medium">Currency:</span> {selectedPayment.currency}
+                    </p>
+                    <p>
+                      <span className="font-medium">Exchange Rate:</span>{" "}
+                      {selectedPayment.exchange_rate}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -448,7 +473,8 @@ export default function PaymentsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Total Amount</span>
                       <span className="text-lg font-bold text-primary">
-                        {selectedPayment.currency} {(selectedPayment.paid_amount + selectedPayment.received_amount).toFixed(2)}
+                        {selectedPayment.currency}{" "}
+                        {(selectedPayment.paid_amount + selectedPayment.received_amount).toFixed(2)}
                       </span>
                     </div>
                   </CardContent>
@@ -473,9 +499,18 @@ export default function PaymentsPage() {
                         {selectedPayment.allocations.map((allocation, index) => (
                           <TableRow key={index}>
                             <TableCell>{allocation.invoice_id}</TableCell>
-                            <TableCell>{selectedPayment.currency} {allocation.allocated_amount.toFixed(2)}</TableCell>
-                            <TableCell>{selectedPayment.currency} {allocation.discount_amount.toFixed(2)}</TableCell>
-                            <TableCell>{selectedPayment.currency} {(allocation.allocated_amount - allocation.discount_amount).toFixed(2)}</TableCell>
+                            <TableCell>
+                              {selectedPayment.currency} {allocation.allocated_amount.toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              {selectedPayment.currency} {allocation.discount_amount.toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              {selectedPayment.currency}{" "}
+                              {(allocation.allocated_amount - allocation.discount_amount).toFixed(
+                                2,
+                              )}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -496,5 +531,5 @@ export default function PaymentsPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

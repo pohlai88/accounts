@@ -1,33 +1,28 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-  Sparkles,
-  ArrowRight,
-  CheckCircle2,
-  Zap,
-  Shield,
-  TrendingUp
-} from 'lucide-react'
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, ArrowRight, CheckCircle2, Zap, Shield, TrendingUp } from "lucide-react";
 
 export default function HomePage() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     // Check if user is already logged in
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
-        router.push('/dashboard')
+        router.push("/dashboard");
       }
-    }
-    checkAuth()
-  }, [router])
+    };
+    checkAuth();
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
@@ -40,12 +35,10 @@ export default function HomePage() {
             <Badge variant="secondary">ERPNext-Inspired</Badge>
           </div>
           <div className="space-x-2">
-            <Button variant="outline" onClick={() => router.push('/login')}>
+            <Button variant="outline" onClick={() => router.push("/login")}>
               Sign In
             </Button>
-            <Button onClick={() => router.push('/erpnext-demo')}>
-              View Demo
-            </Button>
+            <Button onClick={() => router.push("/erpnext-demo")}>View Demo</Button>
           </div>
         </div>
       </header>
@@ -60,17 +53,22 @@ export default function HomePage() {
               <span className="text-primary">With Modern UX</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Experience ERPNext-level accounting depth with lightning-fast performance, 
-              beautiful design, and mobile-first experience that crushes the competition.
+              Experience ERPNext-level accounting depth with lightning-fast performance, beautiful
+              design, and mobile-first experience that crushes the competition.
             </p>
           </div>
 
           <div className="flex items-center justify-center space-x-4">
-            <Button size="lg" onClick={() => router.push('/login')} className="text-lg px-8 py-6">
+            <Button size="lg" onClick={() => router.push("/login")} className="text-lg px-8 py-6">
               Get Started Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => router.push('/erpnext-demo')} className="text-lg px-8 py-6">
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => router.push("/erpnext-demo")}
+              className="text-lg px-8 py-6"
+            >
               Interactive Demo
             </Button>
           </div>
@@ -100,8 +98,8 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                716KB bundle vs competitors' 2-3MB. Sub-second response times 
-                vs 2-5 second delays. Built for speed.
+                716KB bundle vs competitors' 2-3MB. Sub-second response times vs 2-5 second delays.
+                Built for speed.
               </p>
             </CardContent>
           </Card>
@@ -113,8 +111,8 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Battle-tested accounting patterns from ERPNext. Separate payment 
-                ledger, immutable audit trails, advanced reconciliation.
+                Battle-tested accounting patterns from ERPNext. Separate payment ledger, immutable
+                audit trails, advanced reconciliation.
               </p>
             </CardContent>
           </Card>
@@ -126,8 +124,8 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Dark-first design, mobile-optimized, real-time validation. 
-                WCAG 2.2 AAA accessible. Beautiful and functional.
+                Dark-first design, mobile-optimized, real-time validation. WCAG 2.2 AAA accessible.
+                Beautiful and functional.
               </p>
             </CardContent>
           </Card>
@@ -136,7 +134,7 @@ export default function HomePage() {
         {/* Competitive Comparison */}
         <div className="mt-20 text-center space-y-8">
           <h3 className="text-3xl font-bold">Why Choose Modern Accounting?</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="space-y-2">
               <h4 className="font-semibold">vs. QuickBooks</h4>
@@ -216,15 +214,20 @@ export default function HomePage() {
         <div className="mt-20 text-center space-y-6">
           <h3 className="text-3xl font-bold">Ready to Transform Your Accounting?</h3>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of businesses already using Modern Accounting to streamline 
-            their financial operations with Fortune 500-grade tools.
+            Join thousands of businesses already using Modern Accounting to streamline their
+            financial operations with Fortune 500-grade tools.
           </p>
           <div className="space-x-4">
-            <Button size="lg" onClick={() => router.push('/login')} className="text-lg px-8 py-6">
+            <Button size="lg" onClick={() => router.push("/login")} className="text-lg px-8 py-6">
               Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => router.push('/erpnext-demo')} className="text-lg px-8 py-6">
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => router.push("/erpnext-demo")}
+              className="text-lg px-8 py-6"
+            >
               Explore Features
             </Button>
           </div>
@@ -235,7 +238,10 @@ export default function HomePage() {
       <footer className="border-t mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-sm text-muted-foreground">
-            <p>© 2024 Modern Accounting. Built with Next.js 15, Supabase, and ERPNext-inspired business logic.</p>
+            <p>
+              © 2024 Modern Accounting. Built with Next.js 15, Supabase, and ERPNext-inspired
+              business logic.
+            </p>
             <div className="flex items-center justify-center space-x-4 mt-2">
               <Badge variant="outline">TypeScript</Badge>
               <Badge variant="outline">Supabase</Badge>
@@ -246,5 +252,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

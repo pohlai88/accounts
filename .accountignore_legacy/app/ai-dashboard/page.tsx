@@ -1,88 +1,86 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs'
-import { 
-  Brain, 
-  Lightbulb, 
-  Target, 
-  Zap, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Brain,
+  Lightbulb,
+  Target,
+  Zap,
   TrendingUp,
   Settings,
   FileText,
   DollarSign,
   Shield,
-  Star
-} from 'lucide-react'
-import { SmartOnboardingWizard } from '@/components/ai/smart-onboarding-wizard'
-import { AISuggestionsPanel } from '@/components/ai/ai-suggestions-panel'
-import { AutoCategorization } from '@/components/ai/auto-categorization'
-import { ProgressTrackingDashboard, QuickActions } from '@/components/ai/progress-tracking-dashboard'
-import { AIEngine, AIContext } from '@/lib/ai-engine'
+  Star,
+} from "lucide-react";
+import { SmartOnboardingWizard } from "@/components/ai/smart-onboarding-wizard";
+import { AISuggestionsPanel } from "@/components/ai/ai-suggestions-panel";
+import { AutoCategorization } from "@/components/ai/auto-categorization";
+import {
+  ProgressTrackingDashboard,
+  QuickActions,
+} from "@/components/ai/progress-tracking-dashboard";
+import { AIEngine, AIContext } from "@/lib/ai-engine";
 
 export default function AIDashboardPage() {
   const [context, setContext] = useState<AIContext>({
-    userId: 'user-123',
-    companyId: 'company-123',
-    userRole: 'admin',
-    businessType: 'service',
-    companySize: 'small',
-    currentPage: 'ai-dashboard',
+    userId: "user-123",
+    companyId: "company-123",
+    userRole: "admin",
+    businessType: "service",
+    companySize: "small",
+    currentPage: "ai-dashboard",
     recentActions: [],
     setupComplete: false,
-    lastLogin: new Date().toISOString()
-  })
-  const [showOnboarding, setShowOnboarding] = useState(false)
-  const [activeTab, setActiveTab] = useState('overview')
+    lastLogin: new Date().toISOString(),
+  });
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     // Check if user needs onboarding
     if (!context.setupComplete) {
-      setShowOnboarding(true)
+      setShowOnboarding(true);
     }
-  }, [context.setupComplete])
+  }, [context.setupComplete]);
 
   const handleOnboardingComplete = () => {
-    setContext(prev => ({ ...prev, setupComplete: true }))
-    setShowOnboarding(false)
-  }
+    setContext(prev => ({ ...prev, setupComplete: true }));
+    setShowOnboarding(false);
+  };
 
   const handleOnboardingSkip = () => {
-    setShowOnboarding(false)
-  }
+    setShowOnboarding(false);
+  };
 
   const handleSuggestionAction = (suggestion: any) => {
-    console.log('Suggestion action:', suggestion)
+    console.log("Suggestion action:", suggestion);
     // Handle suggestion action
-  }
+  };
 
   const handleStepComplete = (stepId: string) => {
-    console.log('Step completed:', stepId)
+    console.log("Step completed:", stepId);
     // Handle step completion
-  }
+  };
 
   const handleQuickAction = (action: string) => {
-    console.log('Quick action:', action)
+    console.log("Quick action:", action);
     // Handle quick action
-  }
+  };
 
   const handleCategorizationComplete = (result: any) => {
-    console.log('Categorization complete:', result)
+    console.log("Categorization complete:", result);
     // Handle categorization completion
-  }
+  };
 
   const handleManualOverride = (accountId: string) => {
-    console.log('Manual override:', accountId)
+    console.log("Manual override:", accountId);
     // Handle manual override
-  }
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -163,11 +161,9 @@ export default function AIDashboardPage() {
                     <span className="text-sm font-medium">75%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
+                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: "75%" }}></div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    3 of 4 steps completed
-                  </div>
+                  <div className="text-xs text-muted-foreground">3 of 4 steps completed</div>
                 </div>
               </CardContent>
             </Card>
@@ -203,9 +199,7 @@ export default function AIDashboardPage() {
                 <div className="p-4 border rounded-lg text-center">
                   <Lightbulb className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                   <h3 className="font-medium">Smart Suggestions</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Get personalized recommendations
-                  </p>
+                  <p className="text-sm text-muted-foreground">Get personalized recommendations</p>
                 </div>
                 <div className="p-4 border rounded-lg text-center">
                   <Brain className="h-8 w-8 text-purple-500 mx-auto mb-2" />
@@ -224,9 +218,7 @@ export default function AIDashboardPage() {
                 <div className="p-4 border rounded-lg text-center">
                   <Zap className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                   <h3 className="font-medium">Quick Actions</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Jump to common tasks quickly
-                  </p>
+                  <p className="text-sm text-muted-foreground">Jump to common tasks quickly</p>
                 </div>
               </div>
             </CardContent>
@@ -325,5 +317,5 @@ export default function AIDashboardPage() {
         />
       )}
     </div>
-  )
+  );
 }

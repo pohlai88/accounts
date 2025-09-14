@@ -1,540 +1,539 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+import React, { useState, useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle
-} from '@/components/ui/dialog'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-    Plus,
-    Trash2,
-    Save,
-    Send,
-    X,
-    Calculator,
-    FileText,
-    DollarSign,
-    Calendar,
-    User,
-    Building2
-} from 'lucide-react'
-import { TransactionService, CreateInvoiceInput, CreateInvoiceItemInput } from '@/lib/transaction-service'
-import { AccountingService } from '@/lib/accounting-service'
-import { format } from 'date-fns'
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  Trash2,
+  Save,
+  Send,
+  X,
+  Calculator,
+  FileText,
+  DollarSign,
+  Calendar,
+  User,
+  Building2,
+} from "lucide-react";
+import {
+  TransactionService,
+  CreateInvoiceInput,
+  CreateInvoiceItemInput,
+} from "@/lib/transaction-service";
+import { AccountingService } from "@/lib/accounting-service";
+import { format } from "date-fns";
 
 // Form validation schema
 const invoiceItemSchema = z.object({
-    item_code: z.string().optional(),
-    item_name: z.string().min(1, 'Item name is required'),
-    description: z.string().optional(),
-    item_group: z.string().optional(),
-    qty: z.number().min(0.001, 'Quantity must be greater than 0'),
-    rate: z.number().min(0, 'Rate must be greater than or equal to 0'),
-    tax_rate: z.number().min(0).max(100).default(0),
-    income_account_id: z.string().optional(),
-    expense_account_id: z.string().optional(),
-    cost_center_id: z.string().optional(),
-    warehouse: z.string().optional(),
-    project_id: z.string().optional()
-})
+  item_code: z.string().optional(),
+  item_name: z.string().min(1, "Item name is required"),
+  description: z.string().optional(),
+  item_group: z.string().optional(),
+  qty: z.number().min(0.001, "Quantity must be greater than 0"),
+  rate: z.number().min(0, "Rate must be greater than or equal to 0"),
+  tax_rate: z.number().min(0).max(100).default(0),
+  income_account_id: z.string().optional(),
+  expense_account_id: z.string().optional(),
+  cost_center_id: z.string().optional(),
+  warehouse: z.string().optional(),
+  project_id: z.string().optional(),
+});
 
 const salesInvoiceSchema = z.object({
-    customer_id: z.string().optional(),
-    customer_name: z.string().min(1, 'Customer name is required'),
-    invoice_date: z.string().min(1, 'Invoice date is required'),
-    due_date: z.string().min(1, 'Due date is required'),
-    posting_date: z.string().min(1, 'Posting date is required'),
-    currency: z.string().min(1, 'Currency is required'),
-    exchange_rate: z.number().min(0.000001, 'Exchange rate must be greater than 0').default(1),
-    cost_center_id: z.string().optional(),
-    project_id: z.string().optional(),
-    terms_and_conditions: z.string().optional(),
-    remarks: z.string().optional(),
-    reference_no: z.string().optional(),
-    reference_date: z.string().optional(),
-    items: z.array(invoiceItemSchema).min(1, 'At least one item is required')
-})
+  customer_id: z.string().optional(),
+  customer_name: z.string().min(1, "Customer name is required"),
+  invoice_date: z.string().min(1, "Invoice date is required"),
+  due_date: z.string().min(1, "Due date is required"),
+  posting_date: z.string().min(1, "Posting date is required"),
+  currency: z.string().min(1, "Currency is required"),
+  exchange_rate: z.number().min(0.000001, "Exchange rate must be greater than 0").default(1),
+  cost_center_id: z.string().optional(),
+  project_id: z.string().optional(),
+  terms_and_conditions: z.string().optional(),
+  remarks: z.string().optional(),
+  reference_no: z.string().optional(),
+  reference_date: z.string().optional(),
+  items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
+});
 
-type SalesInvoiceFormData = z.infer<typeof salesInvoiceSchema>
+type SalesInvoiceFormData = z.infer<typeof salesInvoiceSchema>;
 
 interface SalesInvoiceFormProps {
-    companyId: string
-    onSave: (invoice: any) => void
-    onCancel: () => void
-    initialData?: Partial<SalesInvoiceFormData>
+  companyId: string;
+  onSave: (invoice: any) => void;
+  onCancel: () => void;
+  initialData?: Partial<SalesInvoiceFormData>;
 }
 
 export function SalesInvoiceForm({
-    companyId,
-    onSave,
-    onCancel,
-    initialData
+  companyId,
+  onSave,
+  onCancel,
+  initialData,
 }: SalesInvoiceFormProps) {
-    const [accounts, setAccounts] = useState<any[]>([])
-    const [customers, setCustomers] = useState<any[]>([])
-    const [loading, setLoading] = useState(false)
-    const [showItemDialog, setShowItemDialog] = useState(false)
-    const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showItemDialog, setShowItemDialog] = useState(false);
+  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
 
-    const {
-        register,
-        control,
-        handleSubmit,
-        watch,
-        setValue,
-        formState: { errors, isSubmitting }
-    } = useForm<SalesInvoiceFormData>({
-        resolver: zodResolver(salesInvoiceSchema),
-        defaultValues: {
-            customer_name: '',
-            invoice_date: format(new Date(), 'yyyy-MM-dd'),
-            due_date: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
-            posting_date: format(new Date(), 'yyyy-MM-dd'),
-            currency: 'USD',
-            exchange_rate: 1,
-            items: [{
-                item_name: '',
-                qty: 1,
-                rate: 0,
-                tax_rate: 0
-            }]
-        }
-    })
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<SalesInvoiceFormData>({
+    resolver: zodResolver(salesInvoiceSchema),
+    defaultValues: {
+      customer_name: "",
+      invoice_date: format(new Date(), "yyyy-MM-dd"),
+      due_date: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+      posting_date: format(new Date(), "yyyy-MM-dd"),
+      currency: "USD",
+      exchange_rate: 1,
+      items: [
+        {
+          item_name: "",
+          qty: 1,
+          rate: 0,
+          tax_rate: 0,
+        },
+      ],
+    },
+  });
 
-    const { fields, append, remove, update } = useFieldArray({
-        control,
-        name: 'items'
-    })
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: "items",
+  });
 
-    const watchedItems = watch('items')
-    const watchedCurrency = watch('currency')
-    const watchedExchangeRate = watch('exchange_rate')
+  const watchedItems = watch("items");
+  const watchedCurrency = watch("currency");
+  const watchedExchangeRate = watch("exchange_rate");
 
-    // Calculate totals
-    const netTotal = watchedItems.reduce((sum, item) => sum + (item.qty * item.rate), 0)
-    const taxTotal = watchedItems.reduce((sum, item) => {
-        const itemAmount = item.qty * item.rate
-        const taxAmount = itemAmount * (item.tax_rate || 0) / 100
-        return sum + taxAmount
-    }, 0)
-    const grandTotal = netTotal + taxTotal
+  // Calculate totals
+  const netTotal = watchedItems.reduce((sum, item) => sum + item.qty * item.rate, 0);
+  const taxTotal = watchedItems.reduce((sum, item) => {
+    const itemAmount = item.qty * item.rate;
+    const taxAmount = (itemAmount * (item.tax_rate || 0)) / 100;
+    return sum + taxAmount;
+  }, 0);
+  const grandTotal = netTotal + taxTotal;
 
-    useEffect(() => {
-        loadAccounts()
-        loadCustomers()
-    }, [companyId])
+  useEffect(() => {
+    loadAccounts();
+    loadCustomers();
+  }, [companyId]);
 
-    const loadAccounts = async () => {
-        try {
-            const result = await AccountingService.getAccounts(companyId)
-            if (result.success && result.accounts) {
-                setAccounts(result.accounts)
-            }
-        } catch (error) {
-            console.error('Error loading accounts:', error)
-        }
+  const loadAccounts = async () => {
+    try {
+      const result = await AccountingService.getAccounts(companyId);
+      if (result.success && result.accounts) {
+        setAccounts(result.accounts);
+      }
+    } catch (error) {
+      console.error("Error loading accounts:", error);
     }
+  };
 
-    const loadCustomers = async () => {
-        try {
-            // In a real app, this would come from a customers API
-            setCustomers([
-                { id: '1', name: 'ABC Corp', email: 'contact@abccorp.com' },
-                { id: '2', name: 'XYZ Ltd', email: 'info@xyzltd.com' },
-                { id: '3', name: 'DEF Inc', email: 'hello@definc.com' }
-            ])
-        } catch (error) {
-            console.error('Error loading customers:', error)
-        }
+  const loadCustomers = async () => {
+    try {
+      // In a real app, this would come from a customers API
+      setCustomers([
+        { id: "1", name: "ABC Corp", email: "contact@abccorp.com" },
+        { id: "2", name: "XYZ Ltd", email: "info@xyzltd.com" },
+        { id: "3", name: "DEF Inc", email: "hello@definc.com" },
+      ]);
+    } catch (error) {
+      console.error("Error loading customers:", error);
     }
+  };
 
-    const onSubmit = async (data: SalesInvoiceFormData) => {
-        setLoading(true)
-        try {
-            const invoiceData: CreateInvoiceInput = {
-                invoice_type: 'Sales',
-                customer_id: data.customer_id,
-                customer_name: data.customer_name,
-                invoice_date: data.invoice_date,
-                due_date: data.due_date,
-                posting_date: data.posting_date,
-                currency: data.currency,
-                exchange_rate: data.exchange_rate,
-                company_id: companyId,
-                cost_center_id: data.cost_center_id,
-                project_id: data.project_id,
-                terms_and_conditions: data.terms_and_conditions,
-                remarks: data.remarks,
-                reference_no: data.reference_no,
-                reference_date: data.reference_date,
-                items: data.items.map(item => ({
-                    item_code: item.item_code,
-                    item_name: item.item_name,
-                    description: item.description,
-                    item_group: item.item_group,
-                    qty: item.qty,
-                    rate: item.rate,
-                    tax_rate: item.tax_rate,
-                    income_account_id: item.income_account_id,
-                    expense_account_id: item.expense_account_id,
-                    cost_center_id: item.cost_center_id,
-                    warehouse: item.warehouse,
-                    project_id: item.project_id
-                }))
-            }
+  const onSubmit = async (data: SalesInvoiceFormData) => {
+    setLoading(true);
+    try {
+      const invoiceData: CreateInvoiceInput = {
+        invoice_type: "Sales",
+        customer_id: data.customer_id,
+        customer_name: data.customer_name,
+        invoice_date: data.invoice_date,
+        due_date: data.due_date,
+        posting_date: data.posting_date,
+        currency: data.currency,
+        exchange_rate: data.exchange_rate,
+        company_id: companyId,
+        cost_center_id: data.cost_center_id,
+        project_id: data.project_id,
+        terms_and_conditions: data.terms_and_conditions,
+        remarks: data.remarks,
+        reference_no: data.reference_no,
+        reference_date: data.reference_date,
+        items: data.items.map(item => ({
+          item_code: item.item_code,
+          item_name: item.item_name,
+          description: item.description,
+          item_group: item.item_group,
+          qty: item.qty,
+          rate: item.rate,
+          tax_rate: item.tax_rate,
+          income_account_id: item.income_account_id,
+          expense_account_id: item.expense_account_id,
+          cost_center_id: item.cost_center_id,
+          warehouse: item.warehouse,
+          project_id: item.project_id,
+        })),
+      };
 
-            const result = await TransactionService.createInvoice(invoiceData)
-            if (result.success && result.invoice) {
-                onSave(result.invoice)
-            } else {
-                console.error('Error creating invoice:', result.error)
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error)
-        } finally {
-            setLoading(false)
-        }
+      const result = await TransactionService.createInvoice(invoiceData);
+      if (result.success && result.invoice) {
+        onSave(result.invoice);
+      } else {
+        console.error("Error creating invoice:", result.error);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const addItem = () => {
-        append({
-            item_name: '',
-            qty: 1,
-            rate: 0,
-            tax_rate: 0
-        })
+  const addItem = () => {
+    append({
+      item_name: "",
+      qty: 1,
+      rate: 0,
+      tax_rate: 0,
+    });
+  };
+
+  const removeItem = (index: number) => {
+    remove(index);
+  };
+
+  const editItem = (index: number) => {
+    setEditingItemIndex(index);
+    setShowItemDialog(true);
+  };
+
+  const saveItem = (itemData: CreateInvoiceItemInput) => {
+    if (editingItemIndex !== null) {
+      update(editingItemIndex, itemData);
+    } else {
+      append(itemData);
     }
+    setShowItemDialog(false);
+    setEditingItemIndex(null);
+  };
 
-    const removeItem = (index: number) => {
-        remove(index)
-    }
+  return (
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FileText className="h-5 w-5" />
+            <span>Sales Invoice</span>
+          </CardTitle>
+          <CardDescription>Create a new sales invoice for your customer</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Header Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <Label htmlFor="customer_name">Customer Name *</Label>
+                <Input
+                  id="customer_name"
+                  {...register("customer_name")}
+                  placeholder="Enter customer name"
+                />
+                {errors.customer_name && (
+                  <p className="text-sm text-red-500 mt-1">{errors.customer_name.message}</p>
+                )}
+              </div>
 
-    const editItem = (index: number) => {
-        setEditingItemIndex(index)
-        setShowItemDialog(true)
-    }
+              <div>
+                <Label htmlFor="invoice_date">Invoice Date *</Label>
+                <Input id="invoice_date" type="date" {...register("invoice_date")} />
+                {errors.invoice_date && (
+                  <p className="text-sm text-red-500 mt-1">{errors.invoice_date.message}</p>
+                )}
+              </div>
 
-    const saveItem = (itemData: CreateInvoiceItemInput) => {
-        if (editingItemIndex !== null) {
-            update(editingItemIndex, itemData)
-        } else {
-            append(itemData)
-        }
-        setShowItemDialog(false)
-        setEditingItemIndex(null)
-    }
+              <div>
+                <Label htmlFor="due_date">Due Date *</Label>
+                <Input id="due_date" type="date" {...register("due_date")} />
+                {errors.due_date && (
+                  <p className="text-sm text-red-500 mt-1">{errors.due_date.message}</p>
+                )}
+              </div>
 
-    return (
-        <div className="max-w-6xl mx-auto p-6 space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5" />
-                        <span>Sales Invoice</span>
-                    </CardTitle>
-                    <CardDescription>
-                        Create a new sales invoice for your customer
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                        {/* Header Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <Label htmlFor="customer_name">Customer Name *</Label>
-                                <Input
-                                    id="customer_name"
-                                    {...register('customer_name')}
-                                    placeholder="Enter customer name"
-                                />
-                                {errors.customer_name && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.customer_name.message}</p>
-                                )}
+              <div>
+                <Label htmlFor="posting_date">Posting Date *</Label>
+                <Input id="posting_date" type="date" {...register("posting_date")} />
+                {errors.posting_date && (
+                  <p className="text-sm text-red-500 mt-1">{errors.posting_date.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Currency and Exchange Rate */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="currency">Currency *</Label>
+                <Select
+                  value={watchedCurrency}
+                  onValueChange={value => setValue("currency", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD - US Dollar</SelectItem>
+                    <SelectItem value="EUR">EUR - Euro</SelectItem>
+                    <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                    <SelectItem value="MYR">MYR - Malaysian Ringgit</SelectItem>
+                    <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.currency && (
+                  <p className="text-sm text-red-500 mt-1">{errors.currency.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="exchange_rate">Exchange Rate</Label>
+                <Input
+                  id="exchange_rate"
+                  type="number"
+                  step="0.000001"
+                  {...register("exchange_rate", { valueAsNumber: true })}
+                />
+                {errors.exchange_rate && (
+                  <p className="text-sm text-red-500 mt-1">{errors.exchange_rate.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Items Table */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Invoice Items</h3>
+                <Button type="button" onClick={addItem} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Item
+                </Button>
+              </div>
+
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Item Name</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Qty</TableHead>
+                      <TableHead>Rate</TableHead>
+                      <TableHead>Tax %</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {fields.map((field, index) => {
+                      const item = watchedItems[index];
+                      const amount = item.qty * item.rate;
+                      const taxAmount = (amount * (item.tax_rate || 0)) / 100;
+                      const totalAmount = amount + taxAmount;
+
+                      return (
+                        <TableRow key={field.id}>
+                          <TableCell>
+                            <Input
+                              {...register(`items.${index}.item_name`)}
+                              placeholder="Item name"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              {...register(`items.${index}.description`)}
+                              placeholder="Description"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              step="0.001"
+                              {...register(`items.${index}.qty`, { valueAsNumber: true })}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              {...register(`items.${index}.rate`, { valueAsNumber: true })}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              {...register(`items.${index}.tax_rate`, { valueAsNumber: true })}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-right">
+                              <div className="font-medium">{totalAmount.toFixed(2)}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {amount.toFixed(2)} + {taxAmount.toFixed(2)} tax
+                              </div>
                             </div>
-
-                            <div>
-                                <Label htmlFor="invoice_date">Invoice Date *</Label>
-                                <Input
-                                    id="invoice_date"
-                                    type="date"
-                                    {...register('invoice_date')}
-                                />
-                                {errors.invoice_date && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.invoice_date.message}</p>
-                                )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex space-x-1">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => editItem(index)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeItem(index)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
 
-                            <div>
-                                <Label htmlFor="due_date">Due Date *</Label>
-                                <Input
-                                    id="due_date"
-                                    type="date"
-                                    {...register('due_date')}
-                                />
-                                {errors.due_date && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.due_date.message}</p>
-                                )}
-                            </div>
+              {errors.items && <p className="text-sm text-red-500">{errors.items.message}</p>}
+            </div>
 
-                            <div>
-                                <Label htmlFor="posting_date">Posting Date *</Label>
-                                <Input
-                                    id="posting_date"
-                                    type="date"
-                                    {...register('posting_date')}
-                                />
-                                {errors.posting_date && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.posting_date.message}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Currency and Exchange Rate */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="currency">Currency *</Label>
-                                <Select
-                                    value={watchedCurrency}
-                                    onValueChange={(value) => setValue('currency', value)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select currency" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="USD">USD - US Dollar</SelectItem>
-                                        <SelectItem value="EUR">EUR - Euro</SelectItem>
-                                        <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                                        <SelectItem value="MYR">MYR - Malaysian Ringgit</SelectItem>
-                                        <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.currency && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.currency.message}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <Label htmlFor="exchange_rate">Exchange Rate</Label>
-                                <Input
-                                    id="exchange_rate"
-                                    type="number"
-                                    step="0.000001"
-                                    {...register('exchange_rate', { valueAsNumber: true })}
-                                />
-                                {errors.exchange_rate && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.exchange_rate.message}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Items Table */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-medium">Invoice Items</h3>
-                                <Button type="button" onClick={addItem} size="sm">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Item
-                                </Button>
-                            </div>
-
-                            <div className="border rounded-lg">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Item Name</TableHead>
-                                            <TableHead>Description</TableHead>
-                                            <TableHead>Qty</TableHead>
-                                            <TableHead>Rate</TableHead>
-                                            <TableHead>Tax %</TableHead>
-                                            <TableHead>Amount</TableHead>
-                                            <TableHead>Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {fields.map((field, index) => {
-                                            const item = watchedItems[index]
-                                            const amount = item.qty * item.rate
-                                            const taxAmount = amount * (item.tax_rate || 0) / 100
-                                            const totalAmount = amount + taxAmount
-
-                                            return (
-                                                <TableRow key={field.id}>
-                                                    <TableCell>
-                                                        <Input
-                                                            {...register(`items.${index}.item_name`)}
-                                                            placeholder="Item name"
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Input
-                                                            {...register(`items.${index}.description`)}
-                                                            placeholder="Description"
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Input
-                                                            type="number"
-                                                            step="0.001"
-                                                            {...register(`items.${index}.qty`, { valueAsNumber: true })}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Input
-                                                            type="number"
-                                                            step="0.01"
-                                                            {...register(`items.${index}.rate`, { valueAsNumber: true })}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Input
-                                                            type="number"
-                                                            step="0.01"
-                                                            {...register(`items.${index}.tax_rate`, { valueAsNumber: true })}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="text-right">
-                                                            <div className="font-medium">{totalAmount.toFixed(2)}</div>
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {amount.toFixed(2)} + {taxAmount.toFixed(2)} tax
-                                                            </div>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="flex space-x-1">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => editItem(index)}
-                                                            >
-                                                                Edit
-                                                            </Button>
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => removeItem(index)}
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </TableCell>
-                                                </TableRow>
-                                            )
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </div>
-
-                            {errors.items && (
-                                <p className="text-sm text-red-500">{errors.items.message}</p>
-                            )}
-                        </div>
-
-                        {/* Totals */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Card>
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">Net Total</span>
-                                        <span className="text-lg font-bold">{netTotal.toFixed(2)}</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">Tax Total</span>
-                                        <span className="text-lg font-bold">{taxTotal.toFixed(2)}</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">Grand Total</span>
-                                        <span className="text-lg font-bold text-primary">{grandTotal.toFixed(2)}</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Additional Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="terms_and_conditions">Terms & Conditions</Label>
-                                <Textarea
-                                    id="terms_and_conditions"
-                                    {...register('terms_and_conditions')}
-                                    placeholder="Enter terms and conditions"
-                                    rows={3}
-                                />
-                            </div>
-
-                            <div>
-                                <Label htmlFor="remarks">Remarks</Label>
-                                <Textarea
-                                    id="remarks"
-                                    {...register('remarks')}
-                                    placeholder="Enter any additional remarks"
-                                    rows={3}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Reference Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="reference_no">Reference No</Label>
-                                <Input
-                                    id="reference_no"
-                                    {...register('reference_no')}
-                                    placeholder="Enter reference number"
-                                />
-                            </div>
-
-                            <div>
-                                <Label htmlFor="reference_date">Reference Date</Label>
-                                <Input
-                                    id="reference_date"
-                                    type="date"
-                                    {...register('reference_date')}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Form Actions */}
-                        <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={onCancel}>
-                                <X className="h-4 w-4 mr-2" />
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={isSubmitting || loading}>
-                                <Save className="h-4 w-4 mr-2" />
-                                {isSubmitting || loading ? 'Saving...' : 'Save Invoice'}
-                            </Button>
-                        </div>
-                    </form>
+            {/* Totals */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Net Total</span>
+                    <span className="text-lg font-bold">{netTotal.toFixed(2)}</span>
+                  </div>
                 </CardContent>
-            </Card>
-        </div>
-    )
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Tax Total</span>
+                    <span className="text-lg font-bold">{taxTotal.toFixed(2)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Grand Total</span>
+                    <span className="text-lg font-bold text-primary">{grandTotal.toFixed(2)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Additional Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="terms_and_conditions">Terms & Conditions</Label>
+                <Textarea
+                  id="terms_and_conditions"
+                  {...register("terms_and_conditions")}
+                  placeholder="Enter terms and conditions"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="remarks">Remarks</Label>
+                <Textarea
+                  id="remarks"
+                  {...register("remarks")}
+                  placeholder="Enter any additional remarks"
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Reference Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="reference_no">Reference No</Label>
+                <Input
+                  id="reference_no"
+                  {...register("reference_no")}
+                  placeholder="Enter reference number"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="reference_date">Reference Date</Label>
+                <Input id="reference_date" type="date" {...register("reference_date")} />
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={onCancel}>
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting || loading}>
+                <Save className="h-4 w-4 mr-2" />
+                {isSubmitting || loading ? "Saving..." : "Save Invoice"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

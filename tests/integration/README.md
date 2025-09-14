@@ -42,7 +42,7 @@ import {
   testApiIntegration,
   testServiceIntegration,
   testDatabaseIntegration,
-} from '@aibos/tests/integration';
+} from "@aibos/tests/integration";
 
 // Test attachment API integration
 await testAttachmentApi();
@@ -166,42 +166,42 @@ pnpm typecheck
 ### Attachment API Integration Testing
 
 ```typescript
-import { testAttachmentApi } from '@aibos/tests/integration';
+import { testAttachmentApi } from "@aibos/tests/integration";
 
 // Test attachment API integration
 async function testAttachmentApiIntegration() {
   const testConfig = {
     api: {
-      baseUrl: 'http://localhost:3001/api/v1',
+      baseUrl: "http://localhost:3001/api/v1",
       timeout: 10000,
     },
     attachments: [
       {
-        type: 'invoice',
-        file: 'test-invoice.pdf',
+        type: "invoice",
+        file: "test-invoice.pdf",
         size: 1024000,
-        mimeType: 'application/pdf',
+        mimeType: "application/pdf",
       },
       {
-        type: 'receipt',
-        file: 'test-receipt.jpg',
+        type: "receipt",
+        file: "test-receipt.jpg",
         size: 512000,
-        mimeType: 'image/jpeg',
+        mimeType: "image/jpeg",
       },
     ],
     processing: {
       ocr: true,
       validation: true,
-      storage: 's3',
+      storage: "s3",
     },
   };
 
   const result = await testAttachmentApi(testConfig);
 
   if (result.success) {
-    console.log('Attachment API integration test passed');
+    console.log("Attachment API integration test passed");
   } else {
-    console.error('Attachment API integration test failed:', result.errors);
+    console.error("Attachment API integration test failed:", result.errors);
   }
 }
 ```
@@ -209,45 +209,45 @@ async function testAttachmentApiIntegration() {
 ### API Integration Testing
 
 ```typescript
-import { testApiIntegration } from '@aibos/tests/integration';
+import { testApiIntegration } from "@aibos/tests/integration";
 
 // Test API integration
 async function testApiIntegration() {
   const testConfig = {
     endpoints: [
       {
-        path: '/api/v1/invoices',
-        method: 'POST',
+        path: "/api/v1/invoices",
+        method: "POST",
         requestBody: {
-          customerId: 'customer-123',
+          customerId: "customer-123",
           amount: 1000,
-          dueDate: '2024-02-15',
+          dueDate: "2024-02-15",
         },
         expectedStatus: 201,
       },
       {
-        path: '/api/v1/bills',
-        method: 'POST',
+        path: "/api/v1/bills",
+        method: "POST",
         requestBody: {
-          vendorId: 'vendor-456',
+          vendorId: "vendor-456",
           amount: 500,
-          dueDate: '2024-02-20',
+          dueDate: "2024-02-20",
         },
         expectedStatus: 201,
       },
     ],
     authentication: {
-      type: 'bearer',
-      token: 'test-token-123',
+      type: "bearer",
+      token: "test-token-123",
     },
   };
 
   const result = await testApiIntegration(testConfig);
 
   if (result.success) {
-    console.log('API integration test passed');
+    console.log("API integration test passed");
   } else {
-    console.error('API integration test failed:', result.errors);
+    console.error("API integration test failed:", result.errors);
   }
 }
 ```
@@ -255,29 +255,29 @@ async function testApiIntegration() {
 ### Service Integration Testing
 
 ```typescript
-import { testServiceIntegration } from '@aibos/tests/integration';
+import { testServiceIntegration } from "@aibos/tests/integration";
 
 // Test service integration
 async function testServiceIntegration() {
   const testConfig = {
     services: [
       {
-        name: 'accounting-service',
-        endpoint: 'http://localhost:3002',
-        healthCheck: '/health',
-        dependencies: ['database', 'auth-service'],
+        name: "accounting-service",
+        endpoint: "http://localhost:3002",
+        healthCheck: "/health",
+        dependencies: ["database", "auth-service"],
       },
       {
-        name: 'notification-service',
-        endpoint: 'http://localhost:3003',
-        healthCheck: '/health',
-        dependencies: ['email-service'],
+        name: "notification-service",
+        endpoint: "http://localhost:3003",
+        healthCheck: "/health",
+        dependencies: ["email-service"],
       },
     ],
     communication: {
       accountingToNotification: {
-        event: 'invoice.created',
-        payload: { invoiceId: 'invoice-123' },
+        event: "invoice.created",
+        payload: { invoiceId: "invoice-123" },
       },
     },
   };
@@ -285,9 +285,9 @@ async function testServiceIntegration() {
   const result = await testServiceIntegration(testConfig);
 
   if (result.success) {
-    console.log('Service integration test passed');
+    console.log("Service integration test passed");
   } else {
-    console.error('Service integration test failed:', result.errors);
+    console.error("Service integration test failed:", result.errors);
   }
 }
 ```
@@ -295,36 +295,36 @@ async function testServiceIntegration() {
 ### Database Integration Testing
 
 ```typescript
-import { testDatabaseIntegration } from '@aibos/tests/integration';
+import { testDatabaseIntegration } from "@aibos/tests/integration";
 
 // Test database integration
 async function testDatabaseIntegration() {
   const testConfig = {
     database: {
-      connectionString: 'postgresql://localhost:5432/test_db',
+      connectionString: "postgresql://localhost:5432/test_db",
       timeout: 5000,
     },
     operations: [
       {
-        type: 'insert',
-        table: 'gl_journal',
+        type: "insert",
+        table: "gl_journal",
         data: {
-          tenant_id: 'tenant-123',
-          company_id: 'company-456',
-          journal_date: '2024-01-15',
-          description: 'Test Journal Entry',
+          tenant_id: "tenant-123",
+          company_id: "company-456",
+          journal_date: "2024-01-15",
+          description: "Test Journal Entry",
         },
       },
       {
-        type: 'select',
-        table: 'gl_journal',
-        where: { tenant_id: 'tenant-123' },
+        type: "select",
+        table: "gl_journal",
+        where: { tenant_id: "tenant-123" },
       },
       {
-        type: 'update',
-        table: 'gl_journal',
-        data: { description: 'Updated Journal Entry' },
-        where: { tenant_id: 'tenant-123' },
+        type: "update",
+        table: "gl_journal",
+        data: { description: "Updated Journal Entry" },
+        where: { tenant_id: "tenant-123" },
       },
     ],
   };
@@ -332,9 +332,9 @@ async function testDatabaseIntegration() {
   const result = await testDatabaseIntegration(testConfig);
 
   if (result.success) {
-    console.log('Database integration test passed');
+    console.log("Database integration test passed");
   } else {
-    console.error('Database integration test failed:', result.errors);
+    console.error("Database integration test failed:", result.errors);
   }
 }
 ```
@@ -342,40 +342,40 @@ async function testDatabaseIntegration() {
 ### External Service Integration Testing
 
 ```typescript
-import { testExternalServiceIntegration } from '@aibos/tests/integration';
+import { testExternalServiceIntegration } from "@aibos/tests/integration";
 
 // Test external service integration
 async function testExternalServiceIntegration() {
   const testConfig = {
     services: [
       {
-        name: 'fx-rate-service',
-        endpoint: 'https://api.exchangerate-api.com/v4/latest',
+        name: "fx-rate-service",
+        endpoint: "https://api.exchangerate-api.com/v4/latest",
         timeout: 5000,
         retries: 3,
       },
       {
-        name: 'email-service',
-        endpoint: 'https://api.resend.com/emails',
+        name: "email-service",
+        endpoint: "https://api.resend.com/emails",
         timeout: 10000,
         retries: 2,
       },
     ],
     testCases: [
       {
-        service: 'fx-rate-service',
-        method: 'GET',
-        path: '/USD',
+        service: "fx-rate-service",
+        method: "GET",
+        path: "/USD",
         expectedStatus: 200,
       },
       {
-        service: 'email-service',
-        method: 'POST',
-        path: '/',
+        service: "email-service",
+        method: "POST",
+        path: "/",
         requestBody: {
-          to: 'test@example.com',
-          subject: 'Test Email',
-          html: '<p>Test content</p>',
+          to: "test@example.com",
+          subject: "Test Email",
+          html: "<p>Test content</p>",
         },
         expectedStatus: 200,
       },
@@ -385,9 +385,9 @@ async function testExternalServiceIntegration() {
   const result = await testExternalServiceIntegration(testConfig);
 
   if (result.success) {
-    console.log('External service integration test passed');
+    console.log("External service integration test passed");
   } else {
-    console.error('External service integration test failed:', result.errors);
+    console.error("External service integration test failed:", result.errors);
   }
 }
 ```
@@ -401,7 +401,7 @@ import {
   testServiceIntegration,
   testDatabaseIntegration,
   testExternalServiceIntegration,
-} from '@aibos/tests/integration';
+} from "@aibos/tests/integration";
 
 // Comprehensive integration testing suite
 async function runIntegrationTests() {
@@ -416,32 +416,32 @@ async function runIntegrationTests() {
   try {
     // Test attachment API integration
     results.attachment = await testAttachmentApi({
-      api: { baseUrl: 'http://localhost:3001/api/v1' },
-      attachments: ['test-invoice.pdf', 'test-receipt.jpg'],
+      api: { baseUrl: "http://localhost:3001/api/v1" },
+      attachments: ["test-invoice.pdf", "test-receipt.jpg"],
     });
 
     // Test API integration
     results.api = await testApiIntegration({
       endpoints: [
-        { path: '/api/v1/invoices', method: 'POST' },
-        { path: '/api/v1/bills', method: 'POST' },
+        { path: "/api/v1/invoices", method: "POST" },
+        { path: "/api/v1/bills", method: "POST" },
       ],
     });
 
     // Test service integration
     results.service = await testServiceIntegration({
       services: [
-        { name: 'accounting-service', endpoint: 'http://localhost:3002' },
-        { name: 'notification-service', endpoint: 'http://localhost:3003' },
+        { name: "accounting-service", endpoint: "http://localhost:3002" },
+        { name: "notification-service", endpoint: "http://localhost:3003" },
       ],
     });
 
     // Test database integration
     results.database = await testDatabaseIntegration({
-      database: { connectionString: 'postgresql://localhost:5432/test_db' },
+      database: { connectionString: "postgresql://localhost:5432/test_db" },
       operations: [
-        { type: 'insert', table: 'gl_journal' },
-        { type: 'select', table: 'gl_journal' },
+        { type: "insert", table: "gl_journal" },
+        { type: "select", table: "gl_journal" },
       ],
     });
 
@@ -449,15 +449,15 @@ async function runIntegrationTests() {
     results.external = await testExternalServiceIntegration({
       services: [
         {
-          name: 'fx-rate-service',
-          endpoint: 'https://api.exchangerate-api.com/v4/latest',
+          name: "fx-rate-service",
+          endpoint: "https://api.exchangerate-api.com/v4/latest",
         },
       ],
     });
 
-    console.log('All integration tests completed:', results);
+    console.log("All integration tests completed:", results);
   } catch (error) {
-    console.error('Integration test suite failed:', error);
+    console.error("Integration test suite failed:", error);
     throw error;
   }
 
@@ -478,7 +478,7 @@ async function runIntegrationTests() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_INTEGRATION = 'true';
+process.env.DEBUG_INTEGRATION = "true";
 ```
 
 **Logs**: Check test logs for integration test execution details

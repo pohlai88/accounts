@@ -1,8 +1,8 @@
 // Performance monitoring for V1 compliance
 // Tracks API P95 ≤ 500ms, UI TTFB ≤ 200ms, Error rate ≤ 1%
 
-import { performance } from 'perf_hooks';
-import { axiom } from '../axiom';
+import { performance } from "perf_hooks";
+import { axiom } from "../axiom";
 
 export interface PerformanceMetrics {
   operation: string;
@@ -93,7 +93,7 @@ export class PerformanceMonitor {
     duration: number,
     success: boolean,
     metadata?: Record<string, unknown>,
-    error?: string
+    error?: string,
   ): void {
     const metrics: PerformanceMetrics = {
       operation,
@@ -101,7 +101,7 @@ export class PerformanceMonitor {
       timestamp: Date.now(),
       success,
       error,
-      metadata
+      metadata,
     };
 
     this.metricsBuffer.push(metrics);
@@ -123,7 +123,7 @@ export class PerformanceMonitor {
         const duration = performance.now() - startTime;
         this.trackOperation(operation, duration, success, metadata, error);
         return duration;
-      }
+      },
     };
   }
 
@@ -138,16 +138,18 @@ export class PerformanceMonitor {
 
     try {
       // Send to Axiom
-      await axiom.ingest('performance_metrics', metricsToFlush.map(metric => ({
-        ...metric,
-        _time: new Date(metric.timestamp).toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        service: 'aibos-accounts',
-        version: process.env.APP_VERSION || '1.0.0'
-      })));
-
+      await axiom.ingest(
+        "performance_metrics",
+        metricsToFlush.map(metric => ({
+          ...metric,
+          _time: new Date(metric.timestamp).toISOString(),
+          environment: process.env.NODE_ENV || "development",
+          service: "aibos-accounts",
+          version: process.env.APP_VERSION || "1.0.0",
+        })),
+      );
     } catch (error) {
-      console.error('Failed to flush performance metrics:', error);
+      console.error("Failed to flush performance metrics:", error);
       // Re-add metrics to buffer for retry
       this.metricsBuffer.unshift(...metricsToFlush);
     }
@@ -170,7 +172,7 @@ export class PerformanceMonitor {
     }
 
     if (violations.length > 0) {
-      this.reportComplianceViolation('API_PERFORMANCE', violations, metrics);
+      this.reportComplianceViolation("API_PERFORMANCE", violations, metrics);
     }
   }
 
@@ -199,7 +201,7 @@ export class PerformanceMonitor {
     }
 
     if (violations.length > 0) {
-      this.reportComplianceViolation('UI_PERFORMANCE', violations, metrics);
+      this.reportComplianceViolation("UI_PERFORMANCE", violations, metrics);
     }
   }
 
@@ -209,29 +211,29 @@ export class PerformanceMonitor {
   private async reportComplianceViolation(
     type: string,
     violations: string[],
-    metrics: PerformanceMetrics
+    metrics: PerformanceMetrics,
   ): Promise<void> {
     try {
-      await axiom.ingest('compliance_violations', [{
-        _time: new Date().toISOString(),
-        type,
-        violations,
-        metrics,
-        severity: 'warning',
-        environment: process.env.NODE_ENV || 'development',
-        service: 'aibos-accounts'
-      }]);
+      await axiom.ingest("compliance_violations", [
+        {
+          _time: new Date().toISOString(),
+          type,
+          violations,
+          metrics,
+          severity: "warning",
+          environment: process.env.NODE_ENV || "development",
+          service: "aibos-accounts",
+        },
+      ]);
     } catch (error) {
-      console.error('Failed to report compliance violation:', error);
+      console.error("Failed to report compliance violation:", error);
     }
   }
 
   /**
    * Get performance summary for the last period
    */
-  public async getPerformanceSummary(
-    _hours: number = 1
-  ): Promise<{
+  public async getPerformanceSummary(_hours: number = 1): Promise<{
     apiMetrics: {
       averageResponseTime: number;
       p95ResponseTime: number;
@@ -257,19 +259,19 @@ export class PerformanceMonitor {
         averageResponseTime: 0,
         p95ResponseTime: 0,
         errorRate: 0,
-        totalRequests: 0
+        totalRequests: 0,
       },
       uiMetrics: {
         averageTTFB: 0,
         p95TTFB: 0,
         averageLCP: 0,
-        averageCLS: 0
+        averageCLS: 0,
       },
       complianceStatus: {
         apiCompliant: true,
         uiCompliant: true,
-        violations: []
-      }
+        violations: [],
+      },
     };
   }
 

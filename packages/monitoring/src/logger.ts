@@ -1,9 +1,9 @@
-import { EventEmitter } from 'events';
-import { createWriteStream, WriteStream } from 'fs';
-import { join } from 'path';
+import { EventEmitter } from "events";
+import { createWriteStream, WriteStream } from "fs";
+import { join } from "path";
 
 export interface LogConfig {
-  level: 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+  level: "debug" | "info" | "warn" | "error" | "fatal";
   enableConsole: boolean;
   enableFile: boolean;
   enableRemote: boolean;
@@ -71,13 +71,13 @@ export class Logger extends EventEmitter {
 
   constructor(config: Partial<LogConfig> = {}) {
     super();
-    
+
     this.config = {
-      level: 'info',
+      level: "info",
       enableConsole: true,
       enableFile: true,
       enableRemote: false,
-      logDirectory: './logs',
+      logDirectory: "./logs",
       maxFileSize: 10 * 1024 * 1024, // 10MB
       maxFiles: 10,
       enableRotation: true,
@@ -86,7 +86,7 @@ export class Logger extends EventEmitter {
       enableCorrelation: true,
       enableSampling: false,
       sampleRate: 0.1,
-      ...config
+      ...config,
     };
 
     this.startFlushInterval();
@@ -106,9 +106,9 @@ export class Logger extends EventEmitter {
       requestId?: string;
       correlationId?: string;
       tags?: Record<string, string>;
-    } = {}
+    } = {},
   ): void {
-    this.log('debug', message, metadata, context);
+    this.log("debug", message, metadata, context);
   }
 
   /**
@@ -125,9 +125,9 @@ export class Logger extends EventEmitter {
       requestId?: string;
       correlationId?: string;
       tags?: Record<string, string>;
-    } = {}
+    } = {},
   ): void {
-    this.log('info', message, metadata, context);
+    this.log("info", message, metadata, context);
   }
 
   /**
@@ -144,9 +144,9 @@ export class Logger extends EventEmitter {
       requestId?: string;
       correlationId?: string;
       tags?: Record<string, string>;
-    } = {}
+    } = {},
   ): void {
-    this.log('warn', message, metadata, context);
+    this.log("warn", message, metadata, context);
   }
 
   /**
@@ -164,16 +164,18 @@ export class Logger extends EventEmitter {
       requestId?: string;
       correlationId?: string;
       tags?: Record<string, string>;
-    } = {}
+    } = {},
   ): void {
-    const errorData = error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack || '',
-      code: (error as any).code
-    } : undefined;
+    const errorData = error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack || "",
+          code: (error as any).code,
+        }
+      : undefined;
 
-    this.log('error', message, metadata, { ...context, error: errorData });
+    this.log("error", message, metadata, { ...context, error: errorData });
   }
 
   /**
@@ -191,16 +193,18 @@ export class Logger extends EventEmitter {
       requestId?: string;
       correlationId?: string;
       tags?: Record<string, string>;
-    } = {}
+    } = {},
   ): void {
-    const errorData = error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack || '',
-      code: (error as any).code
-    } : undefined;
+    const errorData = error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack || "",
+          code: (error as any).code,
+        }
+      : undefined;
 
-    this.log('fatal', message, metadata, { ...context, error: errorData });
+    this.log("fatal", message, metadata, { ...context, error: errorData });
   }
 
   /**
@@ -220,19 +224,24 @@ export class Logger extends EventEmitter {
       correlationId?: string;
       userAgent?: string;
       ipAddress?: string;
-    } = {}
+    } = {},
   ): void {
-    const level = statusCode >= 400 ? 'warn' : 'info';
+    const level = statusCode >= 400 ? "warn" : "info";
     const message = `${method} ${url} ${statusCode} ${duration}ms`;
 
-    this.log(level, message, {
-      method,
-      url,
-      statusCode,
-      duration,
-      userAgent: context.userAgent,
-      ipAddress: context.ipAddress
-    }, context);
+    this.log(
+      level,
+      message,
+      {
+        method,
+        url,
+        statusCode,
+        duration,
+        userAgent: context.userAgent,
+        ipAddress: context.ipAddress,
+      },
+      context,
+    );
   }
 
   /**
@@ -251,18 +260,23 @@ export class Logger extends EventEmitter {
       correlationId?: string;
       query?: string;
       rowsAffected?: number;
-    } = {}
+    } = {},
   ): void {
-    const level = duration > 1000 ? 'warn' : 'info';
+    const level = duration > 1000 ? "warn" : "info";
     const message = `Database ${operation} on ${table} took ${duration}ms`;
 
-    this.log(level, message, {
-      operation,
-      table,
-      duration,
-      query: context.query,
-      rowsAffected: context.rowsAffected
-    }, context);
+    this.log(
+      level,
+      message,
+      {
+        operation,
+        table,
+        duration,
+        query: context.query,
+        rowsAffected: context.rowsAffected,
+      },
+      context,
+    );
   }
 
   /**
@@ -270,7 +284,7 @@ export class Logger extends EventEmitter {
    */
   logSecurityEvent(
     eventType: string,
-    severity: 'low' | 'medium' | 'high' | 'critical',
+    severity: "low" | "medium" | "high" | "critical",
     message: string,
     context: {
       traceId?: string;
@@ -282,19 +296,29 @@ export class Logger extends EventEmitter {
       ipAddress?: string;
       userAgent?: string;
       details?: Record<string, any>;
-    } = {}
+    } = {},
   ): void {
-    const level = severity === 'critical' ? 'fatal' : 
-                 severity === 'high' ? 'error' : 
-                 severity === 'medium' ? 'warn' : 'info';
+    const level =
+      severity === "critical"
+        ? "fatal"
+        : severity === "high"
+          ? "error"
+          : severity === "medium"
+            ? "warn"
+            : "info";
 
-    this.log(level, message, {
-      eventType,
-      severity,
-      ipAddress: context.ipAddress,
-      userAgent: context.userAgent,
-      details: context.details
-    }, context);
+    this.log(
+      level,
+      message,
+      {
+        eventType,
+        severity,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        details: context.details,
+      },
+      context,
+    );
   }
 
   /**
@@ -311,16 +335,21 @@ export class Logger extends EventEmitter {
       userId?: string;
       requestId?: string;
       correlationId?: string;
-    } = {}
+    } = {},
   ): void {
-    const level = duration > 5000 ? 'warn' : 'info';
+    const level = duration > 5000 ? "warn" : "info";
     const message = `Performance: ${operation} took ${duration}ms`;
 
-    this.log(level, message, {
-      operation,
-      duration,
-      ...metadata
-    }, context);
+    this.log(
+      level,
+      message,
+      {
+        operation,
+        duration,
+        ...metadata,
+      },
+      context,
+    );
   }
 
   /**
@@ -329,25 +358,27 @@ export class Logger extends EventEmitter {
   queryLogs(query: LogQuery): LogEntry[] {
     // In a real implementation, this would query a log storage system
     // For now, we'll return a mock response
-    return this.logBuffer.filter(entry => {
-      if (query.level && entry.level !== query.level) return false;
-      if (query.service && entry.service !== query.service) return false;
-      if (query.tenantId && entry.tenantId !== query.tenantId) return false;
-      if (query.userId && entry.userId !== query.userId) return false;
-      if (query.traceId && entry.traceId !== query.traceId) return false;
-      if (query.message && !entry.message.includes(query.message)) return false;
-      
-      if (query.startTime && entry.timestamp < query.startTime) return false;
-      if (query.endTime && entry.timestamp > query.endTime) return false;
+    return this.logBuffer
+      .filter(entry => {
+        if (query.level && entry.level !== query.level) return false;
+        if (query.service && entry.service !== query.service) return false;
+        if (query.tenantId && entry.tenantId !== query.tenantId) return false;
+        if (query.userId && entry.userId !== query.userId) return false;
+        if (query.traceId && entry.traceId !== query.traceId) return false;
+        if (query.message && !entry.message.includes(query.message)) return false;
 
-      if (query.tags) {
-        for (const [key, value] of Object.entries(query.tags)) {
-          if (entry.tags[key] !== value) return false;
+        if (query.startTime && entry.timestamp < query.startTime) return false;
+        if (query.endTime && entry.timestamp > query.endTime) return false;
+
+        if (query.tags) {
+          for (const [key, value] of Object.entries(query.tags)) {
+            if (entry.tags[key] !== value) return false;
+          }
         }
-      }
 
-      return true;
-    }).slice(query.offset || 0, (query.offset || 0) + (query.limit || 100));
+        return true;
+      })
+      .slice(query.offset || 0, (query.offset || 0) + (query.limit || 100));
   }
 
   /**
@@ -386,7 +417,7 @@ export class Logger extends EventEmitter {
       logsByService,
       logsByTenant,
       errorRate,
-      averageLogSize: totalLogs > 0 ? totalSize / totalLogs : 0
+      averageLogSize: totalLogs > 0 ? totalSize / totalLogs : 0,
     };
   }
 
@@ -406,7 +437,7 @@ export class Logger extends EventEmitter {
       correlationId?: string;
       tags?: Record<string, string>;
       error?: any;
-    } = {}
+    } = {},
   ): void {
     // Check log level
     if (!this.shouldLog(level)) return;
@@ -432,14 +463,14 @@ export class Logger extends EventEmitter {
       tags: context.tags || {},
       metadata,
       error: context.error,
-      performance: this.getPerformanceMetrics()
+      performance: this.getPerformanceMetrics(),
     };
 
     // Add to buffer
     this.logBuffer.push(entry);
 
     // Emit event
-    this.emit('log', entry);
+    this.emit("log", entry);
 
     // Console output
     if (this.config.enableConsole) {
@@ -466,10 +497,10 @@ export class Logger extends EventEmitter {
    * Check if should log at this level
    */
   private shouldLog(level: string): boolean {
-    const levels = ['debug', 'info', 'warn', 'error', 'fatal'];
+    const levels = ["debug", "info", "warn", "error", "fatal"];
     const currentLevelIndex = levels.indexOf(this.config.level);
     const messageLevelIndex = levels.indexOf(level);
-    
+
     return messageLevelIndex >= currentLevelIndex;
   }
 
@@ -501,17 +532,17 @@ export class Logger extends EventEmitter {
 
     // Use appropriate console method
     switch (entry.level) {
-      case 'debug':
+      case "debug":
         console.debug(logMessage);
         break;
-      case 'info':
+      case "info":
         console.info(logMessage);
         break;
-      case 'warn':
+      case "warn":
         console.warn(logMessage);
         break;
-      case 'error':
-      case 'fatal':
+      case "error":
+      case "fatal":
         console.error(logMessage);
         break;
       default:
@@ -526,17 +557,17 @@ export class Logger extends EventEmitter {
     try {
       const filename = `${entry.level}.log`;
       const filepath = join(this.config.logDirectory, filename);
-      
+
       let stream = this.logStreams.get(filepath);
       if (!stream) {
-        stream = createWriteStream(filepath, { flags: 'a' });
+        stream = createWriteStream(filepath, { flags: "a" });
         this.logStreams.set(filepath, stream);
       }
 
-      const logLine = JSON.stringify(entry) + '\n';
+      const logLine = JSON.stringify(entry) + "\n";
       stream.write(logLine);
     } catch (error) {
-      console.error('Failed to write to log file:', error);
+      console.error("Failed to write to log file:", error);
     }
   }
 
@@ -550,7 +581,7 @@ export class Logger extends EventEmitter {
 
     // In a real implementation, this would send to a remote logging service
     // For now, we'll just emit an event
-    this.emit('remoteLog', entry);
+    this.emit("remoteLog", entry);
   }
 
   /**
@@ -561,7 +592,7 @@ export class Logger extends EventEmitter {
     return {
       duration: 0, // Would be calculated based on operation
       memoryUsage: memUsage.heapUsed,
-      cpuUsage: 0 // Would be calculated based on CPU usage
+      cpuUsage: 0, // Would be calculated based on CPU usage
     };
   }
 
@@ -569,21 +600,21 @@ export class Logger extends EventEmitter {
    * Get service name
    */
   private getServiceName(): string {
-    return process.env.SERVICE_NAME || 'aibos-accounts';
+    return process.env.SERVICE_NAME || "aibos-accounts";
   }
 
   /**
    * Get service version
    */
   private getServiceVersion(): string {
-    return process.env.SERVICE_VERSION || '1.0.0';
+    return process.env.SERVICE_VERSION || "1.0.0";
   }
 
   /**
    * Get environment
    */
   private getEnvironment(): string {
-    return process.env.NODE_ENV || 'development';
+    return process.env.NODE_ENV || "development";
   }
 
   /**
@@ -601,7 +632,7 @@ export class Logger extends EventEmitter {
   private flushLogs(): void {
     // In a real implementation, this would flush logs to persistent storage
     // For now, we'll just emit an event
-    this.emit('logsFlushed', this.logBuffer.length);
+    this.emit("logsFlushed", this.logBuffer.length);
   }
 
   /**
@@ -614,4 +645,3 @@ export class Logger extends EventEmitter {
     this.logStreams.clear();
   }
 }
-

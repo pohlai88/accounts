@@ -37,34 +37,34 @@
 ## 3) Getting Started
 
 ```typescript
-import { closeFiscalPeriod, openFiscalPeriod, createPeriodLock } from '@aibos/accounting/periods';
+import { closeFiscalPeriod, openFiscalPeriod, createPeriodLock } from "@aibos/accounting/periods";
 
 // Close fiscal period
 const closeResult = await closeFiscalPeriod(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-789',
-    closeDate: new Date('2024-01-31'),
-    closedBy: 'user-123',
-    userRole: 'manager',
-    closeReason: 'Month-end close',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-789",
+    closeDate: new Date("2024-01-31"),
+    closedBy: "user-123",
+    userRole: "manager",
+    closeReason: "Month-end close",
     generateReversingEntries: true,
   },
-  dbClient
+  dbClient,
 );
 
 // Open fiscal period
 const openResult = await openFiscalPeriod(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-790',
-    openedBy: 'user-123',
-    userRole: 'manager',
-    openReason: 'Reopening for adjustments',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-790",
+    openedBy: "user-123",
+    userRole: "manager",
+    openReason: "Reopening for adjustments",
   },
-  dbClient
+  dbClient,
 );
 ```
 
@@ -168,173 +168,173 @@ pnpm --filter @aibos/accounting typecheck
 ### Close Fiscal Period
 
 ```typescript
-import { closeFiscalPeriod } from '@aibos/accounting/periods';
+import { closeFiscalPeriod } from "@aibos/accounting/periods";
 
 // Close fiscal period with full validation
 const closeResult = await closeFiscalPeriod(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-789',
-    closeDate: new Date('2024-01-31'),
-    closedBy: 'user-123',
-    userRole: 'manager',
-    closeReason: 'Month-end close',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-789",
+    closeDate: new Date("2024-01-31"),
+    closedBy: "user-123",
+    userRole: "manager",
+    closeReason: "Month-end close",
     forceClose: false, // Don't force close if validation fails
     generateReversingEntries: true, // Create reversing entries for accruals
   },
-  dbClient
+  dbClient,
 );
 
 if (closeResult.success) {
-  console.log('Period closed successfully');
-  console.log('Period ID:', closeResult.fiscalPeriodId);
-  console.log('Closed at:', closeResult.closedAt);
-  console.log('Closed by:', closeResult.closedBy);
-  console.log('Status:', closeResult.status);
-  console.log('Reversing entries created:', closeResult.reversingEntriesCreated);
-  console.log('Next period ID:', closeResult.nextPeriodId);
+  console.log("Period closed successfully");
+  console.log("Period ID:", closeResult.fiscalPeriodId);
+  console.log("Closed at:", closeResult.closedAt);
+  console.log("Closed by:", closeResult.closedBy);
+  console.log("Status:", closeResult.status);
+  console.log("Reversing entries created:", closeResult.reversingEntriesCreated);
+  console.log("Next period ID:", closeResult.nextPeriodId);
 
   // Check validation results
   const validation = closeResult.validationResults;
-  console.log('Can close:', validation.canClose);
-  console.log('Warnings:', validation.warnings);
-  console.log('Errors:', validation.errors);
-  console.log('Checks:', validation.checks);
+  console.log("Can close:", validation.canClose);
+  console.log("Warnings:", validation.warnings);
+  console.log("Errors:", validation.errors);
+  console.log("Checks:", validation.checks);
 } else {
-  console.error('Period close failed:', closeResult.error);
-  console.log('Error code:', closeResult.code);
-  console.log('Details:', closeResult.details);
+  console.error("Period close failed:", closeResult.error);
+  console.log("Error code:", closeResult.code);
+  console.log("Details:", closeResult.details);
 }
 ```
 
 ### Open Fiscal Period
 
 ```typescript
-import { openFiscalPeriod } from '@aibos/accounting/periods';
+import { openFiscalPeriod } from "@aibos/accounting/periods";
 
 // Open previously closed period
 const openResult = await openFiscalPeriod(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-789',
-    openedBy: 'user-123',
-    userRole: 'manager',
-    openReason: 'Reopening for year-end adjustments',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-789",
+    openedBy: "user-123",
+    userRole: "manager",
+    openReason: "Reopening for year-end adjustments",
     approvalRequired: true, // Require approval for reopening
   },
-  dbClient
+  dbClient,
 );
 
 if (openResult.success) {
-  console.log('Period opened successfully');
-  console.log('Period ID:', openResult.fiscalPeriodId);
-  console.log('Opened at:', openResult.closedAt); // Note: this will be the open time
-  console.log('Opened by:', openResult.closedBy); // Note: this will be the opener
-  console.log('Status:', openResult.status);
+  console.log("Period opened successfully");
+  console.log("Period ID:", openResult.fiscalPeriodId);
+  console.log("Opened at:", openResult.closedAt); // Note: this will be the open time
+  console.log("Opened by:", openResult.closedBy); // Note: this will be the opener
+  console.log("Status:", openResult.status);
 } else {
-  console.error('Period open failed:', openResult.error);
-  console.log('Error code:', openResult.code);
+  console.error("Period open failed:", openResult.error);
+  console.log("Error code:", openResult.code);
 }
 ```
 
 ### Create Period Lock
 
 ```typescript
-import { createPeriodLock } from '@aibos/accounting/periods';
+import { createPeriodLock } from "@aibos/accounting/periods";
 
 // Create period lock
 const lockResult = await createPeriodLock(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-789',
-    lockType: 'POSTING', // POSTING, REPORTING, or FULL
-    lockedBy: 'user-123',
-    userRole: 'manager',
-    reason: 'Preventing further postings during close process',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-789",
+    lockType: "POSTING", // POSTING, REPORTING, or FULL
+    lockedBy: "user-123",
+    userRole: "manager",
+    reason: "Preventing further postings during close process",
   },
-  dbClient
+  dbClient,
 );
 
 if (lockResult.success) {
-  console.log('Period lock created successfully');
-  console.log('Lock ID:', lockResult.lockId);
+  console.log("Period lock created successfully");
+  console.log("Lock ID:", lockResult.lockId);
 } else {
-  console.error('Period lock creation failed:', lockResult.error);
+  console.error("Period lock creation failed:", lockResult.error);
 }
 ```
 
 ### Force Close Period
 
 ```typescript
-import { closeFiscalPeriod } from '@aibos/accounting/periods';
+import { closeFiscalPeriod } from "@aibos/accounting/periods";
 
 // Force close period (override validation warnings)
 const forceCloseResult = await closeFiscalPeriod(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-789',
-    closeDate: new Date('2024-01-31'),
-    closedBy: 'user-123',
-    userRole: 'admin', // Admin role required for force close
-    closeReason: 'Force close due to system maintenance',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-789",
+    closeDate: new Date("2024-01-31"),
+    closedBy: "user-123",
+    userRole: "admin", // Admin role required for force close
+    closeReason: "Force close due to system maintenance",
     forceClose: true, // Override validation warnings
     generateReversingEntries: false,
   },
-  dbClient
+  dbClient,
 );
 
 if (forceCloseResult.success) {
-  console.log('Period force closed successfully');
-  console.log('Warnings overridden:', forceCloseResult.validationResults.warnings);
+  console.log("Period force closed successfully");
+  console.log("Warnings overridden:", forceCloseResult.validationResults.warnings);
 } else {
-  console.error('Force close failed:', forceCloseResult.error);
+  console.error("Force close failed:", forceCloseResult.error);
 }
 ```
 
 ### Period Validation
 
 ```typescript
-import { closeFiscalPeriod } from '@aibos/accounting/periods';
+import { closeFiscalPeriod } from "@aibos/accounting/periods";
 
 // Close period and check validation results
 const closeResult = await closeFiscalPeriod(
   {
-    tenantId: 'tenant-123',
-    companyId: 'company-456',
-    fiscalPeriodId: 'period-789',
-    closeDate: new Date('2024-01-31'),
-    closedBy: 'user-123',
-    userRole: 'manager',
-    closeReason: 'Month-end close',
+    tenantId: "tenant-123",
+    companyId: "company-456",
+    fiscalPeriodId: "period-789",
+    closeDate: new Date("2024-01-31"),
+    closedBy: "user-123",
+    userRole: "manager",
+    closeReason: "Month-end close",
   },
-  dbClient
+  dbClient,
 );
 
 if (closeResult.success) {
   const validation = closeResult.validationResults;
 
   // Check individual validation checks
-  console.log('Validation checks:');
-  console.log('All journals posted:', validation.checks.allJournalsPosted);
-  console.log('Trial balance balanced:', validation.checks.trialBalanceBalanced);
-  console.log('No unreconciled transactions:', validation.checks.noUnreconciledTransactions);
-  console.log('All required adjustments:', validation.checks.allRequiredAdjustments);
-  console.log('Approval required:', validation.checks.approvalRequired);
-  console.log('SoD compliance:', validation.checks.sodCompliance);
+  console.log("Validation checks:");
+  console.log("All journals posted:", validation.checks.allJournalsPosted);
+  console.log("Trial balance balanced:", validation.checks.trialBalanceBalanced);
+  console.log("No unreconciled transactions:", validation.checks.noUnreconciledTransactions);
+  console.log("All required adjustments:", validation.checks.allRequiredAdjustments);
+  console.log("Approval required:", validation.checks.approvalRequired);
+  console.log("SoD compliance:", validation.checks.sodCompliance);
 
   // Check warnings and errors
   if (validation.warnings.length > 0) {
-    console.log('Warnings:');
-    validation.warnings.forEach((warning) => console.log('-', warning));
+    console.log("Warnings:");
+    validation.warnings.forEach(warning => console.log("-", warning));
   }
 
   if (validation.errors.length > 0) {
-    console.log('Errors:');
-    validation.errors.forEach((error) => console.log('-', error));
+    console.log("Errors:");
+    validation.errors.forEach(error => console.log("-", error));
   }
 }
 ```
@@ -353,7 +353,7 @@ if (closeResult.success) {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_PERIODS = 'true';
+process.env.DEBUG_PERIODS = "true";
 ```
 
 **Logs**: Check Axiom telemetry for period operation logs

@@ -499,7 +499,7 @@ function AdvancedBillManagement() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_BILLS = 'true';
+process.env.DEBUG_BILLS = "true";
 ```
 
 **Logs**: Check browser console for bill operation logs

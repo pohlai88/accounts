@@ -10,13 +10,7 @@ export const dlqHandler = inngest.createFunction(
   },
   { event: "inngest/function.failed" },
   async ({ event, step }) => {
-    const { 
-      function_id, 
-      run_id, 
-      error, 
-      original_event, 
-      attempt_count 
-    } = event.data;
+    const { function_id, run_id, error, original_event, attempt_count } = event.data;
 
     // Step 1: Log the failure
     await step.run("log-failure", async () => {
@@ -100,18 +94,18 @@ export const dlqHandler = inngest.createFunction(
       };
 
       const rule = autoRecoveryRules[function_id as keyof typeof autoRecoveryRules];
-      
+
       if (!rule || attempt_count >= rule.maxAttempts) {
         return { action: "manual_review" as const, reason: "Max attempts exceeded" };
       }
 
       const errorType = classifyError(error?.message || "");
-      
+
       if (rule.recoverableErrors.includes(errorType)) {
-        return { 
-          action: "auto_retry" as const, 
+        return {
+          action: "auto_retry" as const,
           delay: rule.retryDelay,
-          errorType 
+          errorType,
         };
       }
 
@@ -141,10 +135,10 @@ export const dlqHandler = inngest.createFunction(
       } else {
         // Mark for manual review
         const supabase = createServiceClient();
-        
+
         await supabase
           .from("dead_letter_queue")
-          .update({ 
+          .update({
             status: "manual_review",
             recovery_action: recoveryAction.reason,
           })
@@ -161,7 +155,7 @@ export const dlqHandler = inngest.createFunction(
     // Step 5: Send notification for critical failures
     await step.run("notify-if-critical", async () => {
       const criticalFunctions = ["fx-rate-ingestion", "payment-processing"];
-      
+
       if (criticalFunctions.includes(function_id) || attempt_count >= 3) {
         await inngest.send({
           name: "email/send",
@@ -200,7 +194,7 @@ export const dlqHandler = inngest.createFunction(
       functionId: function_id,
       runId: run_id,
     };
-  }
+  },
 );
 
 // DLQ Retry Handler
@@ -219,10 +213,10 @@ export const dlqRetryHandler = inngest.createFunction(
     // Step 2: Update DLQ status
     await step.run("update-dlq-status", async () => {
       const supabase = createServiceClient();
-      
+
       await supabase
         .from("dead_letter_queue")
-        .update({ 
+        .update({
           status: "retrying",
           retry_count: supabase.rpc("increment_retry_count", { dlq_id: dlqId }),
           last_retry_at: new Date().toISOString(),
@@ -251,7 +245,7 @@ export const dlqRetryHandler = inngest.createFunction(
       dlqId,
       retriedAt: new Date().toISOString(),
     };
-  }
+  },
 );
 
 // Error classification helper

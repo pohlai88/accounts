@@ -160,7 +160,7 @@ pnpm add -D @types/node
 
 ```typescript
 // packages/security/src/auth.ts
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { jwtVerify, createRemoteJWKSet } from "jose";
 
 export type SecurityContext = {
   userId: string;
@@ -173,8 +173,8 @@ export type SecurityContext = {
 const JWKS = createRemoteJWKSet(new URL(process.env.SUPABASE_JWKS_URL!));
 
 export async function verifyAccessToken(authorization?: string) {
-  if (!authorization?.startsWith('Bearer ')) {
-    throw new Error('Missing token');
+  if (!authorization?.startsWith("Bearer ")) {
+    throw new Error("Missing token");
   }
 
   const token = authorization.slice(7);
@@ -191,7 +191,7 @@ export async function verifyAccessToken(authorization?: string) {
 
 ```typescript
 // apps/web-api/app/api/auth/login/route.ts
-import { verifyAccessToken, buildSecurityContext } from '@aibos/security/auth';
+import { verifyAccessToken, buildSecurityContext } from "@aibos/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
         error: { message: error.message },
         timestamp: new Date().toISOString(),
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 }
@@ -249,7 +249,7 @@ pnpm add @upstash/redis
 
 ```typescript
 // packages/cache/src/redis.ts
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 
 export const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -261,14 +261,14 @@ export const redis = new Redis({
 
 ```typescript
 // apps/web-api/app/api/rules/route.ts
-import { cacheGet, cacheKey, cacheSet } from '@aibos/cache/cache';
+import { cacheGet, cacheKey, cacheSet } from "@aibos/cache/cache";
 
 export async function GET(req: NextRequest) {
   const ctx = await getSecurityContext(req);
   const query = Object.fromEntries(req.nextUrl.searchParams);
 
   // Check cache
-  const key = cacheKey(ctx.tenantId, '/api/rules', query);
+  const key = cacheKey(ctx.tenantId, "/api/rules", query);
   const cached = await cacheGet(key);
   if (cached) return NextResponse.json(cached);
 
@@ -290,29 +290,29 @@ export async function GET(req: NextRequest) {
 
 ```typescript
 // apps/web-api/app/api/health/route.ts
-import { NextResponse } from 'next/server';
-import { redis } from '@aibos/cache/redis';
+import { NextResponse } from "next/server";
+import { redis } from "@aibos/cache/redis";
 
 export async function GET() {
   const checks = {
-    database: 'ok', // Add real DB check
+    database: "ok", // Add real DB check
     redis: await redis
       .ping()
-      .then(() => 'ok')
-      .catch(() => 'fail'),
-    application: 'ok',
+      .then(() => "ok")
+      .catch(() => "fail"),
+    application: "ok",
   };
 
-  const allOk = Object.values(checks).every((v) => v === 'ok');
+  const allOk = Object.values(checks).every(v => v === "ok");
 
   return NextResponse.json(
     {
-      status: allOk ? 'ok' : 'degraded',
+      status: allOk ? "ok" : "degraded",
       checks,
-      version: process.env.APP_VERSION ?? 'unknown',
+      version: process.env.APP_VERSION ?? "unknown",
       timestamp: new Date().toISOString(),
     },
-    { status: allOk ? 200 : 503 }
+    { status: allOk ? 200 : 503 },
   );
 }
 ```
@@ -341,13 +341,13 @@ jobs:
 
 ```typescript
 // packages/security/src/rate-limit.ts
-import { redis } from '@aibos/cache/redis';
+import { redis } from "@aibos/cache/redis";
 
 export async function assertRateLimit(
   tenantId: string,
   route: string,
   limit = 300,
-  windowSec = 60
+  windowSec = 60,
 ) {
   const now = Date.now();
   const key = `rl:${tenantId}:${route}`;
@@ -362,9 +362,9 @@ export async function assertRateLimit(
   const count = Number(countRes);
 
   if (count > limit) {
-    const err: any = new Error('Too Many Requests');
+    const err: any = new Error("Too Many Requests");
     err.status = 429;
-    err.headers = { 'Retry-After': '5' };
+    err.headers = { "Retry-After": "5" };
     throw err;
   }
 }
@@ -374,13 +374,13 @@ export async function assertRateLimit(
 
 ```typescript
 // apps/web-api/app/api/rules/route.ts
-import { assertRateLimit } from '@aibos/security/rate-limit';
+import { assertRateLimit } from "@aibos/security/rate-limit";
 
 export async function GET(req: NextRequest) {
   const ctx = await getSecurityContext(req);
 
   // Rate limiting
-  await assertRateLimit(ctx.tenantId, '/api/rules');
+  await assertRateLimit(ctx.tenantId, "/api/rules");
 
   // ... rest of handler
 }
@@ -394,14 +394,14 @@ export async function GET(req: NextRequest) {
 
 ```typescript
 // packages/cache/src/idempotency.ts
-import { redis } from './redis';
+import { redis } from "./redis";
 
 export async function withIdempotency<T>(
   key: string,
   tenantId: string,
   route: string,
   compute: () => Promise<T>,
-  ttlSec = 3600
+  ttlSec = 3600,
 ): Promise<T> {
   const slot = `idem:${tenantId}:${route}:${key}`;
   const hit = await redis.get<string>(slot);
@@ -418,24 +418,24 @@ export async function withIdempotency<T>(
 
 ```typescript
 // apps/web-api/app/api/rules/route.ts
-import { withIdempotency } from '@aibos/cache/idempotency';
+import { withIdempotency } from "@aibos/cache/idempotency";
 
 export async function POST(req: NextRequest) {
   const ctx = await getSecurityContext(req);
-  const idemKey = req.headers.get('idempotency-key');
+  const idemKey = req.headers.get("idempotency-key");
 
   if (!idemKey) {
     return NextResponse.json(
       {
         success: false,
-        error: { message: 'Idempotency-Key required' },
+        error: { message: "Idempotency-Key required" },
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const body = await req.json();
-  const data = await withIdempotency(idemKey, ctx.tenantId, '/api/rules', async () => {
+  const data = await withIdempotency(idemKey, ctx.tenantId, "/api/rules", async () => {
     return createRule(ctx, body);
   });
 
@@ -457,10 +457,10 @@ export class MetricsCollector {
     method: string,
     statusCode: number,
     duration: number,
-    tenantId: string
+    tenantId: string,
   ) {
     // Send to Axiom
-    console.log('API Call:', { endpoint, method, statusCode, duration, tenantId });
+    console.log("API Call:", { endpoint, method, statusCode, duration, tenantId });
   }
 }
 ```
@@ -473,17 +473,17 @@ export class PerformanceMonitor {
   async measureAPICall<T>(
     operation: () => Promise<T>,
     endpoint: string,
-    tenantId: string
+    tenantId: string,
   ): Promise<T> {
     const start = Date.now();
     try {
       const result = await operation();
       const duration = Date.now() - start;
-      this.metrics.recordAPICall(endpoint, 'GET', 200, duration, tenantId);
+      this.metrics.recordAPICall(endpoint, "GET", 200, duration, tenantId);
       return result;
     } catch (error) {
       const duration = Date.now() - start;
-      this.metrics.recordAPICall(endpoint, 'GET', 500, duration, tenantId);
+      this.metrics.recordAPICall(endpoint, "GET", 500, duration, tenantId);
       throw error;
     }
   }

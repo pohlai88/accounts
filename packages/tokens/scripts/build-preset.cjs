@@ -1,8 +1,8 @@
 /**
  * Build script to generate Tailwind preset from dual-mode tokens
- * 
+ *
  * Accessibility is not a compromise, it's a fundamental need that we respect and fully support.
- * 
+ *
  * This script generates a preset that supports:
  * - Aesthetic Mode: Beautiful, subtle, modern design
  * - Accessibility Mode: WCAG 2.2 AAA compliant design
@@ -10,13 +10,13 @@
 
 /* eslint-env node */
 /* eslint-disable no-undef */
-const fs = require('fs');
-const path = require('path');
-const { pathToFileURL } = require('url');
+const fs = require("fs");
+const path = require("path");
+const { pathToFileURL } = require("url");
 
 // Async wrapper to support dynamic import when tokens are ESM
 (async () => {
-  const tokensPath = path.join(__dirname, '../dist/tokens.js');
+  const tokensPath = path.join(__dirname, "../dist/tokens.js");
   let tokens;
   try {
     try {
@@ -24,7 +24,7 @@ const { pathToFileURL } = require('url');
       const mod = require(tokensPath);
       tokens = mod?.default ?? mod;
     } catch (err) {
-      if (err && err.code === 'ERR_REQUIRE_ESM') {
+      if (err && err.code === "ERR_REQUIRE_ESM") {
         // Handle ESM tokens
         const mod = await import(pathToFileURL(tokensPath).href);
         tokens = mod?.default ?? mod;
@@ -33,13 +33,15 @@ const { pathToFileURL } = require('url');
       }
     }
     if (!tokens?.DESIGN_MODES || !tokens?.SEMANTIC_TOKENS) {
-      throw new Error('Tokens module missing required exports: DESIGN_MODES or SEMANTIC_TOKENS');
+      throw new Error("Tokens module missing required exports: DESIGN_MODES or SEMANTIC_TOKENS");
     }
   } catch (error) {
-    console.error('❌ Failed to load design tokens:', error?.message || error);
-    console.error('   Path:', tokensPath);
-    console.error('   Expected a built JS module exporting DESIGN_MODES and SEMANTIC_TOKENS.');
-    console.error('   Fix: build your tokens first (e.g., `pnpm -w build:tokens`) or verify your build output format (CJS/ESM).');
+    console.error("❌ Failed to load design tokens:", error?.message || error);
+    console.error("   Path:", tokensPath);
+    console.error("   Expected a built JS module exporting DESIGN_MODES and SEMANTIC_TOKENS.");
+    console.error(
+      "   Fix: build your tokens first (e.g., `pnpm -w build:tokens`) or verify your build output format (CJS/ESM).",
+    );
     process.exit(1);
   }
 
@@ -305,10 +307,10 @@ module.exports = {
 `;
 
   // Write the preset file
-  const presetPath = path.join(__dirname, '../tailwind.preset.cjs');
+  const presetPath = path.join(__dirname, "../tailwind.preset.cjs");
   fs.mkdirSync(path.dirname(presetPath), { recursive: true });
   fs.writeFileSync(presetPath, presetContent);
 
-  console.log('✅ Tailwind preset generated successfully');
+  console.log("✅ Tailwind preset generated successfully");
   console.log(`📁 Output: ${presetPath}`);
 })();

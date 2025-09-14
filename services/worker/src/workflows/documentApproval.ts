@@ -17,7 +17,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
     const {
       tenantId,
       attachmentId,
-      workflowType = 'single_approver',
+      workflowType = "single_approver",
       approvers,
       requireAllApprovers = false,
       allowSelfApproval = false,
@@ -26,8 +26,8 @@ export const documentApprovalWorkflow = inngest.createFunction(
       notifyOnApproval = true, // eslint-disable-line @typescript-eslint/no-unused-vars
       reminderInterval = 24,
       comments,
-      priority = 'normal',
-      dueDate
+      priority = "normal",
+      dueDate,
     } = event.data as any;
 
     const supabase = createServiceClient();
@@ -35,9 +35,9 @@ export const documentApprovalWorkflow = inngest.createFunction(
 
     const auditContext = createV1AuditContext({
       url: `/document/approval/${attachmentId}`,
-      method: 'POST',
+      method: "POST",
       headers: new globalThis.Headers(),
-      ip: 'worker'
+      ip: "worker",
     } as any);
 
     // Step 1: Validate input and fetch attachment
@@ -58,10 +58,10 @@ export const documentApprovalWorkflow = inngest.createFunction(
 
       // Fetch attachment details
       const { data: attachment, error: attachmentError } = await supabase
-        .from('attachments')
-        .select('*')
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId)
+        .from("attachments")
+        .select("*")
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId)
         .single();
 
       if (attachmentError || !attachment) {
@@ -70,38 +70,39 @@ export const documentApprovalWorkflow = inngest.createFunction(
 
       // Check if attachment already has an active approval workflow
       const existingWorkflow = attachment.metadata?.approvalWorkflow;
-      if (existingWorkflow && existingWorkflow.status === 'in_progress') {
+      if (existingWorkflow && existingWorkflow.status === "in_progress") {
         throw new Error(`Attachment already has an active approval workflow`);
       }
 
       // Auto-approve based on OCR confidence if threshold is set
       const ocrConfidence = attachment.metadata?.ocrConfidence || 0;
-      const shouldAutoApprove = autoApproveThreshold &&
+      const shouldAutoApprove =
+        autoApproveThreshold &&
         ocrConfidence >= autoApproveThreshold &&
-        attachment.metadata?.ocrStatus === 'completed';
+        attachment.metadata?.ocrStatus === "completed";
 
       if (shouldAutoApprove) {
         // Auto-approve the document
         await supabase
-          .from('attachments')
+          .from("attachments")
           .update({
             metadata: {
               ...attachment.metadata,
-              approvalStatus: 'approved',
-              approvedBy: 'system',
+              approvalStatus: "approved",
+              approvedBy: "system",
               approvedAt: new Date().toISOString(),
-              approvalReason: `Auto-approved based on OCR confidence: ${ocrConfidence}`
-            }
+              approvalReason: `Auto-approved based on OCR confidence: ${ocrConfidence}`,
+            },
           })
-          .eq('id', attachmentId);
+          .eq("id", attachmentId);
 
         await auditService.logOperation(auditContext, {
-          operation: 'document_auto_approved',
+          operation: "document_auto_approved",
           data: {
             attachmentId,
             ocrConfidence,
-            threshold: autoApproveThreshold
-          }
+            threshold: autoApproveThreshold,
+          },
         });
 
         return { autoApproved: true, ocrConfidence };
@@ -114,13 +115,13 @@ export const documentApprovalWorkflow = inngest.createFunction(
         attachmentId,
         tenantId,
         workflowType,
-        status: 'in_progress',
+        status: "in_progress",
         approvers: approvers.map((approver, index) => ({
           ...approver,
           id: crypto.randomUUID(),
-          status: 'pending',
+          status: "pending",
           stage: approver.stage || 1,
-          order: index
+          order: index,
         })),
         requireAllApprovers,
         allowSelfApproval,
@@ -128,32 +129,32 @@ export const documentApprovalWorkflow = inngest.createFunction(
         dueDate,
         comments,
         submittedAt: new Date().toISOString(),
-        submittedBy: event.user?.id || 'system',
+        submittedBy: event.user?.id || "system",
         currentStage: 1,
-        totalStages: Math.max(...approvers.map(a => a.stage || 1))
+        totalStages: Math.max(...approvers.map(a => a.stage || 1)),
       };
 
       // Update attachment with approval workflow
       await supabase
-        .from('attachments')
+        .from("attachments")
         .update({
           metadata: {
             ...attachment.metadata,
-            approvalStatus: 'pending',
-            approvalWorkflow: workflow
-          }
+            approvalStatus: "pending",
+            approvalWorkflow: workflow,
+          },
         })
-        .eq('id', attachmentId);
+        .eq("id", attachmentId);
 
       await auditService.logOperation(auditContext, {
-        operation: 'document_approval_workflow_started',
+        operation: "document_approval_workflow_started",
         data: {
           attachmentId,
           workflowId,
           workflowType,
           approverCount: approvers.length,
-          priority
-        }
+          priority,
+        },
       });
 
       return {
@@ -162,16 +163,16 @@ export const documentApprovalWorkflow = inngest.createFunction(
         attachment: {
           id: attachment.id,
           filename: attachment.filename,
-          category: attachment.category
-        }
+          category: attachment.category,
+        },
       };
     });
 
     if (workflowData.autoApproved) {
       return {
         success: true,
-        status: 'auto_approved',
-        ocrConfidence: (workflowData as any).ocrConfidence
+        status: "auto_approved",
+        ocrConfidence: (workflowData as any).ocrConfidence,
       };
     }
 
@@ -181,7 +182,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
     if (notifyOnSubmission) {
       await step.run("send-initial-notifications", async () => {
         const currentStageApprovers = workflow.approvers.filter(
-          (approver: { stage: number }) => approver.stage === workflow.currentStage
+          (approver: { stage: number }) => approver.stage === workflow.currentStage,
         );
 
         for (const approver of currentStageApprovers) {
@@ -199,18 +200,18 @@ export const documentApprovalWorkflow = inngest.createFunction(
                 priority: workflow.priority,
                 dueDate: workflow.dueDate,
                 comments: workflow.comments,
-                approvalUrl: `${process.env.APP_URL}/documents/${attachmentId}/approve`
+                approvalUrl: `${process.env.APP_URL}/documents/${attachmentId}/approve`,
               },
               tenantId,
-              priority: workflow.priority === 'urgent' ? 'high' : 'normal'
-            }
+              priority: workflow.priority === "urgent" ? "high" : "normal",
+            },
           });
         }
 
         logger.info("Initial approval notifications sent", {
           attachmentId,
           approverCount: currentStageApprovers.length,
-          stage: workflow.currentStage
+          stage: workflow.currentStage,
         });
 
         return { notificationsSent: currentStageApprovers.length };
@@ -226,13 +227,13 @@ export const documentApprovalWorkflow = inngest.createFunction(
             attachmentId,
             tenantId,
             workflowId: workflow.id,
-            reminderInterval
-          }
+            reminderInterval,
+          },
         });
 
         logger.info("Reminder notifications scheduled", {
           attachmentId,
-          reminderInterval
+          reminderInterval,
         });
 
         return { reminderScheduled: true };
@@ -242,12 +243,12 @@ export const documentApprovalWorkflow = inngest.createFunction(
     return {
       success: true,
       workflowId: workflow.id,
-      status: 'in_progress',
+      status: "in_progress",
       currentStage: workflow.currentStage,
       totalStages: workflow.totalStages,
-      approverCount: workflow.approvers.length
+      approverCount: workflow.approvers.length,
     };
-  }
+  },
 );
 
 // Document Approval Decision Handler
@@ -259,15 +260,8 @@ export const documentApprovalDecision = inngest.createFunction(
   },
   { event: "document/approval.decision" },
   async ({ event, step }) => {
-    const {
-      tenantId,
-      attachmentId,
-      decision,
-      comments,
-      conditions,
-      delegateTo,
-      delegationReason
-    } = event.data as any;
+    const { tenantId, attachmentId, decision, comments, conditions, delegateTo, delegationReason } =
+      event.data as any;
 
     const userId = event.user?.id || event.data.userId;
     const supabase = createServiceClient();
@@ -275,9 +269,9 @@ export const documentApprovalDecision = inngest.createFunction(
 
     const auditContext = createV1AuditContext({
       url: `/document/approval/${attachmentId}/decision`,
-      method: 'POST',
+      method: "POST",
       headers: new globalThis.Headers(),
-      ip: 'worker'
+      ip: "worker",
     } as any);
 
     // Step 1: Validate decision and fetch current workflow
@@ -296,10 +290,10 @@ export const documentApprovalDecision = inngest.createFunction(
 
       // Fetch attachment with current workflow
       const { data: attachment, error: attachmentError } = await supabase
-        .from('attachments')
-        .select('*')
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId)
+        .from("attachments")
+        .select("*")
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId)
         .single();
 
       if (attachmentError || !attachment) {
@@ -307,17 +301,19 @@ export const documentApprovalDecision = inngest.createFunction(
       }
 
       const workflow = attachment.metadata?.approvalWorkflow;
-      if (!workflow || workflow.status !== 'in_progress') {
+      if (!workflow || workflow.status !== "in_progress") {
         throw new Error(`No active approval workflow found for attachment: ${attachmentId}`);
       }
 
       // Find the approver making this decision
       const approver = workflow.approvers.find(
-        (a: { userId: string; status: string }) => a.userId === userId && a.status === 'pending'
+        (a: { userId: string; status: string }) => a.userId === userId && a.status === "pending",
       );
 
       if (!approver) {
-        throw new Error(`User ${userId} is not authorized to make approval decisions for this document`);
+        throw new Error(
+          `User ${userId} is not authorized to make approval decisions for this document`,
+        );
       }
 
       return { attachment, workflow, approver };
@@ -330,9 +326,9 @@ export const documentApprovalDecision = inngest.createFunction(
       const now = new Date().toISOString();
 
       // Handle delegation
-      if (decision === 'approve' && delegateTo) {
+      if (decision === "approve" && delegateTo) {
         // Update approver to delegated status
-        approver.status = 'delegated';
+        approver.status = "delegated";
         approver.delegatedTo = delegateTo;
         approver.delegationReason = delegationReason;
         approver.decidedAt = now;
@@ -342,26 +338,26 @@ export const documentApprovalDecision = inngest.createFunction(
           ...approver,
           id: crypto.randomUUID(),
           userId: delegateTo,
-          status: 'pending',
-          delegatedFrom: userId
+          status: "pending",
+          delegatedFrom: userId,
         };
         workflow.approvers.push(newApprover);
 
         await auditService.logOperation(auditContext, {
-          operation: 'document_approval_delegated',
+          operation: "document_approval_delegated",
           data: {
             attachmentId,
             fromUserId: userId,
             toUserId: delegateTo,
-            reason: delegationReason
-          }
+            reason: delegationReason,
+          },
         });
 
         return workflow;
       }
 
       // Update approver decision
-      approver.status = decision === 'approve' ? 'approved' : 'rejected';
+      approver.status = decision === "approve" ? "approved" : "rejected";
       approver.decision = decision;
       approver.comments = comments;
       approver.conditions = conditions;
@@ -375,21 +371,21 @@ export const documentApprovalDecision = inngest.createFunction(
           userId,
           decision,
           comments,
-          stage: approver.stage
-        }
+          stage: approver.stage,
+        },
       });
 
       // Check if workflow is complete
       const currentStageApprovers = workflow.approvers.filter(
-        (a: { stage: number }) => a.stage === workflow.currentStage
+        (a: { stage: number }) => a.stage === workflow.currentStage,
       );
 
       const approvedCount = currentStageApprovers.filter(
-        (a: { status: string }) => a.status === 'approved'
+        (a: { status: string }) => a.status === "approved",
       ).length;
 
       const rejectedCount = currentStageApprovers.filter(
-        (a: { status: string }) => a.status === 'rejected'
+        (a: { status: string }) => a.status === "rejected",
       ).length;
 
       // Determine if current stage is complete
@@ -414,14 +410,14 @@ export const documentApprovalDecision = inngest.createFunction(
       if (stageComplete) {
         if (!stageApproved) {
           // Workflow rejected
-          workflow.status = 'rejected';
+          workflow.status = "rejected";
           workflow.completedAt = now;
-          workflow.finalDecision = 'rejected';
+          workflow.finalDecision = "rejected";
         } else if (workflow.currentStage >= workflow.totalStages) {
           // Workflow approved (final stage)
-          workflow.status = 'completed';
+          workflow.status = "completed";
           workflow.completedAt = now;
-          workflow.finalDecision = 'approved';
+          workflow.finalDecision = "approved";
         } else {
           // Move to next stage
           workflow.currentStage += 1;
@@ -436,32 +432,32 @@ export const documentApprovalDecision = inngest.createFunction(
       const updateData: Record<string, unknown> = {
         metadata: {
           ...attachment.metadata,
-          approvalWorkflow: updatedWorkflow
-        }
+          approvalWorkflow: updatedWorkflow,
+        },
       };
 
       // Update approval status if workflow is complete
-      if (updatedWorkflow.status === 'completed') {
+      if (updatedWorkflow.status === "completed") {
         updateData.metadata = {
-          ...updateData.metadata as Record<string, unknown>,
-          approvalStatus: 'approved',
+          ...(updateData.metadata as Record<string, unknown>),
+          approvalStatus: "approved",
           approvedBy: userId,
-          approvedAt: updatedWorkflow.completedAt
+          approvedAt: updatedWorkflow.completedAt,
         };
-      } else if (updatedWorkflow.status === 'rejected') {
+      } else if (updatedWorkflow.status === "rejected") {
         updateData.metadata = {
-          ...updateData.metadata as Record<string, unknown>,
-          approvalStatus: 'rejected',
+          ...(updateData.metadata as Record<string, unknown>),
+          approvalStatus: "rejected",
           rejectedBy: userId,
           rejectedAt: updatedWorkflow.completedAt,
-          rejectionReason: comments
+          rejectionReason: comments,
         };
       }
 
       const { error: updateError } = await supabase
-        .from('attachments')
+        .from("attachments")
         .update(updateData)
-        .eq('id', attachmentId);
+        .eq("id", attachmentId);
 
       if (updateError) {
         throw new Error(`Failed to update attachment: ${updateError.message}`);
@@ -470,7 +466,7 @@ export const documentApprovalDecision = inngest.createFunction(
       logger.info("Attachment workflow updated", {
         attachmentId,
         workflowStatus: updatedWorkflow.status,
-        currentStage: updatedWorkflow.currentStage
+        currentStage: updatedWorkflow.currentStage,
       });
 
       return { updated: true };
@@ -478,7 +474,7 @@ export const documentApprovalDecision = inngest.createFunction(
 
     // Step 4: Send notifications based on workflow state
     await step.run("send-decision-notifications", async () => {
-      if (updatedWorkflow.status === 'completed') {
+      if (updatedWorkflow.status === "completed") {
         // Notify submitter of approval
         await inngest.send({
           name: "email/send",
@@ -491,10 +487,10 @@ export const documentApprovalDecision = inngest.createFunction(
               filename: attachment.filename,
               approvedBy: userId,
               finalComments: comments,
-              documentUrl: `${process.env.APP_URL}/documents/${attachmentId}`
+              documentUrl: `${process.env.APP_URL}/documents/${attachmentId}`,
             },
-            tenantId
-          }
+            tenantId,
+          },
         });
 
         // Trigger any downstream workflows
@@ -504,11 +500,10 @@ export const documentApprovalDecision = inngest.createFunction(
             attachmentId,
             tenantId,
             approvedBy: userId,
-            approvedAt: updatedWorkflow.completedAt
-          }
+            approvedAt: updatedWorkflow.completedAt,
+          },
         });
-
-      } else if (updatedWorkflow.status === 'rejected') {
+      } else if (updatedWorkflow.status === "rejected") {
         // Notify submitter of rejection
         await inngest.send({
           name: "email/send",
@@ -521,17 +516,16 @@ export const documentApprovalDecision = inngest.createFunction(
               filename: attachment.filename,
               rejectedBy: userId,
               rejectionReason: comments,
-              documentUrl: `${process.env.APP_URL}/documents/${attachmentId}`
+              documentUrl: `${process.env.APP_URL}/documents/${attachmentId}`,
             },
-            tenantId
-          }
+            tenantId,
+          },
         });
-
       } else if (updatedWorkflow.currentStage > (workflow.currentStage || 1)) {
         // Notify next stage approvers
         const nextStageApprovers = updatedWorkflow.approvers.filter(
           (a: { stage: number; status: string }) =>
-            a.stage === updatedWorkflow.currentStage && a.status === 'pending'
+            a.stage === updatedWorkflow.currentStage && a.status === "pending",
         );
 
         for (const nextApprover of nextStageApprovers) {
@@ -550,10 +544,10 @@ export const documentApprovalDecision = inngest.createFunction(
                 totalStages: updatedWorkflow.totalStages,
                 priority: updatedWorkflow.priority,
                 dueDate: updatedWorkflow.dueDate,
-                approvalUrl: `${process.env.APP_URL}/documents/${attachmentId}/approve`
+                approvalUrl: `${process.env.APP_URL}/documents/${attachmentId}/approve`,
               },
-              tenantId
-            }
+              tenantId,
+            },
           });
         }
       }
@@ -567,9 +561,9 @@ export const documentApprovalDecision = inngest.createFunction(
       workflowStatus: updatedWorkflow.status,
       currentStage: updatedWorkflow.currentStage,
       totalStages: updatedWorkflow.totalStages,
-      isComplete: updatedWorkflow.status === 'completed' || updatedWorkflow.status === 'rejected'
+      isComplete: updatedWorkflow.status === "completed" || updatedWorkflow.status === "rejected",
     };
-  }
+  },
 );
 
 // Approval Reminder Handler
@@ -588,19 +582,19 @@ export const documentApprovalReminder = inngest.createFunction(
     // Check if workflow is still active
     const workflowCheck = await step.run("check-workflow-status", async () => {
       const { data: attachment, error } = await supabase
-        .from('attachments')
-        .select('metadata')
-        .eq('id', attachmentId)
-        .eq('tenant_id', tenantId)
+        .from("attachments")
+        .select("metadata")
+        .eq("id", attachmentId)
+        .eq("tenant_id", tenantId)
         .single();
 
       if (error || !attachment) {
-        return { active: false, reason: 'Attachment not found' };
+        return { active: false, reason: "Attachment not found" };
       }
 
       const workflow = attachment.metadata?.approvalWorkflow;
-      if (!workflow || workflow.id !== workflowId || workflow.status !== 'in_progress') {
-        return { active: false, reason: 'Workflow no longer active' };
+      if (!workflow || workflow.id !== workflowId || workflow.status !== "in_progress") {
+        return { active: false, reason: "Workflow no longer active" };
       }
 
       return { active: true, workflow };
@@ -610,7 +604,7 @@ export const documentApprovalReminder = inngest.createFunction(
       logger.info("Skipping reminder - workflow no longer active", {
         attachmentId,
         workflowId,
-        reason: (workflowCheck as any).reason
+        reason: (workflowCheck as any).reason,
       });
       return { skipped: true, reason: (workflowCheck as any).reason };
     }
@@ -620,7 +614,7 @@ export const documentApprovalReminder = inngest.createFunction(
       const workflow = (workflowCheck as any).workflow;
       const pendingApprovers = workflow.approvers.filter(
         (a: { stage: number; status: string }) =>
-          a.stage === workflow.currentStage && a.status === 'pending'
+          a.stage === workflow.currentStage && a.status === "pending",
       );
 
       for (const approver of pendingApprovers) {
@@ -634,20 +628,22 @@ export const documentApprovalReminder = inngest.createFunction(
               attachmentId,
               filename: workflow.attachmentFilename,
               approverName: approver.name || approver.userId,
-              daysPending: Math.floor((Date.now() - new Date(workflow.submittedAt).getTime()) / (1000 * 60 * 60 * 24)),
+              daysPending: Math.floor(
+                (Date.now() - new Date(workflow.submittedAt).getTime()) / (1000 * 60 * 60 * 24),
+              ),
               priority: workflow.priority,
               dueDate: workflow.dueDate,
-              approvalUrl: `${process.env.APP_URL}/documents/${attachmentId}/approve`
+              approvalUrl: `${process.env.APP_URL}/documents/${attachmentId}/approve`,
             },
             tenantId,
-            priority: 'normal'
-          }
+            priority: "normal",
+          },
         });
       }
 
       logger.info("Reminder notifications sent", {
         attachmentId,
-        reminderCount: pendingApprovers.length
+        reminderCount: pendingApprovers.length,
       });
 
       return { remindersSent: pendingApprovers.length };
@@ -661,8 +657,8 @@ export const documentApprovalReminder = inngest.createFunction(
           attachmentId,
           tenantId,
           workflowId,
-          reminderInterval
-        }
+          reminderInterval,
+        },
       });
 
       return { nextReminderScheduled: true };
@@ -670,11 +666,11 @@ export const documentApprovalReminder = inngest.createFunction(
 
     return {
       success: true,
-      remindersSent: (workflowCheck as any).workflow?.approvers?.filter(
-        (a: { stage: number; status: string }) =>
-          a.stage === (workflowCheck as any).workflow.currentStage && a.status === 'pending'
-      ).length || 0
+      remindersSent:
+        (workflowCheck as any).workflow?.approvers?.filter(
+          (a: { stage: number; status: string }) =>
+            a.stage === (workflowCheck as any).workflow.currentStage && a.status === "pending",
+        ).length || 0,
     };
-  }
+  },
 );
-

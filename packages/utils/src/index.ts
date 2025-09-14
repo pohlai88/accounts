@@ -25,14 +25,17 @@ export * from "./middleware/idempotency";
 export * from "./audit/service";
 
 // V1 Compliance - Audit and Context (avoiding conflicts)
-export { AuditService as V1AuditService, getAuditService as getV1AuditService } from "./audit/audit-service";
+export {
+  AuditService as V1AuditService,
+  getAuditService as getV1AuditService,
+} from "./audit/audit-service";
 export type { AuditContext as V1AuditContext, AuditEvent } from "./audit/audit-service";
 export {
   createRequestContext as createV1RequestContext,
   extractUserContext as extractV1UserContext,
   createAuditContext as createV1AuditContext,
   validateContext,
-  sanitizeContext
+  sanitizeContext,
 } from "./context/request-context";
 export type { UserContext } from "./context/request-context";
 
@@ -44,7 +47,7 @@ export {
   ReportExportRequest,
   ExportableData,
   ExcelCellStyle,
-  ChartConfig
+  ChartConfig,
 } from "./export/types";
 export {
   exportToCsv,
@@ -52,25 +55,30 @@ export {
   exportToJsonl,
   exportToCsvEnhanced,
   createExportService,
-  ExportService
+  ExportService,
 } from "./export";
 export {
   createExportManagerService,
   ExportManagerService,
   ExportHistory,
   ExportStats,
-  cleanupExpiredExportsJob
+  cleanupExpiredExportsJob,
 } from "./export/export-manager";
 export {
   createExportScheduleService,
   ExportScheduleService,
   ScheduledExport,
   ScheduleConfig,
-  processScheduledExports
+  processScheduledExports,
 } from "./export/export-scheduler";
 
 // Monitoring and performance tracking for V1 compliance
-export { performanceMonitor, PerformanceMetrics, APIMetrics, UIMetrics } from "./monitoring/performance-monitor";
+export {
+  performanceMonitor,
+  PerformanceMetrics,
+  APIMetrics,
+  UIMetrics,
+} from "./monitoring/performance-monitor";
 export { errorTracker, ErrorContext, ErrorEvent, ErrorSummary } from "./monitoring/error-tracker";
 
 // Enhanced Auth utilities for admin configuration
@@ -107,6 +115,6 @@ export const sendEmail = async (params: {
     subject: params.subject,
     html: params.html,
     idemKey: undefined,
-    from: "system"
+    from: "system",
   });
 };

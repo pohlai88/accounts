@@ -1,141 +1,137 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog'
-import { 
-  Lightbulb, 
-  CheckCircle, 
-  X, 
-  ArrowRight, 
-  Clock, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Lightbulb,
+  CheckCircle,
+  X,
+  ArrowRight,
+  Clock,
   AlertTriangle,
   TrendingUp,
   Settings,
   FileText,
   DollarSign,
   Shield,
-  Zap
-} from 'lucide-react'
-import { 
-  AIEngine,
-  AISuggestion,
-  AIContext
-} from '@/lib/ai-engine'
+  Zap,
+} from "lucide-react";
+import { AIEngine, AISuggestion, AIContext } from "@/lib/ai-engine";
 
 interface AISuggestionsPanelProps {
-  companyId: string
-  userId: string
-  context: AIContext
-  onSuggestionAction: (suggestion: AISuggestion) => void
+  companyId: string;
+  userId: string;
+  context: AIContext;
+  onSuggestionAction: (suggestion: AISuggestion) => void;
 }
 
-export function AISuggestionsPanel({ 
-  companyId, 
-  userId, 
-  context, 
-  onSuggestionAction 
+export function AISuggestionsPanel({
+  companyId,
+  userId,
+  context,
+  onSuggestionAction,
 }: AISuggestionsPanelProps) {
-  const [suggestions, setSuggestions] = useState<AISuggestion[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedSuggestion, setSelectedSuggestion] = useState<AISuggestion | null>(null)
-  const [showDetails, setShowDetails] = useState(false)
+  const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedSuggestion, setSelectedSuggestion] = useState<AISuggestion | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
-    loadSuggestions()
-  }, [companyId, context])
+    loadSuggestions();
+  }, [companyId, context]);
 
   const loadSuggestions = async () => {
     try {
-      const result = await AIEngine.getSuggestions(context)
+      const result = await AIEngine.getSuggestions(context);
       if (result.success && result.suggestions) {
-        setSuggestions(result.suggestions)
+        setSuggestions(result.suggestions);
       }
     } catch (error) {
-      console.error('Error loading suggestions:', error)
+      console.error("Error loading suggestions:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSuggestionClick = (suggestion: AISuggestion) => {
-    setSelectedSuggestion(suggestion)
-    setShowDetails(true)
-  }
+    setSelectedSuggestion(suggestion);
+    setShowDetails(true);
+  };
 
   const handleComplete = async (suggestion: AISuggestion) => {
     try {
-      await AIEngine.markSuggestionCompleted(suggestion.id, userId)
-      setSuggestions(prev => prev.filter(s => s.id !== suggestion.id))
-      onSuggestionAction(suggestion)
+      await AIEngine.markSuggestionCompleted(suggestion.id, userId);
+      setSuggestions(prev => prev.filter(s => s.id !== suggestion.id));
+      onSuggestionAction(suggestion);
     } catch (error) {
-      console.error('Error completing suggestion:', error)
+      console.error("Error completing suggestion:", error);
     }
-  }
+  };
 
   const handleDismiss = async (suggestion: AISuggestion) => {
     try {
-      await AIEngine.dismissSuggestion(suggestion.id, userId)
-      setSuggestions(prev => prev.filter(s => s.id !== suggestion.id))
+      await AIEngine.dismissSuggestion(suggestion.id, userId);
+      setSuggestions(prev => prev.filter(s => s.id !== suggestion.id));
     } catch (error) {
-      console.error('Error dismissing suggestion:', error)
+      console.error("Error dismissing suggestion:", error);
     }
-  }
+  };
 
   const getSuggestionIcon = (type: string) => {
     switch (type) {
-      case 'setup':
-        return <Settings className="h-4 w-4" />
-      case 'transaction':
-        return <DollarSign className="h-4 w-4" />
-      case 'report':
-        return <FileText className="h-4 w-4" />
-      case 'optimization':
-        return <Zap className="h-4 w-4" />
-      case 'compliance':
-        return <Shield className="h-4 w-4" />
+      case "setup":
+        return <Settings className="h-4 w-4" />;
+      case "transaction":
+        return <DollarSign className="h-4 w-4" />;
+      case "report":
+        return <FileText className="h-4 w-4" />;
+      case "optimization":
+        return <Zap className="h-4 w-4" />;
+      case "compliance":
+        return <Shield className="h-4 w-4" />;
       default:
-        return <Lightbulb className="h-4 w-4" />
+        return <Lightbulb className="h-4 w-4" />;
     }
-  }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800 border-red-200'
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200'
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'setup':
-        return 'bg-blue-100 text-blue-800'
-      case 'transaction':
-        return 'bg-green-100 text-green-800'
-      case 'report':
-        return 'bg-purple-100 text-purple-800'
-      case 'optimization':
-        return 'bg-orange-100 text-orange-800'
-      case 'compliance':
-        return 'bg-red-100 text-red-800'
+      case "setup":
+        return "bg-blue-100 text-blue-800";
+      case "transaction":
+        return "bg-green-100 text-green-800";
+      case "report":
+        return "bg-purple-100 text-purple-800";
+      case "optimization":
+        return "bg-orange-100 text-orange-800";
+      case "compliance":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800'
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -147,7 +143,7 @@ export function AISuggestionsPanel({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (suggestions.length === 0) {
@@ -161,7 +157,7 @@ export function AISuggestionsPanel({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -180,7 +176,7 @@ export function AISuggestionsPanel({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {suggestions.map((suggestion) => (
+          {suggestions.map(suggestion => (
             <div
               key={suggestion.id}
               className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
@@ -188,38 +184,32 @@ export function AISuggestionsPanel({
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3 flex-1">
-                  <div className="mt-0.5">
-                    {getSuggestionIcon(suggestion.type)}
-                  </div>
+                  <div className="mt-0.5">{getSuggestionIcon(suggestion.type)}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h4 className="text-sm font-medium truncate">
-                        {suggestion.title}
-                      </h4>
-                      <Badge 
-                        variant="outline" 
+                      <h4 className="text-sm font-medium truncate">{suggestion.title}</h4>
+                      <Badge
+                        variant="outline"
                         className={`text-xs ${getPriorityColor(suggestion.priority)}`}
                       >
                         {suggestion.priority}
                       </Badge>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={`text-xs ${getTypeColor(suggestion.type)}`}
                       >
                         {suggestion.type}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {suggestion.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-2">{suggestion.description}</p>
                     <div className="flex items-center space-x-2">
                       <Button
                         size="sm"
                         variant="outline"
                         className="h-6 px-2 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleComplete(suggestion)
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleComplete(suggestion);
                         }}
                       >
                         <CheckCircle className="h-3 w-3 mr-1" />
@@ -229,9 +219,9 @@ export function AISuggestionsPanel({
                         size="sm"
                         variant="ghost"
                         className="h-6 px-2 text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDismiss(suggestion)
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleDismiss(suggestion);
                         }}
                       >
                         <X className="h-3 w-3 mr-1" />
@@ -255,33 +245,26 @@ export function AISuggestionsPanel({
               {selectedSuggestion && getSuggestionIcon(selectedSuggestion.type)}
               <span>{selectedSuggestion?.title}</span>
             </DialogTitle>
-            <DialogDescription>
-              {selectedSuggestion?.description}
-            </DialogDescription>
+            <DialogDescription>{selectedSuggestion?.description}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {selectedSuggestion && (
               <>
                 <div className="flex items-center space-x-2">
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className={getPriorityColor(selectedSuggestion.priority)}
                   >
                     {selectedSuggestion.priority} priority
                   </Badge>
-                  <Badge 
-                    variant="outline" 
-                    className={getTypeColor(selectedSuggestion.type)}
-                  >
+                  <Badge variant="outline" className={getTypeColor(selectedSuggestion.type)}>
                     {selectedSuggestion.type}
                   </Badge>
                 </div>
-                
+
                 <div className="p-3 bg-muted/50 rounded-lg">
                   <h4 className="text-sm font-medium mb-1">Suggested Action</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedSuggestion.action}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{selectedSuggestion.action}</p>
                 </div>
 
                 {selectedSuggestion.metadata && (
@@ -294,16 +277,13 @@ export function AISuggestionsPanel({
                 )}
 
                 <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowDetails(false)}
-                  >
+                  <Button variant="outline" onClick={() => setShowDetails(false)}>
                     Close
                   </Button>
                   <Button
                     onClick={() => {
-                      handleComplete(selectedSuggestion)
-                      setShowDetails(false)
+                      handleComplete(selectedSuggestion);
+                      setShowDetails(false);
                     }}
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
@@ -316,18 +296,18 @@ export function AISuggestionsPanel({
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
 
 interface AISuggestionsSummaryProps {
-  suggestions: AISuggestion[]
+  suggestions: AISuggestion[];
 }
 
 export function AISuggestionsSummary({ suggestions }: AISuggestionsSummaryProps) {
-  const highPriorityCount = suggestions.filter(s => s.priority === 'high').length
-  const setupCount = suggestions.filter(s => s.type === 'setup').length
-  const transactionCount = suggestions.filter(s => s.type === 'transaction').length
-  const reportCount = suggestions.filter(s => s.type === 'report').length
+  const highPriorityCount = suggestions.filter(s => s.priority === "high").length;
+  const setupCount = suggestions.filter(s => s.type === "setup").length;
+  const transactionCount = suggestions.filter(s => s.type === "transaction").length;
+  const reportCount = suggestions.filter(s => s.type === "report").length;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -348,5 +328,5 @@ export function AISuggestionsSummary({ suggestions }: AISuggestionsSummaryProps)
         <div className="text-xs text-muted-foreground">Reports</div>
       </div>
     </div>
-  )
+  );
 }

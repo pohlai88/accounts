@@ -1,5 +1,5 @@
 // V1 Authentication Types
-import type { UserId, TenantId, CompanyId } from '@aibos/contracts';
+import type { UserId, TenantId, CompanyId } from "@aibos/contracts";
 
 export interface AuthUser {
   id: UserId;
@@ -20,13 +20,7 @@ export interface JWTClaims {
   exp: number;
 }
 
-export type UserRole =
-  | 'admin'
-  | 'manager'
-  | 'accountant'
-  | 'clerk'
-  | 'viewer'
-  | 'system';
+export type UserRole = "admin" | "manager" | "accountant" | "clerk" | "viewer" | "system";
 
 export interface AuthContext {
   user: AuthUser | null;

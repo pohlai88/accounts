@@ -3,33 +3,33 @@
  * Welcome, nudge, and onboarding email system
  */
 
-import { supabase } from './supabase'
+import { supabase } from "./supabase";
 
 export interface EmailTemplate {
-    id: string
-    name: string
-    subject: string
-    html: string
-    text: string
-    variables: string[]
+  id: string;
+  name: string;
+  subject: string;
+  html: string;
+  text: string;
+  variables: string[];
 }
 
 export interface EmailEvent {
-    type: 'welcome_owner' | 'welcome_invite' | 'nudge_d1' | 'nudge_d3' | 'nudge_d7' | 'completion'
-    user_id: string
-    company_id?: string
-    data: Record<string, any>
-    scheduled_at?: string
+  type: "welcome_owner" | "welcome_invite" | "nudge_d1" | "nudge_d3" | "nudge_d7" | "completion";
+  user_id: string;
+  company_id?: string;
+  data: Record<string, any>;
+  scheduled_at?: string;
 }
 
 // Email Templates
 export const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
-    welcome_owner: {
-        id: 'welcome_owner',
-        name: 'Welcome Email (Owner)',
-        subject: 'Welcome to AI-BOS Accounting — your company is live 🚀',
-        variables: ['user_name', 'company_name', 'dashboard_url', 'checklist_url'],
-        html: `
+  welcome_owner: {
+    id: "welcome_owner",
+    name: "Welcome Email (Owner)",
+    subject: "Welcome to AI-BOS Accounting — your company is live 🚀",
+    variables: ["user_name", "company_name", "dashboard_url", "checklist_url"],
+    html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -163,7 +163,7 @@ export const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
     </div>
 </body>
 </html>`,
-        text: `Welcome to AI-BOS Accounting!
+    text: `Welcome to AI-BOS Accounting!
 
 Hi {{user_name}},
 
@@ -183,15 +183,15 @@ Open your checklist: {{checklist_url}}
 Pro Tip: Press ⌘K anywhere to access our AI command palette!
 
 Welcome aboard!
-The AI-BOS Team`
-    },
+The AI-BOS Team`,
+  },
 
-    welcome_invite: {
-        id: 'welcome_invite',
-        name: 'Welcome Email (Invited User)',
-        subject: 'You\'ve been invited to {{company_name}} on AI-BOS Accounting',
-        variables: ['user_name', 'company_name', 'inviter_name', 'role', 'dashboard_url'],
-        html: `
+  welcome_invite: {
+    id: "welcome_invite",
+    name: "Welcome Email (Invited User)",
+    subject: "You've been invited to {{company_name}} on AI-BOS Accounting",
+    variables: ["user_name", "company_name", "inviter_name", "role", "dashboard_url"],
+    html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -252,7 +252,7 @@ The AI-BOS Team`
     </div>
 </body>
 </html>`,
-        text: `You've been invited to {{company_name}}!
+    text: `You've been invited to {{company_name}}!
 
 Hi {{user_name}},
 
@@ -269,15 +269,15 @@ Access your dashboard: {{dashboard_url}}
 Start here: Check your inbox for 2 tasks waiting for you.
 
 Best regards,
-The AI-BOS Team`
-    },
+The AI-BOS Team`,
+  },
 
-    nudge_d1: {
-        id: 'nudge_d1',
-        name: 'Day 1 Nudge Email',
-        subject: 'Make it real in 3 minutes ⚡',
-        variables: ['user_name', 'company_name', 'dashboard_url'],
-        html: `
+  nudge_d1: {
+    id: "nudge_d1",
+    name: "Day 1 Nudge Email",
+    subject: "Make it real in 3 minutes ⚡",
+    variables: ["user_name", "company_name", "dashboard_url"],
+    html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -333,7 +333,7 @@ The AI-BOS Team`
     </div>
 </body>
 </html>`,
-        text: `Make it real in 3 minutes
+    text: `Make it real in 3 minutes
 
 Hi {{user_name}},
 
@@ -349,183 +349,179 @@ Once you add real data, the magic happens!
 Continue setup: {{dashboard_url}}
 
 Cheers,
-The AI-BOS Team`
-    }
-}
+The AI-BOS Team`,
+  },
+};
 
 export class LifecycleEmails {
+  /**
+   * Send welcome email to new owner
+   */
+  static async sendWelcomeOwner(data: {
+    user_id: string;
+    user_name: string;
+    company_name: string;
+    email: string;
+  }) {
+    const template = EMAIL_TEMPLATES.welcome_owner;
 
-    /**
-     * Send welcome email to new owner
-     */
-    static async sendWelcomeOwner(data: {
-        user_id: string
-        user_name: string
-        company_name: string
-        email: string
-    }) {
-        const template = EMAIL_TEMPLATES.welcome_owner
+    const emailContent = this.processTemplate(template, {
+      user_name: data.user_name,
+      company_name: data.company_name,
+      dashboard_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      checklist_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?tab=checklist`,
+    });
 
-        const emailContent = this.processTemplate(template, {
-            user_name: data.user_name,
-            company_name: data.company_name,
-            dashboard_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-            checklist_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?tab=checklist`
-        })
+    return this.sendEmail({
+      to: data.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    });
+  }
 
-        return this.sendEmail({
-            to: data.email,
-            subject: emailContent.subject,
-            html: emailContent.html,
-            text: emailContent.text
-        })
+  /**
+   * Send welcome email to invited user
+   */
+  static async sendWelcomeInvite(data: {
+    user_id: string;
+    user_name: string;
+    company_name: string;
+    inviter_name: string;
+    role: string;
+    email: string;
+  }) {
+    const template = EMAIL_TEMPLATES.welcome_invite;
+
+    const emailContent = this.processTemplate(template, {
+      user_name: data.user_name,
+      company_name: data.company_name,
+      inviter_name: data.inviter_name,
+      role: data.role.charAt(0).toUpperCase() + data.role.slice(1),
+      dashboard_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+    });
+
+    return this.sendEmail({
+      to: data.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    });
+  }
+
+  /**
+   * Schedule nudge email
+   */
+  static async scheduleNudgeEmail(data: {
+    user_id: string;
+    user_name: string;
+    company_name: string;
+    email: string;
+    days: number;
+  }) {
+    const template = EMAIL_TEMPLATES.nudge_d1;
+
+    const scheduledAt = new Date();
+    scheduledAt.setDate(scheduledAt.getDate() + data.days);
+
+    // Store in database for later processing
+    await supabase.from("scheduled_emails").insert({
+      user_id: data.user_id,
+      template_id: template.id,
+      recipient_email: data.email,
+      template_data: {
+        user_name: data.user_name,
+        company_name: data.company_name,
+        dashboard_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      },
+      scheduled_at: scheduledAt.toISOString(),
+      status: "scheduled",
+    });
+  }
+
+  /**
+   * Process email template with variables
+   */
+  private static processTemplate(template: EmailTemplate, variables: Record<string, string>) {
+    let subject = template.subject;
+    let html = template.html;
+    let text = template.text;
+
+    // Replace variables in all content
+    Object.entries(variables).forEach(([key, value]) => {
+      const placeholder = `{{${key}}}`;
+      subject = subject.replace(new RegExp(placeholder, "g"), value);
+      html = html.replace(new RegExp(placeholder, "g"), value);
+      text = text.replace(new RegExp(placeholder, "g"), value);
+    });
+
+    return { subject, html, text };
+  }
+
+  /**
+   * Send email via Supabase Edge Function or external service
+   */
+  private static async sendEmail(data: {
+    to: string;
+    subject: string;
+    html: string;
+    text: string;
+  }) {
+    try {
+      // In production, this would integrate with:
+      // - Supabase Edge Function for email sending
+      // - SendGrid, Mailgun, or similar service
+      // - Or Supabase's built-in email service
+
+      console.log("Sending email:", {
+        to: data.to,
+        subject: data.subject,
+      });
+
+      // For now, just log the email content
+      // In production, replace with actual email service
+
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      return { success: false, error: error.message };
     }
+  }
 
-    /**
-     * Send welcome email to invited user
-     */
-    static async sendWelcomeInvite(data: {
-        user_id: string
-        user_name: string
-        company_name: string
-        inviter_name: string
-        role: string
-        email: string
-    }) {
-        const template = EMAIL_TEMPLATES.welcome_invite
+  /**
+   * Process scheduled emails (would be called by a cron job)
+   */
+  static async processScheduledEmails() {
+    const { data: scheduledEmails } = await supabase
+      .from("scheduled_emails")
+      .select("*")
+      .eq("status", "scheduled")
+      .lte("scheduled_at", new Date().toISOString());
 
-        const emailContent = this.processTemplate(template, {
-            user_name: data.user_name,
-            company_name: data.company_name,
-            inviter_name: data.inviter_name,
-            role: data.role.charAt(0).toUpperCase() + data.role.slice(1),
-            dashboard_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+    if (!scheduledEmails) return;
+
+    for (const email of scheduledEmails) {
+      const template = EMAIL_TEMPLATES[email.template_id];
+      if (!template) continue;
+
+      const emailContent = this.processTemplate(template, email.template_data);
+
+      const result = await this.sendEmail({
+        to: email.recipient_email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      });
+
+      // Update status
+      await supabase
+        .from("scheduled_emails")
+        .update({
+          status: result.success ? "sent" : "failed",
+          sent_at: result.success ? new Date().toISOString() : null,
+          error_message: result.success ? null : result.error,
         })
-
-        return this.sendEmail({
-            to: data.email,
-            subject: emailContent.subject,
-            html: emailContent.html,
-            text: emailContent.text
-        })
+        .eq("id", email.id);
     }
-
-    /**
-     * Schedule nudge email
-     */
-    static async scheduleNudgeEmail(data: {
-        user_id: string
-        user_name: string
-        company_name: string
-        email: string
-        days: number
-    }) {
-        const template = EMAIL_TEMPLATES.nudge_d1
-
-        const scheduledAt = new Date()
-        scheduledAt.setDate(scheduledAt.getDate() + data.days)
-
-        // Store in database for later processing
-        await supabase.from('scheduled_emails').insert({
-            user_id: data.user_id,
-            template_id: template.id,
-            recipient_email: data.email,
-            template_data: {
-                user_name: data.user_name,
-                company_name: data.company_name,
-                dashboard_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
-            },
-            scheduled_at: scheduledAt.toISOString(),
-            status: 'scheduled'
-        })
-    }
-
-    /**
-     * Process email template with variables
-     */
-    private static processTemplate(
-        template: EmailTemplate,
-        variables: Record<string, string>
-    ) {
-        let subject = template.subject
-        let html = template.html
-        let text = template.text
-
-        // Replace variables in all content
-        Object.entries(variables).forEach(([key, value]) => {
-            const placeholder = `{{${key}}}`
-            subject = subject.replace(new RegExp(placeholder, 'g'), value)
-            html = html.replace(new RegExp(placeholder, 'g'), value)
-            text = text.replace(new RegExp(placeholder, 'g'), value)
-        })
-
-        return { subject, html, text }
-    }
-
-    /**
-     * Send email via Supabase Edge Function or external service
-     */
-    private static async sendEmail(data: {
-        to: string
-        subject: string
-        html: string
-        text: string
-    }) {
-        try {
-            // In production, this would integrate with:
-            // - Supabase Edge Function for email sending
-            // - SendGrid, Mailgun, or similar service
-            // - Or Supabase's built-in email service
-
-            console.log('Sending email:', {
-                to: data.to,
-                subject: data.subject
-            })
-
-            // For now, just log the email content
-            // In production, replace with actual email service
-
-            return { success: true }
-        } catch (error) {
-            console.error('Failed to send email:', error)
-            return { success: false, error: error.message }
-        }
-    }
-
-    /**
-     * Process scheduled emails (would be called by a cron job)
-     */
-    static async processScheduledEmails() {
-        const { data: scheduledEmails } = await supabase
-            .from('scheduled_emails')
-            .select('*')
-            .eq('status', 'scheduled')
-            .lte('scheduled_at', new Date().toISOString())
-
-        if (!scheduledEmails) return
-
-        for (const email of scheduledEmails) {
-            const template = EMAIL_TEMPLATES[email.template_id]
-            if (!template) continue
-
-            const emailContent = this.processTemplate(template, email.template_data)
-
-            const result = await this.sendEmail({
-                to: email.recipient_email,
-                subject: emailContent.subject,
-                html: emailContent.html,
-                text: emailContent.text
-            })
-
-            // Update status
-            await supabase
-                .from('scheduled_emails')
-                .update({
-                    status: result.success ? 'sent' : 'failed',
-                    sent_at: result.success ? new Date().toISOString() : null,
-                    error_message: result.success ? null : result.error
-                })
-                .eq('id', email.id)
-        }
-    }
+  }
 }

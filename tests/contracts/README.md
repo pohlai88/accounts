@@ -41,19 +41,19 @@ import {
   validateApiContract,
   validateDatabaseContract,
   validateSchemaCompatibility,
-} from '@aibos/tests/contracts';
+} from "@aibos/tests/contracts";
 
 // Validate API contract
 await validateApiContract({
-  endpoint: '/api/v1/invoices',
-  method: 'POST',
+  endpoint: "/api/v1/invoices",
+  method: "POST",
   requestSchema: invoiceRequestSchema,
   responseSchema: invoiceResponseSchema,
 });
 
 // Validate database contract
 await validateDatabaseContract({
-  table: 'gl_journal',
+  table: "gl_journal",
   schema: journalSchema,
   constraints: journalConstraints,
 });
@@ -164,39 +164,39 @@ pnpm typecheck
 ### API Contract Testing
 
 ```typescript
-import { validateApiContract } from '@aibos/tests/contracts';
+import { validateApiContract } from "@aibos/tests/contracts";
 
 // Test invoice API contract
 async function testInvoiceApiContract() {
   const contract = {
-    endpoint: '/api/v1/invoices',
-    method: 'POST',
+    endpoint: "/api/v1/invoices",
+    method: "POST",
     requestSchema: {
-      type: 'object',
+      type: "object",
       properties: {
-        customerId: { type: 'string' },
-        amount: { type: 'number' },
-        dueDate: { type: 'string', format: 'date' },
+        customerId: { type: "string" },
+        amount: { type: "number" },
+        dueDate: { type: "string", format: "date" },
       },
-      required: ['customerId', 'amount', 'dueDate'],
+      required: ["customerId", "amount", "dueDate"],
     },
     responseSchema: {
-      type: 'object',
+      type: "object",
       properties: {
-        id: { type: 'string' },
-        status: { type: 'string' },
-        createdAt: { type: 'string', format: 'date-time' },
+        id: { type: "string" },
+        status: { type: "string" },
+        createdAt: { type: "string", format: "date-time" },
       },
-      required: ['id', 'status', 'createdAt'],
+      required: ["id", "status", "createdAt"],
     },
   };
 
   const result = await validateApiContract(contract);
 
   if (result.valid) {
-    console.log('API contract is valid');
+    console.log("API contract is valid");
   } else {
-    console.error('API contract validation failed:', result.errors);
+    console.error("API contract validation failed:", result.errors);
   }
 }
 ```
@@ -204,33 +204,33 @@ async function testInvoiceApiContract() {
 ### Database Contract Testing
 
 ```typescript
-import { validateDatabaseContract } from '@aibos/tests/contracts';
+import { validateDatabaseContract } from "@aibos/tests/contracts";
 
 // Test journal table contract
 async function testJournalTableContract() {
   const contract = {
-    table: 'gl_journal',
+    table: "gl_journal",
     schema: {
-      id: { type: 'string', primaryKey: true },
-      tenantId: { type: 'string', notNull: true },
-      companyId: { type: 'string', notNull: true },
-      journalDate: { type: 'date', notNull: true },
-      description: { type: 'string', maxLength: 255 },
-      status: { type: 'enum', values: ['draft', 'posted', 'reversed'] },
+      id: { type: "string", primaryKey: true },
+      tenantId: { type: "string", notNull: true },
+      companyId: { type: "string", notNull: true },
+      journalDate: { type: "date", notNull: true },
+      description: { type: "string", maxLength: 255 },
+      status: { type: "enum", values: ["draft", "posted", "reversed"] },
     },
     constraints: [
-      { type: 'foreignKey', column: 'tenantId', references: 'tenants.id' },
-      { type: 'foreignKey', column: 'companyId', references: 'companies.id' },
-      { type: 'check', condition: "journalDate >= '2020-01-01'" },
+      { type: "foreignKey", column: "tenantId", references: "tenants.id" },
+      { type: "foreignKey", column: "companyId", references: "companies.id" },
+      { type: "check", condition: "journalDate >= '2020-01-01'" },
     ],
   };
 
   const result = await validateDatabaseContract(contract);
 
   if (result.valid) {
-    console.log('Database contract is valid');
+    console.log("Database contract is valid");
   } else {
-    console.error('Database contract validation failed:', result.errors);
+    console.error("Database contract validation failed:", result.errors);
   }
 }
 ```
@@ -238,37 +238,37 @@ async function testJournalTableContract() {
 ### Schema Compatibility Testing
 
 ```typescript
-import { validateSchemaCompatibility } from '@aibos/tests/contracts';
+import { validateSchemaCompatibility } from "@aibos/tests/contracts";
 
 // Test schema compatibility between versions
 async function testSchemaCompatibility() {
   const oldSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-      id: { type: 'string' },
-      name: { type: 'string' },
-      email: { type: 'string' },
+      id: { type: "string" },
+      name: { type: "string" },
+      email: { type: "string" },
     },
-    required: ['id', 'name'],
+    required: ["id", "name"],
   };
 
   const newSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-      id: { type: 'string' },
-      name: { type: 'string' },
-      email: { type: 'string' },
-      phone: { type: 'string' }, // New optional field
+      id: { type: "string" },
+      name: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" }, // New optional field
     },
-    required: ['id', 'name'],
+    required: ["id", "name"],
   };
 
   const result = await validateSchemaCompatibility(oldSchema, newSchema);
 
   if (result.compatible) {
-    console.log('Schemas are compatible');
+    console.log("Schemas are compatible");
   } else {
-    console.error('Schema compatibility issues:', result.issues);
+    console.error("Schema compatibility issues:", result.issues);
   }
 }
 ```
@@ -276,36 +276,36 @@ async function testSchemaCompatibility() {
 ### Breaking Change Detection
 
 ```typescript
-import { validateSchemaBreakingChanges } from '@aibos/tests/contracts';
+import { validateSchemaBreakingChanges } from "@aibos/tests/contracts";
 
 // Detect breaking changes in API schema
 async function detectBreakingChanges() {
   const oldApiSchema = {
-    '/api/v1/invoices': {
+    "/api/v1/invoices": {
       POST: {
         request: {
-          type: 'object',
+          type: "object",
           properties: {
-            customerId: { type: 'string' },
-            amount: { type: 'number' },
+            customerId: { type: "string" },
+            amount: { type: "number" },
           },
-          required: ['customerId', 'amount'],
+          required: ["customerId", "amount"],
         },
       },
     },
   };
 
   const newApiSchema = {
-    '/api/v1/invoices': {
+    "/api/v1/invoices": {
       POST: {
         request: {
-          type: 'object',
+          type: "object",
           properties: {
-            customerId: { type: 'string' },
-            amount: { type: 'number' },
-            currency: { type: 'string' }, // New required field
+            customerId: { type: "string" },
+            amount: { type: "number" },
+            currency: { type: "string" }, // New required field
           },
-          required: ['customerId', 'amount', 'currency'],
+          required: ["customerId", "amount", "currency"],
         },
       },
     },
@@ -314,9 +314,9 @@ async function detectBreakingChanges() {
   const result = await validateSchemaBreakingChanges(oldApiSchema, newApiSchema);
 
   if (result.hasBreakingChanges) {
-    console.error('Breaking changes detected:', result.breakingChanges);
+    console.error("Breaking changes detected:", result.breakingChanges);
   } else {
-    console.log('No breaking changes detected');
+    console.log("No breaking changes detected");
   }
 }
 ```
@@ -324,33 +324,33 @@ async function detectBreakingChanges() {
 ### Contract Versioning
 
 ```typescript
-import { validateSchemaVersioning } from '@aibos/tests/contracts';
+import { validateSchemaVersioning } from "@aibos/tests/contracts";
 
 // Validate schema versioning
 async function validateSchemaVersioning() {
   const schemas = {
-    'v1.0.0': {
-      type: 'object',
+    "v1.0.0": {
+      type: "object",
       properties: {
-        id: { type: 'string' },
-        name: { type: 'string' },
+        id: { type: "string" },
+        name: { type: "string" },
       },
     },
-    'v1.1.0': {
-      type: 'object',
+    "v1.1.0": {
+      type: "object",
       properties: {
-        id: { type: 'string' },
-        name: { type: 'string' },
-        email: { type: 'string' },
+        id: { type: "string" },
+        name: { type: "string" },
+        email: { type: "string" },
       },
     },
-    'v2.0.0': {
-      type: 'object',
+    "v2.0.0": {
+      type: "object",
       properties: {
-        id: { type: 'string' },
-        name: { type: 'string' },
-        email: { type: 'string' },
-        phone: { type: 'string' },
+        id: { type: "string" },
+        name: { type: "string" },
+        email: { type: "string" },
+        phone: { type: "string" },
       },
     },
   };
@@ -358,9 +358,9 @@ async function validateSchemaVersioning() {
   const result = await validateSchemaVersioning(schemas);
 
   if (result.valid) {
-    console.log('Schema versioning is valid');
+    console.log("Schema versioning is valid");
   } else {
-    console.error('Schema versioning issues:', result.issues);
+    console.error("Schema versioning issues:", result.issues);
   }
 }
 ```
@@ -373,7 +373,7 @@ import {
   validateDatabaseContract,
   validateSchemaCompatibility,
   validateSchemaBreakingChanges,
-} from '@aibos/tests/contracts';
+} from "@aibos/tests/contracts";
 
 // Comprehensive contract testing suite
 async function runContractTests() {
@@ -385,13 +385,13 @@ async function runContractTests() {
   };
 
   // Test API contracts
-  const apiEndpoints = ['/api/v1/invoices', '/api/v1/bills', '/api/v1/journals', '/api/v1/reports'];
+  const apiEndpoints = ["/api/v1/invoices", "/api/v1/bills", "/api/v1/journals", "/api/v1/reports"];
 
   for (const endpoint of apiEndpoints) {
     try {
       const result = await validateApiContract({
         endpoint,
-        method: 'POST',
+        method: "POST",
         requestSchema: getRequestSchema(endpoint),
         responseSchema: getResponseSchema(endpoint),
       });
@@ -402,7 +402,7 @@ async function runContractTests() {
   }
 
   // Test database contracts
-  const tables = ['gl_journal', 'ar_invoices', 'ap_bills', 'gl_accounts'];
+  const tables = ["gl_journal", "ar_invoices", "ap_bills", "gl_accounts"];
 
   for (const table of tables) {
     try {
@@ -450,7 +450,7 @@ async function runContractTests() {
 
 ```typescript
 // Enable detailed logging
-process.env.DEBUG_CONTRACTS = 'true';
+process.env.DEBUG_CONTRACTS = "true";
 ```
 
 **Logs**: Check test logs for contract validation details

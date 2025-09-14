@@ -1,21 +1,21 @@
 // OCR Processing API for Attachments
 // V1 compliance: Trigger and manage OCR processing with job tracking
 
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import {
   createServiceClient,
   extractV1UserContext,
   getV1AuditService,
-  createV1AuditContext
-} from '@aibos/utils';
-import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from '@aibos/contracts';
+  createV1AuditContext,
+} from "@aibos/utils";
+import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from "@aibos/contracts";
 
 // Lazy load Inngest to avoid circular dependencies during build
 let inngest: unknown = null;
 const getInngest = async () => {
   if (!inngest) {
-    const { Inngest } = await import('inngest');
+    const { Inngest } = await import("inngest");
     inngest = new Inngest({ id: "web-api" });
   }
   return inngest;
@@ -35,50 +35,44 @@ export async function POST(request: NextRequest) {
     const validatedData = ProcessOCRReq.parse(body);
 
     if (!userContext.userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "userId is required" }, { status: 401 });
     }
 
     // Verify attachment exists and user has access
     const { data: attachment, error: fetchError } = await supabase
-      .from('attachments')
-      .select('id, filename, mime_type, file_size, status, metadata')
-      .eq('id', validatedData.attachmentId)
-      .eq('tenant_id', validatedData.tenantId)
+      .from("attachments")
+      .select("id, filename, mime_type, file_size, status, metadata")
+      .eq("id", validatedData.attachmentId)
+      .eq("tenant_id", validatedData.tenantId)
       .single();
 
     if (fetchError || !attachment) {
-      return NextResponse.json(
-        { error: 'Attachment not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
     }
 
     // Check if attachment is suitable for OCR
     const supportedMimeTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/bmp',
-      'image/tiff',
-      'application/pdf'
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/bmp",
+      "image/tiff",
+      "application/pdf",
     ];
 
     if (!supportedMimeTypes.includes(attachment.mime_type)) {
       return NextResponse.json(
         { error: `File type ${attachment.mime_type} is not supported for OCR processing` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Check if OCR is already in progress
     const currentOcrStatus = attachment.metadata?.ocrStatus;
-    if (currentOcrStatus === 'processing') {
+    if (currentOcrStatus === "processing") {
       return NextResponse.json(
-        { error: 'OCR processing is already in progress for this attachment' },
-        { status: 409 }
+        { error: "OCR processing is already in progress for this attachment" },
+        { status: 409 },
       );
     }
 
@@ -87,29 +81,26 @@ export async function POST(request: NextRequest) {
 
     // Update attachment to mark OCR as queued
     const { error: updateError } = await supabase
-      .from('attachments')
+      .from("attachments")
       .update({
         metadata: {
           ...attachment.metadata,
-          ocrStatus: 'queued',
+          ocrStatus: "queued",
           ocrJobId: jobId,
           ocrQueuedAt: new Date().toISOString(),
-          ocrRequestedBy: userContext.userId
-        }
+          ocrRequestedBy: userContext.userId,
+        },
       })
-      .eq('id', validatedData.attachmentId);
+      .eq("id", validatedData.attachmentId);
 
     if (updateError) {
-      await auditService.logError(auditContext, 'OCR_QUEUE_ERROR', {
-        operation: 'ocr_processing_queue',
+      await auditService.logError(auditContext, "OCR_QUEUE_ERROR", {
+        operation: "ocr_processing_queue",
         error: updateError.message,
-        data: { attachmentId: validatedData.attachmentId }
+        data: { attachmentId: validatedData.attachmentId },
       });
 
-      return NextResponse.json(
-        { error: 'Failed to queue OCR processing' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to queue OCR processing" }, { status: 500 });
     }
 
     // Send OCR processing job to Inngest
@@ -120,14 +111,14 @@ export async function POST(request: NextRequest) {
         data: {
           ...validatedData,
           jobId,
-          userId: userContext.userId
-        }
+          userId: userContext.userId,
+        },
       });
 
       // Estimate completion time based on file size and priority
       const baseProcessingTime = Math.max(30, Math.min(300, attachment.file_size / 1024 / 10)); // 30s to 5min based on file size
-      const priorityMultiplier = validatedData.priority === 'high' ? 0.5 :
-        validatedData.priority === 'low' ? 2 : 1;
+      const priorityMultiplier =
+        validatedData.priority === "high" ? 0.5 : validatedData.priority === "low" ? 2 : 1;
       const estimatedSeconds = baseProcessingTime * priorityMultiplier;
 
       const estimatedCompletionTime = new Date();
@@ -135,7 +126,7 @@ export async function POST(request: NextRequest) {
 
       // Audit log: OCR processing queued
       await auditService.logOperation(auditContext, {
-        operation: 'ocr_processing_queued',
+        operation: "ocr_processing_queued",
         data: {
           attachmentId: validatedData.attachmentId,
           filename: attachment.filename,
@@ -145,62 +136,54 @@ export async function POST(request: NextRequest) {
           extractTables: validatedData.extractTables,
           extractMetadata: validatedData.extractMetadata,
           priority: validatedData.priority,
-          estimatedCompletionTime: estimatedCompletionTime.toISOString()
-        }
+          estimatedCompletionTime: estimatedCompletionTime.toISOString(),
+        },
       });
 
       const response: unknown = {
         success: true,
         jobId,
-        status: 'queued',
-        estimatedCompletionTime: estimatedCompletionTime.toISOString()
+        status: "queued",
+        estimatedCompletionTime: estimatedCompletionTime.toISOString(),
       };
 
       return NextResponse.json(response);
-
     } catch (inngestError) {
       // Revert the attachment status if Inngest fails
       await supabase
-        .from('attachments')
+        .from("attachments")
         .update({
           metadata: {
             ...attachment.metadata,
-            ocrStatus: 'failed',
-            ocrError: inngestError instanceof Error ? inngestError.message : String(inngestError)
-          }
+            ocrStatus: "failed",
+            ocrError: inngestError instanceof Error ? inngestError.message : String(inngestError),
+          },
         })
-        .eq('id', validatedData.attachmentId);
+        .eq("id", validatedData.attachmentId);
 
-      await auditService.logError(auditContext, 'OCR_QUEUE_ERROR', {
-        operation: 'ocr_processing_queue',
+      await auditService.logError(auditContext, "OCR_QUEUE_ERROR", {
+        operation: "ocr_processing_queue",
         error: inngestError instanceof Error ? inngestError.message : String(inngestError),
-        data: { attachmentId: validatedData.attachmentId, jobId }
+        data: { attachmentId: validatedData.attachmentId, jobId },
       });
 
-      return NextResponse.json(
-        { error: 'Failed to queue OCR processing job' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to queue OCR processing job" }, { status: 500 });
     }
-
   } catch (error) {
-    await auditService.logError(auditContext, 'OCR_PROCESSING_ERROR', {
-      operation: 'ocr_processing_request',
+    await auditService.logError(auditContext, "OCR_PROCESSING_ERROR", {
+      operation: "ocr_processing_request",
       error: error instanceof Error ? error.message : String(error),
-      data: { requestBody: body }
+      data: { requestBody: body },
     });
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request parameters', details: error.issues },
-        { status: 400 }
+        { error: "Invalid request parameters", details: error.issues },
+        { status: 400 },
       );
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -213,121 +196,108 @@ export async function GET(request: NextRequest) {
 
   try {
     const url = new URL(request.url);
-    const attachmentId = url.searchParams.get('attachmentId');
-    const tenantId = url.searchParams.get('tenantId');
-    const jobId = url.searchParams.get('jobId');
+    const attachmentId = url.searchParams.get("attachmentId");
+    const tenantId = url.searchParams.get("tenantId");
+    const jobId = url.searchParams.get("jobId");
 
     if (!attachmentId || !tenantId) {
       return NextResponse.json(
-        { error: 'attachmentId and tenantId are required' },
-        { status: 400 }
+        { error: "attachmentId and tenantId are required" },
+        { status: 400 },
       );
     }
 
     if (!userContext.userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "userId is required" }, { status: 401 });
     }
 
     // Fetch attachment with OCR data
     const { data: attachment, error: fetchError } = await supabase
-      .from('attachments')
-      .select('id, filename, metadata')
-      .eq('id', attachmentId)
-      .eq('tenant_id', tenantId)
+      .from("attachments")
+      .select("id, filename, metadata")
+      .eq("id", attachmentId)
+      .eq("tenant_id", tenantId)
       .single();
 
     if (fetchError || !attachment) {
-      return NextResponse.json(
-        { error: 'Attachment not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
     }
 
     const ocrData = attachment.metadata?.ocrData;
-    const ocrStatus = attachment.metadata?.ocrStatus || 'not_started';
+    const ocrStatus = attachment.metadata?.ocrStatus || "not_started";
     const ocrJobId = attachment.metadata?.ocrJobId;
     const ocrError = attachment.metadata?.ocrError;
 
     // If jobId is provided, verify it matches
     if (jobId && ocrJobId !== jobId) {
-      return NextResponse.json(
-        { error: 'Job ID does not match' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Job ID does not match" }, { status: 404 });
     }
 
     // Prepare response based on OCR status
     let response: unknown;
 
     switch (ocrStatus) {
-      case 'completed':
+      case "completed":
         response = {
           attachmentId,
-          status: 'completed',
+          status: "completed",
           confidence: attachment.metadata?.ocrConfidence || 0,
           extractedText: ocrData?.extractedText,
           extractedTables: ocrData?.extractedTables,
           structuredData: ocrData?.structuredData,
           processedAt: ocrData?.processedAt || new Date().toISOString(),
-          processingTime: ocrData?.processingTime || 0
+          processingTime: ocrData?.processingTime || 0,
         };
         break;
 
-      case 'failed':
+      case "failed":
         response = {
           attachmentId,
-          status: 'failed',
+          status: "failed",
           confidence: 0,
-          error: ocrError || 'OCR processing failed',
+          error: ocrError || "OCR processing failed",
           processedAt: new Date().toISOString(),
-          processingTime: 0
+          processingTime: 0,
         };
         break;
 
-      case 'processing':
-      case 'queued':
+      case "processing":
+      case "queued":
         response = {
           attachmentId,
-          status: ocrStatus as 'processing',
-          confidence: 0
+          status: ocrStatus as "processing",
+          confidence: 0,
         };
         break;
 
       default:
         return NextResponse.json(
-          { error: 'OCR has not been processed for this attachment' },
-          { status: 404 }
+          { error: "OCR has not been processed for this attachment" },
+          { status: 404 },
         );
     }
 
     // Audit log: OCR results accessed
     await auditService.logOperation(auditContext, {
-      operation: 'ocr_results_accessed',
+      operation: "ocr_results_accessed",
       data: {
         attachmentId,
         filename: attachment.filename,
         ocrStatus,
         jobId: ocrJobId,
-        hasResults: ocrStatus === 'completed'
-      }
+        hasResults: ocrStatus === "completed",
+      },
     });
 
     return NextResponse.json(response);
-
   } catch (error) {
-    await auditService.logError(auditContext, 'OCR_RESULTS_ERROR', {
-      operation: 'ocr_results_get',
+    await auditService.logError(auditContext, "OCR_RESULTS_ERROR", {
+      operation: "ocr_results_get",
       error: error instanceof Error ? error.message : String(error),
-      data: { url: request.url }
+      data: { url: request.url },
     });
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -340,37 +310,31 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const url = new URL(request.url);
-    const attachmentId = url.searchParams.get('attachmentId');
-    const tenantId = url.searchParams.get('tenantId');
-    const jobId = url.searchParams.get('jobId');
+    const attachmentId = url.searchParams.get("attachmentId");
+    const tenantId = url.searchParams.get("tenantId");
+    const jobId = url.searchParams.get("jobId");
 
     if (!attachmentId || !tenantId) {
       return NextResponse.json(
-        { error: 'attachmentId and tenantId are required' },
-        { status: 400 }
+        { error: "attachmentId and tenantId are required" },
+        { status: 400 },
       );
     }
 
     if (!userContext.userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "userId is required" }, { status: 401 });
     }
 
     // Fetch attachment
     const { data: attachment, error: fetchError } = await supabase
-      .from('attachments')
-      .select('id, filename, metadata')
-      .eq('id', attachmentId)
-      .eq('tenant_id', tenantId)
+      .from("attachments")
+      .select("id, filename, metadata")
+      .eq("id", attachmentId)
+      .eq("tenant_id", tenantId)
       .single();
 
     if (fetchError || !attachment) {
-      return NextResponse.json(
-        { error: 'Attachment not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
     }
 
     const ocrStatus = attachment.metadata?.ocrStatus;
@@ -378,44 +342,38 @@ export async function DELETE(request: NextRequest) {
 
     // Verify job ID if provided
     if (jobId && ocrJobId !== jobId) {
-      return NextResponse.json(
-        { error: 'Job ID does not match' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Job ID does not match" }, { status: 404 });
     }
 
     // Check if OCR can be cancelled
-    if (ocrStatus !== 'queued' && ocrStatus !== 'processing') {
+    if (ocrStatus !== "queued" && ocrStatus !== "processing") {
       return NextResponse.json(
         { error: `Cannot cancel OCR in status: ${ocrStatus}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Update attachment to mark OCR as cancelled
     const { error: updateError } = await supabase
-      .from('attachments')
+      .from("attachments")
       .update({
         metadata: {
           ...attachment.metadata,
-          ocrStatus: 'cancelled',
+          ocrStatus: "cancelled",
           ocrCancelledAt: new Date().toISOString(),
-          ocrCancelledBy: userContext.userId
-        }
+          ocrCancelledBy: userContext.userId,
+        },
       })
-      .eq('id', attachmentId);
+      .eq("id", attachmentId);
 
     if (updateError) {
-      await auditService.logError(auditContext, 'OCR_CANCEL_ERROR', {
-        operation: 'ocr_processing_cancel',
+      await auditService.logError(auditContext, "OCR_CANCEL_ERROR", {
+        operation: "ocr_processing_cancel",
         error: updateError.message,
-        data: { attachmentId, jobId: ocrJobId }
+        data: { attachmentId, jobId: ocrJobId },
       });
 
-      return NextResponse.json(
-        { error: 'Failed to cancel OCR processing' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to cancel OCR processing" }, { status: 500 });
     }
 
     // Note: In a full implementation, you would also cancel the Inngest job
@@ -423,33 +381,29 @@ export async function DELETE(request: NextRequest) {
 
     // Audit log: OCR processing cancelled
     await auditService.logOperation(auditContext, {
-      operation: 'ocr_processing_cancelled',
+      operation: "ocr_processing_cancelled",
       data: {
         attachmentId,
         filename: attachment.filename,
         jobId: ocrJobId,
-        previousStatus: ocrStatus
-      }
+        previousStatus: ocrStatus,
+      },
     });
 
     return NextResponse.json({
       success: true,
       attachmentId,
       jobId: ocrJobId,
-      status: 'cancelled',
-      cancelledAt: new Date().toISOString()
+      status: "cancelled",
+      cancelledAt: new Date().toISOString(),
     });
-
   } catch (error) {
-    await auditService.logError(auditContext, 'OCR_CANCEL_ERROR', {
-      operation: 'ocr_processing_cancel',
+    await auditService.logError(auditContext, "OCR_CANCEL_ERROR", {
+      operation: "ocr_processing_cancel",
       error: error instanceof Error ? error.message : String(error),
-      data: { url: request.url }
+      data: { url: request.url },
     });
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
