@@ -173,7 +173,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
-    "@types/node": "^24.3.3"
+    "@types/node": "^24.3.3",
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^3.4.0"
   },
   "prettier": "./packages/config/prettier-config"
 }

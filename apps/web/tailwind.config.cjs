@@ -1,11 +1,11 @@
 /**
- * @aibos/web Tailwind Configuration
+ * Tailwind Configuration
  *
  * Uses @aibos/tailwind-preset for consistent design system.
- * No custom colors or values - everything comes from SSOT preset.
+ * All utilities and theme extensions are centralized in the preset.
  */
 
-const preset = require("../../packages/config/tailwind-preset");
+const preset = require("@aibos/tailwind-preset");
 
 module.exports = {
   presets: [preset],
@@ -13,8 +13,8 @@ module.exports = {
     "../../packages/ui/src/**/*.{ts,tsx}",
     "../../packages/tokens/src/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-  ],
-  // No additional theme extensions - everything comes from SSOT preset
+    "./components/**/*.{ts,tsx}"
+],
+  // No additional theme extensions or plugins - everything comes from SSOT preset
   // This ensures zero drift and single source of truth
 };
