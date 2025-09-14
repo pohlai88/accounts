@@ -20,13 +20,24 @@
       "outputLogs": "full"
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**", "build/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "dist/**",
+        "build/**"
+      ],
       "outputLogs": "full"
     },
     "test": {
-      "dependsOn": ["build"],
-      "outputs": ["coverage/**", "test-results/**"],
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ],
       "outputLogs": "full"
     },
     "dev": {
@@ -35,24 +46,40 @@
       "outputLogs": "full"
     },
     "test:unit": {
-      "dependsOn": ["build"],
-      "outputs": ["coverage/**", "test-results/**"],
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ],
       "outputLogs": "full"
     },
     "test:coverage": {
-      "dependsOn": ["build"],
-      "outputs": ["coverage/**"],
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
       "outputLogs": "full"
     },
     "test:watch": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
       "persistent": true,
       "outputLogs": "full"
     },
     "e2e": {
-      "dependsOn": ["build"],
-      "outputs": ["test-results/**", "playwright-report/**"],
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "test-results/**",
+        "playwright-report/**"
+      ],
       "outputLogs": "full"
     },
     "format": {

@@ -1,4 +1,4 @@
-name: test
+name: ci-comprehensive
 on:
   push:
     branches: [main, develop]
@@ -6,10 +6,40 @@ on:
     branches: [main, develop]
 
 jobs:
-  # Unit tests with coverage
-  unit-tests:
+  # Fast quality checks (runs in parallel with main CI)
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm -w install --frozen-lockfile
+      - run: pnpm quality:check
+      - run: pnpm format:check
+
+  # Dependency health checks
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm -w install --frozen-lockfile
+      - run: pnpm deps:check
+      - run: pnpm deps:audit
+
+  # Test coverage and E2E (only on main/develop)
+  test-coverage:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -28,24 +58,10 @@ jobs:
           flags: unittests
           name: codecov-umbrella
 
-  # E2E tests
-  e2e-tests:
+  # E2E tests (only on main/develop)
+  e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: unit-tests
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
