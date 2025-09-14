@@ -1,7 +1,7 @@
 // Export implementations for CSV, XLSX, and JSONL formats
 // V1 compliance requirement: Export in CSV/XLSX/JSONL
 
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { ExportableData, ExportOptions, ExportResult } from './types';
 
 /**
@@ -77,89 +77,67 @@ export async function exportToXlsx(
     const { filename = 'export.xlsx', includeHeaders = true } = options;
 
     // Create a new workbook
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
 
-    // Prepare worksheet data
-    const worksheetData: (string | number | boolean | null)[][] = [];
+    // Add main data worksheet
+    const sheetName = getSheetName(options.metadata?.reportType as string);
+    const worksheet = workbook.addWorksheet(sheetName);
 
     // Add headers if requested
     if (includeHeaders) {
-      worksheetData.push(headers);
+      worksheet.addRow(headers);
+
+      // Style header row
+      const headerRow = worksheet.getRow(1);
+      headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      headerRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF366092' }
+      };
+      headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
     }
 
     // Add data rows
-    worksheetData.push(...rows);
-
-    // Create worksheet from data
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-
-    // Apply formatting and styling
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+    rows.forEach(row => {
+      worksheet.addRow(row);
+    });
 
     // Set column widths based on content
-    const columnWidths: { wch: number }[] = [];
-    for (let col = range.s.c; col <= range.e.c; col++) {
+    worksheet.columns.forEach((column, index) => {
       let maxWidth = 10; // minimum width
 
       // Check header width
-      if (includeHeaders && headers[col]) {
-        maxWidth = Math.max(maxWidth, String(headers[col]).length);
+      if (includeHeaders && headers[index]) {
+        maxWidth = Math.max(maxWidth, String(headers[index]).length);
       }
 
       // Check data widths
-      for (let row = includeHeaders ? 1 : 0; row < worksheetData.length; row++) {
-        const cellValue = worksheetData[row]?.[col];
+      const dataStartRow = includeHeaders ? 2 : 1;
+      for (let rowIndex = dataStartRow; rowIndex <= worksheet.rowCount; rowIndex++) {
+        const cellValue = worksheet.getRow(rowIndex).getCell(index + 1).value;
         if (cellValue !== null && cellValue !== undefined) {
           maxWidth = Math.max(maxWidth, String(cellValue).length);
         }
       }
 
-      columnWidths.push({ wch: Math.min(maxWidth + 2, 50) }); // cap at 50 characters
-    }
-    worksheet['!cols'] = columnWidths;
+      column.width = Math.min(maxWidth + 2, 50); // cap at 50 characters
+    });
 
-    // Style headers if present
-    if (includeHeaders) {
-      for (let col = range.s.c; col <= range.e.c; col++) {
-        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
-        if (worksheet[cellAddress]) {
-          worksheet[cellAddress].s = {
-            font: { bold: true, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "366092" } },
-            alignment: { horizontal: "center", vertical: "center" },
-            border: {
-              top: { style: "thin", color: { rgb: "000000" } },
-              bottom: { style: "thin", color: { rgb: "000000" } },
-              left: { style: "thin", color: { rgb: "000000" } },
-              right: { style: "thin", color: { rgb: "000000" } }
-            }
-          };
-        }
-      }
-    }
-
-    // Add metadata as a separate sheet if present
+    // Add metadata sheet if available
     if (metadata && Object.keys(metadata).length > 0) {
-      const metadataData = Object.entries(metadata).map(([key, value]) => [
-        key,
-        typeof value === 'object' ? JSON.stringify(value) : String(value)
-      ]);
-      metadataData.unshift(['Property', 'Value']); // headers
-
-      const metadataWorksheet = XLSX.utils.aoa_to_sheet(metadataData);
-      XLSX.utils.book_append_sheet(workbook, metadataWorksheet, 'Metadata');
+      const metadataSheet = workbook.addWorksheet('Metadata');
+      metadataSheet.addRow(['Property', 'Value']);
+      Object.entries(metadata).forEach(([key, value]) => {
+        metadataSheet.addRow([
+          key,
+          typeof value === 'object' ? JSON.stringify(value) : String(value)
+        ]);
+      });
     }
-
-    // Add main data sheet
-    const sheetName = getSheetName(options.metadata?.reportType as string);
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
     // Generate Excel file buffer
-    const excelBuffer = XLSX.write(workbook, {
-      type: 'buffer',
-      bookType: 'xlsx',
-      compression: true
-    });
+    const excelBuffer = await workbook.xlsx.writeBuffer() as unknown as Buffer;
 
     const size = excelBuffer.length;
     const base64Data = excelBuffer.toString('base64');

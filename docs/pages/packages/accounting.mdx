@@ -1,0 +1,67 @@
+# Accounting Package
+
+The `@aibos/accounting` package provides core accounting logic, calculations, and business rules.
+
+## Overview
+
+This package includes:
+
+- **Chart of Accounts** - Account structure and validation
+- **Journal Entries** - Double-entry bookkeeping logic
+- **Period Management** - Fiscal year and period handling
+- **Posting Engine** - Transaction posting and validation
+- **Financial Reports** - Trial balance, P&L, Balance Sheet
+- **Tax Calculations** - Automated tax computations
+- **Multi-currency** - Foreign exchange handling
+
+## Installation
+
+```bash
+pnpm add @aibos/accounting
+```
+
+## Usage
+
+```typescript
+import { createJournalEntry, postTransaction, generateTrialBalance } from '@aibos/accounting';
+
+// Create a journal entry
+const entry = createJournalEntry({
+  date: new Date(),
+  description: 'Invoice Payment',
+  entries: [
+    { account: 'cash', debit: 1000 },
+    { account: 'accounts_receivable', credit: 1000 },
+  ],
+});
+
+// Post the transaction
+await postTransaction(entry);
+
+// Generate trial balance
+const trialBalance = await generateTrialBalance({
+  period: '2024-01',
+  tenantId: 'tenant-123',
+});
+```
+
+## API Reference
+
+### Core Functions
+
+- `createJournalEntry()` - Create journal entries
+- `postTransaction()` - Post transactions to ledger
+- `generateTrialBalance()` - Generate trial balance reports
+- `validateChartOfAccounts()` - Validate account structure
+
+### Business Logic
+
+- `calculateTax()` - Tax calculation engine
+- `handleForeignExchange()` - Multi-currency support
+- `managePeriods()` - Period management utilities
+
+## Related
+
+- [Database Package](/packages/db) - Data persistence
+- [Contracts Package](/packages/contracts) - Type definitions
+- [Utils Package](/packages/utils) - Shared utilities

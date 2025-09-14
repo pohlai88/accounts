@@ -171,7 +171,7 @@ async function generateReportData(request: ReportExportRequest) {
         asOfDate: filters.asOfDate ? new Date(filters.asOfDate) : new Date(),
         includeZeroBalances: filters.includeInactive ?? false,
         accountFilter: filters.accountIds ? { accountIds: filters.accountIds } : undefined
-      }, supabase as any);
+      }, supabase as unknown);
 
       if (!result.success) {
         throw new Error(result.error);
@@ -203,7 +203,7 @@ async function generateReportData(request: ReportExportRequest) {
         companyId: filters.companyId,
         asOfDate: filters.asOfDate ? new Date(filters.asOfDate) : new Date(),
         reportFormat: 'STANDARD'
-      }, supabase as any);
+      }, supabase as unknown);
 
       if (!result.success) {
         throw new Error(result.error);
@@ -263,7 +263,7 @@ async function generateReportData(request: ReportExportRequest) {
         startDate: filters.fromDate ? new Date(filters.fromDate) : new Date(),
         endDate: filters.toDate ? new Date(filters.toDate) : new Date(),
         reportFormat: 'STANDARD'
-      }, supabase as any);
+      }, supabase as unknown);
 
       if (!result.success) {
         throw new Error(result.error);
@@ -329,7 +329,7 @@ async function generateReportData(request: ReportExportRequest) {
         startDate: filters.fromDate ? new Date(filters.fromDate) : new Date(),
         endDate: filters.toDate ? new Date(filters.toDate) : new Date(),
         method: 'INDIRECT'
-      }, supabase as any);
+      }, supabase as unknown);
 
       if (!result.success) {
         throw new Error(result.error);

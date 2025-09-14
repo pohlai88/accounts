@@ -47,6 +47,7 @@ export type AuditEntityType =
   | 'TENANT'
   | 'COMPANY'
   | 'USER'
+  | 'CUSTOMER'
   | 'MEMBERSHIP'
   | 'CURRENCY'
   | 'FX_RATE'

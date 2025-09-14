@@ -1,4 +1,4 @@
-// D2 AR Invoice API - Create and Post Invoices to GL
+// Enhanced Invoice API - GET and POST endpoints
 import { NextRequest, NextResponse } from 'next/server';
 import { CreateInvoiceReq } from '@aibos/contracts';
 import { calculateInvoiceTotals, validateInvoiceLines, calculateInvoiceTaxes } from '@aibos/accounting';
@@ -6,6 +6,89 @@ import { insertInvoice, type InvoiceInput } from '@aibos/db';
 import { createRequestContext, extractUserContext } from '@aibos/utils';
 import { getAuditService, createAuditContext } from '@aibos/utils';
 import { processIdempotencyKey } from '@aibos/utils/middleware/idempotency';
+import { createClient } from '@supabase/supabase-js';
+
+/**
+ * GET /api/invoices - Get invoices with filtering and pagination
+ */
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  try {
+    const context = createRequestContext(req);
+    const scope = extractUserContext(req);
+    const { searchParams } = new URL(req.url);
+
+    // Parse query parameters
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const status = searchParams.get('status');
+    const customerId = searchParams.get('customerId');
+    const fromDate = searchParams.get('fromDate');
+    const toDate = searchParams.get('toDate');
+
+    // Create Supabase client
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Build query
+    let query = supabase
+      .from('invoices')
+      .select(`
+        *,
+        customers!invoices_customer_id_fkey (
+          id,
+          name,
+          email
+        )
+      `)
+      .eq('tenant_id', scope.tenantId)
+      .eq('company_id', scope.companyId);
+
+    // Apply filters
+    if (status) {
+      query = query.eq('status', status);
+    }
+    if (customerId) {
+      query = query.eq('customer_id', customerId);
+    }
+    if (fromDate) {
+      query = query.gte('invoice_date', fromDate);
+    }
+    if (toDate) {
+      query = query.lte('invoice_date', toDate);
+    }
+
+    // Apply pagination
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data: invoices, error, count } = await query
+      .range(from, to)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to fetch invoices: ${error.message}`);
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: invoices || [],
+      meta: {
+        page,
+        limit,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit)
+      }
+    });
+
+  } catch (error) {
+    console.error('Failed to fetch invoices:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch invoices' },
+      { status: 500 }
+    );
+  }
+}
 
 /**
  * POST /api/invoices - Create new invoice
@@ -39,7 +122,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       taxCode: line.taxCode
     })));
 
-    // 2. Validate invoice lines calculations with calculated taxes
+    // 3. Validate invoice lines calculations with calculated taxes
     const lineValidation = validateInvoiceLines(lineTaxCalculations.map(calc => ({
       lineNumber: calc.lineNumber,
       description: body.lines.find(l => l.lineNumber === calc.lineNumber)?.description || '',
@@ -71,7 +154,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // 3. Calculate invoice totals with actual tax amounts
+    // 4. Calculate invoice totals with actual tax amounts
     const totals = calculateInvoiceTotals(lineTaxCalculations.map(calc => ({
       lineNumber: calc.lineNumber,
       description: body.lines.find(l => l.lineNumber === calc.lineNumber)?.description || '',
@@ -84,7 +167,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       revenueAccountId: body.lines.find(l => l.lineNumber === calc.lineNumber)?.revenueAccountId || ''
     })));
 
-    // 4. Create invoice input with calculated taxes
+    // 5. Create invoice input with calculated taxes
     const invoiceInput: InvoiceInput = {
       customerId: body.customerId,
       invoiceNumber: body.invoiceNumber,
@@ -113,10 +196,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       })
     };
 
-    // 4. Insert invoice
+    // 6. Insert invoice
     invoiceResult = await insertInvoice(scope, invoiceInput);
 
-    // 5. Log successful invoice creation
+    // 7. Log successful invoice creation
     await auditService.logOperation({
       scope,
       action: 'CREATE',
@@ -132,7 +215,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       context: auditContext
     });
 
-    // 6. Build response
+    // 8. Build response
     const response = {
       id: invoiceResult.id,
       invoiceNumber: invoiceResult.invoiceNumber,

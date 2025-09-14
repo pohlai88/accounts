@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ES2022", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
@@ -18,24 +15,16 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@aibos/contracts/*": [
-        "packages/contracts/src/*"
-      ],
-      "@aibos/db/*": [
-        "packages/db/src/*"
-      ],
-      "@aibos/accounting/*": [
-        "packages/accounting/src/*"
-      ],
-      "@aibos/auth/*": [
-        "packages/auth/src/*"
-      ],
-      "@aibos/ui/*": [
-        "packages/ui/src/*"
-      ],
-      "@aibos/utils/*": [
-        "packages/utils/src/*"
-      ]
+      "@aibos/contracts/*": ["packages/contracts/src/*"],
+      "@aibos/db/*": ["packages/db/src/*"],
+      "@aibos/accounting/*": ["packages/accounting/src/*"],
+      "@aibos/auth/*": ["packages/auth/src/*"],
+      "@aibos/ui/*": ["packages/ui/src/*"],
+      "@aibos/utils/*": ["packages/utils/src/*"],
+      "@aibos/realtime/*": ["packages/realtime/src/*"],
+      "@aibos/monitoring/*": ["packages/monitoring/src/*"],
+      "@aibos/security/*": ["packages/security/src/*"],
+      "@aibos/cache/*": ["packages/cache/src/*"]
     }
   }
 }

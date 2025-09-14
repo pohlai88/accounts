@@ -3,8 +3,7 @@
 import { ReactNode, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { AuthProvider } from '@aibos/ui/AuthProvider';
-import { AccessibilityProvider } from '@aibos/ui/AccessibilityProvider';
+import { AuthProvider, AccessibilityProvider } from '@aibos/ui';
 
 interface ProvidersProps {
     children: ReactNode;

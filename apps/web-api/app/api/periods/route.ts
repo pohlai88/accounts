@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
     const auditService = getV1AuditService();
-    let operationResult: any = null;
+    let operationResult: unknown = null;
 
     try {
         // 1. Process idempotency key (V1 requirement)
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
                 { 
                     action, 
                     error: result.error, 
-                    code: (result as any).code,
+                    code: (result as unknown).code,
                     executionTime: endTime - startTime
                 }
             );
@@ -242,7 +242,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 success: false,
                 error: result.error || 'Period management operation failed',
-                code: (result as any).code || 'PERIOD_MANAGEMENT_ERROR'
+                code: (result as unknown).code || 'PERIOD_MANAGEMENT_ERROR'
             }, { status: 400 });
         }
 
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(response);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Log error for audit trail (V1 requirement)
         await auditService.logError(
             createV1AuditContext(request),

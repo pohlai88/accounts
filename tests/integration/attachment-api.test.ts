@@ -8,13 +8,24 @@ import { join } from 'path';
 
 // Test configuration
 const TEST_CONFIG = {
-  supabaseUrl: process.env.TEST_SUPABASE_URL || 'http://localhost:54321',
-  supabaseKey: process.env.TEST_SUPABASE_ANON_KEY || 'test-key',
-  apiBaseUrl: process.env.TEST_API_URL || 'http://localhost:3000',
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+  apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000',
   tenantId: 'test-tenant-123',
   companyId: 'test-company-456',
   userId: 'test-user-789'
 };
+
+// Skip tests if Supabase is not available
+const skipTests = !TEST_CONFIG.supabaseUrl || !TEST_CONFIG.supabaseKey;
+
+if (skipTests) {
+  console.log('Attachment API test configuration:', {
+    supabaseUrl: TEST_CONFIG.supabaseUrl ? 'SET' : 'MISSING',
+    supabaseKey: TEST_CONFIG.supabaseKey ? 'SET' : 'MISSING',
+    apiBaseUrl: TEST_CONFIG.apiBaseUrl
+  });
+}
 
 // Test files
 const TEST_FILES = {
@@ -43,17 +54,17 @@ async function makeApiRequest(endpoint: string, options: RequestInit = {}) {
       ...options.headers
     }
   });
-  
+
   return response;
 }
 
 async function uploadTestFile(fileConfig: typeof TEST_FILES.pdf, metadata: Record<string, unknown> = {}) {
   const fileBuffer = readFileSync(fileConfig.path);
   const formData = new FormData();
-  
+
   const file = new File([fileBuffer], fileConfig.name, { type: fileConfig.type });
   formData.append('file', file);
-  
+
   const requestData = {
     tenantId: TEST_CONFIG.tenantId,
     companyId: TEST_CONFIG.companyId,
@@ -63,9 +74,9 @@ async function uploadTestFile(fileConfig: typeof TEST_FILES.pdf, metadata: Recor
     metadata,
     ...metadata
   };
-  
+
   formData.append('data', JSON.stringify(requestData));
-  
+
   const response = await fetch(`${TEST_CONFIG.apiBaseUrl}/api/attachments/upload`, {
     method: 'POST',
     headers: {
@@ -75,18 +86,23 @@ async function uploadTestFile(fileConfig: typeof TEST_FILES.pdf, metadata: Recor
     },
     body: formData
   });
-  
+
   return response;
 }
 
-describe('Attachment API Integration Tests', () => {
+describe.skipIf(skipTests)('Attachment API Integration Tests', () => {
   let supabase: ReturnType<typeof createClient>;
   let testAttachmentIds: string[] = [];
 
   beforeAll(async () => {
+    if (skipTests) {
+      console.log('Skipping attachment API tests - Supabase not available');
+      return;
+    }
+
     // Initialize Supabase client for direct database operations
     supabase = createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseKey);
-    
+
     // Verify test environment is ready
     const { data, error } = await supabase.from('attachments').select('count').limit(1);
     if (error) {
@@ -123,21 +139,21 @@ describe('Attachment API Integration Tests', () => {
     it('should upload a PDF file successfully', async () => {
       const response = await uploadTestFile(TEST_FILES.pdf);
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.attachmentId).toBeTruthy();
       expect(result.filename).toContain('.pdf');
-      
+
       testAttachmentIds.push(result.attachmentId);
-      
+
       // Verify database record
       const { data: attachment } = await supabase
         .from('attachments')
         .select('*')
         .eq('id', result.attachmentId)
         .single();
-      
+
       expect(attachment).toBeTruthy();
       expect(attachment.tenant_id).toBe(TEST_CONFIG.tenantId);
       expect(attachment.company_id).toBe(TEST_CONFIG.companyId);
@@ -148,20 +164,20 @@ describe('Attachment API Integration Tests', () => {
     it('should upload an image file successfully', async () => {
       const response = await uploadTestFile(TEST_FILES.image, { category: 'receipt' });
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.attachmentId).toBeTruthy();
-      
+
       testAttachmentIds.push(result.attachmentId);
-      
+
       // Verify file type handling
       const { data: attachment } = await supabase
         .from('attachments')
         .select('*')
         .eq('id', result.attachmentId)
         .single();
-      
+
       expect(attachment.mime_type).toBe('image/jpeg');
       expect(attachment.category).toBe('receipt');
     });
@@ -171,11 +187,11 @@ describe('Attachment API Integration Tests', () => {
       const response1 = await uploadTestFile(TEST_FILES.pdf);
       const result1 = await response1.json();
       testAttachmentIds.push(result1.attachmentId);
-      
+
       // Upload same file again
       const response2 = await uploadTestFile(TEST_FILES.pdf);
       const result2 = await response2.json();
-      
+
       expect(response2.status).toBe(200);
       expect(result2.success).toBe(true);
       expect(result2.attachmentId).toBe(result1.attachmentId); // Should return existing
@@ -186,7 +202,7 @@ describe('Attachment API Integration Tests', () => {
       // Create a large file buffer (> 10MB)
       const largeBuffer = Buffer.alloc(11 * 1024 * 1024);
       const formData = new FormData();
-      
+
       const largeFile = new File([largeBuffer], 'large-file.pdf', { type: 'application/pdf' });
       formData.append('file', largeFile);
       formData.append('data', JSON.stringify({
@@ -194,7 +210,7 @@ describe('Attachment API Integration Tests', () => {
         companyId: TEST_CONFIG.companyId,
         category: 'invoice'
       }));
-      
+
       const response = await fetch(`${TEST_CONFIG.apiBaseUrl}/api/attachments/upload`, {
         method: 'POST',
         headers: {
@@ -204,7 +220,7 @@ describe('Attachment API Integration Tests', () => {
         },
         body: formData
       });
-      
+
       expect(response.status).toBe(400);
       const result = await response.json();
       expect(result.error).toContain('exceeds 10MB limit');
@@ -212,8 +228,8 @@ describe('Attachment API Integration Tests', () => {
 
     it('should validate file types', async () => {
       const formData = new FormData();
-      const invalidFile = new File(['malicious content'], 'malware.exe', { 
-        type: 'application/x-executable' 
+      const invalidFile = new File(['malicious content'], 'malware.exe', {
+        type: 'application/x-executable'
       });
       formData.append('file', invalidFile);
       formData.append('data', JSON.stringify({
@@ -221,7 +237,7 @@ describe('Attachment API Integration Tests', () => {
         companyId: TEST_CONFIG.companyId,
         category: 'invoice'
       }));
-      
+
       const response = await fetch(`${TEST_CONFIG.apiBaseUrl}/api/attachments/upload`, {
         method: 'POST',
         headers: {
@@ -231,7 +247,7 @@ describe('Attachment API Integration Tests', () => {
         },
         body: formData
       });
-      
+
       expect(response.status).toBe(400);
       const result = await response.json();
       expect(result.error).toContain('File type not allowed');
@@ -241,19 +257,19 @@ describe('Attachment API Integration Tests', () => {
       const response = await uploadTestFile(TEST_FILES.pdf, {
         tenantId: 'different-tenant-id'
       });
-      
+
       // Should still succeed but use the header tenant ID
       expect(response.status).toBe(200);
       const result = await response.json();
       testAttachmentIds.push(result.attachmentId);
-      
+
       // Verify tenant ID from header was used
       const { data: attachment } = await supabase
         .from('attachments')
         .select('*')
         .eq('id', result.attachmentId)
         .single();
-      
+
       expect(attachment.tenant_id).toBe(TEST_CONFIG.tenantId); // From header, not body
     });
   });
@@ -271,7 +287,7 @@ describe('Attachment API Integration Tests', () => {
     it('should retrieve attachment details', async () => {
       const response = await makeApiRequest(`/attachments/${attachmentId}?tenantId=${TEST_CONFIG.tenantId}`);
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.id).toBe(attachmentId);
       expect(result.filename).toContain('.pdf');
@@ -281,7 +297,7 @@ describe('Attachment API Integration Tests', () => {
 
     it('should handle attachment not found', async () => {
       const response = await makeApiRequest(`/attachments/nonexistent-id?tenantId=${TEST_CONFIG.tenantId}`);
-      
+
       expect(response.status).toBe(404);
       const result = await response.json();
       expect(result.error).toContain('not found');
@@ -289,7 +305,7 @@ describe('Attachment API Integration Tests', () => {
 
     it('should enforce tenant isolation for retrieval', async () => {
       const response = await makeApiRequest(`/attachments/${attachmentId}?tenantId=different-tenant`);
-      
+
       expect(response.status).toBe(404);
     });
   });
@@ -306,18 +322,18 @@ describe('Attachment API Integration Tests', () => {
 
     it('should download attachment file', async () => {
       const response = await makeApiRequest(`/attachments/${attachmentId}/download?tenantId=${TEST_CONFIG.tenantId}`);
-      
+
       expect(response.status).toBe(200);
       expect(response.headers.get('content-type')).toBe('application/pdf');
       expect(response.headers.get('content-disposition')).toContain('attachment');
-      
+
       const fileBuffer = await response.arrayBuffer();
       expect(fileBuffer.byteLength).toBeGreaterThan(0);
     });
 
     it('should handle download of non-existent file', async () => {
       const response = await makeApiRequest(`/attachments/nonexistent-id/download?tenantId=${TEST_CONFIG.tenantId}`);
-      
+
       expect(response.status).toBe(404);
     });
   });
@@ -336,18 +352,18 @@ describe('Attachment API Integration Tests', () => {
       const response = await makeApiRequest(`/attachments/${attachmentId}?tenantId=${TEST_CONFIG.tenantId}`, {
         method: 'DELETE'
       });
-      
+
       expect(response.status).toBe(200);
       const result = await response.json();
       expect(result.success).toBe(true);
-      
+
       // Verify soft delete in database
       const { data: attachment } = await supabase
         .from('attachments')
         .select('*')
         .eq('id', attachmentId)
         .single();
-      
+
       expect(attachment.status).toBe('deleted');
       expect(attachment.deleted_at).toBeTruthy();
     });
@@ -356,7 +372,7 @@ describe('Attachment API Integration Tests', () => {
       const response = await makeApiRequest(`/attachments/nonexistent-id?tenantId=${TEST_CONFIG.tenantId}`, {
         method: 'DELETE'
       });
-      
+
       expect(response.status).toBe(404);
     });
   });
@@ -369,7 +385,7 @@ describe('Attachment API Integration Tests', () => {
         { file: TEST_FILES.image, category: 'receipt', tags: ['expense', 'travel'] },
         { file: TEST_FILES.pdf, category: 'contract', tags: ['legal', 'review'] }
       ];
-      
+
       for (const fileConfig of files) {
         const response = await uploadTestFile(fileConfig.file, fileConfig);
         const result = await response.json();
@@ -382,7 +398,7 @@ describe('Attachment API Integration Tests', () => {
         `/attachments/search?tenantId=${TEST_CONFIG.tenantId}&category=invoice`
       );
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.attachments).toHaveLength(2); // 2 invoices uploaded
       expect(result.attachments.every((a: any) => a.category === 'invoice')).toBe(true);
@@ -393,7 +409,7 @@ describe('Attachment API Integration Tests', () => {
         `/attachments/search?tenantId=${TEST_CONFIG.tenantId}&tags=urgent`
       );
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.attachments).toHaveLength(1);
       expect(result.attachments[0].tags).toContain('urgent');
@@ -404,7 +420,7 @@ describe('Attachment API Integration Tests', () => {
         `/attachments/search?tenantId=${TEST_CONFIG.tenantId}&searchQuery=invoice`
       );
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.attachments.length).toBeGreaterThan(0);
       expect(result.attachments.some((a: any) => a.filename.includes('invoice'))).toBe(true);
@@ -415,7 +431,7 @@ describe('Attachment API Integration Tests', () => {
         `/attachments/search?tenantId=${TEST_CONFIG.tenantId}&page=1&limit=2`
       );
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.attachments).toHaveLength(2);
       expect(result.pagination.page).toBe(1);
@@ -429,10 +445,10 @@ describe('Attachment API Integration Tests', () => {
         `/attachments/search?tenantId=${TEST_CONFIG.tenantId}&sortBy=filename&sortOrder=asc`
       );
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.attachments.length).toBeGreaterThan(1);
-      
+
       // Verify sorting
       const filenames = result.attachments.map((a: any) => a.filename);
       const sortedFilenames = [...filenames].sort();
@@ -444,7 +460,7 @@ describe('Attachment API Integration Tests', () => {
         `/attachments/search?tenantId=${TEST_CONFIG.tenantId}`
       );
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.filters.availableCategories).toContain('invoice');
       expect(result.filters.availableCategories).toContain('receipt');
@@ -458,12 +474,12 @@ describe('Attachment API Integration Tests', () => {
 
     beforeEach(async () => {
       attachmentIds = [];
-      
+
       // Upload test files
       for (let i = 0; i < 3; i++) {
-        const response = await uploadTestFile(TEST_FILES.pdf, { 
+        const response = await uploadTestFile(TEST_FILES.pdf, {
           category: 'invoice',
-          tags: ['batch-test'] 
+          tags: ['batch-test']
         });
         const result = await response.json();
         attachmentIds.push(result.attachmentId);
@@ -480,20 +496,20 @@ describe('Attachment API Integration Tests', () => {
           operation: 'delete'
         })
       });
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.successCount).toBe(3);
       expect(result.failureCount).toBe(0);
-      
+
       // Verify all files are soft deleted
       const { data: attachments } = await supabase
         .from('attachments')
         .select('status')
         .in('id', attachmentIds);
-      
+
       expect(attachments?.every(a => a.status === 'deleted')).toBe(true);
     });
 
@@ -507,19 +523,19 @@ describe('Attachment API Integration Tests', () => {
           category: 'report'
         })
       });
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.successCount).toBe(3);
-      
+
       // Verify category updates
       const { data: attachments } = await supabase
         .from('attachments')
         .select('category')
         .in('id', attachmentIds);
-      
+
       expect(attachments?.every(a => a.category === 'report')).toBe(true);
     });
 
@@ -533,20 +549,20 @@ describe('Attachment API Integration Tests', () => {
           tags: ['processed', 'reviewed']
         })
       });
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.successCount).toBe(3);
-      
+
       // Verify tags added
       const { data: attachments } = await supabase
         .from('attachments')
         .select('tags')
         .in('id', attachmentIds);
-      
-      expect(attachments?.every(a => 
+
+      expect(attachments?.every(a =>
         a.tags.includes('processed') && a.tags.includes('reviewed')
       )).toBe(true);
     });
@@ -554,7 +570,7 @@ describe('Attachment API Integration Tests', () => {
     it('should handle partial failures in batch operations', async () => {
       // Include a non-existent attachment ID
       const invalidIds = [...attachmentIds, 'nonexistent-id'];
-      
+
       const response = await makeApiRequest('/attachments/batch', {
         method: 'POST',
         body: JSON.stringify({
@@ -563,9 +579,9 @@ describe('Attachment API Integration Tests', () => {
           operation: 'delete'
         })
       });
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.successCount).toBe(3);
@@ -590,7 +606,7 @@ describe('Attachment API Integration Tests', () => {
         processedBy: 'integration-test',
         priority: 'high'
       };
-      
+
       const response = await makeApiRequest('/attachments/metadata', {
         method: 'PUT',
         body: JSON.stringify({
@@ -600,19 +616,19 @@ describe('Attachment API Integration Tests', () => {
           operation: 'merge'
         })
       });
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
-      
+
       // Verify metadata update in database
       const { data: attachment } = await supabase
         .from('attachments')
         .select('metadata')
         .eq('id', attachmentId)
         .single();
-      
+
       expect(attachment.metadata.customField).toBe('custom value');
       expect(attachment.metadata.processedBy).toBe('integration-test');
       expect(attachment.metadata.priority).toBe('high');
@@ -620,7 +636,7 @@ describe('Attachment API Integration Tests', () => {
 
     it('should replace entire metadata object', async () => {
       const newMetadata = { onlyField: 'only value' };
-      
+
       const response = await makeApiRequest('/attachments/metadata', {
         method: 'PUT',
         body: JSON.stringify({
@@ -630,16 +646,16 @@ describe('Attachment API Integration Tests', () => {
           operation: 'replace'
         })
       });
-      
+
       expect(response.status).toBe(200);
-      
+
       // Verify metadata replacement
       const { data: attachment } = await supabase
         .from('attachments')
         .select('metadata')
         .eq('id', attachmentId)
         .single();
-      
+
       expect(attachment.metadata.onlyField).toBe('only value');
       expect(Object.keys(attachment.metadata)).toHaveLength(3); // onlyField + updatedBy + updatedAt
     });
@@ -656,7 +672,7 @@ describe('Attachment API Integration Tests', () => {
           }
         })
         .eq('id', attachmentId);
-      
+
       const response = await makeApiRequest('/attachments/metadata', {
         method: 'PUT',
         body: JSON.stringify({
@@ -666,16 +682,16 @@ describe('Attachment API Integration Tests', () => {
           keysToDelete: ['field1', 'field3']
         })
       });
-      
+
       expect(response.status).toBe(200);
-      
+
       // Verify keys deleted
       const { data: attachment } = await supabase
         .from('attachments')
         .select('metadata')
         .eq('id', attachmentId)
         .single();
-      
+
       expect(attachment.metadata.field1).toBeUndefined();
       expect(attachment.metadata.field2).toBe('value2');
       expect(attachment.metadata.field3).toBeUndefined();
@@ -705,22 +721,22 @@ describe('Attachment API Integration Tests', () => {
           priority: 'normal'
         })
       });
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.jobId).toBeTruthy();
       expect(result.status).toBe('queued');
       expect(result.estimatedCompletionTime).toBeTruthy();
-      
+
       // Verify OCR status in database
       const { data: attachment } = await supabase
         .from('attachments')
         .select('metadata')
         .eq('id', attachmentId)
         .single();
-      
+
       expect(attachment.metadata.ocrStatus).toBe('queued');
       expect(attachment.metadata.ocrJobId).toBe(result.jobId);
     });
@@ -746,13 +762,13 @@ describe('Attachment API Integration Tests', () => {
           }
         })
         .eq('id', attachmentId);
-      
+
       const response = await makeApiRequest(
         `/attachments/ocr?attachmentId=${attachmentId}&tenantId=${TEST_CONFIG.tenantId}`
       );
-      
+
       const result = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(result.status).toBe('completed');
       expect(result.confidence).toBe(0.85);
@@ -771,29 +787,29 @@ describe('Attachment API Integration Tests', () => {
           extractText: true
         })
       });
-      
+
       const queueResult = await queueResponse.json();
       const jobId = queueResult.jobId;
-      
+
       // Cancel OCR
       const cancelResponse = await makeApiRequest(
         `/attachments/ocr?attachmentId=${attachmentId}&tenantId=${TEST_CONFIG.tenantId}&jobId=${jobId}`,
         { method: 'DELETE' }
       );
-      
+
       const cancelResult = await cancelResponse.json();
-      
+
       expect(cancelResponse.status).toBe(200);
       expect(cancelResult.success).toBe(true);
       expect(cancelResult.status).toBe('cancelled');
-      
+
       // Verify cancellation in database
       const { data: attachment } = await supabase
         .from('attachments')
         .select('metadata')
         .eq('id', attachmentId)
         .single();
-      
+
       expect(attachment.metadata.ocrStatus).toBe('cancelled');
     });
   });
@@ -803,13 +819,13 @@ describe('Attachment API Integration Tests', () => {
       const response = await fetch(`${TEST_CONFIG.apiBaseUrl}/api/attachments/search`, {
         method: 'GET'
       });
-      
+
       expect(response.status).toBe(401);
     });
 
     it('should handle invalid tenant ID', async () => {
       const response = await makeApiRequest('/attachments/search?tenantId=invalid-tenant');
-      
+
       // Should return empty results, not error (tenant isolation)
       expect(response.status).toBe(200);
       const result = await response.json();
@@ -821,7 +837,7 @@ describe('Attachment API Integration Tests', () => {
         method: 'POST',
         body: 'invalid json'
       });
-      
+
       expect(response.status).toBe(400);
     });
 
@@ -829,7 +845,7 @@ describe('Attachment API Integration Tests', () => {
       // This would require mocking database failures
       // In a real test, you might temporarily break the database connection
       // For now, we'll test the API's error handling structure
-      
+
       const response = await makeApiRequest('/attachments/nonexistent-endpoint');
       expect(response.status).toBe(404);
     });
@@ -839,7 +855,7 @@ describe('Attachment API Integration Tests', () => {
       const uploadResult = await uploadResponse.json();
       const attachmentId = uploadResult.attachmentId;
       testAttachmentIds.push(attachmentId);
-      
+
       // Perform concurrent operations
       const operations = [
         makeApiRequest(`/attachments/${attachmentId}?tenantId=${TEST_CONFIG.tenantId}`),
@@ -862,9 +878,9 @@ describe('Attachment API Integration Tests', () => {
           })
         })
       ];
-      
+
       const results = await Promise.all(operations);
-      
+
       // All operations should succeed
       expect(results.every(r => r.status === 200)).toBe(true);
     });

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { createClient } from '@supabase/supabase-js';
+import { ok, problem } from '../../_lib/response';
 
 // Login request schema
 const LoginRequestSchema = z.object({
@@ -7,127 +9,92 @@ const LoginRequestSchema = z.object({
     password: z.string().min(1)
 });
 
-// Mock user data - In production, this would come from your database
-const MOCK_USERS = [
-    {
-        id: 'user_1',
-        email: 'admin@aibos.com',
-        password: 'admin123', // In production, this would be hashed
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'admin',
-        permissions: ['read', 'write', 'delete', 'approve'],
-        tenantId: 'tenant_1',
-        companyId: 'company_1',
-        companyName: 'AIBOS Demo Company',
-        tenantName: 'AIBOS Demo Tenant'
-    },
-    {
-        id: 'user_2',
-        email: 'user@aibos.com',
-        password: 'user123',
-        firstName: 'Regular',
-        lastName: 'User',
-        role: 'user',
-        permissions: ['read', 'write'],
-        tenantId: 'tenant_1',
-        companyId: 'company_1',
-        companyName: 'AIBOS Demo Company',
-        tenantName: 'AIBOS Demo Tenant'
-    }
-];
+// Initialize Supabase client
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: NextRequest) {
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     try {
         const body = await req.json();
         const { email, password } = LoginRequestSchema.parse(body);
 
-        // Find user (in production, this would be a database query)
-        const user = MOCK_USERS.find(u => u.email === email && u.password === password);
+        // Authenticate with Supabase
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
 
-        if (!user) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: {
-                        type: 'authentication_error',
-                        title: 'Invalid credentials',
-                        status: 401,
-                        detail: 'Email or password is incorrect'
-                    },
-                    timestamp: new Date().toISOString(),
-                    requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-                },
-                { status: 401 }
-            );
+        if (authError || !authData.user) {
+            return problem({
+                status: 401,
+                title: 'Authentication failed',
+                code: 'INVALID_CREDENTIALS',
+                detail: 'Email or password is incorrect',
+                requestId
+            });
         }
 
-        // Generate tokens (in production, use proper JWT)
-        const accessToken = `access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const refreshToken = `refresh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+        // Get user profile from database
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
 
-        // Return user data and tokens
-        return NextResponse.json({
-            success: true,
-            data: {
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    role: user.role,
-                    permissions: user.permissions,
-                    tenantId: user.tenantId,
-                    companyId: user.companyId,
-                    companyName: user.companyName,
-                    tenantName: user.tenantName
-                },
-                accessToken,
-                refreshToken,
-                expiresAt: expiresAt.toISOString()
+        if (profileError || !profile) {
+            return problem({
+                status: 500,
+                title: 'Profile retrieval failed',
+                code: 'PROFILE_ERROR',
+                detail: 'Unable to retrieve user profile',
+                requestId
+            });
+        }
+
+        // Return user data and Supabase session
+        return ok({
+            user: {
+                id: authData.user.id,
+                email: authData.user.email,
+                firstName: profile.first_name || '',
+                lastName: profile.last_name || '',
+                role: profile.role || 'user',
+                permissions: profile.permissions || ['read'],
+                tenantId: profile.tenant_id || '',
+                companyId: profile.company_id || '',
+                companyName: profile.company_name || '',
+                tenantName: profile.tenant_name || ''
             },
-            timestamp: new Date().toISOString(),
-            requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        });
+            session: {
+                accessToken: authData.session?.access_token,
+                refreshToken: authData.session?.refresh_token,
+                expiresAt: authData.session?.expires_at ? new Date(authData.session.expires_at * 1000).toISOString() : null
+            }
+        }, requestId);
 
     } catch (error) {
         console.error('Login error:', error);
 
         if (error instanceof z.ZodError) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: {
-                        type: 'validation_error',
-                        title: 'Invalid request data',
-                        status: 400,
-                        detail: 'Please check your email and password format',
-                        errors: error.issues.reduce((acc, err) => {
-                            acc[err.path.join('.')] = [err.message];
-                            return acc;
-                        }, {} as Record<string, string[]>)
-                    },
-                    timestamp: new Date().toISOString(),
-                    requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-                },
-                { status: 400 }
-            );
+            return problem({
+                status: 400,
+                title: 'Invalid request data',
+                code: 'VALIDATION_ERROR',
+                detail: 'Please check your email and password format',
+                requestId
+            });
         }
 
-        return NextResponse.json(
-            {
-                success: false,
-                error: {
-                    type: 'internal_error',
-                    title: 'Login failed',
-                    status: 500,
-                    detail: 'An unexpected error occurred'
-                },
-                timestamp: new Date().toISOString(),
-                requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-            },
-            { status: 500 }
-        );
+        return problem({
+            status: 500,
+            title: 'Login failed',
+            code: 'INTERNAL_ERROR',
+            detail: 'An unexpected error occurred',
+            requestId
+        });
     }
 }

@@ -5,7 +5,6 @@
     "package.json",
     "tsconfig.base.json",
     ".npmrc",
-    "syncpack.config.json",
     ".cursorrules.json"
   ],
   "ui": "stream",

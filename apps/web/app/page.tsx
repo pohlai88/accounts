@@ -1,11 +1,6 @@
 'use client'
 
-import { useAuth } from '@aibos/ui/AuthProvider'
-import { Button } from '@aibos/ui/Button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@aibos/ui/Card'
-import { Badge } from '@aibos/ui/Badge'
-import { Alert, AlertDescription } from '@aibos/ui/Alert'
-import { useAccessibility } from '@aibos/ui/AccessibilityProvider'
+import { useAuth, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Alert, AlertDescription, useAccessibility } from '@aibos/ui'
 import {
   useInvoices,
   useCustomers,
@@ -92,9 +87,10 @@ export default function Home() {
     {
       fromDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0] || '2024-01-01',
       toDate: new Date().toISOString().split('T')[0] || '2024-12-31',
-      companyId: session?.user.companyId || 'default-company'
+      companyId: (session?.user as any)?.companyId || 'default-company',
+      tenantId: (session?.user as any)?.tenantId || 'default-tenant'
     },
-    { enabled: shouldFetchData && !!session?.user.companyId }
+    { enabled: shouldFetchData && !!(session?.user as any)?.companyId }
   )
 
   const { invalidateAll } = useInvalidateQueries()

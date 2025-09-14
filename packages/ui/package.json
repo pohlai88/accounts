@@ -5,6 +5,7 @@
     "@aibos/auth": "workspace:*",
     "@aibos/tokens": "workspace:*",
     "@aibos/utils": "workspace:*",
+    "@heroicons/react": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -13,17 +14,22 @@
     "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.3.5",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "vitest": "^3.2.4"
   },
-  "main": "dist/index.js",
+  "main": "dist/ui/src/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "dist/ui/src/index.d.ts"
 }

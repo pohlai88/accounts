@@ -1,17 +1,19 @@
 # Supabase Configuration Template
 # Copy this to .env and replace with your actual credentials
 
-# LOCAL SUPABASE FOR TESTING (safer than live database)
-NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+# Supabase Project URL (from your Supabase dashboard)
+NEXT_PUBLIC_SUPABASE_URL=https://dsjxvwhuvnefduvjbmgk.supabase.co
 
-# Local Supabase Keys (from npx supabase status output)
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+# Supabase Anon/Public Key (from your Supabase dashboard > Settings > API)
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_e-p-iLqZgELlx2u8mq75tg_1c-gYCeh
 
-# Local Supabase Service Role Key
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+# Supabase Service Role Key (from your Supabase dashboard > Settings > API)
+# WARNING: Keep this secret! Never expose in client-side code
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzanh2d2h1dm5lZmR1dmpibWdrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzUyMDI2NiwiZXhwIjoyMDczMDk2MjY2fQ.c9ZBloPgahgXHVWnxo3fUWvIqjdFa-MFbNkCZL928so
 
-# Local Database Connection String
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+# Database Connection String (PostgreSQL format)
+# Format: postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres
+DATABASE_URL=DATABASE_URL=postgresql://postgres.dsjxvwhuvnefduvjbmgk:Weepohlai88!@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres
 
 # Additional Configuration
 NODE_ENV=development
@@ -20,13 +22,36 @@ NODE_ENV=development
 RESEND_API_KEY=re_your-resend-api-key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 
+# OAuth Providers (Google)
+SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=your-google-client-id
+SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=your-google-client-secret
+
+# OAuth Providers (GitHub)
+SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=your-github-client-id
+SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=your-github-client-secret
+
+# SMS Provider (Twilio) - Optional
+SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN=your-twilio-auth-token
+
+# Storage Configuration
+NEXT_PUBLIC_SUPABASE_STORAGE_URL=https://dsjxvwhuvnefduvjbmgk.supabase.co/storage/v1
+
 # Axiom Telemetry (Optional)
 AXIOM_TOKEN=xaat-0759aa0c-8bf5-4b78-b0c7-8aec2d88cccd
 AXIOM_PERSONAL_TOKEN=xapt-40b687c2-3119-448f-8841-57d46fa19978
 AXIOM_ORG_ID=aibos-8ft7
 
 # JWT Secret (for local development)
-JWT_SECRET=your-jwt-secret-key-for-local-dev
+JWT_SECRET=your-vzkLbujCm0YSo1PFazlwjpRiD0TbtmV8pMSB4c9jSHu9xeMhYr/9OW1Bljq+AGBHd/edl2jtDobXOwumetRIFg==
+
+# Supabase JWT Verification (for security package)
+SUPABASE_JWKS_URL=https://dsjxvwhuvnefduvjbmgk.supabase.co/auth/v1/.well-known/jwks.json
+SUPABASE_ISSUER=https://dsjxvwhuvnefduvjbmgk.supabase.co/
+SUPABASE_AUDIENCE=authenticated
+
+# Feature Flags
+FEATURE_AUTH_SECURITYCONTEXT=true
+FEATURE_AUTH_MOCK=false
 
 # Inngest
 INNGEST_EVENT_KEY=iww734ygADar8MrgqDYTwwKINEC2GE_WwnppVYN9XrOw0AUbJUns9O-Qyivlmau6uIEfOnEnfp8MGsHucTLBCA

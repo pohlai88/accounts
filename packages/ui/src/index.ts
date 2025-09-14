@@ -21,3 +21,6 @@ export * from './utils';
 
 // Auth Context (moved from @aibos/auth to avoid React dependency)
 export * from './AuthProvider';
+
+// Accessibility Provider
+export * from './AccessibilityProvider';

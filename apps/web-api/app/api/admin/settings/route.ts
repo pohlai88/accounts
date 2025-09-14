@@ -61,7 +61,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     } catch (error) {
         console.error('Failed to get admin settings:', error);
 
-        if ((error as any).status === 403) {
+        if ((error as any)?.status === 403) {
             return NextResponse.json(
                 { success: false, error: 'Forbidden', message: (error as Error).message },
                 { status: 403 }
@@ -134,7 +134,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     } catch (error) {
         console.error('Failed to update feature flags:', error);
 
-        if ((error as any).status === 403) {
+        if ((error as any)?.status === 403) {
             return NextResponse.json(
                 { success: false, error: 'Forbidden', message: (error as Error).message },
                 { status: 403 }
@@ -214,7 +214,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     } catch (error) {
         console.error('Failed to update policy settings:', error);
 
-        if ((error as any).status === 403) {
+        if ((error as any)?.status === 403) {
             return NextResponse.json(
                 { success: false, error: 'Forbidden', message: (error as Error).message },
                 { status: 403 }

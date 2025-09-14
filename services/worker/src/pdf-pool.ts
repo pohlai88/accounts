@@ -1,7 +1,7 @@
 // D3 Puppeteer Pool Management - Finance-Grade PDF Generation
 // V1 Requirement: Persistent browser pool with health checks, 3 retries, 45s timeout
 
-import puppeteer, { Browser } from 'puppeteer';
+import { chromium, Browser } from 'playwright';
 import { logger } from '@aibos/utils';
 
 export interface PdfGenerationOptions {
@@ -161,7 +161,7 @@ class PuppeteerPool {
 
             // Set content and wait for load
             await page.setContent(options.html, {
-                waitUntil: 'networkidle0',
+                waitUntil: 'networkidle',
                 timeout
             });
 
@@ -179,8 +179,7 @@ class PuppeteerPool {
                 headerTemplate: options.headerTemplate || '',
                 footerTemplate: options.footerTemplate || '',
                 printBackground: options.printBackground !== false, // Default to true
-                scale: options.scale || 1,
-                timeout
+                scale: options.scale || 1
             });
 
             // Update browser usage stats
@@ -234,7 +233,7 @@ class PuppeteerPool {
     private async createBrowser(): Promise<BrowserInstance> {
         logger.info('Creating new browser instance');
 
-        const browser = await puppeteer.launch({
+        const browser = await chromium.launch({
             headless: true,
             args: [
                 '--no-sandbox',
@@ -260,8 +259,7 @@ class PuppeteerPool {
         this.browsers.push(instance);
 
         logger.info('Browser instance created', {
-            totalBrowsers: this.browsers.length,
-            pid: browser.process()?.pid
+            totalBrowsers: this.browsers.length
         });
 
         return instance;

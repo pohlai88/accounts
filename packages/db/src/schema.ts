@@ -528,3 +528,6 @@ export const auditLogs = pgTable("audit_logs", {
 
 // Re-export attachment schema for V1 compliance
 export * from './schema-attachments';
+
+// Re-export user settings schema for multi-tenant support
+export * from './schema-user-settings';

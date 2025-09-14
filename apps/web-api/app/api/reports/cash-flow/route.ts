@@ -30,7 +30,7 @@ export type TCashFlowRequest = z.infer<typeof CashFlowRequestSchema>;
  */
 export async function GET(request: NextRequest) {
     const auditService = getV1AuditService();
-    let reportResult: any = null;
+    const reportResult: unknown = null;
 
     try {
         // 1. Process idempotency key (V1 requirement)
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
                 startDate: new Date(input.comparativePeriod.startDate),
                 endDate: new Date(input.comparativePeriod.endDate)
             } : undefined
-        }, supabase as any);
+        }, supabase as unknown);
 
         if (!result.success) {
             return NextResponse.json({
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
                 startDate: new Date(input.comparativePeriod.startDate),
                 endDate: new Date(input.comparativePeriod.endDate)
             } : undefined
-        }, supabase as any);
+        }, supabase as unknown);
 
         if (!result.success) {
             return NextResponse.json({

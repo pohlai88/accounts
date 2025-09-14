@@ -26,7 +26,7 @@ export type TBalanceSheetRequest = z.infer<typeof BalanceSheetRequestSchema>;
  */
 export async function GET(request: NextRequest) {
     const auditService = getV1AuditService();
-    let reportResult: any = null;
+    let reportResult: unknown = null;
 
     try {
         // 1. Process idempotency key (V1 requirement)
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
             ...input,
             asOfDate: new Date(input.asOfDate),
             comparativePeriod: input.comparativePeriod ? new Date(input.comparativePeriod) : undefined
-        }, supabase as any);
+        }, supabase as unknown);
 
         if (!reportResult.success) {
             // Log failed report generation (V1 audit requirement)
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
     const auditService = getV1AuditService();
-    let reportResult: any = null;
+    let reportResult: unknown = null;
 
     try {
         // 1. Process idempotency key (V1 requirement)
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
             ...input,
             asOfDate: new Date(input.asOfDate),
             comparativePeriod: input.comparativePeriod ? new Date(input.comparativePeriod) : undefined
-        }, supabase as any);
+        }, supabase as unknown);
 
         if (!reportResult.success) {
             // Log failed report generation

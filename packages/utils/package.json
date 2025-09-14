@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@aibos/auth": "workspace:*",
+    "@aibos/contracts": "workspace:*",
     "@aibos/db": "workspace:*",
     "@axiomhq/winston": "^1.3.1",
     "@supabase/ssr": "^0.5.1",
@@ -13,21 +14,22 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.33.0",
+    "exceljs": "^4.4.0",
     "pg": "^8.16.3",
-    "puppeteer": "^22.13.1",
+    "playwright": "^1.55.0",
     "react": "^18.3.1",
+    "redis": "^5.8.2",
     "resend": "^3.1.0",
     "uuid": "^13.0.0",
-    "winston": "^3.10.0",
-    "xlsx": "^0.18.5"
+    "winston": "^3.10.0"
   },
   "devDependencies": {
-    "@types/node": "^20.16.5",
+    "@types/node": "^24.3.3",
     "@types/pg": "^8.15.5",
     "@types/react": "^18.3.5",
     "next": "^14.2.32",
     "typescript": "^5.6.2",
-    "vitest": "^2.1.9"
+    "vitest": "^3.2.4"
   },
   "exports": {
     ".": {
@@ -43,7 +45,15 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:attachments": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts",
+    "test:attachments:unit": "vitest run test/attachment-service-working.test.ts --config vitest.config.attachments.ts",
+    "test:attachments:schema": "vitest run test/attachment-schema.test.ts --config vitest.config.attachments.ts",
+    "test:attachments:api": "vitest run test/attachment-api.test.ts --config vitest.config.attachments.ts",
+    "test:attachments:coverage": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts --coverage",
+    "test:attachments:watch": "vitest test/attachment-*.test.ts --config vitest.config.attachments.ts --watch",
+    "test:attachments:verbose": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts --reporter=verbose",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module",
   "types": "dist/index.d.ts"

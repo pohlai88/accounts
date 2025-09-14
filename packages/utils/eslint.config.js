@@ -5,7 +5,7 @@ import tsParser from '@typescript-eslint/parser'
 export default [
   // Base JavaScript config
   js.configs.recommended,
-  
+
   {
     files: ['**/*.{js,ts}'],
     languageOptions: {
@@ -33,6 +33,27 @@ export default [
         crypto: 'readonly',
         atob: 'readonly',
         btoa: 'readonly',
+        // Additional browser globals for testing
+        window: 'readonly',
+        document: 'readonly',
+        fetch: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        Headers: 'readonly',
+        FormData: 'readonly',
+        File: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        navigator: 'readonly',
+        location: 'readonly',
+        history: 'readonly',
+        screen: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly',
+        performance: 'readonly',
         // TypeScript globals
         NodeJS: 'readonly',
       },
@@ -44,14 +65,14 @@ export default [
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': ['warn', { fixToUnknown: true, ignoreRestArgs: false }],
-      
+
       // General rules
       'no-console': 'off', // Allow console in utility packages
       'prefer-const': 'error',
       'no-unused-vars': 'off', // Use TypeScript version instead
     },
   },
-  
+
   {
     ignores: [
       'node_modules/**',

@@ -78,7 +78,7 @@ export type TTrialBalanceResponse = z.infer<typeof TrialBalanceResponseSchema>;
  */
 export async function GET(request: NextRequest) {
     const auditService = getV1AuditService();
-    let reportResult: any = null;
+    let reportResult: unknown = null;
 
     // Start performance monitoring
     const perfTimer = performanceMonitor.createTimer('api.reports.trial-balance.get');
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
         reportResult = await generateTrialBalance({
             ...input,
             asOfDate: new Date(input.asOfDate)
-        }, supabase as any);
+        }, supabase as unknown);
 
         if (!reportResult.success) {
             // Log failed report generation (V1 audit requirement)
@@ -236,7 +236,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
     const auditService = getV1AuditService();
-    let reportResult: any = null;
+    let reportResult: unknown = null;
 
     // Start performance monitoring
     const perfTimer = performanceMonitor.createTimer('api.reports.trial-balance');
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
         reportResult = await generateTrialBalance({
             ...input,
             asOfDate: new Date(input.asOfDate)
-        }, supabase as any);
+        }, supabase as unknown);
 
         if (!reportResult.success) {
             // Log failed report generation

@@ -1,24 +1,23 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../packages/config/tsconfig.web.json",
   "compilerOptions": {
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "allowJs": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@aibos/contracts/*": ["../../packages/contracts/src/*"],
+      "@aibos/db/*": ["../../packages/db/src/*"],
+      "@aibos/auth/*": ["../../packages/auth/src/*"],
+      "@aibos/ui/*": ["../../packages/ui/src/*"],
+      "@aibos/utils/*": ["../../packages/utils/src/*"]
+    },
     "noEmit": true,
-    "incremental": true,
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

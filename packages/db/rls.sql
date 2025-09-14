@@ -125,6 +125,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Enhanced RLS policies for multi-tenant support
+-- Function to check if user has active membership in tenant
+CREATE OR REPLACE FUNCTION has_active_membership(_tenant_id UUID)
+RETURNS BOOLEAN LANGUAGE SQL STABLE AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM memberships 
+    WHERE user_id = (auth.jwt() ->> 'sub')::uuid
+      AND tenant_id = _tenant_id
+      AND status = 'active'
+  );
+$$;
+
+-- Enhanced RLS policies using membership check
+DROP POLICY IF EXISTS company_tenant_scope ON companies;
+CREATE POLICY company_tenant_scope ON companies FOR ALL USING (
+  tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+  AND has_active_membership(tenant_id)
+);
+
+-- Update all tenant-scoped policies to include membership check
+DROP POLICY IF EXISTS coa_tenant_company_scope ON chart_of_accounts;
+CREATE POLICY coa_tenant_company_scope ON chart_of_accounts FOR ALL USING (
+  tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+  AND company_id = (auth.jwt() ->> 'company_id')::uuid
+  AND has_active_membership(tenant_id)
+);
+
+DROP POLICY IF EXISTS journal_tenant_company_scope ON gl_journal;
+CREATE POLICY journal_tenant_company_scope ON gl_journal FOR ALL USING (
+  tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+  AND company_id = (auth.jwt() ->> 'company_id')::uuid
+  AND has_active_membership(tenant_id)
+);
+
 -- Audit triggers for all major tables
 CREATE TRIGGER audit_tenants AFTER INSERT OR UPDATE OR DELETE ON tenants
   FOR EACH ROW EXECUTE FUNCTION create_audit_log();

@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://docs.aibos.example.com/sitemap.xml

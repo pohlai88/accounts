@@ -80,6 +80,10 @@ export * from "./auth/react-hooks";
 // API Client and State Management
 export * from "./api-client";
 export * from "./state-management";
+export * from "./server-api-client";
+export * from "./api-gateway";
+export * from "./cache";
+export * from "./idempotency";
 
 // Import functions for convenience exports
 import { makeLogger } from "./logger";

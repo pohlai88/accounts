@@ -101,7 +101,8 @@ export const SOD_MATRIX: Record<string, SoDRule> = {
     requiredRole: ['accountant', 'manager', 'admin'],
     requiresFeature: 'ar',
     module: 'AR',
-    amountThreshold: 50000
+    amountThreshold: 50000,
+    approverRoles: ['manager', 'admin']
   },
   'invoice:approve': {
     action: 'Approve Invoice',
@@ -309,7 +310,20 @@ export function checkSoDCompliance(
     creatorRole
   };
 
-  const decision = canPerformAction(user, action, context, {}, {});
+  // Default feature flags for backward compatibility
+  const defaultFeatureFlags: FeatureFlags = {
+    je: true,
+    ar: true,
+    ap: true,
+    attachments: true,
+    reports: true
+  };
+
+  const defaultPolicySettings: PolicySettings = {
+    approval_threshold_rm: 50000
+  };
+
+  const decision = canPerformAction(user, action, context, defaultFeatureFlags, defaultPolicySettings);
 
   return {
     allowed: decision.allowed,

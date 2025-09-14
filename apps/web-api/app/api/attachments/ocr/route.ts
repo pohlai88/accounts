@@ -12,7 +12,7 @@ import {
 import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from '@aibos/contracts';
 
 // Lazy load Inngest to avoid circular dependencies during build
-let inngest: any = null;
+let inngest: unknown = null;
 const getInngest = async () => {
   if (!inngest) {
     const { Inngest } = await import('inngest');
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   const auditContext = createV1AuditContext(request);
   const supabase = createServiceClient();
 
-  let body: any;
+  let body: unknown;
 
   try {
     body = await request.json();
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      const response: any = {
+      const response: unknown = {
         success: true,
         jobId,
         status: 'queued',
@@ -260,7 +260,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Prepare response based on OCR status
-    let response: any;
+    let response: unknown;
 
     switch (ocrStatus) {
       case 'completed':

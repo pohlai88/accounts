@@ -1,7 +1,38 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { postJournal, JournalPostingInput } from "../src/posting";
 
+// Mock the database functions
+vi.mock("@aibos/db", () => ({
+  getAccountsInfo: vi.fn().mockResolvedValue(new Map([
+    ["00000000-0000-0000-0000-000000000001", {
+      id: "00000000-0000-0000-0000-000000000001",
+      code: "1000",
+      name: "Cash",
+      accountType: "ASSET",
+      currency: "MYR",
+      isActive: true,
+      level: 1,
+      parentId: undefined
+    }],
+    ["00000000-0000-0000-0000-000000000002", {
+      id: "00000000-0000-0000-0000-000000000002",
+      code: "2000",
+      name: "Accounts Payable",
+      accountType: "LIABILITY",
+      currency: "MYR",
+      isActive: true,
+      level: 1,
+      parentId: undefined
+    }]
+  ])),
+  getAllAccountsInfo: vi.fn().mockResolvedValue([])
+}));
+
 describe("posting", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   const mockContext = {
     tenantId: "tenant-123",
     companyId: "company-456",

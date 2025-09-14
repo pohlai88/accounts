@@ -48,14 +48,17 @@ export default defineConfig({
       ]
     },
     environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: [resolve(__dirname, './tests/setup.ts')],
     globals: true,
     include: [
       'packages/**/*.{test,spec}.{ts,tsx}',
       'packages/**/test/**/*.{test,spec}.{ts,tsx}',
       'apps/**/*.{test,spec}.{ts,tsx}',
       'services/**/*.{test,spec}.{ts,tsx}',
-      'tests/unit/**/*.{test,spec}.{ts,tsx}'
+      'tests/unit/**/*.{test,spec}.{ts,tsx}',
+      // Package-level patterns for when running from individual packages
+      'src/**/*.{test,spec}.{ts,tsx}',
+      '**/*.{test,spec}.{ts,tsx}'
     ],
     exclude: [
       'node_modules/**',
@@ -77,10 +80,9 @@ export default defineConfig({
       }
     },
     // Reporter configuration
-    reporters: ['verbose', 'json', 'html'],
+    reporters: ['verbose', 'json'],
     outputFile: {
-      json: './test-results/vitest-results.json',
-      html: './test-results/vitest-report.html'
+      json: './test-results/vitest-results.json'
     }
   },
   resolve: {

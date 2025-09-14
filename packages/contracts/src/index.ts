@@ -7,3 +7,4 @@ export * from "./attachments";
 export * from "./types/api";
 export * from "./types/entities";
 export * from "./types/errors";
+export * from "./types/branded";

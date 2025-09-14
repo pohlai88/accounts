@@ -246,7 +246,7 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil((count || 0) / validatedParams.limit);
 
-    const response: any = {
+    const response: unknown = {
       attachments: formattedAttachments,
       pagination: {
         page: validatedParams.page,

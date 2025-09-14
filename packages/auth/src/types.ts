@@ -1,26 +1,28 @@
 // V1 Authentication Types
+import type { UserId, TenantId, CompanyId } from '@aibos/contracts';
+
 export interface AuthUser {
-  id: string;
+  id: UserId;
   email: string;
-  tenant_id: string;
-  company_id: string;
+  tenant_id: TenantId;
+  company_id: CompanyId;
   role: string;
   permissions?: Record<string, boolean>;
 }
 
 export interface JWTClaims {
-  sub: string; // user_id
+  sub: UserId; // user_id
   email: string;
-  tenant_id: string;
-  company_id: string;
+  tenant_id: TenantId;
+  company_id: CompanyId;
   role: string;
   iat: number;
   exp: number;
 }
 
-export type UserRole = 
+export type UserRole =
   | 'admin'
-  | 'manager' 
+  | 'manager'
   | 'accountant'
   | 'clerk'
   | 'viewer'
@@ -29,7 +31,7 @@ export type UserRole =
 export interface AuthContext {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  tenantId: string | null;
-  companyId: string | null;
+  tenantId: TenantId | null;
+  companyId: CompanyId | null;
   role: UserRole | null;
 }

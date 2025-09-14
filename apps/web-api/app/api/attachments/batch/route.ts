@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   const auditContext = createV1AuditContext(request);
   const supabase = createServiceClient();
 
-  let body: any;
+  let body: unknown;
 
   try {
     body = await request.json();
