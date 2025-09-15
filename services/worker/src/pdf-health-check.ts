@@ -1,7 +1,7 @@
 // D3 Puppeteer Health Check System - Monitor PDF Generation Pool
 // V1 Requirement: Health check page.create() every 60s, auto-restart pool on fail
 
-import { getPuppeteerPool } from "./pdf-pool";
+import { getPuppeteerPool } from "./pdf-pool.js";
 import { logger } from "@aibos/utils";
 
 export interface HealthCheckResult {

@@ -1,6 +1,6 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { createServiceClient, logger } from "@aibos/utils";
-import { renderPdf } from "@aibos/utils/server";
+import { renderPdf } from "@aibos/utils/pdf";
 
 // V1 PDF Generation with Puppeteer pool and health checks
 export const pdfGeneration = inngest.createFunction(
@@ -11,7 +11,7 @@ export const pdfGeneration = inngest.createFunction(
     concurrency: 5, // Limit concurrent PDF generation
   },
   { event: "pdf/generate" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { templateType, data, tenantId, companyId, entityId, entityType } = event.data;
 
     // Step 1: Validate input and prepare template
@@ -132,7 +132,9 @@ export const pdfGeneration = inngest.createFunction(
 
     // Step 4: Update entity with PDF reference
     await step.run("update-entity-reference", async () => {
-      if (!entityId || !entityType) return;
+      if (!entityId || !entityType) {
+        return;
+      }
 
       const supabase = createServiceClient();
 
@@ -230,7 +232,7 @@ function generateInvoiceTemplate(data: any): string {
         <div>Invoice #: ${data.invoiceNumber}</div>
         <div>Date: ${data.date}</div>
       </div>
-      
+
       <div class="invoice-details">
         <div><strong>Bill To:</strong></div>
         <div>${data.customer?.name || "N/A"}</div>
@@ -247,10 +249,9 @@ function generateInvoiceTemplate(data: any): string {
           </tr>
         </thead>
         <tbody>
-          ${
-            data.lineItems
-              ?.map(
-                (item: any) => `
+          ${data.lineItems
+      ?.map(
+        (item: any) => `
             <tr>
               <td>${item.description}</td>
               <td>${item.quantity}</td>
@@ -258,9 +259,9 @@ function generateInvoiceTemplate(data: any): string {
               <td>${item.amount}</td>
             </tr>
           `,
-              )
-              .join("") || '<tr><td colspan="4">No items</td></tr>'
-          }
+      )
+      .join("") || '<tr><td colspan="4">No items</td></tr>'
+    }
         </tbody>
       </table>
 
@@ -307,10 +308,9 @@ function generateJournalTemplate(data: any): string {
           </tr>
         </thead>
         <tbody>
-          ${
-            data.lines
-              ?.map(
-                (line: any) => `
+          ${data.lines
+      ?.map(
+        (line: any) => `
             <tr>
               <td>${line.accountName}</td>
               <td>${line.description || ""}</td>
@@ -318,9 +318,9 @@ function generateJournalTemplate(data: any): string {
               <td>${line.credit > 0 ? line.credit : ""}</td>
             </tr>
           `,
-              )
-              .join("") || '<tr><td colspan="4">No lines</td></tr>'
-          }
+      )
+      .join("") || '<tr><td colspan="4">No lines</td></tr>'
+    }
         </tbody>
       </table>
 

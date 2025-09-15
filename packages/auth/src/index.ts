@@ -1,5 +1,5 @@
-export * from "./types";
-export * from "./sod";
+
+export * from "./types.js";
 
 // Re-export key functions for easy access
 export {
@@ -8,7 +8,7 @@ export {
   checkSoDCompliance,
   getApproverRoles,
   SOD_MATRIX,
-} from "./sod";
+} from "./sod.js";
 
 // Re-export governance packs
 export {
@@ -20,8 +20,8 @@ export {
   FRANCHISE_PACK,
   applyGovernancePack,
   getRecommendedPack,
-} from "./governance-packs";
-export type { GovernancePack } from "./governance-packs";
+} from "./governance-packs.js";
+export type { GovernancePack } from "./governance-packs.js";
 
 // Note: React context moved to @aibos/ui package to avoid React dependency
 

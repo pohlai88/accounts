@@ -1,8 +1,8 @@
 // Export Scheduling Service
 // V1 compliance: Automated report generation and scheduling
 
-import { ExportFormat, ReportExportRequest, ExportResult } from "./types";
-import { createExportService } from "./export-service";
+import { ExportFormat, ReportExportRequest, ExportResult } from "./types.js";
+import { createExportService } from "./export-service.js";
 
 export interface ScheduledExport {
   id: string;
@@ -113,8 +113,8 @@ export function createExportScheduleService(): ExportScheduleService {
 
     async listSchedules(tenantId: string, companyId?: string): Promise<ScheduledExport[]> {
       return Array.from(schedules.values()).filter(schedule => {
-        if (schedule.filters.tenantId !== tenantId) return false;
-        if (companyId && schedule.filters.companyId !== companyId) return false;
+        if (schedule.filters.tenantId !== tenantId) { return false; }
+        if (companyId && schedule.filters.companyId !== companyId) { return false; }
         return true;
       });
     },

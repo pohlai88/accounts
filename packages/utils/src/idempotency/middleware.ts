@@ -1,6 +1,6 @@
 // Idempotency Middleware for API Gateway
-import { ApiRequest, GatewayResponse, Middleware } from "../api-gateway/types";
-import { IdempotencyManager } from "./manager";
+import { ApiRequest, GatewayResponse, Middleware } from "@aibos/utils/api-gateway/types.js";
+import { IdempotencyManager } from "./manager.js";
 
 export function createIdempotencyMiddleware(idempotencyManager: IdempotencyManager): Middleware {
   return {

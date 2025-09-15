@@ -16,7 +16,7 @@
  */
 
 // Import the auto-generated token preset
-const tokenPreset = require("../../tokens/tailwind.preset.cjs");
+const tokenPreset = require("@aibos/tokens/tailwind.preset.cjs");
 
 module.exports = {
   // Extend the token preset (this ensures auto-generation from tokens)

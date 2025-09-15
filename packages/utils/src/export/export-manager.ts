@@ -1,8 +1,8 @@
 // Export Management Service
 // V1 compliance: Download history, format selection, file management
 
-import { ExportFormat, ReportExportRequest } from "./types";
-import { createExportService } from "./export-service";
+import { ExportFormat, ReportExportRequest } from "./types.js";
+import { createExportService } from "./export-service.js";
 
 export interface ExportHistory {
   id: string;
@@ -104,7 +104,7 @@ export function createExportManagerService(): ExportManagerService {
 
     async getExport(id: string): Promise<ExportHistory | null> {
       const exportRecord = exports.get(id);
-      if (!exportRecord) return null;
+      if (!exportRecord) { return null; }
 
       // Check if export has expired
       if (exportRecord.expiresAt < new Date()) {
@@ -119,8 +119,8 @@ export function createExportManagerService(): ExportManagerService {
     async listExports(tenantId: string, companyId?: string, limit = 50): Promise<ExportHistory[]> {
       const filtered = Array.from(exports.values())
         .filter(exp => {
-          if (exp.tenantId !== tenantId) return false;
-          if (companyId && exp.companyId !== companyId) return false;
+          if (exp.tenantId !== tenantId) { return false; }
+          if (companyId && exp.companyId !== companyId) { return false; }
           return true;
         })
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
@@ -197,8 +197,8 @@ export function createExportManagerService(): ExportManagerService {
 
     async getExportStats(tenantId: string, companyId?: string): Promise<ExportStats> {
       const filtered = Array.from(exports.values()).filter(exp => {
-        if (exp.tenantId !== tenantId) return false;
-        if (companyId && exp.companyId !== companyId) return false;
+        if (exp.tenantId !== tenantId) { return false; }
+        if (companyId && exp.companyId !== companyId) { return false; }
         return true;
       });
 

@@ -1,2 +1,2 @@
 // Server-only utilities (includes Puppeteer)
-export * from "./pdf";
+export * from "./pdf.js";

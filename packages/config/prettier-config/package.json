@@ -16,5 +16,8 @@
   "license": "MIT",
   "peerDependencies": {
     "prettier": ">=3.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0"
   }
 }

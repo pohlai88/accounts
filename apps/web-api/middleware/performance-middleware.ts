@@ -45,7 +45,7 @@ export class PerformanceMiddleware {
    */
   startTracking(req: NextRequest): PerformanceTracker {
     if (!this.config.enabled) {
-      return new NoOpPerformanceTracker();
+      return new NoOpPerformanceTracker(req, this.config, metrics => this.recordMetrics(metrics)) as unknown as PerformanceTracker;
     }
 
     return new PerformanceTracker(req, this.config, metrics => this.recordMetrics(metrics));
@@ -270,6 +270,25 @@ export class PerformanceTracker {
 }
 
 export class NoOpPerformanceTracker {
+  private startTime: number = 0;
+  private startCpuUsage: NodeJS.CpuUsage = { user: 0, system: 0 };
+  private requestId: string = "";
+  private method: string = "";
+  private url: string = "";
+  private tenantId?: string;
+  private userId?: string;
+  private config: PerformanceConfig;
+  private onComplete: (metrics: PerformanceMetrics) => void;
+
+  constructor(
+    _req: NextRequest,
+    config: PerformanceConfig,
+    onComplete: (metrics: PerformanceMetrics) => void,
+  ) {
+    this.config = config;
+    this.onComplete = onComplete;
+  }
+
   complete(_res: NextResponse): void {
     // No-op for disabled performance tracking
   }

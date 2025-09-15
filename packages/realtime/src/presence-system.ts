@@ -175,7 +175,7 @@ export class PresenceSystem extends EventEmitter {
    */
   getTenantPresence(tenantId: string): PresenceInfo[] {
     const userIds = this.tenantPresence.get(tenantId);
-    if (!userIds) return [];
+    if (!userIds) { return []; }
 
     return Array.from(userIds)
       .map(userId => this.presence.get(userId))
@@ -358,7 +358,7 @@ export class PresenceSystem extends EventEmitter {
    */
   private handlePresenceMessage(connectionId: string, message: { data: unknown }): void {
     const connection = this.wsManager.getConnection(connectionId);
-    if (!connection) return;
+    if (!connection) { return; }
 
     const { status, metadata } = message.data as {
       status: "online" | "away" | "busy" | "offline";
@@ -447,5 +447,21 @@ export class PresenceSystem extends EventEmitter {
         this.removeFromTenantPresence(presence.tenantId, userId);
       }
     }
+  }
+
+  // Static method for compatibility
+  static getStats(): PresenceStats {
+    // This is a static method that would need access to a global instance
+    // For now, return empty stats as a compatibility bridge
+    console.warn("PresenceSystem.getStats() - static method not implemented, returning empty stats");
+    return {
+      totalUsers: 0,
+      onlineUsers: 0,
+      awayUsers: 0,
+      busyUsers: 0,
+      offlineUsers: 0,
+      usersByTenant: {},
+      averageSessionDuration: 0,
+    };
   }
 }

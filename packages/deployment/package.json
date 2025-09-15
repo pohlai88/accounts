@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Production deployment utilities and configurations for AI-BOS Accounts",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p . --noEmit",
     "dev": "tsc -p . --watch",
@@ -36,8 +35,10 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
     }
   }
 }

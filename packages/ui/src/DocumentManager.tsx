@@ -1,7 +1,7 @@
 import * as React from "react";
-import { FileUpload } from "./FileUpload";
-import { DocumentPreview } from "./DocumentPreview";
-import { cn } from "./utils";
+import { FileUpload } from "./FileUpload.js";
+import { DocumentPreview } from "./DocumentPreview.js";
+import { cn } from "./utils.js";
 
 // SSOT Compliant Document Management Interface
 // Uses semantic tokens throughout, no inline styles
@@ -229,7 +229,7 @@ export const DocumentManager: React.FC<DocumentManagerProps> = ({
         className={cn(
           "px-2 py-1 text-xs font-medium rounded-full",
           statusClasses[status as keyof typeof statusClasses] ||
-            "bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]",
+          "bg-[var(--sys-bg-subtle)] text-[var(--sys-text-secondary)]",
         )}
       >
         {status}

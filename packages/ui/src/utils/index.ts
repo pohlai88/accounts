@@ -4,4 +4,4 @@
  * Single source of truth for all utility exports
  */
 
-export { cn } from "./cn";
+export { cn } from "./cn.js";

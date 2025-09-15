@@ -1,6 +1,6 @@
 // Request Context Utilities - V1 Compliance
-import { NextRequest } from "next/server";
-import { AuditContext } from "../audit/audit-service";
+import { NextRequest } from "next/server.js";
+import type { V1AuditAuditContext } from "../types.js";
 
 export interface RequestContext {
   requestId: string;
@@ -81,7 +81,7 @@ export function extractUserContext(request: NextRequest): UserContext {
 /**
  * Create audit context from request
  */
-export function createAuditContext(request: NextRequest): AuditContext {
+export function createAuditContext(request: NextRequest): V1AuditAuditContext {
   const userContext = extractUserContext(request);
 
   return {

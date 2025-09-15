@@ -234,7 +234,7 @@ export class NotificationSystem extends EventEmitter {
    */
   markAllAsRead(userId: string, tenantId: string): number {
     const userNotificationIds = this.userNotifications.get(userId);
-    if (!userNotificationIds) return 0;
+    if (!userNotificationIds) {return 0;}
 
     let markedCount = 0;
     for (const notificationId of userNotificationIds) {
@@ -296,7 +296,7 @@ export class NotificationSystem extends EventEmitter {
     } = {},
   ): Notification[] {
     const userNotificationIds = this.userNotifications.get(userId);
-    if (!userNotificationIds) return [];
+    if (!userNotificationIds) {return [];}
 
     const { limit = 50, offset = 0, unreadOnly = false, category, type } = options;
 
@@ -435,7 +435,7 @@ export class NotificationSystem extends EventEmitter {
    */
   private handleNotificationAction(connectionId: string, message: { data: unknown }): void {
     const connection = this.wsManager.getConnection(connectionId);
-    if (!connection) return;
+    if (!connection) {return;}
 
     const { notificationId, actionId, data } = message.data as {
       notificationId: string;
@@ -444,10 +444,10 @@ export class NotificationSystem extends EventEmitter {
     };
     const notification = this.notifications.get(notificationId);
 
-    if (!notification || notification.userId !== connection.userId) return;
+    if (!notification || notification.userId !== connection.userId) {return;}
 
     const action = notification.actions?.find(a => a.id === actionId);
-    if (!action) return;
+    if (!action) {return;}
 
     // Execute action
     this.executeNotificationAction(notification, action, data, connection.userId);
@@ -497,11 +497,11 @@ export class NotificationSystem extends EventEmitter {
     preferences: NotificationPreferences,
   ): boolean {
     // Check global settings
-    if (!preferences.globalSettings.enableWebSocket) return false;
+    if (!preferences.globalSettings.enableWebSocket) {return false;}
 
     // Check category settings
     const categoryPrefs = preferences.categories[notification.category];
-    if (categoryPrefs && !categoryPrefs.enabled) return false;
+    if (categoryPrefs && !categoryPrefs.enabled) {return false;}
 
     // Check quiet hours
     if (categoryPrefs?.quietHours) {

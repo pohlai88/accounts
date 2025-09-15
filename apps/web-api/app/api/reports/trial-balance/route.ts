@@ -1,7 +1,7 @@
 // D4 Trial Balance API Route - V1 Compliant Implementation
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { generateTrialBalance } from "@aibos/accounting/src/reports/trial-balance";
+import { generateTrialBalance, type TrialBalanceResult, type TrialBalanceError } from "@aibos/accounting/reports/trial-balance";
 import { createClient } from "@supabase/supabase-js";
 import { processIdempotencyKey } from "@aibos/utils/middleware/idempotency";
 import {
@@ -9,9 +9,9 @@ import {
   createV1AuditContext,
   createV1RequestContext,
   extractV1UserContext,
-  performanceMonitor,
+  utilsPerformanceMonitor,
 } from "@aibos/utils";
-import { checkSoDCompliance } from "@aibos/auth/src/sod";
+import { checkSoDCompliance } from "@aibos/auth";
 
 // Request schema validation (V1 requirement: Zod for all IO)
 const TrialBalanceRequestSchema = z.object({
@@ -90,10 +90,10 @@ export type TTrialBalanceResponse = z.infer<typeof TrialBalanceResponseSchema>;
  */
 export async function GET(request: NextRequest) {
   const auditService = getV1AuditService();
-  let reportResult: unknown = null;
+  let reportResult: TrialBalanceResult | TrialBalanceError | null = null;
 
   // Start performance monitoring
-  const perfTimer = performanceMonitor.createTimer("api.reports.trial-balance.get");
+  const perfTimer = utilsPerformanceMonitor.createTimer("api.reports.trial-balance.get");
 
   try {
     // 1. Process idempotency key (V1 requirement)
@@ -152,10 +152,20 @@ export async function GET(request: NextRequest) {
         ...input,
         asOfDate: new Date(input.asOfDate),
       },
-      supabase as unknown,
+      {
+        query: async (sql: string, params?: unknown[]) => {
+          const { data, error } = await supabase.rpc('execute_sql', {
+            query: sql,
+            params: params || []
+          });
+          if (error) throw error;
+          return data;
+        }
+      },
     );
 
     if (!reportResult.success) {
+      const errorResult = reportResult as TrialBalanceError;
       // Log failed report generation (V1 audit requirement)
       await auditService.logReportGeneration(
         createV1AuditContext(request),
@@ -163,7 +173,7 @@ export async function GET(request: NextRequest) {
         input,
         {
           success: false,
-          error: reportResult.error,
+          error: errorResult.error,
           generationTime: Date.now() - startTime,
         },
       );
@@ -171,8 +181,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: reportResult.error,
-          code: reportResult.code,
+          error: errorResult.error,
+          code: errorResult.code,
         },
         { status: 400 },
       );
@@ -253,10 +263,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const auditService = getV1AuditService();
-  let reportResult: unknown = null;
+  let reportResult: TrialBalanceResult | TrialBalanceError | null = null;
 
   // Start performance monitoring
-  const perfTimer = performanceMonitor.createTimer("api.reports.trial-balance");
+  const perfTimer = utilsPerformanceMonitor.createTimer("api.reports.trial-balance");
 
   try {
     // 1. Process idempotency key (V1 requirement)
@@ -306,7 +316,16 @@ export async function POST(request: NextRequest) {
         ...input,
         asOfDate: new Date(input.asOfDate),
       },
-      supabase as unknown,
+      {
+        query: async (sql: string, params?: unknown[]) => {
+          const { data, error } = await supabase.rpc('execute_sql', {
+            query: sql,
+            params: params || []
+          });
+          if (error) throw error;
+          return data;
+        }
+      },
     );
 
     if (!reportResult.success) {

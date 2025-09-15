@@ -1,5 +1,5 @@
 // API Gateway Router
-import { ApiRequest, GatewayResponse, RouteConfig, RouteMatch, Middleware } from "./types";
+import { ApiRequest, GatewayResponse, RouteConfig, RouteMatch, Middleware } from "./types.js";
 
 export class ApiRouter {
   private routes: RouteConfig[] = [];
@@ -23,7 +23,7 @@ export class ApiRouter {
    */
   findRoute(method: string, path: string): RouteMatch | null {
     for (const route of this.routes) {
-      if (route.method !== method) continue;
+      if (route.method !== method) {continue;}
 
       const match = this.matchPath(route.path, path);
       if (match) {
@@ -76,7 +76,7 @@ export class ApiRouter {
   private parseQuery(queryString: string): Record<string, string> {
     const query: Record<string, string> = {};
 
-    if (!queryString) return query;
+    if (!queryString) {return query;}
 
     const pairs = queryString.split("&");
     for (const pair of pairs) {

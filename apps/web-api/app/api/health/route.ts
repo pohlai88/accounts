@@ -18,10 +18,13 @@ async function check(name: string, fn: () => Promise<void>) {
     await withTimeout(fn());
     return { status: "healthy" as const, responseTime: Math.round(performance.now() - start) };
   } catch (e: unknown) {
+    const errorMessage = e && typeof e === 'object' && 'message' in e
+      ? (e as { message: string }).message
+      : String(e);
     return {
       status: "degraded" as const,
       responseTime: Math.round(performance.now() - start),
-      error: String(e?.message ?? e),
+      error: errorMessage,
     };
   }
 }
@@ -74,7 +77,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/jwks`, {
           signal: ctl.signal,
         });
-        if (!res.ok) throw new Error(`jwks http ${res.status}`);
+        if (!res.ok) { throw new Error(`jwks http ${res.status}`); }
       } finally {
         clearTimeout(t);
       }
@@ -85,7 +88,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       const t = setTimeout(() => ctl.abort(), BUDGET_MS);
       try {
         const res = await fetch(`${origin}/api/ping`, { signal: ctl.signal });
-        if (!res.ok) throw new Error(`ping http ${res.status}`);
+        if (!res.ok) { throw new Error(`ping http ${res.status}`); }
       } finally {
         clearTimeout(t);
       }

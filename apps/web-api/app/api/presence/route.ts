@@ -2,9 +2,11 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { getSecurityContext } from "../_lib/request";
 import { ok, problem } from "../_lib/response";
+import { PresenceSchema, type Presence } from "@aibos/contracts";
+import { getErrorMessage, getErrorCode } from "@aibos/utils";
 
 // Mock presence system (in production, use real instance)
-const mockPresence = new Map<string, unknown>();
+const mockPresence = new Map<string, Presence>();
 
 const UpdatePresenceSchema = z.object({
   status: z.enum(["online", "away", "busy", "offline"]),
@@ -21,8 +23,9 @@ const UpdatePresenceSchema = z.object({
 const PresenceQuerySchema = z.object({
   status: z.enum(["online", "away", "busy", "offline"]).optional(),
   includeOffline: z
-    .string()
-    .transform(val => val === "true")
+    .union([z.string(), z.boolean()])
+    .optional()
+    .transform(val => val === "true" || val === true)
     .default(false),
 });
 
@@ -34,21 +37,21 @@ export async function GET(req: NextRequest) {
 
     // Mock implementation - in production, use real presence system
     const presenceList = Array.from(mockPresence.values())
-      .filter((p: unknown) => p.tenantId === ctx.tenantId)
-      .filter((p: unknown) => {
-        if (query.status && p.status !== query.status) return false;
-        if (!query.includeOffline && p.status === "offline") return false;
+      .filter((p) => p.tenantId === ctx.tenantId)
+      .filter((p) => {
+        if (query.status && p.status !== query.status) { return false; }
+        if (!query.includeOffline && p.status === "offline") { return false; }
         return true;
       })
-      .sort((a: unknown, b: unknown) => a.userId.localeCompare(b.userId));
+      .sort((a, b) => a.userId.localeCompare(b.userId));
 
     // Calculate statistics
     const stats = {
       total: presenceList.length,
-      online: presenceList.filter((p: unknown) => p.status === "online").length,
-      away: presenceList.filter((p: unknown) => p.status === "away").length,
-      busy: presenceList.filter((p: unknown) => p.status === "busy").length,
-      offline: presenceList.filter((p: unknown) => p.status === "offline").length,
+      online: presenceList.filter((p) => p.status === "online").length,
+      away: presenceList.filter((p) => p.status === "away").length,
+      busy: presenceList.filter((p) => p.status === "busy").length,
+      offline: presenceList.filter((p) => p.status === "offline").length,
     };
 
     return ok(
@@ -62,11 +65,12 @@ export async function GET(req: NextRequest) {
     console.error("Get presence error:", error);
 
     if (error && typeof error === "object" && "status" in error) {
+      const apiError = error as { status: number; message: string };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: apiError.status,
+        title: apiError.message,
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: apiError.message,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
@@ -88,11 +92,11 @@ export async function POST(req: NextRequest) {
     const presenceData = UpdatePresenceSchema.parse(body);
 
     // Update presence
-    const presence = {
+    const presence: Presence = {
       userId: ctx.userId,
       tenantId: ctx.tenantId,
       ...presenceData,
-      lastSeen: new Date().toISOString(),
+      lastSeen: Date.now(),
     };
 
     // Store presence (mock)
@@ -112,22 +116,22 @@ export async function POST(req: NextRequest) {
     console.error("Update presence error:", error);
 
     if (error && typeof error === "object" && "status" in error) {
+      const apiError = error as { status: number; message: string };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: apiError.status,
+        title: apiError.message,
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: apiError.message,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
 
-    if (error.name === "ZodError") {
+    if (error instanceof z.ZodError) {
       return problem({
         status: 400,
         title: "Validation error",
         code: "VALIDATION_ERROR",
-        detail: "Invalid presence data",
-        errors: error.errors,
+        detail: `Invalid presence data: ${error.errors.map(e => e.message).join(', ')}`,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }

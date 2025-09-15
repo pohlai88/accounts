@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "./utils";
+import { cn } from "./utils.js";
 
 // SSOT Compliant File Upload Component with Drag-and-Drop
 // Uses semantic tokens throughout, no inline styles

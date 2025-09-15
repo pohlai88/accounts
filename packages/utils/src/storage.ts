@@ -12,10 +12,11 @@ export async function putPdf(opts: { tenantId: string; path: string; bytes: Buff
       contentType: "application/pdf",
       upsert: true,
     });
-  if (error) throw error;
+  if (error) {throw error;}
   const { data } = supabase.storage.from("documents").getPublicUrl(`${opts.tenantId}/${opts.path}`);
   return { url: data.publicUrl };
 }
 
 // V1 Compliance: Export attachment system
-export * from "./storage/index";
+export * from "./storage/index.js";
+export { attachmentService } from "./storage/index.js";

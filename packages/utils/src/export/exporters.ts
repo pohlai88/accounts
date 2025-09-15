@@ -2,7 +2,7 @@
 // V1 compliance requirement: Export in CSV/XLSX/JSONL
 
 import * as ExcelJS from "exceljs";
-import { ExportableData, ExportOptions, ExportResult } from "./types";
+import { ExportableData, ExportOptions, ExportResult } from "./types.js";
 
 /**
  * Export data to CSV format
@@ -35,7 +35,7 @@ export async function exportToCsv(
     for (const row of rows) {
       const csvRow = row
         .map(cell => {
-          if (cell === null || cell === undefined) return "";
+          if (cell === null || cell === undefined) {return "";}
           const cellStr = String(cell);
           // Escape quotes and wrap in quotes if contains comma, quote, or newline
           if (cellStr.includes(",") || cellStr.includes('"') || cellStr.includes("\n")) {
@@ -267,7 +267,7 @@ export async function exportToCsvEnhanced(
     for (const row of rows) {
       const csvRow = row
         .map(cell => {
-          if (cell === null || cell === undefined) return "";
+          if (cell === null || cell === undefined) {return "";}
 
           // Format dates if dateFormat is specified
           if (typeof cell === "object" && cell !== null && "getTime" in cell) {

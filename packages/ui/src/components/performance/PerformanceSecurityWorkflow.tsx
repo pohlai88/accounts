@@ -1,8 +1,8 @@
 import React, { useState, Suspense, lazy } from "react";
-import { Card } from "../../Card";
-import { Button } from "../../Button";
-import { Input } from "../../Input";
-import { cn } from "../../utils";
+import { Card } from "@aibos/ui/Card";
+import { Button } from "@aibos/ui/Button";
+import { Input } from "@aibos/ui/Input";
+import { cn } from "@aibos/ui/utils";
 import {
   Activity,
   AlertTriangle,
@@ -17,21 +17,21 @@ import {
 
 // Lazy load components
 const PerformanceMonitor = lazy(() =>
-  import("./PerformanceMonitor").then(m => ({ default: m.PerformanceMonitor })),
+  import("./PerformanceMonitor.js").then(m => ({ default: m.PerformanceMonitor })),
 );
 const SecurityAudit = lazy(() =>
-  import("./SecurityAudit").then(m => ({ default: m.SecurityAudit })),
+  import("./SecurityAudit.js").then(m => ({ default: m.SecurityAudit })),
 );
 const DataEncryption = lazy(() =>
-  import("./DataEncryption").then(m => ({ default: m.DataEncryption })),
+  import("./DataEncryption.js").then(m => ({ default: m.DataEncryption })),
 );
 const BackupRecovery = lazy(() =>
-  import("./BackupRecovery").then(m => ({ default: m.BackupRecovery })),
+  import("./BackupRecovery.js").then(m => ({ default: m.BackupRecovery })),
 );
 const MonitoringAlerting = lazy(() =>
-  import("./MonitoringAlerting").then(m => ({ default: m.MonitoringAlerting })),
+  import("./MonitoringAlerting.js").then(m => ({ default: m.MonitoringAlerting })),
 );
-const LoadTesting = lazy(() => import("./LoadTesting").then(m => ({ default: m.LoadTesting })));
+const LoadTesting = lazy(() => import("./LoadTesting.js").then(m => ({ default: m.LoadTesting })));
 
 interface PerformanceSecurityWorkflowProps {
   // Performance monitoring props
@@ -222,7 +222,7 @@ export const PerformanceSecurityWorkflow: React.FC<PerformanceSecurityWorkflowPr
                 className={cn(
                   "w-full justify-start text-[var(--sys-text-secondary)] hover:text-[var(--sys-text-primary)] p-3",
                   activeSection === section.id &&
-                    "bg-[var(--sys-fill-low)] text-[var(--sys-text-primary)]",
+                  "bg-[var(--sys-fill-low)] text-[var(--sys-text-primary)]",
                 )}
                 onClick={() => setActiveSection(section.id)}
                 aria-current={activeSection === section.id ? "page" : undefined}

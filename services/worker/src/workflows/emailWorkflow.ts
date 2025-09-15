@@ -1,4 +1,4 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { sendEmail, logger } from "@aibos/utils";
 
 // V1 Email Workflow with Resend integration
@@ -9,7 +9,7 @@ export const emailWorkflow = inngest.createFunction(
     retries: 3,
   },
   { event: "email/send" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const {
       to,
       subject,

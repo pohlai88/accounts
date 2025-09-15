@@ -7,8 +7,8 @@ import {
   ExportResult,
   ExportableData,
   ReportExportRequest,
-} from "./types";
-import { exportToCsv, exportToXlsx, exportToJsonl } from "./exporters";
+} from "./types.js";
+import { exportToCsv, exportToXlsx, exportToJsonl } from "./exporters.js";
 
 export interface ExportService {
   exportReport(request: ReportExportRequest): Promise<ExportResult>;

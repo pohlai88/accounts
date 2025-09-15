@@ -10,7 +10,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ApiRequestContext, apiClient, isSuccess } from "./api-client";
+import { ApiRequestContext, apiClient, isSuccess } from "./api-client.js";
 
 // ============================================================================
 // REAL DATA FETCHING HOOKS
@@ -33,7 +33,7 @@ export function useInvoices(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchInvoices = useCallback(async () => {
-    if (options?.enabled === false) return;
+    if (options?.enabled === false) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -85,7 +85,7 @@ export function useInvoice(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchInvoice = useCallback(async () => {
-    if (options?.enabled === false || !id) return;
+    if (options?.enabled === false || !id) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -125,7 +125,7 @@ export function useCreateInvoice(context: ApiRequestContext, options?: { enabled
 
   const mutate = useCallback(
     async (invoiceData: unknown) => {
-      if (options?.enabled === false) return;
+      if (options?.enabled === false) { return; }
 
       setIsLoading(true);
       setError(null);
@@ -165,7 +165,7 @@ export function usePostInvoice(context: ApiRequestContext, options?: { enabled?:
 
   const mutate = useCallback(
     async (data: { invoiceId: string; arAccountId: string }) => {
-      if (options?.enabled === false) return;
+      if (options?.enabled === false) { return; }
 
       setIsLoading(true);
       setError(null);
@@ -214,7 +214,7 @@ export function useCustomers(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchCustomers = useCallback(async () => {
-    if (options?.enabled === false) return;
+    if (options?.enabled === false) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -264,7 +264,7 @@ export function useCustomer(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchCustomer = useCallback(async () => {
-    if (options?.enabled === false || !id) return;
+    if (options?.enabled === false || !id) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -304,7 +304,7 @@ export function useCreateCustomer(context: ApiRequestContext, options?: { enable
 
   const mutate = useCallback(
     async (customerData: unknown) => {
-      if (options?.enabled === false) return;
+      if (options?.enabled === false) { return; }
 
       setIsLoading(true);
       setError(null);
@@ -354,7 +354,7 @@ export function useJournals(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchJournals = useCallback(async () => {
-    if (options?.enabled === false) return;
+    if (options?.enabled === false) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -405,7 +405,7 @@ export function useJournal(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchJournal = useCallback(async () => {
-    if (options?.enabled === false || !id) return;
+    if (options?.enabled === false || !id) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -458,7 +458,7 @@ export function useTrialBalance(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchTrialBalance = useCallback(async () => {
-    if (options?.enabled === false) return;
+    if (options?.enabled === false) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -514,7 +514,7 @@ export function useChartOfAccounts(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchAccounts = useCallback(async () => {
-    if (options?.enabled === false) return;
+    if (options?.enabled === false) { return; }
 
     setIsLoading(true);
     setError(null);
@@ -559,7 +559,7 @@ export function useTaxCodes(context: ApiRequestContext, options?: { enabled?: bo
   const [error, setError] = useState<Error | null>(null);
 
   const fetchTaxCodes = useCallback(async () => {
-    if (options?.enabled === false) return;
+    if (options?.enabled === false) { return; }
 
     setIsLoading(true);
     setError(null);

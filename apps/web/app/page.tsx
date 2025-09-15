@@ -68,12 +68,12 @@ export default function Home() {
   // Get request context for API calls - ensure it's serializable
   const requestContext = session
     ? {
-        tenantId: session.user.companyId,
-        companyId: session.user.companyId,
-        userId: session.user.id,
-        userRole: session.user.role,
-        requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      }
+      tenantId: session.user.companyId,
+      companyId: session.user.companyId,
+      userId: session.user.id,
+      userRole: session.user.role,
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    }
     : null;
 
   // Fetch data when authenticated - only on client side
@@ -107,7 +107,7 @@ export default function Home() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !isClient) return;
+    if (!email || !password || !isClient) { return; }
 
     setIsLoggingIn(true);
     try {
@@ -122,7 +122,7 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
-    if (!isClient) return;
+    if (!isClient) { return; }
     try {
       await logout();
     } catch (error) {

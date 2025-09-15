@@ -1,7 +1,7 @@
 // D4 Cash Flow Statement API Route - V1 Compliant Implementation
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { generateCashFlow } from "@aibos/accounting/src/reports/cash-flow";
+import { generateCashFlow, type CashFlowResult, type CashFlowError } from "@aibos/accounting/reports/cash-flow";
 import { createClient } from "@supabase/supabase-js";
 import { processIdempotencyKey } from "@aibos/utils/middleware/idempotency";
 import {
@@ -10,7 +10,7 @@ import {
   createV1RequestContext,
   extractV1UserContext,
 } from "@aibos/utils";
-import { checkSoDCompliance } from "@aibos/auth/src/sod";
+import { checkSoDCompliance } from "@aibos/auth";
 
 // Request schema validation
 const CashFlowRequestSchema = z.object({
@@ -37,7 +37,7 @@ export type TCashFlowRequest = z.infer<typeof CashFlowRequestSchema>;
  */
 export async function GET(request: NextRequest) {
   const auditService = getV1AuditService();
-  const reportResult: unknown = null;
+  let reportResult: CashFlowResult | CashFlowError | null = null;
 
   try {
     // 1. Process idempotency key (V1 requirement)
@@ -100,20 +100,30 @@ export async function GET(request: NextRequest) {
         endDate: new Date(input.endDate),
         comparativePeriod: input.comparativePeriod
           ? {
-              startDate: new Date(input.comparativePeriod.startDate),
-              endDate: new Date(input.comparativePeriod.endDate),
-            }
+            startDate: new Date(input.comparativePeriod.startDate),
+            endDate: new Date(input.comparativePeriod.endDate),
+          }
           : undefined,
       },
-      supabase as unknown,
+      {
+        query: async (sql: string, params?: unknown[]) => {
+          const { data, error } = await supabase.rpc('execute_sql', {
+            query: sql,
+            params: params || []
+          });
+          if (error) throw error;
+          return data;
+        }
+      },
     );
 
     if (!result.success) {
+      const errorResult = result as CashFlowError;
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
-          code: result.code,
+          error: errorResult.error,
+          code: errorResult.code,
         },
         { status: 400 },
       );
@@ -182,20 +192,30 @@ export async function POST(request: NextRequest) {
         endDate: new Date(input.endDate),
         comparativePeriod: input.comparativePeriod
           ? {
-              startDate: new Date(input.comparativePeriod.startDate),
-              endDate: new Date(input.comparativePeriod.endDate),
-            }
+            startDate: new Date(input.comparativePeriod.startDate),
+            endDate: new Date(input.comparativePeriod.endDate),
+          }
           : undefined,
       },
-      supabase as unknown,
+      {
+        query: async (sql: string, params?: unknown[]) => {
+          const { data, error } = await supabase.rpc('execute_sql', {
+            query: sql,
+            params: params || []
+          });
+          if (error) throw error;
+          return data;
+        }
+      },
     );
 
     if (!result.success) {
+      const errorResult = result as CashFlowError;
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
-          code: result.code,
+          error: errorResult.error,
+          code: errorResult.code,
         },
         { status: 400 },
       );

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { sendEmail, createServiceClient } from "@aibos/utils";
-import { renderPdf } from "@aibos/utils/server";
+import { renderPdf } from "@aibos/utils/pdf";
 
 export const invoiceApprovedEvt = z.object({
   tenantId: z.string().uuid(),
@@ -13,7 +13,7 @@ export const invoiceApprovedEvt = z.object({
 export const invoiceApproved = inngest.createFunction(
   { id: "invoice-approved" },
   { event: "accounting.invoice.approved", schema: invoiceApprovedEvt },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const html = await step.run(
       "build-html",
       async () => `<html><body><h1>Invoice ${event.data.invoiceId}</h1></body></html>`,

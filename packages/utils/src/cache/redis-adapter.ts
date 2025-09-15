@@ -1,5 +1,5 @@
 // Redis Cache Adapter
-import { CacheAdapter, CacheConfig, CacheOptions, CacheStats, CacheItem } from "./types";
+import { CacheAdapter, CacheConfig, CacheOptions, CacheStats, CacheItem } from "./types.js";
 
 export class RedisCacheAdapter implements CacheAdapter {
   private client: unknown;

@@ -1,6 +1,6 @@
 // D2 AR Invoice Posting Engine - Invoice to GL Integration
-import { validateJournalPosting, type JournalPostingInput } from "../posting";
-import { validateFxPolicy } from "../fx/policy";
+import { validateJournalPosting, type JournalPostingInput } from "../posting.js";
+import { validateFxPolicy } from "../fx/policy.js";
 
 export interface InvoicePostingInput {
   tenantId: string;

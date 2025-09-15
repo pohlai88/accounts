@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": "Real-time features and WebSocket integration for AI-BOS Accounts",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p . --noEmit",
+    "build": "tsc -p .",
     "dev": "tsc -p . --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc -p . --noEmit",
@@ -16,7 +15,8 @@
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
   "dependencies": {
-    "ws": "^8.14.2"
+    "ws": "^8.14.2",
+    "@aibos/utils": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.3.3",
@@ -28,9 +28,12 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./package.json": "./package.json"
   }
 }

@@ -35,7 +35,7 @@ vi.mock("../src/storage/attachment-service", () => ({
 }));
 
 // Import the mocked service
-import { attachmentService } from "../src/storage/attachment-service";
+import { attachmentService } from "@aibos/utils/storage/attachment-service";
 
 describe("AttachmentService - Advanced Features", () => {
   let mockAttachmentService: unknown;

@@ -7,8 +7,9 @@ import {
   calculateInvoiceTaxes,
 } from "@aibos/accounting";
 import { insertInvoice, type InvoiceInput } from "@aibos/db";
-import { createRequestContext, extractUserContext } from "@aibos/utils";
-import { getAuditService, createAuditContext } from "@aibos/utils";
+import { createRequestContext, extractUserContext, pick } from "@aibos/utils";
+import { getAuditService } from "@aibos/utils";
+import { createAuditContext } from "@aibos/utils/audit/service";
 import { processIdempotencyKey } from "@aibos/utils/middleware/idempotency";
 import { createClient } from "@supabase/supabase-js";
 
@@ -18,7 +19,13 @@ import { createClient } from "@supabase/supabase-js";
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const context = createRequestContext(req);
-    const scope = extractUserContext(req);
+    const userContext = extractUserContext(req);
+    const scope = {
+      tenantId: userContext.tenantId!,
+      companyId: userContext.companyId!,
+      userId: userContext.userId!,
+      userRole: userContext.userRole!,
+    };
     const { searchParams } = new URL(req.url);
 
     // Parse query parameters
@@ -107,10 +114,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const context = createRequestContext(req);
     const body = CreateInvoiceReq.parse(await req.json());
-    const scope = extractUserContext(req);
+    const userContext = extractUserContext(req);
+    const scope = {
+      tenantId: userContext.tenantId!,
+      companyId: userContext.companyId!,
+      userId: userContext.userId!,
+      userRole: userContext.userRole!,
+    };
 
     const auditContext = createAuditContext(
-      context.request_id,
+      context.requestId,
       req.ip || req.headers.get("x-forwarded-for") || "unknown",
       req.headers.get("user-agent") || "unknown",
       "API",
@@ -264,9 +277,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Log error for audit trail
     try {
       const context = createRequestContext(req);
-      const scope = extractUserContext(req);
+      const userContext = extractUserContext(req);
+      const scope = {
+        tenantId: userContext.tenantId!,
+        companyId: userContext.companyId!,
+        userId: userContext.userId!,
+        userRole: userContext.userRole!,
+      };
       const auditContext = createAuditContext(
-        context.request_id,
+        context.requestId,
         req.ip || req.headers.get("x-forwarded-for") || "unknown",
         req.headers.get("user-agent") || "unknown",
         "API",

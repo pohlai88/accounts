@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { getSecurityContext } from "../../_lib/request";
-import { ok, problem } from "../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Mock compliance rules (in production, use real instance)
 const mockComplianceRules = [
@@ -123,12 +123,13 @@ export async function GET(req: NextRequest) {
   } catch (error: unknown) {
     console.error("Get compliance rules error:", error);
 
-    if (error && typeof error === "object" && "status" in error) {
+    if (error && typeof error === "object" && "status" in error && "message" in error) {
+      const errorObj = error as { status: unknown; message: unknown };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: Number(errorObj.status) || 500,
+        title: String(errorObj.message),
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: String(errorObj.message),
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
@@ -158,7 +159,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Add to mock store
-    mockComplianceRules.push(newRule);
+    mockComplianceRules.push(newRule as any);
 
     return ok(
       {
@@ -170,23 +171,24 @@ export async function POST(req: NextRequest) {
   } catch (error: unknown) {
     console.error("Create compliance rule error:", error);
 
-    if (error && typeof error === "object" && "status" in error) {
+    if (error && typeof error === "object" && "status" in error && "message" in error) {
+      const errorObj = error as { status: unknown; message: unknown };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: Number(errorObj.status) || 500,
+        title: String(errorObj.message),
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: String(errorObj.message),
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
 
-    if (error.name === "ZodError") {
+    if (error instanceof Error && error.name === "ZodError") {
+      const zodError = error as any; // ZodError has errors property
       return problem({
         status: 400,
         title: "Validation error",
         code: "VALIDATION_ERROR",
-        detail: "Invalid rule data",
-        errors: error.errors,
+        detail: `Invalid rule data: ${zodError.errors.map((e: z.ZodIssue) => e.message).join(', ')}`,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }

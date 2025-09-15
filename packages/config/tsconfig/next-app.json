@@ -1,8 +1,8 @@
 {
     "extends": "./base.json",
     "compilerOptions": {
-        "jsx": "preserve",
-        "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "moduleResolution": "nodenext",
         "noEmit": true,
         "allowJs": true,
         "incremental": true,

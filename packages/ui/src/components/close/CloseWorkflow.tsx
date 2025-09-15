@@ -1,12 +1,12 @@
 import * as React from "react";
-import { cn } from "../../utils";
+import { cn } from "@aibos/ui/utils";
 import { CheckCircle, Clock, Lock, AlertTriangle, ArrowRight, ArrowLeft, Home } from "lucide-react";
-import { CloseRoom } from "./CloseRoom";
-import { CloseChecklist } from "./CloseChecklist";
-import { LockStates } from "./LockStates";
-import { AccrualHelpers } from "./AccrualHelpers";
-import { AdjustingEntries } from "./AdjustingEntries";
-import { ExportPackBuilder } from "./ExportPackBuilder";
+import { CloseRoom } from "./CloseRoom.js";
+import { CloseChecklist } from "./CloseChecklist.js";
+import { LockStates } from "./LockStates.js";
+import { AccrualHelpers } from "./AccrualHelpers.js";
+import { AdjustingEntries } from "./AdjustingEntries.js";
+import { ExportPackBuilder } from "./ExportPackBuilder.js";
 
 // SSOT Compliant Close Workflow Component
 // Master workflow orchestrator for month-end close process
@@ -16,12 +16,12 @@ export interface CloseStep {
   title: string;
   description: string;
   component:
-    | "close-room"
-    | "checklist"
-    | "lock-states"
-    | "accruals"
-    | "adjusting-entries"
-    | "export-pack";
+  | "close-room"
+  | "checklist"
+  | "lock-states"
+  | "accruals"
+  | "adjusting-entries"
+  | "export-pack";
   status: "pending" | "in_progress" | "completed" | "blocked";
   required: boolean;
   estimatedHours: number;
@@ -180,10 +180,10 @@ export const CloseWorkflow: React.FC<CloseWorkflowProps> = ({
                 actualHours: 0,
               },
             }}
-            onTaskUpdate={async () => {}}
-            onPeriodLock={async () => {}}
-            onExportPack={async () => {}}
-            onAddTask={async () => {}}
+            onTaskUpdate={async () => { }}
+            onPeriodLock={async () => { }}
+            onExportPack={async () => { }}
+            onAddTask={async () => { }}
           />
         );
       case "checklist":
@@ -191,10 +191,10 @@ export const CloseWorkflow: React.FC<CloseWorkflowProps> = ({
           <CloseChecklist
             {...commonProps}
             items={[]} // This should come from props
-            onItemUpdate={async () => {}}
-            onBulkUpdate={async () => {}}
-            onAddItem={async () => {}}
-            onRemoveItem={async () => {}}
+            onItemUpdate={async () => { }}
+            onBulkUpdate={async () => { }}
+            onAddItem={async () => { }}
+            onRemoveItem={async () => { }}
           />
         );
       case "lock-states":
@@ -204,9 +204,9 @@ export const CloseWorkflow: React.FC<CloseWorkflowProps> = ({
             currentPeriod={workflowState.currentPeriod}
             locks={[]} // This should come from props
             lockRules={[]} // This should come from props
-            onLockPeriod={async () => {}}
-            onUnlockPeriod={async () => {}}
-            onUpdateLockRule={async () => {}}
+            onLockPeriod={async () => { }}
+            onUnlockPeriod={async () => { }}
+            onUpdateLockRule={async () => { }}
           />
         );
       case "accruals":
@@ -215,13 +215,13 @@ export const CloseWorkflow: React.FC<CloseWorkflowProps> = ({
             {...commonProps}
             accruals={[]} // This should come from props
             depreciations={[]} // This should come from props
-            onCalculateAccruals={async () => {}}
-            onPostAccrual={async () => {}}
-            onReverseAccrual={async () => {}}
-            onCalculateDepreciation={async () => {}}
-            onPostDepreciation={async () => {}}
-            onAddAccrual={async () => {}}
-            onAddDepreciation={async () => {}}
+            onCalculateAccruals={async () => { }}
+            onPostAccrual={async () => { }}
+            onReverseAccrual={async () => { }}
+            onCalculateDepreciation={async () => { }}
+            onPostDepreciation={async () => { }}
+            onAddAccrual={async () => { }}
+            onAddDepreciation={async () => { }}
           />
         );
       case "adjusting-entries":
@@ -229,14 +229,14 @@ export const CloseWorkflow: React.FC<CloseWorkflowProps> = ({
           <AdjustingEntries
             {...commonProps}
             entries={[]} // This should come from props
-            onAddEntry={async () => {}}
-            onUpdateEntry={async () => {}}
-            onPostEntry={async () => {}}
-            onReverseEntry={async () => {}}
-            onDeleteEntry={async () => {}}
-            onAddLine={async () => {}}
-            onUpdateLine={async () => {}}
-            onDeleteLine={async () => {}}
+            onAddEntry={async () => { }}
+            onUpdateEntry={async () => { }}
+            onPostEntry={async () => { }}
+            onReverseEntry={async () => { }}
+            onDeleteEntry={async () => { }}
+            onAddLine={async () => { }}
+            onUpdateLine={async () => { }}
+            onDeleteLine={async () => { }}
           />
         );
       case "export-pack":
@@ -245,12 +245,12 @@ export const CloseWorkflow: React.FC<CloseWorkflowProps> = ({
             {...commonProps}
             currentPack={undefined} // This should come from props
             availableDocuments={[]} // This should come from props
-            onGenerateDocument={async () => {}}
-            onGeneratePack={async () => {}}
-            onDownloadDocument={async () => {}}
-            onDownloadPack={async () => {}}
-            onUpdatePack={async () => {}}
-            onPreviewDocument={async () => {}}
+            onGenerateDocument={async () => { }}
+            onGeneratePack={async () => { }}
+            onDownloadDocument={async () => { }}
+            onDownloadPack={async () => { }}
+            onUpdatePack={async () => { }}
+            onPreviewDocument={async () => { }}
           />
         );
       default:

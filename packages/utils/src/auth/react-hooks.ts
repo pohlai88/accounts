@@ -4,13 +4,8 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  canPerformAction,
-  isFeatureEnabled,
-  type UserContext,
-  type FeatureFlags,
-  type PolicySettings,
-} from "@aibos/auth";
+import { canPerformAction, isFeatureEnabled } from "@aibos/auth";
+import type { UserContext, FeatureFlags, PolicySettings, Decision } from "@aibos/auth/types";
 
 // Client-side user context (passed from server)
 export interface ClientUserContext {
@@ -37,7 +32,7 @@ export function useCanPerform(
   context: { amount?: number; module?: string; creatorRole?: string } = {},
 ): boolean {
   return useMemo(() => {
-    if (!user) return false;
+  if (!user) { return false; }
 
     const userContext: UserContext = {
       id: user.id,
@@ -47,15 +42,19 @@ export function useCanPerform(
       permissions: user.memberPermissions,
     };
 
-    const decision = canPerformAction(
-      userContext,
-      action,
-      context,
-      user.featureFlags,
-      user.policySettings,
-    );
-
-    return decision.allowed;
+    try {
+      const decision = canPerformAction(
+        userContext,
+        action,
+        context,
+        user.featureFlags,
+        user.policySettings,
+      ) as Decision;
+      if (typeof decision === "object" && decision !== null && "allowed" in decision) {
+        return !!decision.allowed;
+      }
+    } catch {}
+    return false;
   }, [user, action, context]);
 }
 
@@ -64,8 +63,13 @@ export function useCanPerform(
  */
 export function useHasFeature(user: ClientUserContext | null, feature: string): boolean {
   return useMemo(() => {
-    if (!user) return false;
-    return isFeatureEnabled(feature, user.featureFlags, user.roles);
+  if (!user) { return false; }
+        try {
+          const result = isFeatureEnabled(feature, user.featureFlags, user.roles) as boolean;
+          return typeof result === "boolean" ? result : false;
+        } catch {
+          return false;
+        }
   }, [user, feature]);
 }
 
@@ -76,10 +80,10 @@ export function usePermissionDecision(
   user: ClientUserContext | null,
   action: string,
   context: { amount?: number; module?: string; creatorRole?: string } = {},
-): { allowed: boolean; requiresApproval?: boolean; reason?: string } {
+): Decision {
   return useMemo(() => {
     if (!user) {
-      return { allowed: false, reason: "No user context" };
+      return { allowed: false, reason: "No user context" } as Decision;
     }
 
     const userContext: UserContext = {
@@ -90,7 +94,13 @@ export function usePermissionDecision(
       permissions: user.memberPermissions,
     };
 
-    return canPerformAction(userContext, action, context, user.featureFlags, user.policySettings);
+    try {
+      const decision = canPerformAction(userContext, action, context, user.featureFlags, user.policySettings) as Decision;
+      if (typeof decision === "object" && decision !== null && "allowed" in decision) {
+        return decision as Decision;
+      }
+    } catch {}
+    return { allowed: false, reason: "Permission check error" } as Decision;
   }, [user, action, context]);
 }
 
@@ -120,29 +130,45 @@ export function useUserCapabilities(user: ClientUserContext | null) {
         action: string,
         context: { amount?: number; module?: string; creatorRole?: string } = {},
       ) => {
-        const decision = canPerformAction(
-          userContext,
-          action,
-          context,
-          user.featureFlags,
-          user.policySettings,
-        );
-        return decision.allowed;
+        try {
+          const decision = canPerformAction(
+            userContext,
+            action,
+            context,
+            user.featureFlags,
+            user.policySettings,
+          ) as Decision;
+          if (typeof decision === "object" && decision !== null && Object.prototype.hasOwnProperty.call(decision, "allowed")) {
+            return !!decision.allowed;
+          }
+        } catch {}
+        return false;
       },
       hasFeature: (feature: string) => {
-        return isFeatureEnabled(feature, user.featureFlags, user.roles);
+  try {
+    const enabled = isFeatureEnabled(feature, user.featureFlags, user.roles) as boolean;
+    return typeof enabled === "boolean" ? enabled : false;
+  } catch {
+    return false;
+  }
       },
       getDecision: (
         action: string,
         context: { amount?: number; module?: string; creatorRole?: string } = {},
-      ) => {
-        return canPerformAction(
-          userContext,
-          action,
-          context,
-          user.featureFlags,
-          user.policySettings,
-        );
+      ): Decision => {
+        try {
+          const decision = canPerformAction(
+            userContext,
+            action,
+            context,
+            user.featureFlags,
+            user.policySettings,
+          ) as Decision;
+          if (typeof decision === "object" && decision !== null && Object.prototype.hasOwnProperty.call(decision, "allowed")) {
+            return decision as Decision;
+          }
+        } catch {}
+        return { allowed: false, reason: "Permission check error" } as Decision;
       },
     };
   }, [user]);

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { getSecurityContext } from "../../_lib/request";
-import { ok, problem } from "../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Mock audit logger (in production, use real instance)
 const mockAuditEvents = [
@@ -49,8 +49,16 @@ const AuditQuerySchema = z.object({
     .string()
     .transform(val => new Date(val).getTime())
     .optional(),
-  limit: z.string().transform(Number).pipe(z.number().min(1).max(1000)).default(100),
-  offset: z.string().transform(Number).pipe(z.number().min(0)).default(0),
+  limit: z.string().optional().transform(val => {
+    const num = Number(val || "100");
+    if (num < 1 || num > 1000) throw new Error("Limit must be between 1 and 1000");
+    return num;
+  }),
+  offset: z.string().optional().transform(val => {
+    const num = Number(val || "0");
+    if (num < 0) throw new Error("Offset must be non-negative");
+    return num;
+  }),
 });
 
 export async function GET(req: NextRequest) {
@@ -72,22 +80,22 @@ export async function GET(req: NextRequest) {
     }
 
     if (query.action) {
-      events = events.filter(event => event.action.includes(query.action));
+      events = events.filter(event => event.action.includes(query.action as string));
     }
 
     if (query.startDate) {
-      events = events.filter(event => event.timestamp >= query.startDate);
+      events = events.filter(event => event.timestamp >= (query.startDate as number));
     }
 
     if (query.endDate) {
-      events = events.filter(event => event.timestamp <= query.endDate);
+      events = events.filter(event => event.timestamp <= (query.endDate as number));
     }
 
     // Sort by timestamp (newest first)
     events.sort((a, b) => b.timestamp - a.timestamp);
 
     // Apply pagination
-    const paginatedEvents = events.slice(query.offset, query.offset + query.limit);
+    const paginatedEvents = events.slice(query.offset as number, (query.offset as number) + (query.limit as number));
 
     // Calculate statistics
     const stats = {
@@ -125,10 +133,10 @@ export async function GET(req: NextRequest) {
       {
         events: paginatedEvents,
         pagination: {
-          limit: query.limit,
-          offset: query.offset,
+          limit: query.limit as number,
+          offset: query.offset as number,
           total: events.length,
-          hasMore: query.offset + query.limit < events.length,
+          hasMore: (query.offset as number) + (query.limit as number) < events.length,
         },
         statistics: stats,
       },
@@ -137,23 +145,24 @@ export async function GET(req: NextRequest) {
   } catch (error: unknown) {
     console.error("Get audit events error:", error);
 
-    if (error && typeof error === "object" && "status" in error) {
+    if (error && typeof error === "object" && "status" in error && "message" in error) {
+      const errorObj = error as { status: unknown; message: unknown };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: Number(errorObj.status) || 500,
+        title: String(errorObj.message),
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: String(errorObj.message),
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
 
-    if (error.name === "ZodError") {
+    if (error instanceof Error && error.name === "ZodError") {
+      const zodError = error as any; // ZodError has errors property
       return problem({
         status: 400,
         title: "Validation error",
         code: "VALIDATION_ERROR",
-        detail: "Invalid query parameters",
-        errors: error.errors,
+        detail: `Invalid query parameters: ${zodError.errors.map((e: z.ZodIssue) => e.message).join(', ')}`,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }

@@ -2,7 +2,7 @@
 // Tracks API P95 ≤ 500ms, UI TTFB ≤ 200ms, Error rate ≤ 1%
 
 import { performance } from "perf_hooks";
-import { axiom } from "../axiom";
+import { axiom } from "@aibos/utils/axiom";
 
 export interface PerformanceMetrics {
   operation: string;
@@ -131,7 +131,7 @@ export class PerformanceMonitor {
    * Flush metrics to Axiom
    */
   private async flushMetrics(): Promise<void> {
-    if (this.metricsBuffer.length === 0) return;
+    if (this.metricsBuffer.length === 0) { return; }
 
     const metricsToFlush = [...this.metricsBuffer];
     this.metricsBuffer = [];

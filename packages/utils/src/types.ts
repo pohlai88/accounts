@@ -2,6 +2,7 @@
  * Utility types for type-safe I/O boundaries
  */
 
+
 // Re-export branded types from contracts (SSOT)
 export type {
   JournalId,
@@ -27,37 +28,109 @@ export type JsonObject = { [key: string]: JsonValue };
 export type JsonArray = JsonValue[];
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
-// Type guard helpers
-export function isJsonObject(value: JsonValue): value is JsonObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+// --- AUDIT TYPES (SSOT) ---
+
+// Classic Audit Service types
+export type AuditAction =
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "POST"
+  | "REVERSE"
+  | "APPROVE"
+  | "REJECT"
+  | "SUBMIT"
+  | "CANCEL"
+  | "VALIDATE"
+  | "EXPORT"
+  | "IMPORT"
+  | "HIT"
+  | "EXPIRE";
+
+export type AuditEntityType =
+  | "JOURNAL"
+  | "JOURNAL_LINE"
+  | "INVOICE"
+  | "PAYMENT"
+  | "ACCOUNT"
+  | "TENANT"
+  | "COMPANY"
+  | "USER"
+  | "CUSTOMER"
+  | "MEMBERSHIP"
+  | "CURRENCY"
+  | "FX_RATE"
+  | "IDEMPOTENCY_KEY";
+
+export interface AuditContext {
+  requestId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  sessionId?: string;
+  correlationId?: string;
+  source?: "API" | "UI" | "SYSTEM" | "BATCH" | "WEBHOOK";
+  version?: string;
 }
 
-export function isJsonArray(value: JsonValue): value is JsonArray {
-  return Array.isArray(value);
+export interface AuditEntry {
+  scope: import("@aibos/db").Scope;
+  action: AuditAction;
+  entityType: AuditEntityType;
+  entityId: string;
+  oldValues?: Record<string, unknown>;
+  newValues?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  context?: AuditContext;
 }
 
-// Safe parsing helper for unknown data
-export function parseUnknownAsJson(data: unknown): JsonValue {
-  if (
-    data === null ||
-    typeof data === "string" ||
-    typeof data === "number" ||
-    typeof data === "boolean"
-  ) {
-    return data;
-  }
-
-  if (Array.isArray(data)) {
-    return data.map(parseUnknownAsJson);
-  }
-
-  if (typeof data === "object" && data !== null) {
-    const result: JsonObject = {};
-    for (const [key, value] of Object.entries(data)) {
-      result[key] = parseUnknownAsJson(value);
-    }
-    return result;
-  }
-
-  throw new Error(`Cannot parse unknown data as JSON: ${typeof data}`);
+export interface AuditQueryFilters {
+  entityType?: AuditEntityType;
+  entityId?: string;
+  action?: AuditAction;
+  userId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  limit?: number;
+  offset?: number;
 }
+
+export interface AuditLogResult {
+  id: string;
+  tenantId: string;
+  companyId?: string;
+  userId?: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  oldValues?: Record<string, unknown>;
+  newValues?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  requestId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+}
+
+// V1 Audit Service types (Supabase)
+export interface V1AuditAuditContext {
+  userId?: string;
+  tenantId?: string;
+  companyId?: string;
+  sessionId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: Date;
+}
+
+export interface V1AuditAuditEvent {
+  id?: string;
+  eventType: string;
+  entityType: string;
+  entityId?: string;
+  action: string;
+  details: Record<string, unknown>;
+  context: V1AuditAuditContext;
+  createdAt: Date;
+}
+
+// --- END AUDIT TYPES ---

@@ -18,26 +18,11 @@ interface AuditLogRow {
   user_agent?: string;
 }
 
-export interface AuditContext {
-  userId?: string;
-  tenantId?: string;
-  companyId?: string;
-  sessionId?: string;
-  ipAddress?: string;
-  userAgent?: string;
-  timestamp: Date;
-}
 
-export interface AuditEvent {
-  id?: string;
-  eventType: string;
-  entityType: string;
-  entityId?: string;
-  action: string;
-  details: Record<string, unknown>;
-  context: AuditContext;
-  createdAt: Date;
-}
+// All public audit types are now exported from @aibos/utils/types (SSOT).
+import type { V1AuditAuditContext, V1AuditAuditEvent } from "../types.js";
+type AuditContext = V1AuditAuditContext;
+type AuditEvent = V1AuditAuditEvent;
 
 export class AuditService {
   private supabase: SupabaseClient;

@@ -113,9 +113,9 @@ export class WebSocketManager extends EventEmitter {
           path: this.config.path,
           perMessageDeflate: this.config.enablePerMessageDeflate
             ? {
-                threshold: 1024,
-                concurrencyLimit: 10,
-              }
+              threshold: 1024,
+              concurrencyLimit: 10,
+            }
             : false,
           maxPayload: 16 * 1024 * 1024, // 16MB
         });
@@ -264,7 +264,7 @@ export class WebSocketManager extends EventEmitter {
    */
   private handleMessage(connectionId: string, message: WebSocketMessage): void {
     const connection = this.connections.get(connectionId);
-    if (!connection) return;
+    if (!connection) { return; }
 
     this.stats.messagesReceived++;
 
@@ -294,10 +294,10 @@ export class WebSocketManager extends EventEmitter {
    */
   private handleSubscribe(connectionId: string, data: { channel: string }): void {
     const connection = this.connections.get(connectionId);
-    if (!connection) return;
+    if (!connection) { return; }
 
     const { channel } = data;
-    if (!channel) return;
+    if (!channel) { return; }
 
     // Validate channel format (tenant:channel)
     const expectedPrefix = `${connection.tenantId}:`;
@@ -323,10 +323,10 @@ export class WebSocketManager extends EventEmitter {
    */
   private handleUnsubscribe(connectionId: string, data: { channel: string }): void {
     const connection = this.connections.get(connectionId);
-    if (!connection) return;
+    if (!connection) { return; }
 
     const { channel } = data;
-    if (!channel) return;
+    if (!channel) { return; }
 
     connection.subscriptions.delete(channel);
     this.emit("unsubscribe", { connectionId, channel, tenantId: connection.tenantId });
@@ -358,7 +358,7 @@ export class WebSocketManager extends EventEmitter {
    */
   private handleDisconnection(connectionId: string, code: number, reason: string): void {
     const connection = this.connections.get(connectionId);
-    if (!connection) return;
+    if (!connection) { return; }
 
     // Update stats
     this.stats.activeConnections--;
@@ -402,7 +402,7 @@ export class WebSocketManager extends EventEmitter {
     message: Omit<WebSocketMessage, "tenantId" | "userId" | "timestamp">,
   ): number {
     const tenantConnections = this.tenantConnections.get(tenantId);
-    if (!tenantConnections) return 0;
+    if (!tenantConnections) { return 0; }
 
     let sent = 0;
     const fullMessage: WebSocketMessage = {
@@ -527,7 +527,7 @@ export class WebSocketManager extends EventEmitter {
    */
   getTenantConnections(tenantId: string): ConnectionInfo[] {
     const tenantConnectionIds = this.tenantConnections.get(tenantId);
-    if (!tenantConnectionIds) return [];
+    if (!tenantConnectionIds) { return []; }
 
     return Array.from(tenantConnectionIds)
       .map(id => this.connections.get(id))
@@ -570,5 +570,20 @@ export class WebSocketManager extends EventEmitter {
     }
 
     return { status, issues };
+  }
+
+  // Static methods for compatibility
+  static getConnectionsByTenant(tenantId: string): ConnectionInfo[] {
+    // This is a static method that would need access to a global instance
+    // For now, return empty array as a compatibility bridge
+    console.warn(`WebSocketManager.getConnectionsByTenant(${tenantId}) - static method not implemented, returning empty array`);
+    return [];
+  }
+
+  static getConnectionsByUser(userId: string): ConnectionInfo[] {
+    // This is a static method that would need access to a global instance
+    // For now, return empty array as a compatibility bridge
+    console.warn(`WebSocketManager.getConnectionsByUser(${userId}) - static method not implemented, returning empty array`);
+    return [];
   }
 }

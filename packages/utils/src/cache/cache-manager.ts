@@ -1,7 +1,7 @@
 // Cache Manager - Main cache interface
-import { CacheAdapter, CacheConfig, CacheOptions, CacheStats } from "./types";
-import { RedisCacheAdapter } from "./redis-adapter";
-import { MemoryCacheAdapter } from "./memory-adapter";
+import { CacheAdapter, CacheConfig, CacheOptions, CacheStats } from "./types.js";
+import { RedisCacheAdapter } from "./redis-adapter.js";
+import { MemoryCacheAdapter } from "./memory-adapter.js";
 
 export class CacheManager {
   private adapter: CacheAdapter;

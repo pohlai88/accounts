@@ -1,16 +1,11 @@
 // Enhanced Auth Context - Integrates with Admin Configuration
 // Extends existing auth patterns with permission checking and feature flags
 
-import { NextRequest } from "next/server";
+import { NextRequest } from "next/server.js";
 import { createClient } from "@supabase/supabase-js";
-import {
-  canPerformAction,
-  isFeatureEnabled,
-  type FeatureFlags,
-  type PolicySettings,
-  type MemberPermissions,
-} from "@aibos/auth";
-import { extractUserContext } from "../context/request-context";
+import { canPerformAction, isFeatureEnabled } from "@aibos/auth";
+import type { FeatureFlags, PolicySettings, MemberPermissions } from "@aibos/auth/types";
+import { extractUserContext } from "@aibos/utils/context/request-context";
 
 // Enhanced user context with admin configuration
 export interface EnhancedUserContext {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
-import { ok, problem } from "../../_lib/response";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Login request schema
 const LoginRequestSchema = z.object({

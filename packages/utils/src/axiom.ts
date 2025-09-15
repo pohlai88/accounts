@@ -48,11 +48,11 @@ export interface PerformanceMetrics {
 // V1 Business Events
 export interface BusinessEvent {
   event_type:
-    | "journal_posted"
-    | "invoice_created"
-    | "payment_processed"
-    | "user_login"
-    | "period_closed";
+  | "journal_posted"
+  | "invoice_created"
+  | "payment_processed"
+  | "user_login"
+  | "period_closed";
   entity_type: string;
   entity_id: string;
   amount?: string;
@@ -212,7 +212,7 @@ export class AxiomBatcher {
   }
 
   async flush(): Promise<void> {
-    if (this.events.length === 0) return;
+    if (this.events.length === 0) { return; }
 
     const eventsToSend = [...this.events];
     this.events = [];

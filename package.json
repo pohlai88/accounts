@@ -34,6 +34,8 @@
     "prettier": "^3.6.2",
     "supabase": "^2.41.4",
     "turbo": "^2.5.6",
+    "typedoc": "^0.28.12",
+    "typedoc-plugin-markdown": "^4.8.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "write-good": "^1.0.8",
@@ -132,6 +134,10 @@
     "deps:analyze": "pnpm -w dedupe --check",
     "deps:fix": "pnpm -w dedupe",
     "deps:report": "pnpm list --depth=0 && pnpm -w dedupe --check",
+    "docs:types:emit": "pnpm -r --filter ./packages/* exec tsc -p tsconfig.json --emitDeclarationOnly --declaration --declarationMap false --noEmitOnError false",
+    "docs:api": "typedoc",
+    "docs:api:clean": "rimraf docs/api",
+    "docs:api:src": "typedoc --options typedoc.src.json",
     "docs:build": "nextra build docs",
     "docs:dev": "nextra dev docs",
     "docs:fmt": "prettier -w \"docs/**/*.{md,mdx}\"",
@@ -173,9 +179,12 @@
     "version-packages": "changeset version"
   },
   "dependencies": {
+    "@aibos/auth": "workspace:^0.1.0",
     "@supabase/supabase-js": "^2.57.4",
+    "@types/next": "^9.0.0",
     "@types/node": "^24.3.3",
     "autoprefixer": "^10.4.20",
+    "next": "^14.2.32",
     "tailwindcss": "^3.4.0"
   },
   "prettier": "./packages/config/prettier-config"

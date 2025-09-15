@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm -w install --frozen-lockfile
       - run: pnpm quality:check
       - run: pnpm format:check
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm -w install --frozen-lockfile
       - run: pnpm deps:check
       - run: pnpm deps:audit
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm -w install --frozen-lockfile
       - run: pnpm build
       - run: pnpm test:unit:coverage
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm -w install --frozen-lockfile
       - run: pnpm build
       - run: pnpm playwright:install --with-deps

@@ -1,4 +1,4 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { createServiceClient, logger } from "@aibos/utils";
 
 // V1 FX Rate Ingestion with dual sources and fallback
@@ -9,7 +9,7 @@ export const fxRateIngestion = inngest.createFunction(
     retries: 3,
   },
   { event: "fx/rates.ingest" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { currencyPairs, source = "primary" } = event.data;
 
     // Step 1: Validate input
@@ -63,7 +63,10 @@ export const fxRateIngestion = inngest.createFunction(
           source: "fallback",
         });
 
-        return fallbackRates.map(rate => ({ ...rate, source: "fallback" }));
+        return fallbackRates.map((rate: unknown) => {
+          const r = rate as { from: string; to: string; rate: number };
+          return { ...r, source: "fallback" };
+        });
       } catch (error) {
         logger.error("Both FX sources failed", {
           error: error instanceof Error ? error.message : String(error),
@@ -135,8 +138,9 @@ export const fxRateIngestion = inngest.createFunction(
 // Primary FX rate source (replace with actual API)
 async function fetchFromPrimarySource(pairs: string[]) {
   // Simulate API call - replace with actual implementation
-  const mockRates = pairs.map(pair => {
-    const [from, to] = pair.split("/");
+  const mockRates = pairs.map((pair: unknown) => {
+    const p = pair as string;
+    const [from, to] = p.split("/");
     return {
       from,
       to,
@@ -156,8 +160,9 @@ async function fetchFromPrimarySource(pairs: string[]) {
 // Fallback FX rate source
 async function fetchFromFallbackSource(pairs: string[]) {
   // Simulate fallback API call
-  const mockRates = pairs.map(pair => {
-    const [from, to] = pair.split("/");
+  const mockRates = pairs.map((pair: unknown) => {
+    const p = pair as string;
+    const [from, to] = p.split("/");
     return {
       from,
       to,

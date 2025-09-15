@@ -17,7 +17,7 @@ export {
   type DesignModes,
   type SemanticTokens,
   type AccessibilityCssVars,
-} from "./tokens";
+} from "./tokens.js";
 
 // Export Tailwind preset for easy consumption
 // Note: The preset is generated during build and available as tailwind.preset.cjs

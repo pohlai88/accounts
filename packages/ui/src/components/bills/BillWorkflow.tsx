@@ -9,12 +9,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@aibos/ui/utils";
-import { BillForm } from "./BillForm";
-import { OCRDataExtractor } from "./OCRDataExtractor";
-import { ApprovalWorkflow } from "./ApprovalWorkflow";
-import { PaymentProcessor } from "./PaymentProcessor";
-import { VendorManager } from "./VendorManager";
-import { ExpenseCategorizer } from "./ExpenseCategorizer";
+import { BillForm } from "./BillForm.js";
+import { OCRDataExtractor } from "./OCRDataExtractor.js";
+import { ApprovalWorkflow } from "./ApprovalWorkflow.js";
+import { PaymentProcessor } from "./PaymentProcessor.js";
+import { VendorManager } from "./VendorManager.js";
+import { ExpenseCategorizer } from "./ExpenseCategorizer.js";
 
 export interface BillWorkflowProps {
   className?: string;

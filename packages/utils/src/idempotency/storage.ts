@@ -1,6 +1,6 @@
 // Idempotency Storage Implementations
-import { IdempotencyKey, IdempotencyStorage } from "./types";
-import { CacheManager } from "../cache";
+import { IdempotencyKey, IdempotencyStorage } from "./types.js";
+import { CacheManager } from "@aibos/utils/cache/index.js";
 
 export class RedisIdempotencyStorage implements IdempotencyStorage {
   private cache: CacheManager;

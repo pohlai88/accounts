@@ -199,9 +199,9 @@ export async function POST(
       data: { invoiceId: params.id },
     });
 
-    if ((error as unknown).status === 403) {
+    if (error && typeof error === "object" && "status" in error && (error as any).status === 403) {
       return NextResponse.json(
-        { success: false, error: "Forbidden", message: (error as Error).message },
+        { success: false, error: "Forbidden", message: error instanceof Error ? error.message : String(error) },
         { status: 403 },
       );
     }

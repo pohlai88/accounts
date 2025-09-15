@@ -1,31 +1,8 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes, scrypt } from "crypto";
 import { promisify } from "util";
+import type { EncryptionConfig, EncryptedData, KeyDerivationConfig } from "./types.js";
 
 const scryptAsync = promisify(scrypt);
-
-export interface EncryptionConfig {
-  algorithm: string;
-  keyLength: number;
-  ivLength: number;
-  saltLength: number;
-  iterations: number;
-  enableCompression: boolean;
-}
-
-export interface EncryptedData {
-  data: string;
-  iv: string;
-  salt: string;
-  algorithm: string;
-  version: string;
-}
-
-export interface KeyDerivationConfig {
-  algorithm: string;
-  keyLength: number;
-  iterations: number;
-  saltLength: number;
-}
 
 export class EncryptionManager {
   private config: EncryptionConfig;
@@ -65,7 +42,7 @@ export class EncryptionManager {
   /**
    * Encrypt sensitive data
    */
-  async encrypt(data: any, password?: string): Promise<EncryptedData> {
+  async encrypt(data: string | Buffer | Record<string, unknown>, password?: string): Promise<EncryptedData> {
     const dataString = typeof data === "string" ? data : JSON.stringify(data);
     const dataBuffer = Buffer.from(dataString, "utf8");
 
@@ -85,7 +62,7 @@ export class EncryptionManager {
     encrypted = Buffer.concat([encrypted, cipher.final()]);
 
     // Get authentication tag
-    const tag = (cipher as any).getAuthTag();
+    const tag = (cipher as unknown as { getAuthTag: () => Buffer }).getAuthTag();
 
     // Combine encrypted data with tag
     const encryptedWithTag = Buffer.concat([encrypted, tag]);
@@ -102,7 +79,7 @@ export class EncryptionManager {
   /**
    * Decrypt sensitive data
    */
-  async decrypt(encryptedData: EncryptedData, password?: string): Promise<any> {
+  async decrypt(encryptedData: EncryptedData, password?: string): Promise<string | Record<string, unknown>> {
     try {
       const iv = Buffer.from(encryptedData.iv, "base64");
       const salt = Buffer.from(encryptedData.salt, "base64");
@@ -119,7 +96,7 @@ export class EncryptionManager {
       // Create decipher
       const decipher = createDecipheriv(encryptedData.algorithm, key, iv);
       // Note: setAAD and setAuthTag are only available for GCM mode, simplified for compatibility
-      (decipher as any).setAuthTag(tag);
+      (decipher as unknown as { setAuthTag: (tag: Buffer) => void }).setAuthTag(tag);
 
       // Decrypt data
       let decrypted = decipher.update(encrypted);
@@ -182,17 +159,17 @@ export class EncryptionManager {
    * Encrypt PII data
    */
   async encryptPII(
-    piiData: Record<string, any>,
+    piiData: Record<string, string | number | boolean | string[]>,
     tenantId: string,
   ): Promise<Record<string, string>> {
     const encrypted: Record<string, string> = {};
 
     for (const [key, value] of Object.entries(piiData)) {
       if (this.isPIIField(key)) {
-        const encryptedValue = await this.encrypt(value, tenantId);
+        const encryptedValue = await this.encrypt(String(value), tenantId);
         encrypted[key] = encryptedValue.data;
       } else {
-        encrypted[key] = value;
+        encrypted[key] = String(value);
       }
     }
 
@@ -205,8 +182,8 @@ export class EncryptionManager {
   async decryptPII(
     encryptedData: Record<string, string>,
     tenantId: string,
-  ): Promise<Record<string, any>> {
-    const decrypted: Record<string, any> = {};
+  ): Promise<Record<string, string | number | boolean | string[]>> {
+    const decrypted: Record<string, string | number | boolean | string[]> = {};
 
     for (const [key, value] of Object.entries(encryptedData)) {
       if (this.isPIIField(key)) {
@@ -229,25 +206,25 @@ export class EncryptionManager {
    * Mask sensitive data for logging
    */
   maskSensitiveData(
-    data: any,
+    data: string | Record<string, unknown>,
     fields: string[] = ["password", "token", "secret", "key", "ssn", "creditCard"],
-  ): any {
+  ): string | Record<string, unknown> {
     if (typeof data === "string") {
       return this.maskString(data);
     }
 
     if (Array.isArray(data)) {
-      return data.map(item => this.maskSensitiveData(item, fields));
+      return data.map(item => this.maskSensitiveData(item as string | Record<string, unknown>, fields)) as unknown as string | Record<string, unknown>;
     }
 
     if (typeof data === "object" && data !== null) {
-      const masked: any = {};
+      const masked: Record<string, unknown> = {};
 
       for (const [key, value] of Object.entries(data)) {
         if (fields.some(field => key.toLowerCase().includes(field.toLowerCase()))) {
           masked[key] = this.maskString(String(value));
         } else {
-          masked[key] = this.maskSensitiveData(value, fields);
+          masked[key] = this.maskSensitiveData(value as string | Record<string, unknown>, fields);
         }
       }
 
@@ -345,8 +322,8 @@ export class GDPRCompliance {
   /**
    * Anonymize personal data
    */
-  anonymizePersonalData(data: Record<string, any>): Record<string, any> {
-    const anonymized: Record<string, any> = {};
+  anonymizePersonalData(data: Record<string, string | number | boolean | string[]>): Record<string, string | number | boolean | string[]> {
+    const anonymized: Record<string, string | number | boolean | string[]> = {};
 
     for (const [key, value] of Object.entries(data)) {
       if (this.isPersonalData(key)) {
@@ -367,7 +344,7 @@ export class GDPRCompliance {
     autoDelete: boolean;
     anonymizeAfter: number; // days
   } {
-    const policies: Record<string, any> = {
+    const policies: Record<string, { retentionPeriod: number; autoDelete: boolean; anonymizeAfter: number }> = {
       user_profile: { retentionPeriod: 2555, autoDelete: false, anonymizeAfter: 1095 }, // 7 years, anonymize after 3 years
       transaction: { retentionPeriod: 2555, autoDelete: false, anonymizeAfter: 1095 }, // 7 years
       audit_log: { retentionPeriod: 2555, autoDelete: false, anonymizeAfter: 1095 }, // 7 years
@@ -400,7 +377,7 @@ export class GDPRCompliance {
   /**
    * Anonymize value
    */
-  private anonymizeValue(value: any): any {
+  private anonymizeValue(value: string | number | boolean | string[]): string | number | boolean | string[] {
     if (typeof value === "string") {
       return this.encryptionManager.maskString(value);
     }
@@ -411,7 +388,7 @@ export class GDPRCompliance {
 
     if (value instanceof Date) {
       const year = value.getFullYear();
-      return new Date(year, 0, 1); // Keep only year
+      return new Date(year, 0, 1).toISOString(); // Keep only year
     }
 
     return "[ANONYMIZED]";

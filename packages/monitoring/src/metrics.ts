@@ -252,8 +252,8 @@ export class MetricsCollector {
   }
 
   private getErrorType(statusCode: number): string {
-    if (statusCode >= 500) return "server_error";
-    if (statusCode >= 400) return "client_error";
+    if (statusCode >= 500) { return "server_error"; }
+    if (statusCode >= 400) { return "client_error"; }
     return "unknown";
   }
 
@@ -316,7 +316,29 @@ export class MetricsCollector {
     return register.metrics();
   }
 
-  // Reset all metrics
+  // Record a custom metric
+  recordMetric(
+    name: string,
+    value: number,
+    unit: string = "count",
+    tags: Record<string, string> = {},
+    metadata: Record<string, any> = {},
+    tenantId: string = "global",
+    userId?: string,
+  ): string {
+    // For now, we'll use a simple counter approach
+    // This could be enhanced to use the proper Prometheus metrics
+    const counterName = `${name}_${unit}`;
+    this.createCounter(counterName, `Custom metric: ${name}`, Object.keys(tags));
+    
+    const counter = this.counters.get(counterName);
+    if (counter) {
+      counter.inc(tags, value);
+    }
+    
+    return `${counterName}_${Date.now()}`;
+  }
+
   resetMetrics(): void {
     register.clear();
     this.initializeDefaultMetrics();
@@ -327,6 +349,102 @@ export class MetricsCollector {
   async getMetricsAsJson(): Promise<any> {
     const metrics = await register.getMetricsAsJSON();
     return metrics;
+  }
+
+  // Static methods for compatibility
+  static async getSystemMetrics(): Promise<PerformanceMetrics> {
+    // Create a mock cache service for static methods
+    const mockCache = {} as CacheService;
+    const collector = new MetricsCollector(mockCache);
+    return collector.getPerformanceMetrics();
+  }
+
+  static async getApplicationMetrics(): Promise<PerformanceMetrics> {
+    // Create a mock cache service for static methods
+    const mockCache = {} as CacheService;
+    const collector = new MetricsCollector(mockCache);
+    return collector.getPerformanceMetrics();
+  }
+
+  static async recordApiRequest(
+    method: string,
+    endpoint: string,
+    statusCode: number,
+    duration: number,
+    labels: Record<string, string> = {}
+  ): Promise<void> {
+    // Create a mock cache service for static methods
+    const mockCache = {} as CacheService;
+    const collector = new MetricsCollector(mockCache);
+
+    // Record API request metrics
+    const counter = collector.getOrCreateCounter("api_requests_total", {
+      name: "api_requests_total",
+      help: "Total number of API requests",
+      labelNames: ["method", "endpoint", "status_code", ...Object.keys(labels)],
+    });
+
+    counter.inc({
+      method,
+      endpoint,
+      status_code: statusCode.toString(),
+      ...labels,
+    });
+
+    // Record response time
+    const histogram = collector.getOrCreateHistogram("api_request_duration_seconds", {
+      name: "api_request_duration_seconds",
+      help: "API request duration in seconds",
+      labelNames: ["method", "endpoint", ...Object.keys(labels)],
+      buckets: [0.1, 0.5, 1, 2, 5, 10],
+    });
+
+    histogram.observe(
+      {
+        method,
+        endpoint,
+        ...labels,
+      },
+      duration / 1000
+    );
+  }
+
+  static async getHealthStatus(): Promise<{ status: string; details: any }> {
+    try {
+      // Create a mock cache service for static methods
+      const mockCache = {} as CacheService;
+      const collector = new MetricsCollector(mockCache);
+      const metrics = await collector.getPerformanceMetrics();
+
+      return {
+        status: "healthy",
+        details: {
+          uptime: metrics.system.uptime,
+          memory: metrics.system.memory,
+          requests: metrics.requests,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "unhealthy",
+        details: { error: error instanceof Error ? error.message : "Unknown error" },
+      };
+    }
+  }
+
+  // Helper methods for creating metrics
+  private getOrCreateCounter(name: string, config: MetricConfig): Counter {
+    if (!this.counters.has(name)) {
+      this.counters.set(name, new Counter(config));
+    }
+    return this.counters.get(name)!;
+  }
+
+  private getOrCreateHistogram(name: string, config: MetricConfig): Histogram {
+    if (!this.histograms.has(name)) {
+      this.histograms.set(name, new Histogram(config));
+    }
+    return this.histograms.get(name)!;
   }
 }
 

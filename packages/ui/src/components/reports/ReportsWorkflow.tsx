@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "../../utils";
+import { cn } from "@aibos/ui/utils";
 import {
   FileText,
   BarChart3,
@@ -72,25 +72,25 @@ export const ReportsWorkflow: React.FC<ReportsWorkflowProps> = ({
 
   // Import report components
   const ProfitLossReport = React.lazy(() =>
-    import("./ProfitLossReport").then(m => ({ default: m.ProfitLossReport })),
+    import("./ProfitLossReport.js").then(m => ({ default: m.ProfitLossReport })),
   );
   const BalanceSheetReport = React.lazy(() =>
-    import("./BalanceSheetReport").then(m => ({ default: m.BalanceSheetReport })),
+    import("./BalanceSheetReport.js").then(m => ({ default: m.BalanceSheetReport })),
   );
   const CashFlowStatement = React.lazy(() =>
-    import("./CashFlowStatement").then(m => ({ default: m.CashFlowStatement })),
+    import("./CashFlowStatement.js").then(m => ({ default: m.CashFlowStatement })),
   );
   const TrialBalance = React.lazy(() =>
-    import("./TrialBalance").then(m => ({ default: m.TrialBalance })),
+    import("./TrialBalance.js").then(m => ({ default: m.TrialBalance })),
   );
   const ARAgingReport = React.lazy(() =>
-    import("./ARAgingReport").then(m => ({ default: m.ARAgingReport })),
+    import("./ARAgingReport.js").then(m => ({ default: m.ARAgingReport })),
   );
   const APAgingReport = React.lazy(() =>
-    import("./APAgingReport").then(m => ({ default: m.APAgingReport })),
+    import("./APAgingReport.js").then(m => ({ default: m.APAgingReport })),
   );
   const CustomReportBuilder = React.lazy(() =>
-    import("./CustomReportBuilder").then(m => ({ default: m.CustomReportBuilder })),
+    import("./CustomReportBuilder.js").then(m => ({ default: m.CustomReportBuilder })),
   );
 
   const reportCategories: ReportCategory[] = [

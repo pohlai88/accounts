@@ -24,9 +24,59 @@
     "typescript": "^5.6.2",
     "vitest": "^3.2.4"
   },
-  "main": "dist/ui/src/index.js",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./Button": {
+      "types": "./dist/Button.d.ts",
+      "import": "./dist/Button.js"
+    },
+    "./Card": {
+      "types": "./dist/Card.d.ts",
+      "import": "./dist/Card.js"
+    },
+    "./Alert": {
+      "types": "./dist/Alert.d.ts",
+      "import": "./dist/Alert.js"
+    },
+    "./Badge": {
+      "types": "./dist/Badge.d.ts",
+      "import": "./dist/Badge.js"
+    },
+    "./Input": {
+      "types": "./dist/Input.d.ts",
+      "import": "./dist/Input.js"
+    },
+    "./Label": {
+      "types": "./dist/Label.d.ts",
+      "import": "./dist/Label.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js"
+    },
+    "./hooks/use-tenant-management": {
+      "types": "./dist/hooks/use-tenant-management.d.ts",
+      "import": "./dist/hooks/use-tenant-management.js"
+    },
+    "./components/tenant-switcher": {
+      "types": "./dist/components/tenant-switcher.d.ts",
+      "import": "./dist/components/tenant-switcher.js"
+    },
+    "./components/member-management": {
+      "types": "./dist/components/member-management.d.ts",
+      "import": "./dist/components/member-management.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "tsc -p . --noEmit",
+    "build": "tsc -p .",
     "typecheck": "tsc -p . --noEmit",
     "lint": "eslint .",
     "dev": "tsc -p . --watch",
@@ -35,6 +85,5 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\""
   },
-  "type": "module",
-  "types": "dist/ui/src/index.d.ts"
+  "type": "module"
 }

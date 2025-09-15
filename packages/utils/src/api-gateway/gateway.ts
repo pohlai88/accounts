@@ -1,12 +1,12 @@
 // API Gateway Core
-import { ApiRequest, GatewayResponse, GatewayConfig, RouteConfig, Middleware } from "./types";
-import { ApiRouter, createRoute, RouteBuilder } from "./router";
+import { ApiRequest, GatewayResponse, GatewayConfig, RouteConfig, Middleware } from "./types.js";
+import { ApiRouter, createRoute, RouteBuilder } from "./router.js";
 import {
   corsMiddleware,
   loggingMiddleware,
   errorHandlingMiddleware,
   rateLimitMiddleware,
-} from "./middleware";
+} from "./middleware.js";
 
 export class ApiGateway {
   private router: ApiRouter;

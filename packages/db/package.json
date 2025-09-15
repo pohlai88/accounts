@@ -15,8 +15,26 @@
     "@aibos/prettier-config": "workspace:*"
   },
   "main": "dist/index.js",
+
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./adapter": {
+      "types": "./dist/adapter.d.ts",
+      "import": "./dist/adapter.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./schema": {
+      "types": "./dist/schema-entry.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "tsc -p . --noEmit",
+    "build": "tsc -p .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -29,6 +47,5 @@
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
-  "type": "module",
-  "types": "dist/index.d.ts"
+  "type": "module"
 }

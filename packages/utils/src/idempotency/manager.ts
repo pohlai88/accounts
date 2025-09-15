@@ -5,12 +5,12 @@ import {
   IdempotencyConfig,
   IdempotencyOptions,
   IdempotencyStorage,
-} from "./types";
+} from "./types.js";
 
-export { IdempotencyOptions } from "./types";
-import { RedisIdempotencyStorage } from "./storage";
-import { MemoryIdempotencyStorage } from "./storage";
-import { CacheManager } from "../cache";
+export { IdempotencyOptions } from "./types.js";
+import { RedisIdempotencyStorage } from "./storage.js";
+import { MemoryIdempotencyStorage } from "./storage.js";
+import { CacheManager } from "@aibos/utils/cache/index.js";
 import { createHash } from "crypto";
 
 export class IdempotencyManager {

@@ -16,13 +16,13 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@aibos/ui/utils";
-import { InvoiceForm, InvoiceFormData } from "./InvoiceForm";
-import { InvoiceList, Invoice } from "./InvoiceList";
-import { CustomerSelector, Customer } from "./CustomerSelector";
-import { PaymentCapture, Payment } from "./PaymentCapture";
-import { InvoiceSender } from "./InvoiceSender";
-import { PaymentReminders, PaymentReminder } from "./PaymentReminders";
-import { InvoiceStatusTimeline, TimelineEvent } from "./InvoiceStatusTimeline";
+import { InvoiceForm, InvoiceFormData } from "./InvoiceForm.js";
+import { InvoiceList, Invoice } from "./InvoiceList.js";
+import { CustomerSelector, Customer } from "./CustomerSelector.js";
+import { PaymentCapture, Payment } from "./PaymentCapture.js";
+import { InvoiceSender } from "./InvoiceSender.js";
+import { PaymentReminders, PaymentReminder } from "./PaymentReminders.js";
+import { InvoiceStatusTimeline, TimelineEvent } from "./InvoiceStatusTimeline.js";
 
 export interface InvoiceWorkflowProps {
   className?: string;

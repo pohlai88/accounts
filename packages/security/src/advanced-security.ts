@@ -2,42 +2,7 @@
 // This will be handled by the middleware wrapper
 import { createHash, randomBytes } from "crypto";
 import { EventEmitter } from "events";
-
-export interface SecurityConfig {
-  enableRateLimiting: boolean;
-  enableCSRFProtection: boolean;
-  enableXSSProtection: boolean;
-  enableContentSecurityPolicy: boolean;
-  enableHSTS: boolean;
-  enableCORS: boolean;
-  maxRequestsPerMinute: number;
-  maxRequestsPerHour: number;
-  maxRequestsPerDay: number;
-  trustedOrigins: string[];
-  allowedMethods: string[];
-  allowedHeaders: string[];
-  securityHeaders: Record<string, string>;
-}
-
-export interface SecurityEvent {
-  type: "rate_limit" | "csrf_attack" | "xss_attempt" | "suspicious_activity" | "security_violation";
-  severity: "low" | "medium" | "high" | "critical";
-  ip: string;
-  userAgent: string;
-  tenantId?: string;
-  userId?: string;
-  details: Record<string, any>;
-  timestamp: number;
-  requestId: string;
-}
-
-export interface RateLimitInfo {
-  ip: string;
-  requests: number;
-  windowStart: number;
-  blocked: boolean;
-  resetTime: number;
-}
+import type { SecurityConfig, SecurityEvent, RateLimitInfo } from "./types.js";
 
 export class AdvancedSecurityManager extends EventEmitter {
   private config: SecurityConfig;
@@ -84,7 +49,7 @@ export class AdvancedSecurityManager extends EventEmitter {
   /**
    * Apply comprehensive security middleware
    */
-  async applySecurity(req: any): Promise<any | null> {
+  async applySecurity(req: { method?: string; url?: string; headers: { get: (key: string) => string | null }; body?: unknown }): Promise<{ status: number; message: string; headers?: Record<string, string> } | null> {
     const requestId = req.headers.get("x-request-id") || this.generateRequestId();
     const ip = this.getClientIP(req);
     const userAgent = req.headers.get("user-agent") || "";
@@ -92,14 +57,14 @@ export class AdvancedSecurityManager extends EventEmitter {
     try {
       // 1. Rate limiting
       if (this.config.enableRateLimiting) {
-        const rateLimitResult = await this.checkRateLimit(ip, req.url);
+        const rateLimitResult = await this.checkRateLimit(ip, req.url || "unknown");
         if (rateLimitResult.blocked) {
           this.recordSecurityEvent({
             type: "rate_limit",
             severity: "medium",
             ip,
             userAgent,
-            details: { url: req.url, limit: rateLimitResult.requests },
+            details: { url: req.url || "unknown", limit: rateLimitResult.requests },
             timestamp: Date.now(),
             requestId,
           });
@@ -114,7 +79,7 @@ export class AdvancedSecurityManager extends EventEmitter {
       }
 
       // 2. CSRF protection
-      if (this.config.enableCSRFProtection && this.isStateChangingMethod(req.method)) {
+      if (this.config.enableCSRFProtection && this.isStateChangingMethod(req.method || "GET")) {
         const csrfResult = await this.validateCSRFToken(req);
         if (!csrfResult.valid) {
           this.recordSecurityEvent({
@@ -122,7 +87,11 @@ export class AdvancedSecurityManager extends EventEmitter {
             severity: "high",
             ip,
             userAgent,
-            details: { method: req.method, url: req.url, reason: csrfResult.reason },
+            details: {
+              method: req.method || "unknown",
+              url: req.url || "unknown",
+              reason: csrfResult.reason || "unknown"
+            },
             timestamp: Date.now(),
             requestId,
           });
@@ -140,7 +109,10 @@ export class AdvancedSecurityManager extends EventEmitter {
             severity: "high",
             ip,
             userAgent,
-            details: { url: req.url, payload: xssResult.payload },
+            details: {
+              url: req.url || "unknown",
+              payload: xssResult.payload || "unknown"
+            },
             timestamp: Date.now(),
             requestId,
           });
@@ -157,7 +129,10 @@ export class AdvancedSecurityManager extends EventEmitter {
           severity: suspiciousResult.severity,
           ip,
           userAgent,
-          details: { url: req.url, reason: suspiciousResult.reason },
+          details: {
+            url: req.url || "unknown",
+            reason: suspiciousResult.reason || "unknown"
+          },
           timestamp: Date.now(),
           requestId,
         });
@@ -177,32 +152,29 @@ export class AdvancedSecurityManager extends EventEmitter {
   /**
    * Add security headers to response
    */
-  addSecurityHeaders(response: any): any {
+  addSecurityHeaders(response: { headers: Record<string, string> }): { headers: Record<string, string> } {
     // Add configured security headers
     Object.entries(this.config.securityHeaders).forEach(([key, value]) => {
-      response.headers.set(key, value);
+      response.headers[key] = value;
     });
 
     // Add CSP header
     if (this.config.enableContentSecurityPolicy) {
       const csp = this.generateCSP();
-      response.headers.set("Content-Security-Policy", csp);
+      response.headers["Content-Security-Policy"] = csp;
     }
 
     // Add HSTS header
     if (this.config.enableHSTS) {
-      response.headers.set(
-        "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains; preload",
-      );
+      response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
     }
 
     // Add CORS headers
     if (this.config.enableCORS) {
-      response.headers.set("Access-Control-Allow-Origin", this.getAllowedOrigin());
-      response.headers.set("Access-Control-Allow-Methods", this.config.allowedMethods.join(", "));
-      response.headers.set("Access-Control-Allow-Headers", this.config.allowedHeaders.join(", "));
-      response.headers.set("Access-Control-Max-Age", "86400");
+      response.headers["Access-Control-Allow-Origin"] = this.getAllowedOrigin();
+      response.headers["Access-Control-Allow-Methods"] = this.config.allowedMethods.join(", ");
+      response.headers["Access-Control-Allow-Headers"] = this.config.allowedHeaders.join(", ");
+      response.headers["Access-Control-Max-Age"] = "86400";
     }
 
     return response;
@@ -222,7 +194,7 @@ export class AdvancedSecurityManager extends EventEmitter {
   /**
    * Validate CSRF token
    */
-  async validateCSRFToken(req: any): Promise<{ valid: boolean; reason?: string }> {
+  async validateCSRFToken(req: { headers: { get: (key: string) => string | null }; body?: unknown }): Promise<{ valid: boolean; reason?: string }> {
     const sessionId = req.headers.get("x-session-id");
     if (!sessionId) {
       return { valid: false, reason: "Missing session ID" };
@@ -313,9 +285,9 @@ export class AdvancedSecurityManager extends EventEmitter {
   /**
    * Detect XSS attempts
    */
-  detectXSSAttempt(req: any): { detected: boolean; payload?: string } {
+  detectXSSAttempt(req: { body?: unknown; url?: string }): { detected: boolean; payload?: string } {
     const url = req.url;
-    const searchParams = new URL(url).searchParams;
+    const searchParams = new URL(url || "http://localhost").searchParams;
 
     const xssPatterns = [
       /<script[^>]*>.*?<\/script>/gi,
@@ -343,7 +315,7 @@ export class AdvancedSecurityManager extends EventEmitter {
    * Detect suspicious activity
    */
   detectSuspiciousActivity(
-    req: any,
+    req: { url?: string; headers: { get: (key: string) => string | null } },
     ip: string,
   ): { detected: boolean; severity: "low" | "medium" | "high" | "critical"; reason?: string } {
     const url = req.url;
@@ -364,7 +336,7 @@ export class AdvancedSecurityManager extends EventEmitter {
     ];
 
     for (const { pattern, severity, reason } of attackPatterns) {
-      if (pattern.test(url) || pattern.test(userAgent)) {
+      if (pattern.test(url || "") || pattern.test(userAgent)) {
         return { detected: true, severity, reason };
       }
     }
@@ -418,10 +390,10 @@ export class AdvancedSecurityManager extends EventEmitter {
   /**
    * Get client IP address
    */
-  private getClientIP(req: any): string {
+  private getClientIP(req: { headers: { get: (key: string) => string | null } }): string {
     const forwarded = req.headers.get("x-forwarded-for");
     if (forwarded) {
-      return forwarded.split(",")[0].trim();
+      return forwarded.split(",")[0]?.trim() || "unknown";
     }
 
     const realIP = req.headers.get("x-real-ip");
@@ -446,9 +418,10 @@ export class AdvancedSecurityManager extends EventEmitter {
     status: number,
     message: string,
     headers: Record<string, string> = {},
-  ): any {
+  ): { status: number; message: string; headers?: Record<string, string> } {
     const response = {
       status,
+      message,
       body: {
         success: false,
         error: {

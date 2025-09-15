@@ -1,4 +1,4 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { createServiceClient, logger } from "@aibos/utils";
 
 // V1 Dead Letter Queue Handler for failed jobs
@@ -9,7 +9,7 @@ export const dlqHandler = inngest.createFunction(
     retries: 1, // DLQ handler itself should not retry extensively
   },
   { event: "inngest/function.failed" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { function_id, run_id, error, original_event, attempt_count } = event.data;
 
     // Step 1: Log the failure
@@ -171,7 +171,7 @@ export const dlqHandler = inngest.createFunction(
                 Error: ${error?.message || "Unknown error"}
                 Attempt: ${attempt_count}
                 Action: ${recoveryAction.action}
-                
+
                 Please review the DLQ admin panel for details.
               `,
             },
@@ -204,7 +204,7 @@ export const dlqRetryHandler = inngest.createFunction(
     name: "DLQ Retry Handler",
   },
   { event: "dlq/retry" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { dlqId, originalEvent, retryDelay, errorType } = event.data;
 
     // Step 1: Wait for retry delay

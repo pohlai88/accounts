@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../Card";
-import { Button } from "../../Button";
-import { Badge } from "../../Badge";
-import { Alert } from "../../Alert";
-import { cn } from "../../utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@aibos/ui/Card";
+import { Button } from "@aibos/ui/Button";
+import { Badge } from "@aibos/ui/Badge";
+import { Alert } from "@aibos/ui/Alert";
+import { cn } from "@aibos/ui/utils";
 import {
   Activity,
   AlertTriangle,
@@ -37,10 +37,10 @@ import {
 } from "lucide-react";
 
 // Import the rule components
-import { RuleStudio } from "./RuleStudio";
-import { RuleTesting } from "./RuleTesting";
-import { RuleAnalytics } from "./RuleAnalytics";
-import { RuleVersioning } from "./RuleVersioning";
+import { RuleStudio } from "./RuleStudio.js";
+import { RuleTesting } from "./RuleTesting.js";
+import { RuleAnalytics } from "./RuleAnalytics.js";
+import { RuleVersioning } from "./RuleVersioning.js";
 
 interface Rule {
   id: string;
@@ -174,263 +174,263 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
     rules.length > 0
       ? rules
       : [
-          {
-            id: "rule_001",
-            name: "Invoice Overdue Alert",
-            description: "Send email alert when invoice is overdue",
-            conditions: [
-              {
-                id: "1",
-                field: "invoice.dueDate",
-                operator: "less_than",
-                value: "today",
-                logicalOperator: "AND",
+        {
+          id: "rule_001",
+          name: "Invoice Overdue Alert",
+          description: "Send email alert when invoice is overdue",
+          conditions: [
+            {
+              id: "1",
+              field: "invoice.dueDate",
+              operator: "less_than",
+              value: "today",
+              logicalOperator: "AND",
+            },
+            { id: "2", field: "invoice.status", operator: "equals", value: "sent" },
+          ],
+          actions: [
+            {
+              id: "1",
+              type: "send_email",
+              config: { template: "overdue_alert", to: "customer.email" },
+              order: 1,
+            },
+            {
+              id: "2",
+              type: "create_task",
+              config: { title: "Follow up on overdue invoice", assignee: "accounting" },
+              order: 2,
+            },
+          ],
+          status: "active",
+          version: 1,
+          createdAt: new Date("2024-01-15"),
+          updatedAt: new Date("2024-01-15"),
+          createdBy: "john.doe@company.com",
+          lastExecuted: new Date("2024-01-20"),
+          executionCount: 45,
+          successRate: 95.6,
+          averageExecutionTime: 120,
+          costPerExecution: 0.0025,
+        },
+        {
+          id: "rule_002",
+          name: "High Value Customer Discount",
+          description: "Apply 10% discount for customers with lifetime value > $10,000",
+          conditions: [
+            { id: "1", field: "customer.lifetimeValue", operator: "greater_than", value: 10000 },
+            { id: "2", field: "order.amount", operator: "greater_than", value: 500 },
+          ],
+          actions: [
+            {
+              id: "1",
+              type: "update_field",
+              config: { field: "order.discount", value: "10%" },
+              order: 1,
+            },
+            {
+              id: "2",
+              type: "send_webhook",
+              config: {
+                url: "https://api.company.com/discounts",
+                data: { customerId: "customer.id", discount: "10%" },
               },
-              { id: "2", field: "invoice.status", operator: "equals", value: "sent" },
-            ],
-            actions: [
-              {
-                id: "1",
-                type: "send_email",
-                config: { template: "overdue_alert", to: "customer.email" },
-                order: 1,
-              },
-              {
-                id: "2",
-                type: "create_task",
-                config: { title: "Follow up on overdue invoice", assignee: "accounting" },
-                order: 2,
-              },
-            ],
-            status: "active",
-            version: 1,
-            createdAt: new Date("2024-01-15"),
-            updatedAt: new Date("2024-01-15"),
-            createdBy: "john.doe@company.com",
-            lastExecuted: new Date("2024-01-20"),
-            executionCount: 45,
-            successRate: 95.6,
-            averageExecutionTime: 120,
-            costPerExecution: 0.0025,
-          },
-          {
-            id: "rule_002",
-            name: "High Value Customer Discount",
-            description: "Apply 10% discount for customers with lifetime value > $10,000",
-            conditions: [
-              { id: "1", field: "customer.lifetimeValue", operator: "greater_than", value: 10000 },
-              { id: "2", field: "order.amount", operator: "greater_than", value: 500 },
-            ],
-            actions: [
-              {
-                id: "1",
-                type: "update_field",
-                config: { field: "order.discount", value: "10%" },
-                order: 1,
-              },
-              {
-                id: "2",
-                type: "send_webhook",
-                config: {
-                  url: "https://api.company.com/discounts",
-                  data: { customerId: "customer.id", discount: "10%" },
-                },
-                order: 2,
-              },
-            ],
-            status: "active",
-            version: 2,
-            createdAt: new Date("2024-01-10"),
-            updatedAt: new Date("2024-01-18"),
-            createdBy: "jane.smith@company.com",
-            lastExecuted: new Date("2024-01-20"),
-            executionCount: 23,
-            successRate: 100,
-            averageExecutionTime: 85,
-            costPerExecution: 0.0018,
-          },
-        ];
+              order: 2,
+            },
+          ],
+          status: "active",
+          version: 2,
+          createdAt: new Date("2024-01-10"),
+          updatedAt: new Date("2024-01-18"),
+          createdBy: "jane.smith@company.com",
+          lastExecuted: new Date("2024-01-20"),
+          executionCount: 23,
+          successRate: 100,
+          averageExecutionTime: 85,
+          costPerExecution: 0.0018,
+        },
+      ];
 
   const mockTestDataSets: TestDataSet[] =
     testDataSets.length > 0
       ? testDataSets
       : [
-          {
-            id: "test_001",
-            name: "Overdue Invoice Test",
-            description: "Test data for overdue invoice scenario",
-            data: {
-              invoice: {
-                id: "INV-001",
-                dueDate: "2024-01-10",
-                status: "sent",
-                amount: 1500,
-                customer: { email: "test@example.com", name: "Test Customer" },
-              },
+        {
+          id: "test_001",
+          name: "Overdue Invoice Test",
+          description: "Test data for overdue invoice scenario",
+          data: {
+            invoice: {
+              id: "INV-001",
+              dueDate: "2024-01-10",
+              status: "sent",
+              amount: 1500,
+              customer: { email: "test@example.com", name: "Test Customer" },
             },
-            createdAt: new Date("2024-01-15"),
-            updatedAt: new Date("2024-01-15"),
           },
-          {
-            id: "test_002",
-            name: "High Value Customer Test",
-            description: "Test data for high value customer discount",
-            data: {
-              customer: {
-                id: "CUST-001",
-                lifetimeValue: 15000,
-                name: "Premium Customer",
-              },
-              order: {
-                id: "ORD-001",
-                amount: 750,
-                items: ["Product A", "Product B"],
-              },
+          createdAt: new Date("2024-01-15"),
+          updatedAt: new Date("2024-01-15"),
+        },
+        {
+          id: "test_002",
+          name: "High Value Customer Test",
+          description: "Test data for high value customer discount",
+          data: {
+            customer: {
+              id: "CUST-001",
+              lifetimeValue: 15000,
+              name: "Premium Customer",
             },
-            createdAt: new Date("2024-01-15"),
-            updatedAt: new Date("2024-01-15"),
+            order: {
+              id: "ORD-001",
+              amount: 750,
+              items: ["Product A", "Product B"],
+            },
           },
-        ];
+          createdAt: new Date("2024-01-15"),
+          updatedAt: new Date("2024-01-15"),
+        },
+      ];
 
   const mockTestResults: TestResult[] =
     testResults.length > 0
       ? testResults
       : [
-          {
-            id: "result_001",
-            ruleId: "rule_001",
-            testDataSetId: "test_001",
-            success: true,
-            executionTime: 125,
-            cost: 0.0025,
-            result: { emailSent: true, taskCreated: true },
-            executedAt: new Date("2024-01-20T10:30:00Z"),
-            conditions: [
-              { condition: "invoice.dueDate < today", result: true, value: "2024-01-10" },
-              { condition: "invoice.status = sent", result: true, value: "sent" },
-            ],
-            actions: [
-              {
-                action: "send_email",
-                executed: true,
-                result: { success: true, messageId: "msg_123" },
-              },
-              {
-                action: "create_task",
-                executed: true,
-                result: { success: true, taskId: "task_456" },
-              },
-            ],
-          },
-        ];
+        {
+          id: "result_001",
+          ruleId: "rule_001",
+          testDataSetId: "test_001",
+          success: true,
+          executionTime: 125,
+          cost: 0.0025,
+          result: { emailSent: true, taskCreated: true },
+          executedAt: new Date("2024-01-20T10:30:00Z"),
+          conditions: [
+            { condition: "invoice.dueDate < today", result: true, value: "2024-01-10" },
+            { condition: "invoice.status = sent", result: true, value: "sent" },
+          ],
+          actions: [
+            {
+              action: "send_email",
+              executed: true,
+              result: { success: true, messageId: "msg_123" },
+            },
+            {
+              action: "create_task",
+              executed: true,
+              result: { success: true, taskId: "task_456" },
+            },
+          ],
+        },
+      ];
 
   const mockMetrics: RuleMetrics[] =
     metrics.length > 0
       ? metrics
       : [
-          {
-            ruleId: "rule_001",
-            ruleName: "Invoice Overdue Alert",
-            totalExecutions: 45,
-            successfulExecutions: 43,
-            failedExecutions: 2,
-            successRate: 95.6,
-            averageExecutionTime: 120,
-            totalCost: 0.1125,
-            costPerExecution: 0.0025,
-            lastExecuted: new Date("2024-01-20"),
-            firstExecuted: new Date("2024-01-15"),
-            executionsToday: 3,
-            executionsThisWeek: 12,
-            executionsThisMonth: 45,
-            peakExecutionTime: "14:30",
-            mostCommonTrigger: "invoice.dueDate",
-            errorRate: 4.4,
-            retryCount: 1,
-          },
-          {
-            ruleId: "rule_002",
-            ruleName: "High Value Customer Discount",
-            totalExecutions: 23,
-            successfulExecutions: 23,
-            failedExecutions: 0,
-            successRate: 100,
-            averageExecutionTime: 85,
-            totalCost: 0.0414,
-            costPerExecution: 0.0018,
-            lastExecuted: new Date("2024-01-20"),
-            firstExecuted: new Date("2024-01-10"),
-            executionsToday: 1,
-            executionsThisWeek: 5,
-            executionsThisMonth: 23,
-            peakExecutionTime: "11:15",
-            mostCommonTrigger: "customer.lifetimeValue",
-            errorRate: 0,
-            retryCount: 0,
-          },
-        ];
+        {
+          ruleId: "rule_001",
+          ruleName: "Invoice Overdue Alert",
+          totalExecutions: 45,
+          successfulExecutions: 43,
+          failedExecutions: 2,
+          successRate: 95.6,
+          averageExecutionTime: 120,
+          totalCost: 0.1125,
+          costPerExecution: 0.0025,
+          lastExecuted: new Date("2024-01-20"),
+          firstExecuted: new Date("2024-01-15"),
+          executionsToday: 3,
+          executionsThisWeek: 12,
+          executionsThisMonth: 45,
+          peakExecutionTime: "14:30",
+          mostCommonTrigger: "invoice.dueDate",
+          errorRate: 4.4,
+          retryCount: 1,
+        },
+        {
+          ruleId: "rule_002",
+          ruleName: "High Value Customer Discount",
+          totalExecutions: 23,
+          successfulExecutions: 23,
+          failedExecutions: 0,
+          successRate: 100,
+          averageExecutionTime: 85,
+          totalCost: 0.0414,
+          costPerExecution: 0.0018,
+          lastExecuted: new Date("2024-01-20"),
+          firstExecuted: new Date("2024-01-10"),
+          executionsToday: 1,
+          executionsThisWeek: 5,
+          executionsThisMonth: 23,
+          peakExecutionTime: "11:15",
+          mostCommonTrigger: "customer.lifetimeValue",
+          errorRate: 0,
+          retryCount: 0,
+        },
+      ];
 
   const mockVersions: RuleVersion[] =
     versions.length > 0
       ? versions
       : [
-          {
-            id: "version_001",
-            ruleId: "rule_001",
-            version: 1,
-            name: "Invoice Overdue Alert",
-            description: "Send email alert when invoice is overdue",
-            conditions: [],
-            actions: [],
-            status: "active",
-            createdAt: new Date("2024-01-15"),
-            createdBy: "john.doe@company.com",
-            changeLog: "Initial version of overdue invoice alert rule",
-            isActive: true,
-            executionCount: 45,
-            successRate: 95.6,
-            averageExecutionTime: 120,
-            costPerExecution: 0.0025,
-            tags: ["invoice", "alert", "email"],
-          },
-          {
-            id: "version_002",
-            ruleId: "rule_002",
-            version: 2,
-            name: "High Value Customer Discount",
-            description: "Apply 10% discount for customers with lifetime value > $10,000",
-            conditions: [],
-            actions: [],
-            status: "active",
-            createdAt: new Date("2024-01-18"),
-            createdBy: "jane.smith@company.com",
-            changeLog: "Updated discount percentage from 5% to 10%",
-            isActive: true,
-            executionCount: 23,
-            successRate: 100,
-            averageExecutionTime: 85,
-            costPerExecution: 0.0018,
-            tags: ["discount", "customer", "pricing"],
-          },
-        ];
+        {
+          id: "version_001",
+          ruleId: "rule_001",
+          version: 1,
+          name: "Invoice Overdue Alert",
+          description: "Send email alert when invoice is overdue",
+          conditions: [],
+          actions: [],
+          status: "active",
+          createdAt: new Date("2024-01-15"),
+          createdBy: "john.doe@company.com",
+          changeLog: "Initial version of overdue invoice alert rule",
+          isActive: true,
+          executionCount: 45,
+          successRate: 95.6,
+          averageExecutionTime: 120,
+          costPerExecution: 0.0025,
+          tags: ["invoice", "alert", "email"],
+        },
+        {
+          id: "version_002",
+          ruleId: "rule_002",
+          version: 2,
+          name: "High Value Customer Discount",
+          description: "Apply 10% discount for customers with lifetime value > $10,000",
+          conditions: [],
+          actions: [],
+          status: "active",
+          createdAt: new Date("2024-01-18"),
+          createdBy: "jane.smith@company.com",
+          changeLog: "Updated discount percentage from 5% to 10%",
+          isActive: true,
+          executionCount: 23,
+          successRate: 100,
+          averageExecutionTime: 85,
+          costPerExecution: 0.0018,
+          tags: ["discount", "customer", "pricing"],
+        },
+      ];
 
   const mockAlerts: PerformanceAlert[] =
     alerts.length > 0
       ? alerts
       : [
-          {
-            id: "alert_001",
-            ruleId: "rule_001",
-            ruleName: "Invoice Overdue Alert",
-            type: "error_rate",
-            severity: "medium",
-            message: "Error rate has increased to 4.4%",
-            threshold: 3.0,
-            currentValue: 4.4,
-            triggeredAt: new Date("2024-01-20T09:15:00Z"),
-            resolved: false,
-          },
-        ];
+        {
+          id: "alert_001",
+          ruleId: "rule_001",
+          ruleName: "Invoice Overdue Alert",
+          type: "error_rate",
+          severity: "medium",
+          message: "Error rate has increased to 4.4%",
+          threshold: 3.0,
+          currentValue: 4.4,
+          triggeredAt: new Date("2024-01-20T09:15:00Z"),
+          resolved: false,
+        },
+      ];
 
   const sections = [
     {

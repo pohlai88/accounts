@@ -4,6 +4,7 @@ import {
   PresenceSystem,
   RealtimeEventSystem,
   NotificationSystem,
+  toWsMessage,
 } from "@aibos/realtime";
 import { createClient } from "@supabase/supabase-js";
 import { EventEmitter } from "events";
@@ -42,9 +43,9 @@ export class ProductionWebSocketServer extends EventEmitter {
       });
 
       // Initialize real-time systems
-      presenceSystem = new PresenceSystem(wsManager);
       eventSystem = new RealtimeEventSystem(wsManager);
-      notificationSystem = new NotificationSystem(wsManager);
+      presenceSystem = new PresenceSystem(wsManager, eventSystem);
+      notificationSystem = new NotificationSystem(wsManager, eventSystem, presenceSystem);
 
       // Start WebSocket server
       await wsManager.start();
@@ -92,41 +93,44 @@ export class ProductionWebSocketServer extends EventEmitter {
   }
 
   private setupAccountingEvents() {
-    if (!eventSystem) return;
+    if (!eventSystem) { return; }
 
     // Journal entry events
-    eventSystem.subscribe("journal.created", data => {
+    eventSystem.subscribe("system", ["journal.created"], data => {
       console.log("📝 Journal entry created:", data);
-      this.broadcastToTenant(data.tenantId, {
+      const eventData = data.data as any;
+      this.broadcastToTenant(eventData.tenantId, {
         type: "journal.created",
-        data: data,
+        data: eventData,
         timestamp: Date.now(),
       });
     });
 
     // Invoice events
-    eventSystem.subscribe("invoice.updated", data => {
+    eventSystem.subscribe("system", ["invoice.updated"], data => {
       console.log("🧾 Invoice updated:", data);
-      this.broadcastToTenant(data.tenantId, {
+      const eventData = data.data as any;
+      this.broadcastToTenant(eventData.tenantId, {
         type: "invoice.updated",
-        data: data,
+        data: eventData,
         timestamp: Date.now(),
       });
     });
 
     // Rule events
-    eventSystem.subscribe("rule.created", data => {
+    eventSystem.subscribe("system", ["rule.created"], data => {
       console.log("📋 Rule created:", data);
-      this.broadcastToTenant(data.tenantId, {
+      const eventData = data.data as any;
+      this.broadcastToTenant(eventData.tenantId, {
         type: "rule.created",
-        data: data,
+        data: eventData,
         timestamp: Date.now(),
       });
     });
   }
 
   private setupUserEvents() {
-    if (!presenceSystem) return;
+    if (!presenceSystem) { return; }
 
     // User presence events
     presenceSystem.on("presence.changed", update => {
@@ -140,31 +144,33 @@ export class ProductionWebSocketServer extends EventEmitter {
   }
 
   private setupTenantEvents() {
-    if (!eventSystem) return;
+    if (!eventSystem) { return; }
 
     // Tenant switching events
-    eventSystem.subscribe("tenant.switched", data => {
+    eventSystem.subscribe("system", ["tenant.switched"], data => {
       console.log("🏢 Tenant switched:", data);
-      this.broadcastToUser(data.userId, {
+      const eventData = data.data as any;
+      this.broadcastToUser(eventData.userId, {
         type: "tenant.switched",
-        data: data,
+        data: eventData,
         timestamp: Date.now(),
       });
     });
 
     // Member invitation events
-    eventSystem.subscribe("member.invited", data => {
+    eventSystem.subscribe("system", ["member.invited"], data => {
       console.log("👥 Member invited:", data);
-      this.broadcastToTenant(data.tenantId, {
+      const eventData = data.data as any;
+      this.broadcastToTenant(eventData.tenantId, {
         type: "member.invited",
-        data: data,
+        data: eventData,
         timestamp: Date.now(),
       });
     });
   }
 
   private setupNotificationEvents() {
-    if (!notificationSystem) return;
+    if (!notificationSystem) { return; }
 
     // System notifications
     notificationSystem.on("notification.created", notification => {
@@ -178,12 +184,26 @@ export class ProductionWebSocketServer extends EventEmitter {
   }
 
   private broadcastToTenant(tenantId: string, message: unknown) {
-    if (!wsManager) return;
+    if (!wsManager) { return; }
 
-    const connections = wsManager.getConnectionsByTenant(tenantId);
+    const connections = wsManager.getTenantConnections(tenantId);
     connections.forEach(connection => {
       try {
-        wsManager?.sendMessage(connection.id, message);
+        const wsMessage = toWsMessage(message);
+        if (wsMessage.ok) {
+          // Convert from wsMessage format to websocket-manager format
+          const convertedMessage = {
+            type: wsMessage.value.type,
+            data: wsMessage.value.payload,
+            tenantId: wsMessage.value.tenantId,
+            userId: wsMessage.value.userId,
+            timestamp: wsMessage.value.ts.getTime(),
+            requestId: wsMessage.value.id,
+          };
+          wsManager?.sendMessage(connection.id, convertedMessage);
+        } else {
+          console.error("Invalid WebSocket message:", wsMessage.error);
+        }
       } catch (error) {
         console.error("Error broadcasting to tenant:", error);
       }
@@ -191,12 +211,26 @@ export class ProductionWebSocketServer extends EventEmitter {
   }
 
   private broadcastToUser(userId: string, message: unknown) {
-    if (!wsManager) return;
+    if (!wsManager) { return; }
 
-    const connections = wsManager.getConnectionsByUser(userId);
+    const connections = WebSocketManager.getConnectionsByUser(userId);
     connections.forEach(connection => {
       try {
-        wsManager?.sendMessage(connection.id, message);
+        const wsMessage = toWsMessage(message);
+        if (wsMessage.ok) {
+          // Convert from wsMessage format to websocket-manager format
+          const convertedMessage = {
+            type: wsMessage.value.type,
+            data: wsMessage.value.payload,
+            tenantId: wsMessage.value.tenantId,
+            userId: wsMessage.value.userId,
+            timestamp: wsMessage.value.ts.getTime(),
+            requestId: wsMessage.value.id,
+          };
+          wsManager?.sendMessage(connection.id, convertedMessage);
+        } else {
+          console.error("Invalid WebSocket message:", wsMessage.error);
+        }
       } catch (error) {
         console.error("Error broadcasting to user:", error);
       }
@@ -206,51 +240,62 @@ export class ProductionWebSocketServer extends EventEmitter {
   // Public API for triggering events from business logic
   public triggerJournalCreated(tenantId: string, journalData: unknown) {
     if (eventSystem) {
-      eventSystem.publish("journal.created", {
-        ...journalData,
+      eventSystem.publishEvent({
+        type: "journal.created",
         tenantId,
-        timestamp: Date.now(),
+        data: journalData,
+        priority: "normal",
       });
     }
   }
 
   public triggerInvoiceUpdated(tenantId: string, invoiceData: unknown) {
     if (eventSystem) {
-      eventSystem.publish("invoice.updated", {
-        ...invoiceData,
+      eventSystem.publishEvent({
+        type: "invoice.updated",
         tenantId,
-        timestamp: Date.now(),
+        data: invoiceData,
+        priority: "normal",
       });
     }
   }
 
   public triggerRuleCreated(tenantId: string, ruleData: unknown) {
     if (eventSystem) {
-      eventSystem.publish("rule.created", {
-        ...ruleData,
+      eventSystem.publishEvent({
+        type: "rule.created",
         tenantId,
-        timestamp: Date.now(),
+        data: ruleData,
+        priority: "normal",
       });
     }
   }
 
   public triggerTenantSwitched(userId: string, tenantData: unknown) {
     if (eventSystem) {
-      eventSystem.publish("tenant.switched", {
-        ...tenantData,
+      eventSystem.publishEvent({
+        type: "tenant.switched",
+        tenantId: "", // This event doesn't have a tenantId, use empty string
         userId,
-        timestamp: Date.now(),
+        data: tenantData,
+        priority: "normal",
       });
     }
   }
 
-  public createNotification(userId: string, notification: unknown) {
+  public createNotification(tenantId: string, userId: string, notification: unknown) {
     if (notificationSystem) {
-      notificationSystem.createNotification({
-        ...notification,
+      notificationSystem.sendNotification(
+        tenantId,
         userId,
-        timestamp: Date.now(),
-      });
+        {
+          title: "Notification",
+          message: "A notification was created",
+          category: "system",
+          type: "info",
+          ...(typeof notification === "object" && notification !== null ? notification : {}),
+        } as any
+      );
     }
   }
 
@@ -259,7 +304,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     return {
       isRunning: this.isRunning,
       connections: wsManager?.getStats() || null,
-      presence: presenceSystem?.getStats() || null,
+      presence: PresenceSystem.getStats() || null,
       events: eventSystem?.getStats() || null,
       notifications: notificationSystem?.getStats() || null,
     };

@@ -7,7 +7,7 @@
 
 import React from "react";
 import { FileText, Plus } from "lucide-react";
-import { EmptyState } from "./EmptyState";
+import { EmptyState } from "./EmptyState.js";
 
 export interface InvoiceEmptyStateProps {
   onCreateInvoice: () => void;

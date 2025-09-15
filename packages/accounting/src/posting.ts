@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { checkSoDCompliance } from "@aibos/auth";
-import { validateCOAFlags, COAValidationError } from "./coa-validation";
+import { validateCOAFlags, COAValidationError } from "./coa-validation.js";
 import { getAccountsInfo, getAllAccountsInfo } from "@aibos/db";
 
 export const JournalLine = z.object({

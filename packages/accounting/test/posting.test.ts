@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { postJournal, JournalPostingInput } from "../src/posting";
+import { postJournal, JournalPostingInput } from "@aibos/accounting/posting";
 
 // Mock the database functions
 vi.mock("@aibos/db", () => ({

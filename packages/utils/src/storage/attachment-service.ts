@@ -1,7 +1,7 @@
 // Attachment service for V1 compliance
 // Handles file upload, storage, and management with Supabase Storage
 
-import { createServiceClient } from "../supabase/server";
+import { createServiceClient } from "../supabase/server.js";
 import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
 

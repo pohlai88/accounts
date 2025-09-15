@@ -1,7 +1,7 @@
 // D4 Balance Sheet API Route - V1 Compliant Implementation
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { generateBalanceSheet } from "@aibos/accounting/src/reports/balance-sheet";
+import { generateBalanceSheet, type BalanceSheetResult, type BalanceSheetError } from "@aibos/accounting/reports/balance-sheet";
 import { createClient } from "@supabase/supabase-js";
 import { processIdempotencyKey } from "@aibos/utils/middleware/idempotency";
 import {
@@ -10,7 +10,7 @@ import {
   createV1RequestContext,
   extractV1UserContext,
 } from "@aibos/utils";
-import { checkSoDCompliance } from "@aibos/auth/src/sod";
+import { checkSoDCompliance } from "@aibos/auth";
 
 // Request schema validation (V1 requirement: Zod for all IO)
 const BalanceSheetRequestSchema = z.object({
@@ -31,7 +31,7 @@ export type TBalanceSheetRequest = z.infer<typeof BalanceSheetRequestSchema>;
  */
 export async function GET(request: NextRequest) {
   const auditService = getV1AuditService();
-  let reportResult: unknown = null;
+  let reportResult: BalanceSheetResult | BalanceSheetError | null = null;
 
   try {
     // 1. Process idempotency key (V1 requirement)
@@ -91,10 +91,20 @@ export async function GET(request: NextRequest) {
         asOfDate: new Date(input.asOfDate),
         comparativePeriod: input.comparativePeriod ? new Date(input.comparativePeriod) : undefined,
       },
-      supabase as unknown,
+      {
+        query: async (sql: string, params?: unknown[]) => {
+          const { data, error } = await supabase.rpc('execute_sql', {
+            query: sql,
+            params: params || []
+          });
+          if (error) throw error;
+          return data;
+        }
+      },
     );
 
     if (!reportResult.success) {
+      const errorResult = reportResult as BalanceSheetError;
       // Log failed report generation (V1 audit requirement)
       await auditService.logReportGeneration(
         createV1AuditContext(request),
@@ -102,7 +112,7 @@ export async function GET(request: NextRequest) {
         input,
         {
           success: false,
-          error: reportResult.error,
+          error: errorResult.error,
           generationTime: Date.now() - startTime,
         },
       );
@@ -110,22 +120,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: reportResult.error,
-          code: reportResult.code,
+          error: errorResult.error,
+          code: errorResult.code,
         },
         { status: 400 },
       );
     }
 
+    const successResult = reportResult as BalanceSheetResult;
     // 8. Log successful report generation (V1 audit requirement)
     await auditService.logReportGeneration(createV1AuditContext(request), "BALANCE_SHEET", input, {
       success: true,
-      totalAssets: reportResult.totals.totalAssets,
-      totalLiabilities: reportResult.totals.totalLiabilities,
-      totalEquity: reportResult.totals.totalEquity,
-      isBalanced: reportResult.isBalanced,
+      totalAssets: successResult.totals.totalAssets,
+      totalLiabilities: successResult.totals.totalLiabilities,
+      totalEquity: successResult.totals.totalEquity,
+      isBalanced: successResult.isBalanced,
       generationTime: Date.now() - startTime,
-      currency: reportResult.currency,
+      currency: successResult.currency,
       reportFormat: input.reportFormat,
     });
 
@@ -133,10 +144,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        ...reportResult,
-        asOfDate: reportResult.asOfDate.toISOString(),
-        comparativeAsOfDate: reportResult.comparativeAsOfDate?.toISOString(),
-        generatedAt: reportResult.generatedAt.toISOString(),
+        ...successResult,
+        asOfDate: successResult.asOfDate.toISOString(),
+        comparativeAsOfDate: successResult.comparativeDate?.toISOString(),
+        generatedAt: successResult.generatedAt.toISOString(),
       },
     });
   } catch (error) {
@@ -178,7 +189,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const auditService = getV1AuditService();
-  let reportResult: unknown = null;
+  let reportResult: BalanceSheetResult | BalanceSheetError | null = null;
 
   try {
     // 1. Process idempotency key (V1 requirement)
@@ -229,7 +240,16 @@ export async function POST(request: NextRequest) {
         asOfDate: new Date(input.asOfDate),
         comparativePeriod: input.comparativePeriod ? new Date(input.comparativePeriod) : undefined,
       },
-      supabase as unknown,
+      {
+        query: async (sql: string, params?: unknown[]) => {
+          const { data, error } = await supabase.rpc('execute_sql', {
+            query: sql,
+            params: params || []
+          });
+          if (error) throw error;
+          return data;
+        }
+      },
     );
 
     if (!reportResult.success) {
@@ -273,7 +293,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...reportResult,
         asOfDate: reportResult.asOfDate.toISOString(),
-        comparativeAsOfDate: reportResult.comparativeAsOfDate?.toISOString(),
+        comparativeAsOfDate: reportResult.comparativeDate?.toISOString(),
         generatedAt: reportResult.generatedAt.toISOString(),
       },
     });

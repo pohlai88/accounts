@@ -7,12 +7,12 @@
 
 import React, { useState } from "react";
 import { cn } from "@aibos/ui/utils";
-import { StatusBar } from "./StatusBar";
-import { Dock } from "./Dock";
-import { CommandPalette, Command } from "./CommandPalette";
-import { UniversalInbox } from "./UniversalInbox";
-import { TimelineDrawer } from "./TimelineDrawer";
-import { UniversalCreate } from "./UniversalCreate";
+import { StatusBar } from "./StatusBar.js";
+import { Dock } from "./Dock.js";
+import { CommandPalette, Command } from "./CommandPalette.js";
+import { UniversalInbox } from "./UniversalInbox.js";
+import { TimelineDrawer } from "./TimelineDrawer.js";
+import { UniversalCreate } from "./UniversalCreate.js";
 
 export interface AppShellProps {
   children: React.ReactNode;

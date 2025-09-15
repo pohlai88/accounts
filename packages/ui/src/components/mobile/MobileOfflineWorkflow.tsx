@@ -1,8 +1,8 @@
 import React, { useState, Suspense, lazy } from "react";
-import { Card } from "../../Card";
-import { Button } from "../../Button";
-import { Input } from "../../Input";
-import { cn } from "../../utils";
+import { Card } from "@aibos/ui/Card";
+import { Button } from "@aibos/ui/Button";
+import { Input } from "@aibos/ui/Input";
+import { cn } from "@aibos/ui/utils";
 import {
   Activity,
   Cloud,
@@ -18,19 +18,19 @@ import {
 
 // Lazy load components
 const OfflineManager = lazy(() =>
-  import("./OfflineManager").then(m => ({ default: m.OfflineManager })),
+  import("./OfflineManager.js").then(m => ({ default: m.OfflineManager })),
 );
 const ConflictResolver = lazy(() =>
-  import("./ConflictResolver").then(m => ({ default: m.ConflictResolver })),
+  import("./ConflictResolver.js").then(m => ({ default: m.ConflictResolver })),
 );
 const BackgroundSync = lazy(() =>
-  import("./BackgroundSync").then(m => ({ default: m.BackgroundSync })),
+  import("./BackgroundSync.js").then(m => ({ default: m.BackgroundSync })),
 );
 const MobileWorkflows = lazy(() =>
-  import("./MobileWorkflows").then(m => ({ default: m.MobileWorkflows })),
+  import("./MobileWorkflows.js").then(m => ({ default: m.MobileWorkflows })),
 );
 const ProgressiveWebApp = lazy(() =>
-  import("./ProgressiveWebApp").then(m => ({ default: m.ProgressiveWebApp })),
+  import("./ProgressiveWebApp.js").then(m => ({ default: m.ProgressiveWebApp })),
 );
 
 interface MobileOfflineWorkflowProps {
@@ -195,7 +195,7 @@ export const MobileOfflineWorkflow: React.FC<MobileOfflineWorkflowProps> = ({
                 className={cn(
                   "w-full justify-start text-[var(--sys-text-secondary)] hover:text-[var(--sys-text-primary)] p-3",
                   activeSection === section.id &&
-                    "bg-[var(--sys-fill-low)] text-[var(--sys-text-primary)]",
+                  "bg-[var(--sys-fill-low)] text-[var(--sys-text-primary)]",
                 )}
                 onClick={() => setActiveSection(section.id)}
                 aria-current={activeSection === section.id ? "page" : undefined}

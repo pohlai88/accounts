@@ -1,9 +1,9 @@
 // D2 FX Storage Helper - Database operations for FX rates
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { fxRates, currencies } from "@aibos/db/src/schema";
+import { fxRates, currencies } from "@aibos/db/schema";
 import { eq, and, desc, gte } from "drizzle-orm";
-import { type FxRateData, STALENESS_THRESHOLDS } from "@aibos/accounting";
+import { type FxRateData, STALENESS_THRESHOLDS } from "@aibos/accounting/types";
 
 // Database connection
 let _db: ReturnType<typeof drizzle> | null = null;

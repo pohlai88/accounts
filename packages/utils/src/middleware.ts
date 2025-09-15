@@ -1,6 +1,6 @@
 // V1 Request Context Middleware for Axiom Logging
-import { NextRequest, NextResponse } from "next/server";
-import { makeLogger, withCtx } from "./logger";
+import { NextRequest, NextResponse } from "next/server.js";
+import { makeLogger, withCtx } from "./logger.js";
 
 // V1 Required Labels: {env, tenant_id, company_id, request_id, user_id?, region}
 export interface RequestContext {
@@ -125,11 +125,11 @@ export function logBusinessEventToLogger(
   context: RequestContext,
   event: {
     type:
-      | "journal_posted"
-      | "invoice_created"
-      | "payment_processed"
-      | "user_login"
-      | "period_closed";
+    | "journal_posted"
+    | "invoice_created"
+    | "payment_processed"
+    | "user_login"
+    | "period_closed";
     entity_type: string;
     entity_id: string;
     amount?: string;
@@ -159,11 +159,11 @@ export function logBusinessEventToLogger(
 function extractFromJWT(request: NextRequest, claim: string): string | null {
   try {
     const authHeader = request.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) return null;
+    if (!authHeader?.startsWith("Bearer ")) { return null; }
 
     const token = authHeader.substring(7);
     const tokenPart = token.split(".")[1];
-    if (!tokenPart) return null;
+    if (!tokenPart) { return null; }
     const payload = JSON.parse(atob(tokenPart));
     return payload[claim] || null;
   } catch {

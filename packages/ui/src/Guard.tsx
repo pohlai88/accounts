@@ -8,7 +8,7 @@ import {
   useCanPerform,
   useHasFeature,
   type ClientUserContext,
-} from "@aibos/utils/auth/react-hooks";
+} from "@aibos/utils";
 
 interface GuardProps {
   user: ClientUserContext | null;
@@ -109,7 +109,7 @@ export function RoleGuard({
   children,
   fallback = null,
 }: GuardProps & { roles: string[] }) {
-  const hasRole = user?.roles?.some(role => roles.includes(role)) ?? false;
+  const hasRole = user?.roles?.some((role: string) => roles.includes(role)) ?? false;
 
   return hasRole ? <>{children}</> : <>{fallback}</>;
 }

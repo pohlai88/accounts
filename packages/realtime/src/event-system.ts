@@ -121,7 +121,7 @@ export class RealtimeEventSystem extends EventEmitter {
    */
   unsubscribe(subscriptionId: string): boolean {
     const subscription = this.subscriptions.get(subscriptionId);
-    if (!subscription) return false;
+    if (!subscription) {return false;}
 
     subscription.isActive = false;
     this.subscriptions.delete(subscriptionId);
@@ -135,7 +135,7 @@ export class RealtimeEventSystem extends EventEmitter {
    */
   subscribeToTenantEvents(connectionId: string, tenantId: string, channels: string[]): void {
     const connection = this.wsManager.getConnection(connectionId);
-    if (!connection || connection.tenantId !== tenantId) return;
+    if (!connection || connection.tenantId !== tenantId) {return;}
 
     // Subscribe to each channel
     for (const channel of channels) {
@@ -316,7 +316,7 @@ export class RealtimeEventSystem extends EventEmitter {
    */
   private handleWebSocketEvent(connectionId: string, message: WebSocketMessage): void {
     const connection = this.wsManager.getConnection(connectionId);
-    if (!connection) return;
+    if (!connection) {return;}
 
     // Process event through local subscriptions
     const messageData = message.data as {
@@ -344,15 +344,15 @@ export class RealtimeEventSystem extends EventEmitter {
    */
   private processEventForSubscriptions(event: RealtimeEvent): void {
     for (const subscription of this.subscriptions.values()) {
-      if (!subscription.isActive) continue;
-      if (subscription.tenantId !== event.tenantId) continue;
-      if (subscription.userId && subscription.userId !== event.userId) continue;
+      if (!subscription.isActive) {continue;}
+      if (subscription.tenantId !== event.tenantId) {continue;}
+      if (subscription.userId && subscription.userId !== event.userId) {continue;}
 
       // Check channel match
-      if (event.channel && !subscription.channels.includes(event.channel)) continue;
+      if (event.channel && !subscription.channels.includes(event.channel)) {continue;}
 
       // Check filters
-      if (subscription.filters && !this.matchesFilters(event, subscription.filters)) continue;
+      if (subscription.filters && !this.matchesFilters(event, subscription.filters)) {continue;}
 
       try {
         subscription.callback(event);

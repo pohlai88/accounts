@@ -1,7 +1,7 @@
 // Governance Pack Presets - Ready-to-use admin configurations
 // Provides 3 preset configurations for different organizational needs
 
-import type { FeatureFlags, PolicySettings, MemberPermissions } from "./sod";
+import type { FeatureFlags, PolicySettings, MemberPermissions } from "./sod.js";
 
 export interface GovernancePack {
   name: string;
@@ -357,8 +357,14 @@ export function getRecommendedPack(
   userCount: number,
   hasCompliance: boolean = false,
 ): keyof typeof GOVERNANCE_PACKS {
-  if (hasCompliance) return "regulated";
-  if (userCount <= 10) return "starter";
-  if (userCount <= 200) return "business";
+  if (hasCompliance) {
+    return "regulated";
+  }
+  if (userCount <= 10) {
+    return "starter";
+  }
+  if (userCount <= 200) {
+    return "business";
+  }
   return "enterprise";
 }

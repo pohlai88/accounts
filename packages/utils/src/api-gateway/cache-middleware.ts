@@ -1,6 +1,6 @@
 // Cache Middleware for API Gateway
-import { ApiRequest, GatewayResponse, Middleware } from "./types";
-import { CacheManager, CacheOptions } from "../cache";
+import { ApiRequest, GatewayResponse, Middleware } from "./types.js";
+import { CacheManager, CacheOptions } from "../cache/index.js";
 
 export function createCacheMiddleware(cacheManager: CacheManager): Middleware {
   return {

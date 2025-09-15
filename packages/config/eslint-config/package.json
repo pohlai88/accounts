@@ -24,5 +24,8 @@
     "typescript"
   ],
   "author": "AI-BOS",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.5.0"
+  }
 }

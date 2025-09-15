@@ -127,7 +127,7 @@ export function validateNormalBalances(
 
   for (const line of lines) {
     const account = accounts.get(line.accountId);
-    if (!account) continue; // Will be caught by validateAccountsExist
+    if (!account) {continue;} // Will be caught by validateAccountsExist
 
     const normalBalance = NORMAL_BALANCES[account.accountType];
     const isDebitEntry = line.debit > 0;
@@ -174,7 +174,7 @@ export function validateControlAccounts(
 
   for (const accountId of accountIds) {
     const account = accounts.get(accountId);
-    if (!account) continue; // Will be caught by validateAccountsExist
+    if (!account) {continue;} // Will be caught by validateAccountsExist
 
     // Check if account is a control account (has children)
     const hasChildren = allAccounts.some(a => a.parentId === accountId);

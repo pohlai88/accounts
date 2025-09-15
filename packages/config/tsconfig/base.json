@@ -1,15 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ESNext",
     "lib": [
-      "ES2022",
-      "ES2023",
+      "ESNext",
       "DOM",
       "DOM.Iterable"
     ],
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": true,
@@ -21,45 +20,97 @@
     "baseUrl": ".",
     "types": [],
     "paths": {
+      "@aibos/contracts": [
+        "packages/contracts/dist/index.d.ts"
+      ],
+      "@aibos/db": [
+        "packages/db/dist/index.d.ts"
+      ],
+      "@aibos/accounting": [
+        "packages/accounting/dist/index.d.ts"
+      ],
+      "@aibos/auth": [
+        "packages/auth/dist/index.d.ts"
+      ],
+      "@aibos/ui": [
+        "packages/ui/dist/index.d.ts"
+      ],
+      "@aibos/utils": [
+        "packages/utils/dist/index.d.ts"
+      ],
+      "@aibos/realtime": [
+        "packages/realtime/dist/index.d.ts"
+      ],
+      "@aibos/monitoring": [
+        "packages/monitoring/dist/index.d.ts"
+      ],
+      "@aibos/security": [
+        "packages/security/dist/index.d.ts"
+      ],
+      "@aibos/cache": [
+        "packages/cache/dist/index.d.ts"
+      ],
+      "@aibos/tokens": [
+        "packages/tokens/dist/index.d.ts"
+      ],
+      "@aibos/api-gateway": [
+        "packages/api-gateway/dist/index.d.ts"
+      ],
+      "@aibos/deployment": [
+        "packages/deployment/dist/index.d.ts"
+      ],
       "@aibos/contracts/*": [
-        "packages/contracts/src/*"
+        "packages/contracts/src/*",
+        "packages/contracts/dist/src/*"
       ],
       "@aibos/db/*": [
-        "packages/db/src/*"
+        "packages/db/src/*",
+        "packages/db/dist/src/*"
       ],
       "@aibos/accounting/*": [
-        "packages/accounting/src/*"
+        "packages/accounting/src/*",
+        "packages/accounting/dist/src/*"
       ],
       "@aibos/auth/*": [
-        "packages/auth/src/*"
+        "packages/auth/src/*",
+        "packages/auth/dist/src/*"
       ],
       "@aibos/ui/*": [
-        "packages/ui/src/*"
+        "packages/ui/src/*",
+        "packages/ui/dist/src/*"
       ],
       "@aibos/utils/*": [
-        "packages/utils/src/*"
+        "packages/utils/src/*",
+        "packages/utils/dist/src/*"
       ],
       "@aibos/realtime/*": [
-        "packages/realtime/src/*"
+        "packages/realtime/src/*",
+        "packages/realtime/dist/src/*"
       ],
       "@aibos/monitoring/*": [
-        "packages/monitoring/src/*"
+        "packages/monitoring/src/*",
+        "packages/monitoring/dist/src/*"
       ],
       "@aibos/security/*": [
-        "packages/security/src/*"
+        "packages/security/src/*",
+        "packages/security/dist/src/*"
       ],
       "@aibos/cache/*": [
-        "packages/cache/src/*"
+        "packages/cache/src/*",
+        "packages/cache/dist/src/*"
       ],
       "@aibos/tokens/*": [
-        "packages/tokens/src/*"
+        "packages/tokens/src/*",
+        "packages/tokens/dist/src/*"
       ],
       "@aibos/api-gateway/*": [
-        "packages/api-gateway/src/*"
+        "packages/api-gateway/src/*",
+        "packages/api-gateway/dist/src/*"
       ],
       "@aibos/deployment/*": [
-        "packages/deployment/src/*"
-      ]
+        "packages/deployment/src/*",
+        "packages/deployment/dist/src/*"
+      ],
     }
   }
 }

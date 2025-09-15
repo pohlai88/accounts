@@ -7,7 +7,7 @@
 
 import React from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "./ThemeProvider.js";
 import { cn } from "@aibos/ui/utils";
 
 export interface ThemeToggleProps {

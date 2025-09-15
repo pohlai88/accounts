@@ -8,8 +8,8 @@ const gateway = createApiGateway({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
   rateLimiting: {
     enabled: process.env.NODE_ENV === "production",
-    defaultWindowMs: 15 * 60 * 1000, // 15 minutes
-    defaultMax: 100, // requests per window
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    maxRequests: 100, // requests per window
   },
   caching: {
     enabled: process.env.NODE_ENV === "production",
@@ -20,35 +20,27 @@ const gateway = createApiGateway({
 // Register API routes
 gateway
   .route("/api/health", "GET")
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // Health check handler
-    return {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-      body: {
-        status: "ok",
-        timestamp: new Date().toISOString(),
-        services: {
-          database: { status: "healthy", responseTime: 0 },
-          storage: { status: "healthy", responseTime: 0 },
-          auth: { status: "healthy", responseTime: 0 },
-          api: { status: "healthy", responseTime: 0 },
-        },
-        version: process.env.APP_VERSION || "dev",
-        uptime: process.uptime(),
+    return NextResponse.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      services: {
+        database: { status: "healthy", responseTime: 0 },
+        storage: { status: "healthy", responseTime: 0 },
+        auth: { status: "healthy", responseTime: 0 },
+        api: { status: "healthy", responseTime: 0 },
       },
-    };
+      version: process.env.APP_VERSION || "dev",
+      uptime: process.uptime(),
+    });
   })
   .build();
 
 gateway
   .route("/api/ping", "GET")
-  .handler(async req => {
-    return {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-      body: { ok: true },
-    };
+  .handler(async (req: NextRequest) => {
+    return NextResponse.json({ ok: true });
   })
   .build();
 
@@ -56,26 +48,18 @@ gateway
 gateway
   .route("/api/invoices", "GET")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement actual invoice fetching
-    return {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-      body: { invoices: [] },
-    };
+    return NextResponse.json({ invoices: [] });
   })
   .build();
 
 gateway
   .route("/api/invoices", "POST")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement invoice creation
-    return {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-      body: { message: "Invoice created" },
-    };
+    return NextResponse.json({ message: "Invoice created" }, { status: 201 });
   })
   .build();
 
@@ -83,26 +67,18 @@ gateway
 gateway
   .route("/api/customers", "GET")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement actual customer fetching
-    return {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-      body: { customers: [] },
-    };
+    return NextResponse.json({ customers: [] });
   })
   .build();
 
 gateway
   .route("/api/customers", "POST")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement customer creation
-    return {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-      body: { message: "Customer created" },
-    };
+    return NextResponse.json({ message: "Customer created" }, { status: 201 });
   })
   .build();
 
@@ -110,26 +86,18 @@ gateway
 gateway
   .route("/api/journals", "GET")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement actual journal fetching
-    return {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-      body: { journals: [] },
-    };
+    return NextResponse.json({ journals: [] });
   })
   .build();
 
 gateway
   .route("/api/journals", "POST")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement journal creation
-    return {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-      body: { message: "Journal created" },
-    };
+    return NextResponse.json({ message: "Journal created" }, { status: 201 });
   })
   .build();
 
@@ -137,13 +105,9 @@ gateway
 gateway
   .route("/api/accounts", "GET")
   .middleware([authMiddleware])
-  .handler(async req => {
+  .handler(async (req: NextRequest) => {
     // TODO: Implement actual accounts fetching
-    return {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-      body: { accounts: [] },
-    };
+    return NextResponse.json({ accounts: [] });
   })
   .build();
 
@@ -171,7 +135,7 @@ async function nextRequestToApiRequest(req: NextRequest): Promise<unknown> {
 /**
  * Convert ApiResponse to NextResponse
  */
-function apiResponseToNextResponse(response: unknown): NextResponse {
+function apiResponseToNextResponse(response: any): NextResponse {
   return new NextResponse(JSON.stringify(response.body), {
     status: response.status,
     headers: response.headers,
@@ -184,7 +148,7 @@ function apiResponseToNextResponse(response: unknown): NextResponse {
 export async function gatewayMiddleware(req: NextRequest): Promise<NextResponse> {
   try {
     const apiRequest = await nextRequestToApiRequest(req);
-    const apiResponse = await gateway.processRequest(apiRequest);
+    const apiResponse = await gateway.processRequest(apiRequest as any);
     return apiResponseToNextResponse(apiResponse);
   } catch (error) {
     console.error("[Gateway Middleware] Error:", error);

@@ -1,7 +1,7 @@
 import { chromium, Browser } from "playwright";
 let browser: Browser | null = null;
 async function getBrowser() {
-  if (browser) return browser;
+  if (browser) {return browser;}
   browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
   return browser;
 }

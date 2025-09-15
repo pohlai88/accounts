@@ -1,7 +1,7 @@
 // D4 Period Management System - Period Close/Open with Approval Workflow
 // V1 Requirement: Period open/close/reversal with approval flow
 
-import { validateSoDCompliance } from "../posting";
+import { validateSoDCompliance } from "../posting.js";
 
 export interface PeriodCloseInput {
   tenantId: string;
@@ -330,7 +330,7 @@ export async function createPeriodLock(
     // Create period lock
     const query = `
       INSERT INTO period_locks (
-        tenant_id, company_id, fiscal_period_id, lock_type, 
+        tenant_id, company_id, fiscal_period_id, lock_type,
         locked_by, reason, is_active
       ) VALUES ($1, $2, $3, $4, $5, $6, true)
       RETURNING id
@@ -458,13 +458,13 @@ async function createReversingEntries(
   const query = `
     SELECT j.id, j.journal_number, j.description
     FROM gl_journal j
-    WHERE j.tenant_id = $1 
+    WHERE j.tenant_id = $1
       AND j.company_id = $2
       AND j.journal_date BETWEEN $3 AND $4
       AND j.status = 'posted'
       AND j.reference LIKE '%ACCRUAL%'
       AND NOT EXISTS (
-        SELECT 1 FROM reversing_entries re 
+        SELECT 1 FROM reversing_entries re
         WHERE re.original_journal_id = j.id
       )
   `;
@@ -492,14 +492,14 @@ async function createReversingEntries(
   // Create reversing entries for each accrual journal
   for (const journal of (data as unknown[]) || []) {
     const nextPeriod = await getNextFiscalPeriod(fiscalPeriod, dbClient);
-    if (!nextPeriod) continue;
+    if (!nextPeriod) { continue; }
 
     const reversalDate = (nextPeriod as { startDate: Date }).startDate;
 
     // Insert reversing entry record
     const insertQuery = `
       INSERT INTO reversing_entries (
-        tenant_id, company_id, original_journal_id, 
+        tenant_id, company_id, original_journal_id,
         reversal_date, reversal_reason, status
       ) VALUES ($1, $2, $3, $4, $5, 'PENDING')
     `;
@@ -529,7 +529,7 @@ async function createReversingEntries(
  */
 async function getFiscalPeriod(fiscalPeriodId: string, dbClient: unknown) {
   const query = `
-    SELECT * FROM fiscal_periods 
+    SELECT * FROM fiscal_periods
     WHERE id = $1
   `;
 
@@ -548,8 +548,8 @@ async function getFiscalPeriod(fiscalPeriodId: string, dbClient: unknown) {
 
 async function getNextFiscalPeriod(currentPeriod: unknown, dbClient: unknown) {
   const query = `
-    SELECT * FROM fiscal_periods 
-    WHERE fiscal_calendar_id = $1 
+    SELECT * FROM fiscal_periods
+    WHERE fiscal_calendar_id = $1
       AND period_number = $2
     ORDER BY period_number
     LIMIT 1
@@ -585,9 +585,9 @@ async function updateFiscalPeriodStatus(
   _reason?: string,
 ) {
   const query = `
-    UPDATE fiscal_periods 
-    SET status = $1, 
-        closed_at = $2, 
+    UPDATE fiscal_periods
+    SET status = $1,
+        closed_at = $2,
         closed_by = $3,
         updated_at = now()
     WHERE id = $4
@@ -609,8 +609,8 @@ async function updateFiscalPeriodStatus(
 
 async function removePeriodLocks(fiscalPeriodId: string, dbClient?: unknown) {
   const query = `
-    UPDATE period_locks 
-    SET is_active = false 
+    UPDATE period_locks
+    SET is_active = false
     WHERE fiscal_period_id = $1
   `;
 
@@ -632,8 +632,8 @@ async function checkUnpostedJournals(
 ): Promise<number> {
   const query = `
     SELECT COUNT(*) as count
-    FROM gl_journal 
-    WHERE tenant_id = $1 
+    FROM gl_journal
+    WHERE tenant_id = $1
       AND company_id = $2
       AND journal_date BETWEEN $3 AND $4
       AND status != 'posted'
@@ -659,12 +659,12 @@ async function checkTrialBalanceBalanced(
   dbClient: unknown,
 ): Promise<{ balanced: boolean; difference: number }> {
   const query = `
-    SELECT 
+    SELECT
       SUM(jl.debit_amount) as total_debits,
       SUM(jl.credit_amount) as total_credits
     FROM gl_journal_lines jl
     JOIN gl_journal j ON jl.journal_id = j.id
-    WHERE j.tenant_id = $1 
+    WHERE j.tenant_id = $1
       AND j.company_id = $2
       AND j.status = 'posted'
       AND j.journal_date <= $3
@@ -712,12 +712,12 @@ function validatePeriodCloseInput(input: PeriodCloseInput): {
 } {
   const errors: string[] = [];
 
-  if (!input.tenantId) errors.push("Tenant ID is required");
-  if (!input.companyId) errors.push("Company ID is required");
-  if (!input.fiscalPeriodId) errors.push("Fiscal period ID is required");
-  if (!input.closedBy) errors.push("Closed by user ID is required");
-  if (!input.userRole) errors.push("User role is required");
-  if (!input.closeDate) errors.push("Close date is required");
+  if (!input.tenantId) { errors.push("Tenant ID is required"); }
+  if (!input.companyId) { errors.push("Company ID is required"); }
+  if (!input.fiscalPeriodId) { errors.push("Fiscal period ID is required"); }
+  if (!input.closedBy) { errors.push("Closed by user ID is required"); }
+  if (!input.userRole) { errors.push("User role is required"); }
+  if (!input.closeDate) { errors.push("Close date is required"); }
 
   if (input.closeDate && input.closeDate > new Date()) {
     errors.push("Close date cannot be in the future");

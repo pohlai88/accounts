@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "../../utils";
+import { cn } from "@aibos/ui/utils";
 import {
   Calculator,
   Calendar,

@@ -36,6 +36,8 @@ describe("Tenant Invite API", () => {
         })),
       })),
       insert: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
     })),
     auth: {
       admin: {
@@ -52,7 +54,7 @@ describe("Tenant Invite API", () => {
   });
 
   it("should invite new user successfully", async () => {
-    const { getSecurityContext } = await import("../../../../_lib/request");
+    const { getSecurityContext } = await import("@aibos/web-api/_lib/request");
 
     // Mock security context
     vi.mocked(getSecurityContext).mockResolvedValue({
@@ -122,7 +124,7 @@ describe("Tenant Invite API", () => {
   });
 
   it("should return 403 for non-admin users", async () => {
-    const { getSecurityContext } = await import("../../../../_lib/request");
+    const { getSecurityContext } = await import("@aibos/web-api/_lib/request");
 
     // Mock security context
     vi.mocked(getSecurityContext).mockResolvedValue({
@@ -163,7 +165,7 @@ describe("Tenant Invite API", () => {
   });
 
   it("should handle existing user reactivation", async () => {
-    const { getSecurityContext } = await import("../../../../_lib/request");
+    const { getSecurityContext } = await import("@aibos/web-api/_lib/request");
 
     // Mock security context
     vi.mocked(getSecurityContext).mockResolvedValue({
@@ -230,7 +232,7 @@ describe("Tenant Invite API", () => {
   });
 
   it("should return 409 for already active member", async () => {
-    const { getSecurityContext } = await import("../../../../_lib/request");
+    const { getSecurityContext } = await import("@aibos/web-api/_lib/request");
 
     // Mock security context
     vi.mocked(getSecurityContext).mockResolvedValue({

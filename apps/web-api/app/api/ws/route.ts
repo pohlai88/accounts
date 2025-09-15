@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { getSecurityContext } from "../_lib/request";
-import { webSocketServer } from "../../../lib/websocket-server";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { webSocketServer } from "@aibos/web-api/lib/websocket-server";
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
           type: "about:blank",
           title: "WebSocket setup failed",
           status: 500,
-          detail: error.message || "Failed to setup WebSocket connection",
+          detail: error instanceof Error ? error.message : "Failed to setup WebSocket connection",
           instance: req.url,
         },
       },
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
           type: "about:blank",
           title: "WebSocket health check failed",
           status: 500,
-          detail: error.message || "Failed to check WebSocket server health",
+          detail: error instanceof Error ? error.message : "Failed to check WebSocket server health",
           instance: req.url,
         },
       },

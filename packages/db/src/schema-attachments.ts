@@ -12,7 +12,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { tenants, companies, users } from "./schema";
+import { tenants, companies, users } from "./schema.js";
 
 // Attachments table
 export const attachments = pgTable("attachments", {

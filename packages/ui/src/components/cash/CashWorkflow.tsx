@@ -23,12 +23,12 @@ import {
 } from "lucide-react";
 
 // Import the cash workflow components
-import { BankConnection } from "./BankConnection";
-import { TransactionImport } from "./TransactionImport";
-import { ReconciliationCanvas } from "./ReconciliationCanvas";
-import { RuleEngine } from "./RuleEngine";
-import { BankFeedManagement } from "./BankFeedManagement";
-import { CashFlowAnalysis } from "./CashFlowAnalysis";
+import { BankConnection } from "./BankConnection.js";
+import { TransactionImport } from "./TransactionImport.js";
+import { ReconciliationCanvas } from "./ReconciliationCanvas.js";
+import { RuleEngine } from "./RuleEngine.js";
+import { BankFeedManagement } from "./BankFeedManagement.js";
+import { CashFlowAnalysis } from "./CashFlowAnalysis.js";
 
 // Types
 interface WorkflowStep {

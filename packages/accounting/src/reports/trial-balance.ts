@@ -1,6 +1,6 @@
 // D4 Trial Balance Report Engine - Foundation for All Financial Reports
 // V1 Requirement: TB/BS/P&L/CF from GL only
-
+// No relative imports to patch in this file.
 export interface TrialBalanceInput {
   tenantId: string;
   companyId: string;
@@ -179,7 +179,7 @@ async function getChartOfAccountsHierarchy(
 > {
   // Build SQL query with filters
   let query = `
-    SELECT 
+    SELECT
       id,
       account_number,
       account_name,
@@ -190,9 +190,9 @@ async function getChartOfAccountsHierarchy(
       is_header,
       normal_balance,
       is_active
-    FROM chart_of_accounts 
-    WHERE tenant_id = $1 
-      AND company_id = $2 
+    FROM chart_of_accounts
+    WHERE tenant_id = $1
+      AND company_id = $2
       AND is_active = true
   `;
 
@@ -281,7 +281,7 @@ async function calculateAccountBalances(
 
   // Query GL journal lines for balance calculations
   const query = `
-    SELECT 
+    SELECT
       jl.account_id,
       j.journal_date,
       SUM(CASE WHEN j.journal_date < $3 THEN jl.debit_amount ELSE 0 END) as opening_debits,
@@ -292,7 +292,7 @@ async function calculateAccountBalances(
       MAX(j.journal_date) as newest_transaction
     FROM gl_journal_lines jl
     JOIN gl_journal j ON jl.journal_id = j.id
-    WHERE j.tenant_id = $1 
+    WHERE j.tenant_id = $1
       AND j.company_id = $2
       AND j.status = 'posted'
       AND j.journal_date <= $4
@@ -332,7 +332,7 @@ async function calculateAccountBalances(
       newest_transaction?: string;
     };
     const account = accounts.find(a => (a as { id: string }).id === rowData.account_id);
-    if (!account) continue;
+    if (!account) { continue; }
 
     const accountData = account as {
       normal_balance: string;
@@ -550,7 +550,7 @@ async function getFiscalYearStart(
   const query = `
     SELECT fc.fiscal_year_start
     FROM fiscal_calendars fc
-    WHERE fc.tenant_id = $1 
+    WHERE fc.tenant_id = $1
       AND fc.company_id = $2
       AND fc.is_active = true
       AND $3 BETWEEN fc.fiscal_year_start AND fc.fiscal_year_end

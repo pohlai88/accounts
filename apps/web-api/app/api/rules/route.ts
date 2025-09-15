@@ -1,11 +1,12 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSecurityContext } from "../_lib/request";
-import { ok, problem } from "../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 import { AdvancedCacheManager } from "@aibos/cache";
-// import { webSocketServer } from '../../lib/websocket-server';
-// import { withSecurity, withRateLimit } from '../../middleware/security-middleware';
-// import { monitoring } from '../../lib/monitoring-integration';
+import { getErrorMessage } from "@aibos/utils";
+// import { webSocketServer } from '@aibos/web-api/lib/websocket-server';
+// import { withSecurity, withRateLimit } from '@aibos/web-api/middleware/security-middleware';
+import { monitoring } from '@aibos/web-api/lib/monitoring-integration';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -21,18 +22,8 @@ function getCacheManager(): AdvancedCacheManager {
     const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-    if (redisUrl && redisToken) {
-      cacheManager = new AdvancedCacheManager(redisUrl, redisToken, {
-        defaultTTL: 300, // 5 minutes
-        keyPrefix: "aibos:rules:",
-        maxRetries: 3,
-        retryDelay: 100,
-      });
-    } else {
-      // Fallback to memory cache for development
-      const { MemoryCacheAdapter } = require("@aibos/cache");
-      cacheManager = new MemoryCacheAdapter() as unknown;
-    }
+    // Use the compatibility layer AdvancedCacheManager (no constructor args)
+    cacheManager = new AdvancedCacheManager();
   }
   return cacheManager;
 }
@@ -85,8 +76,8 @@ async function getRulesHandler(req: NextRequest) {
 
     // Try to get rules from cache first
     try {
-      const cachedRules = await cache.get(tenantId, "rules_list");
-      if (cachedRules) {
+      const cachedRules = await cache.get(`${tenantId}:rules_list`) as any[];
+      if (cachedRules && Array.isArray(cachedRules)) {
         console.log(`Cache hit for rules in tenant ${tenantId}`);
         return ok(
           {
@@ -123,7 +114,7 @@ async function getRulesHandler(req: NextRequest) {
 
     // Cache the result
     try {
-      await cache.set(tenantId, "rules_list", rules, 300); // 5 minutes TTL
+      await cache.set(`${tenantId}:rules_list`, rules, 300); // 5 minutes TTL
       console.log(`Cached rules for tenant ${tenantId}`);
     } catch (cacheError) {
       console.warn("Cache write error:", cacheError);
@@ -172,7 +163,13 @@ async function postRulesHandler(req: NextRequest) {
       ctx = await getSecurityContext(req);
     } catch (error: unknown) {
       if (error && typeof error === "object" && "status" in error && error.status === 401) {
-        monitoring.recordAPIRequest("/api/rules", "POST", 401, Date.now() - startTime, "unknown");
+        monitoring.recordAPIRequest(
+          "/api/rules",
+          "GET",
+          401,
+          Date.now() - startTime,
+          ctx?.tenantId || "unknown"
+        );
         return problem({
           status: 401,
           title: "Unauthorized",
@@ -229,7 +226,7 @@ async function postRulesHandler(req: NextRequest) {
 
     // Invalidate cache for this tenant
     try {
-      await cache.invalidatePattern(tenantId, "rules_*");
+      await cache.invalidatePattern(`${tenantId}:rules_*`);
       console.log(`Cache invalidated for tenant ${tenantId}`);
     } catch (cacheError) {
       console.warn("Cache invalidation error:", cacheError);
@@ -264,10 +261,9 @@ async function postRulesHandler(req: NextRequest) {
       "POST",
       500,
       Date.now() - startTime,
-      "unknown",
-      ctx?.userId,
+      ctx?.tenantId || "unknown"
     );
-    monitoring.error("Rules POST API error", { error: error.message, stack: error.stack });
+    monitoring.error("Rules POST API error", { error: getErrorMessage(error), stack: error instanceof Error ? error.stack : undefined });
 
     return problem({
       status: 500,

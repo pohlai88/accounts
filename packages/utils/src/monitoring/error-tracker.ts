@@ -1,7 +1,7 @@
 // Error tracking for V1 compliance
 // Comprehensive error monitoring with Axiom integration
 
-import { axiom } from "../axiom";
+import { axiom } from "@aibos/utils/axiom";
 
 export interface ErrorContext {
   requestId?: string;
@@ -331,7 +331,7 @@ export class ErrorTracker {
    * Flush errors to Axiom
    */
   private async flushErrors(): Promise<void> {
-    if (this.errorBuffer.length === 0) return;
+    if (this.errorBuffer.length === 0) { return; }
 
     const errorsToFlush = [...this.errorBuffer];
     this.errorBuffer = [];
@@ -348,10 +348,10 @@ export class ErrorTracker {
           // Serialize error object for Axiom
           errorDetails: error.error
             ? {
-                name: error.error.name,
-                message: error.error.message,
-                stack: error.error.stack,
-              }
+              name: error.error.name,
+              message: error.error.message,
+              stack: error.error.stack,
+            }
             : undefined,
         })),
       );

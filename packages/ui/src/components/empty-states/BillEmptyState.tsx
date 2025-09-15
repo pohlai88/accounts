@@ -7,7 +7,7 @@
 
 import React from "react";
 import { Receipt, Upload } from "lucide-react";
-import { EmptyState } from "./EmptyState";
+import { EmptyState } from "./EmptyState.js";
 
 export interface BillEmptyStateProps {
   onAddBill: () => void;

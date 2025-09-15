@@ -1,5 +1,5 @@
 // D2 FX Rate Ingest System - Primary + Fallback Sources with Staleness Detection
-import { validateFxPolicy } from "./policy";
+import { validateFxPolicy } from "./policy.js";
 
 // Use Node.js built-in fetch (Node 18+) and AbortController
 const fetch = globalThis.fetch;
@@ -132,7 +132,7 @@ export async function ingestFxRates(
   const errors: string[] = [];
 
   for (const source of fallbackSources) {
-    if (!source) continue;
+    if (!source) { continue; }
 
     try {
       const fallbackResult = await fetchFromSource(source, baseCurrency, targetCurrencies);

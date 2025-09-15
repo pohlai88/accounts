@@ -1,5 +1,5 @@
 // API Gateway Middleware
-import { ApiRequest, GatewayResponse, Middleware } from "./types";
+import { ApiRequest, GatewayResponse, Middleware } from "./types.js";
 
 /**
  * Authentication Middleware

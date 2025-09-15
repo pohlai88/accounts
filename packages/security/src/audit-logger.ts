@@ -1,88 +1,22 @@
 import { EventEmitter } from "events";
 import { createHash } from "crypto";
-
-export interface AuditEvent {
-  id: string;
-  timestamp: number;
-  tenantId: string;
-  userId?: string;
-  action: string;
-  resource: string;
-  resourceId?: string;
-  details: Record<string, any>;
-  ipAddress?: string;
-  userAgent?: string;
-  sessionId?: string;
-  severity: "low" | "medium" | "high" | "critical";
-  category:
-    | "authentication"
-    | "authorization"
-    | "data_access"
-    | "data_modification"
-    | "system"
-    | "security"
-    | "compliance";
-  outcome: "success" | "failure" | "partial";
-  riskScore: number; // 0-100
-  complianceFlags: string[];
-  metadata: Record<string, any>;
-}
-
-export interface AuditConfig {
-  enableRealTime: boolean;
-  enableBatchProcessing: boolean;
-  batchSize: number;
-  batchInterval: number; // milliseconds
-  retentionPeriod: number; // days
-  enableEncryption: boolean;
-  enableCompression: boolean;
-  maxEventSize: number; // bytes
-  enableRiskScoring: boolean;
-  enableComplianceMonitoring: boolean;
-}
-
-export interface ComplianceRule {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  severity: "low" | "medium" | "high" | "critical";
-  conditions: ComplianceCondition[];
-  actions: ComplianceAction[];
-  enabled: boolean;
-  createdAt: number;
-  updatedAt: number;
-}
-
-export interface ComplianceCondition {
-  field: string;
-  operator:
-    | "equals"
-    | "not_equals"
-    | "contains"
-    | "not_contains"
-    | "greater_than"
-    | "less_than"
-    | "in"
-    | "not_in";
-  value: any;
-  caseSensitive?: boolean;
-}
-
-export interface ComplianceAction {
-  type: "alert" | "block" | "log" | "notify" | "escalate";
-  target: string;
-  parameters: Record<string, any>;
-}
+import type {
+  AuditLogEvent,
+  AuditConfig,
+  ComplianceRule,
+  ComplianceCondition,
+  ComplianceAction
+} from "./types.js";
+import type { EncryptionManager } from "./encryption.js";
 
 export class AuditLogger extends EventEmitter {
   private config: AuditConfig;
-  private events: AuditEvent[] = [];
+  private events: AuditLogEvent[] = [];
   private complianceRules: ComplianceRule[] = [];
   private riskScoringWeights: Record<string, number>;
-  private encryptionManager?: any;
+  private encryptionManager?: EncryptionManager;
 
-  constructor(config: Partial<AuditConfig> = {}, encryptionManager?: any) {
+  constructor(config: Partial<AuditConfig> = {}, encryptionManager?: EncryptionManager) {
     super();
 
     this.config = {
@@ -119,9 +53,9 @@ export class AuditLogger extends EventEmitter {
    * Log audit event
    */
   async logEvent(
-    event: Omit<AuditEvent, "id" | "timestamp" | "riskScore" | "complianceFlags">,
+    event: Omit<AuditLogEvent, "id" | "timestamp" | "riskScore" | "complianceFlags">,
   ): Promise<string> {
-    const auditEvent: AuditEvent = {
+    const auditEvent: AuditLogEvent = {
       ...event,
       id: this.generateEventId(),
       timestamp: Date.now(),
@@ -142,7 +76,7 @@ export class AuditLogger extends EventEmitter {
     // Encrypt sensitive data if enabled
     if (this.config.enableEncryption && this.encryptionManager) {
       auditEvent.details = await this.encryptionManager.encryptPII(
-        auditEvent.details,
+        auditEvent.details as Record<string, string | number | boolean | string[]>,
         auditEvent.tenantId,
       );
     }
@@ -168,7 +102,7 @@ export class AuditLogger extends EventEmitter {
     tenantId: string,
     userId: string,
     action: "login" | "logout" | "login_failed" | "password_changed" | "account_locked",
-    details: Record<string, any> = {},
+    details: Record<string, string | number | boolean | string[] | number[]> = {},
     outcome: "success" | "failure" = "success",
   ): Promise<string> {
     return this.logEvent({
@@ -177,9 +111,9 @@ export class AuditLogger extends EventEmitter {
       action,
       resource: "authentication",
       details,
-      ipAddress: details.ipAddress,
-      userAgent: details.userAgent,
-      sessionId: details.sessionId,
+      ipAddress: details.ipAddress as string | undefined,
+      userAgent: details.userAgent as string | undefined,
+      sessionId: details.sessionId as string | undefined,
       severity: this.getAuthenticationSeverity(action, outcome),
       category: "authentication",
       outcome,
@@ -199,7 +133,7 @@ export class AuditLogger extends EventEmitter {
     resource: string,
     resourceId: string,
     action: "read" | "export" | "download" | "view",
-    details: Record<string, any> = {},
+    details: Record<string, string | number | boolean | string[] | number[]> = {},
   ): Promise<string> {
     return this.logEvent({
       tenantId,
@@ -208,16 +142,16 @@ export class AuditLogger extends EventEmitter {
       resource,
       resourceId,
       details,
-      ipAddress: details.ipAddress,
-      userAgent: details.userAgent,
-      sessionId: details.sessionId,
+      ipAddress: details.ipAddress as string | undefined,
+      userAgent: details.userAgent as string | undefined,
+      sessionId: details.sessionId as string | undefined,
       severity: this.getDataAccessSeverity(action, details),
       category: "data_access",
       outcome: "success",
       metadata: {
         eventType: "data_access",
-        dataType: details.dataType,
-        recordCount: details.recordCount,
+        dataType: details.dataType as string | number | boolean | string[] | number[],
+        recordCount: details.recordCount as string | number | boolean | string[] | number[],
       },
     });
   }
@@ -231,7 +165,7 @@ export class AuditLogger extends EventEmitter {
     resource: string,
     resourceId: string,
     action: "create" | "update" | "delete" | "restore",
-    details: Record<string, any> = {},
+    details: Record<string, string | number | boolean | string[] | number[]> = {},
   ): Promise<string> {
     return this.logEvent({
       tenantId,
@@ -240,16 +174,16 @@ export class AuditLogger extends EventEmitter {
       resource,
       resourceId,
       details,
-      ipAddress: details.ipAddress,
-      userAgent: details.userAgent,
-      sessionId: details.sessionId,
+      ipAddress: details.ipAddress as string | undefined,
+      userAgent: details.userAgent as string | undefined,
+      sessionId: details.sessionId as string | undefined,
       severity: this.getDataModificationSeverity(action, details),
       category: "data_modification",
       outcome: "success",
       metadata: {
         eventType: "data_modification",
-        changes: details.changes,
-        previousValues: details.previousValues,
+        changes: details.changes as string | number | boolean | string[] | number[],
+        previousValues: details.previousValues as string | number | boolean | string[] | number[],
       },
     });
   }
@@ -260,7 +194,7 @@ export class AuditLogger extends EventEmitter {
   async logSecurityEvent(
     tenantId: string,
     action: string,
-    details: Record<string, any> = {},
+    details: Record<string, string | number | boolean | string[] | number[]> = {},
     severity: "low" | "medium" | "high" | "critical" = "medium",
   ): Promise<string> {
     return this.logEvent({
@@ -268,15 +202,15 @@ export class AuditLogger extends EventEmitter {
       action,
       resource: "security",
       details,
-      ipAddress: details.ipAddress,
-      userAgent: details.userAgent,
+      ipAddress: details.ipAddress as string | undefined,
+      userAgent: details.userAgent as string | undefined,
       severity,
       category: "security",
       outcome: "failure",
       metadata: {
         eventType: "security",
-        threatLevel: details.threatLevel,
-        attackVector: details.attackVector,
+        threatLevel: details.threatLevel as string | number | boolean | string[] | number[],
+        attackVector: details.attackVector as string | number | boolean | string[] | number[],
       },
     });
   }
@@ -296,7 +230,7 @@ export class AuditLogger extends EventEmitter {
       limit?: number;
       offset?: number;
     } = {},
-  ): AuditEvent[] {
+  ): AuditLogEvent[] {
     let filteredEvents = this.events;
 
     if (filters.tenantId) {
@@ -445,10 +379,10 @@ export class AuditLogger extends EventEmitter {
    */
   updateComplianceRule(ruleId: string, updates: Partial<ComplianceRule>): boolean {
     const ruleIndex = this.complianceRules.findIndex(r => r.id === ruleId);
-    if (ruleIndex === -1) return false;
+    if (ruleIndex === -1) { return false; }
 
     const existingRule = this.complianceRules[ruleIndex];
-    if (!existingRule) return false;
+    if (!existingRule) { return false; }
 
     this.complianceRules[ruleIndex] = {
       id: existingRule.id,
@@ -470,7 +404,7 @@ export class AuditLogger extends EventEmitter {
   /**
    * Process event for real-time monitoring
    */
-  private processEvent(event: AuditEvent): void {
+  private processEvent(event: AuditLogEvent): void {
     // Check for high-risk events
     if (event.riskScore > 80) {
       this.emit("highRiskEvent", event);
@@ -488,7 +422,7 @@ export class AuditLogger extends EventEmitter {
   /**
    * Check suspicious patterns
    */
-  private checkSuspiciousPatterns(event: AuditEvent): void {
+  private checkSuspiciousPatterns(event: AuditLogEvent): void {
     const recentEvents = this.events.filter(
       e =>
         e.tenantId === event.tenantId &&
@@ -520,7 +454,7 @@ export class AuditLogger extends EventEmitter {
    * Calculate risk score for event
    */
   private calculateRiskScore(
-    event: Omit<AuditEvent, "id" | "timestamp" | "riskScore" | "complianceFlags">,
+    event: Omit<AuditLogEvent, "id" | "timestamp" | "riskScore" | "complianceFlags">,
   ): number {
     let score = 0;
 
@@ -549,12 +483,12 @@ export class AuditLogger extends EventEmitter {
    * Check compliance rules
    */
   private checkComplianceRules(
-    event: Omit<AuditEvent, "id" | "timestamp" | "riskScore" | "complianceFlags">,
+    event: Omit<AuditLogEvent, "id" | "timestamp" | "riskScore" | "complianceFlags">,
   ): string[] {
     const violations: string[] = [];
 
     for (const rule of this.complianceRules) {
-      if (!rule.enabled) continue;
+      if (!rule.enabled) { continue; }
 
       let matches = true;
       for (const condition of rule.conditions) {
@@ -575,7 +509,7 @@ export class AuditLogger extends EventEmitter {
   /**
    * Evaluate compliance condition
    */
-  private evaluateCondition(event: any, condition: ComplianceCondition): boolean {
+  private evaluateCondition(event: Partial<AuditLogEvent>, condition: ComplianceCondition): boolean {
     const fieldValue = this.getFieldValue(event, condition.field);
     const conditionValue = condition.value;
     const caseSensitive = condition.caseSensitive ?? true;
@@ -594,17 +528,17 @@ export class AuditLogger extends EventEmitter {
       case "not_equals":
         return value1 !== value2;
       case "contains":
-        return typeof value1 === "string" && value1.includes(value2);
+        return typeof value1 === "string" && typeof value2 === "string" && value1.includes(value2);
       case "not_contains":
-        return typeof value1 === "string" && !value1.includes(value2);
+        return typeof value1 === "string" && typeof value2 === "string" && !value1.includes(value2);
       case "greater_than":
         return Number(value1) > Number(value2);
       case "less_than":
         return Number(value1) < Number(value2);
       case "in":
-        return Array.isArray(value2) && value2.includes(value1);
+        return Array.isArray(value2) && value2.includes(value1 as never);
       case "not_in":
-        return Array.isArray(value2) && !value2.includes(value1);
+        return Array.isArray(value2) && !value2.includes(value1 as never);
       default:
         return false;
     }
@@ -613,19 +547,19 @@ export class AuditLogger extends EventEmitter {
   /**
    * Get field value from event
    */
-  private getFieldValue(event: any, field: string): any {
+  private getFieldValue(event: Partial<AuditLogEvent>, field: string): string | number | boolean | string[] | number[] | undefined {
     const parts = field.split(".");
     let value = event;
 
     for (const part of parts) {
       if (value && typeof value === "object" && part in value) {
-        value = value[part];
+        value = (value as Record<string, unknown>)[part] as Partial<AuditLogEvent>;
       } else {
         return undefined;
       }
     }
 
-    return value;
+    return value as string | number | boolean | string[] | number[] | undefined;
   }
 
   /**
@@ -635,11 +569,11 @@ export class AuditLogger extends EventEmitter {
     action: string,
     outcome: string,
   ): "low" | "medium" | "high" | "critical" {
-    if (action === "login_failed" && outcome === "failure") return "medium";
-    if (action === "account_locked") return "high";
-    if (action === "password_changed") return "medium";
-    if (action === "login" && outcome === "success") return "low";
-    if (action === "logout" && outcome === "success") return "low";
+    if (action === "login_failed" && outcome === "failure") { return "medium"; }
+    if (action === "account_locked") { return "high"; }
+    if (action === "password_changed") { return "medium"; }
+    if (action === "login" && outcome === "success") { return "low"; }
+    if (action === "logout" && outcome === "success") { return "low"; }
     return "medium";
   }
 
@@ -648,11 +582,12 @@ export class AuditLogger extends EventEmitter {
    */
   private getDataAccessSeverity(
     action: string,
-    details: any,
+    details: Record<string, string | number | boolean | string[] | number[]>,
   ): "low" | "medium" | "high" | "critical" {
-    if (action === "export" || action === "download") return "high";
-    if (details.recordCount > 1000) return "high";
-    if (details.recordCount > 100) return "medium";
+    if (action === "export" || action === "download") { return "high"; }
+    const recordCount = typeof details.recordCount === "number" ? details.recordCount : 0;
+    if (recordCount > 1000) { return "high"; }
+    if (recordCount > 100) { return "medium"; }
     return "low";
   }
 
@@ -661,11 +596,12 @@ export class AuditLogger extends EventEmitter {
    */
   private getDataModificationSeverity(
     action: string,
-    details: any,
+    details: Record<string, string | number | boolean | string[] | number[]>,
   ): "low" | "medium" | "high" | "critical" {
-    if (action === "delete") return "critical";
-    if (action === "create" && details.recordCount > 100) return "high";
-    if (action === "update" && details.recordCount > 50) return "medium";
+    if (action === "delete") { return "critical"; }
+    const recordCount = typeof details.recordCount === "number" ? details.recordCount : 0;
+    if (action === "create" && recordCount > 100) { return "high"; }
+    if (action === "update" && recordCount > 50) { return "medium"; }
     return "low";
   }
 
@@ -709,7 +645,7 @@ export class AuditLogger extends EventEmitter {
    * Start batch processing
    */
   private startBatchProcessing(): void {
-    if (!this.config.enableBatchProcessing) return;
+    if (!this.config.enableBatchProcessing) { return; }
 
     setInterval(() => {
       if (this.events.length >= this.config.batchSize) {

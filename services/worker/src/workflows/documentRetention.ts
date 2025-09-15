@@ -1,5 +1,6 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { createServiceClient, logger, getV1AuditService, createV1AuditContext } from "@aibos/utils";
+import type { V1AuditAuditContext, V1AuditAuditEvent } from "@aibos/utils/types";
 // Note: These types will be used when implementing full document retention
 // import { RetentionPolicyReq, ApplyRetentionPolicyReq, RetentionStatusRes } from "@aibos/contracts";
 
@@ -13,7 +14,7 @@ export const documentRetentionPolicy = inngest.createFunction(
     retries: 3,
   },
   { event: "retention/policy.create" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const {
       tenantId,
       companyId,
@@ -33,12 +34,15 @@ export const documentRetentionPolicy = inngest.createFunction(
     const supabase = createServiceClient();
     const auditService = getV1AuditService();
 
-    const auditContext = createV1AuditContext({
-      url: `/retention/policy`,
-      method: "POST",
-      headers: new globalThis.Headers(),
-      ip: "worker",
-    } as any);
+    const auditContext: V1AuditAuditContext = {
+      userId: event.user?.id || undefined,
+      tenantId: tenantId || undefined,
+      companyId: companyId || undefined,
+      sessionId: undefined,
+      ipAddress: "worker",
+      userAgent: undefined,
+      timestamp: new Date(),
+    };
 
     // Step 1: Validate and create retention policy
     const policyData = await step.run("create-retention-policy", async () => {
@@ -164,14 +168,14 @@ export const documentRetentionPolicy = inngest.createFunction(
       for (let i = 0; i < attachments.length; i += batchSize) {
         const batch = attachments.slice(i, i + batchSize);
 
-        const updates = batch.map(attachment => {
-          const retentionUntil = new Date(attachment.created_at);
+        const updates = batch.map((attachment: unknown) => {
+          const a = attachment as { id: string; created_at: string; metadata: any };
+          const retentionUntil = new Date(a.created_at);
           retentionUntil.setDate(retentionUntil.getDate() + (policyData as any).retentionPeriod);
-
           return {
-            id: attachment.id,
+            id: a.id,
             metadata: {
-              ...attachment.metadata,
+              ...a.metadata,
               retentionPolicy: {
                 policyId: policyData.id,
                 policyName: policyData.policyName,
@@ -242,18 +246,21 @@ export const documentRetentionMonitor = inngest.createFunction(
     retries: 3,
   },
   { event: "retention/monitor" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { tenantId, companyId, policyId } = event.data;
 
     const supabase = createServiceClient();
     const auditService = getV1AuditService();
 
-    const auditContext = createV1AuditContext({
-      url: `/retention/monitor`,
-      method: "POST",
-      headers: new globalThis.Headers(),
-      ip: "worker",
-    } as any);
+    const auditContext: V1AuditAuditContext = {
+      userId: event.user?.id || undefined,
+      tenantId: tenantId || undefined,
+      companyId: companyId || undefined,
+      sessionId: undefined,
+      ipAddress: "worker",
+      userAgent: undefined,
+      timestamp: new Date(),
+    };
 
     // Step 1: Find documents approaching retention expiry
     const expiringDocuments = await step.run("find-expiring-documents", async () => {
@@ -278,7 +285,7 @@ export const documentRetentionMonitor = inngest.createFunction(
 
       for (const attachment of attachments || []) {
         const retentionPolicy = attachment.metadata?.retentionPolicy;
-        if (!retentionPolicy?.retentionUntil) continue;
+        if (!retentionPolicy?.retentionUntil) { continue; }
 
         const retentionDate = new Date(retentionPolicy.retentionUntil);
 
@@ -304,7 +311,7 @@ export const documentRetentionMonitor = inngest.createFunction(
     if (expiringDocuments.expired.length > 0) {
       await step.run("process-expired-documents", async () => {
         for (const document of expiringDocuments.expired) {
-          if (!document) continue;
+          if (!document) { continue; }
 
           const retentionPolicy = document.metadata?.retentionPolicy;
           const action = retentionPolicy?.actionAfterRetention || "archive";
@@ -428,7 +435,7 @@ export const documentRetentionMonitor = inngest.createFunction(
         const groupedByDays: Record<number, typeof expiringDocuments.expiring> = {};
 
         for (const document of expiringDocuments.expiring) {
-          if (!document) continue;
+          if (!document) { continue; }
 
           const daysUntilExpiry = Math.ceil(
             (document.retentionDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
@@ -445,7 +452,7 @@ export const documentRetentionMonitor = inngest.createFunction(
 
         for (const days of notificationDays) {
           const documentsExpiring = groupedByDays[days];
-          if (!documentsExpiring || documentsExpiring.length === 0) continue;
+          if (!documentsExpiring || documentsExpiring.length === 0) { continue; }
 
           await inngest.send({
             name: "email/send",
@@ -456,12 +463,15 @@ export const documentRetentionMonitor = inngest.createFunction(
               data: {
                 daysUntilExpiry: days,
                 documentCount: documentsExpiring.length,
-                documents: documentsExpiring.map(doc => ({
-                  id: doc.id,
-                  filename: doc.filename,
-                  category: doc.category,
-                  retentionDate: doc.retentionDate,
-                })),
+                documents: documentsExpiring.map((doc: unknown) => {
+                  const d = doc as { id: string; filename: string; category: string; retentionDate: string };
+                  return {
+                    id: d.id,
+                    filename: d.filename,
+                    category: d.category,
+                    retentionDate: d.retentionDate,
+                  };
+                }),
                 reviewUrl: `${process.env.APP_URL}/compliance/retention-review`,
               },
               tenantId,
@@ -509,7 +519,7 @@ export const documentLegalHold = inngest.createFunction(
     retries: 3,
   },
   { event: "retention/legal-hold" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const {
       tenantId,
       attachmentIds,
@@ -523,12 +533,15 @@ export const documentLegalHold = inngest.createFunction(
     const supabase = createServiceClient();
     const auditService = getV1AuditService();
 
-    const auditContext = createV1AuditContext({
-      url: `/retention/legal-hold`,
-      method: "POST",
-      headers: new globalThis.Headers(),
-      ip: "worker",
-    } as any);
+    const auditContext: V1AuditAuditContext = {
+      userId: event.user?.id || undefined,
+      tenantId: tenantId || undefined,
+      companyId: undefined,
+      sessionId: undefined,
+      ipAddress: "worker",
+      userAgent: undefined,
+      timestamp: new Date(),
+    };
 
     // Step 1: Validate and process legal hold
     const holdResult = await step.run("process-legal-hold", async () => {
@@ -636,7 +649,7 @@ export const documentLegalHold = inngest.createFunction(
 
     // Step 2: Send notifications
     await step.run("send-legal-hold-notifications", async () => {
-      const successfulHolds = holdResult.results.filter(r => r.success);
+  const successfulHolds = holdResult.results.filter((r: { success: boolean }) => r.success);
 
       if (successfulHolds.length > 0) {
         await inngest.send({
@@ -651,7 +664,7 @@ export const documentLegalHold = inngest.createFunction(
               reason,
               legalCase,
               requestedBy,
-              attachmentIds: successfulHolds.map(r => r.attachmentId),
+              attachmentIds: successfulHolds.map((r: any) => r.attachmentId),
               processedAt: new Date().toISOString(),
             },
             tenantId,

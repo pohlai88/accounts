@@ -1,6 +1,6 @@
 // Trial Balance Report - Unit Tests
 import { describe, it, expect } from "vitest";
-import type { TrialBalanceInput } from "../src/reports/trial-balance";
+import type { TrialBalanceInput } from "@aibos/accounting/reports/trial-balance";
 
 describe("Trial Balance Report - Input Validation", () => {
   const validInput: TrialBalanceInput = {

@@ -1,7 +1,7 @@
 // Production Monitoring Dashboard
 import { NextRequest } from "next/server";
-import { getSecurityContext } from "../../_lib/request";
-import { ok, problem } from "../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 import { monitoring } from "../../../../lib/monitoring-integration";
 
 export async function GET(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const aggregatedMetrics = monitoring.getAggregatedMetrics(ctx.tenantId, 3600000); // Last hour
 
     // Calculate key performance indicators
-    const kpis = calculateKPIs(aggregatedMetrics);
+    const kpis = calculateKPIs(aggregatedMetrics || []);
 
     // Get real-time statistics
     const realTimeStats = {
@@ -102,7 +102,37 @@ export async function GET(req: NextRequest) {
   }
 }
 
-function calculateKPIs(metrics: unknown[]): unknown {
+interface Metric {
+  name?: string;
+  value?: number;
+  tags?: { operation?: string;[key: string]: any };
+}
+
+interface KPIs {
+  totalRequests: number;
+  errorRate: number;
+  averageResponseTime: number;
+  cacheHitRate: number;
+  activeUsers: number;
+  rulesCreated: number;
+  realtimeConnections: number;
+  securityEvents: number;
+  rateLimitHits: number;
+  authenticationFailures: number;
+  suspiciousActivity: number;
+  p50ResponseTime: number;
+  p95ResponseTime: number;
+  p99ResponseTime: number;
+  throughput: number;
+  availability: number;
+  tenantRequests: number;
+  tenantErrors: number;
+  tenantCacheHits: number;
+  tenantCacheMisses: number;
+  tenantRealtimeEvents: number;
+}
+
+function calculateKPIs(metrics: Metric[]): KPIs {
   if (!metrics || metrics.length === 0) {
     return {
       totalRequests: 0,
@@ -130,25 +160,25 @@ function calculateKPIs(metrics: unknown[]): unknown {
   }
 
   // Calculate KPIs from metrics
-  const apiMetrics = metrics.filter(m => m.name?.startsWith("api."));
-  const cacheMetrics = metrics.filter(m => m.name?.startsWith("cache."));
-  const businessMetrics = metrics.filter(m => m.name?.startsWith("business."));
-  const securityMetrics = metrics.filter(m => m.name?.startsWith("security."));
-  const realtimeMetrics = metrics.filter(m => m.name?.startsWith("realtime."));
+  const apiMetrics = metrics.filter((m: Metric) => m.name?.startsWith("api."));
+  const cacheMetrics = metrics.filter((m: Metric) => m.name?.startsWith("cache."));
+  const businessMetrics = metrics.filter((m: Metric) => m.name?.startsWith("business."));
+  const securityMetrics = metrics.filter((m: Metric) => m.name?.startsWith("security."));
+  const realtimeMetrics = metrics.filter((m: Metric) => m.name?.startsWith("realtime."));
 
   const totalRequests = apiMetrics
-    .filter(m => m.name === "api.requests.total")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "api.requests.total")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   const totalErrors = apiMetrics
-    .filter(m => m.name === "api.requests.errors")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "api.requests.errors")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0;
 
   const responseTimeMetrics = apiMetrics
-    .filter(m => m.name === "api.requests.duration")
-    .map(m => m.value || 0);
+    .filter((m: Metric) => m.name === "api.requests.duration")
+    .map((m: Metric) => m.value || 0);
 
   const averageResponseTime =
     responseTimeMetrics.length > 0
@@ -156,27 +186,27 @@ function calculateKPIs(metrics: unknown[]): unknown {
       : 0;
 
   const cacheHits = cacheMetrics
-    .filter(m => m.name === "cache.operations.total" && m.tags?.operation === "hit")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "cache.operations.total" && m.tags?.operation === "hit")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   const cacheMisses = cacheMetrics
-    .filter(m => m.name === "cache.operations.total" && m.tags?.operation === "miss")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "cache.operations.total" && m.tags?.operation === "miss")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   const cacheHitRate =
     cacheHits + cacheMisses > 0 ? (cacheHits / (cacheHits + cacheMisses)) * 100 : 0;
 
   const rulesCreated = businessMetrics
-    .filter(m => m.name === "business.rules_created")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "business.rules_created")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   const securityEvents = securityMetrics
-    .filter(m => m.name === "security.events.total")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "security.events.total")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   const realtimeConnections = realtimeMetrics
-    .filter(m => m.name === "realtime.connections.total")
-    .reduce((sum, m) => sum + (m.value || 0), 0);
+    .filter((m: Metric) => m.name === "realtime.connections.total")
+    .reduce((sum: number, m: Metric) => sum + (m.value || 0), 0);
 
   // Calculate percentiles
   const sortedResponseTimes = responseTimeMetrics.sort((a, b) => a - b);
@@ -210,14 +240,14 @@ function calculateKPIs(metrics: unknown[]): unknown {
 }
 
 function calculatePercentile(sortedArray: number[], percentile: number): number {
-  if (sortedArray.length === 0) return 0;
+  if (sortedArray.length === 0) { return 0; }
 
   const index = (percentile / 100) * (sortedArray.length - 1);
   const lower = Math.floor(index);
-  const upper = Math.ceil(index);
+  const upper = Math.ceil(index) as number;
   const weight = index % 1;
 
-  if (upper >= sortedArray.length) return sortedArray[sortedArray.length - 1];
+  if (upper >= sortedArray.length) { return sortedArray[sortedArray.length - 1] || 0; }
 
-  return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
+  return (sortedArray[lower] || 0) * (1 - weight) + (sortedArray[upper] || 0) * weight;
 }

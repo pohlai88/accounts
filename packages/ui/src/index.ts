@@ -5,22 +5,23 @@
  * All components follow semantic token system and SSOT principles
  */
 
+
 // Components
-export * from "./components";
+export * from "./components/index.js";
 
 // UI Components
-export { Button } from "./Button";
-export { Input } from "./Input";
-export { Label } from "./Label";
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from "./Card";
-export { Badge } from "./Badge";
-export { Alert, AlertTitle, AlertDescription } from "./Alert";
+export { Button } from "./Button.js";
+export { Input } from "./Input.js";
+export { Label } from "./Label.js";
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from "./Card.js";
+export { Badge } from "./Badge.js";
+export { Alert, AlertTitle, AlertDescription } from "./Alert.js";
 
 // Utils
-export * from "./utils";
+export * from "./utils.js";
 
 // Auth Context (moved from @aibos/auth to avoid React dependency)
-export * from "./AuthProvider";
+export * from "./AuthProvider.js";
 
 // Accessibility Provider
-export * from "./AccessibilityProvider";
+export * from "./AccessibilityProvider.js";

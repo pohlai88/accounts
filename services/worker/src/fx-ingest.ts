@@ -1,7 +1,8 @@
 // D2 FX Rate Ingest Job - Automated Currency Rate Updates via Inngest
-import { inngest } from "./inngestClient";
-import { ingestFxRates, STALENESS_THRESHOLDS, type FxRateData } from "@aibos/accounting";
-import { insertFxRates, getFxRatesStaleness } from "./fx-storage";
+import { inngest } from "./inngestClient.js";
+import { ingestFxRates } from "@aibos/accounting/fx/ingest";
+import { STALENESS_THRESHOLDS, type FxRateData } from "@aibos/accounting/types";
+import { insertFxRates, getFxRatesStaleness } from "./fx-storage.js";
 
 // FX rate ingest job - runs every 4 hours
 export const fxRateIngestJob = inngest.createFunction(
@@ -68,12 +69,7 @@ export const fxRateIngestJob = inngest.createFunction(
       }
 
       return {
-        rates: result.rates.map(rate => ({
-          ...rate,
-          timestamp: rate.timestamp.toISOString(),
-          validFrom: rate.validFrom.toISOString(),
-          validTo: rate.validTo?.toISOString(),
-        })),
+        rates: result.rates,
         source: result.source,
         staleness: result.staleness,
         rateCount: result.rates.length,
@@ -83,30 +79,42 @@ export const fxRateIngestJob = inngest.createFunction(
     // Step 3: Store FX rates in database
     const storageResult = await step.run("store-fx-rates", async () => {
       // Convert serialized dates back to Date objects
-      const ratesWithDates: FxRateData[] = ingestResult.rates.map(rate => ({
-        ...rate,
-        timestamp: new Date(rate.timestamp),
-        validFrom: new Date(rate.validFrom),
-        validTo: rate.validTo ? new Date(rate.validTo) : undefined,
-      }));
+  const ratesWithDates: FxRateData[] = (ingestResult.rates as unknown[]).map((rate: unknown) => {
+    const r = rate as Record<string, any>;
+    return {
+      fromCurrency: r.fromCurrency,
+      toCurrency: r.toCurrency,
+      rate: r.rate,
+      source: r.source,
+      timestamp: typeof r.timestamp === "string" ? new Date(r.timestamp) : r.timestamp,
+      validFrom: typeof r.validFrom === "string" ? new Date(r.validFrom) : r.validFrom,
+      validTo: r.validTo ? (typeof r.validTo === "string" ? new Date(r.validTo) : r.validTo) : undefined,
+    };
+  });
 
       const storedCount = await insertFxRates(ratesWithDates);
 
       return {
         storedCount,
-        totalRates: ingestResult.rates.length,
+  totalRates: ingestResult.rates.length,
       };
     });
 
     // Step 4: Validate stored rates
     const validationResult = await step.run("validate-stored-rates", async () => {
       // Convert serialized dates back to Date objects for validation
-      const ratesWithDates: FxRateData[] = ingestResult.rates.map(rate => ({
-        ...rate,
-        timestamp: new Date(rate.timestamp),
-        validFrom: new Date(rate.validFrom),
-        validTo: rate.validTo ? new Date(rate.validTo) : undefined,
-      }));
+  const ratesWithDates: FxRateData[] = (ingestResult.rates as unknown[]).map((rate: unknown) => {
+    const r = rate as Record<string, any>;
+    return {
+      fromCurrency: r.fromCurrency,
+      toCurrency: r.toCurrency,
+      rate: r.rate,
+      source: r.source,
+      timestamp: typeof r.timestamp === "string" ? new Date(r.timestamp) : r.timestamp,
+      validFrom: typeof r.validFrom === "string" ? new Date(r.validFrom) : r.validFrom,
+      validTo: r.validTo ? (typeof r.validTo === "string" ? new Date(r.validTo) : r.validTo) : undefined,
+    };
+  });
 
       const validation = await validateStoredRates(ratesWithDates);
 
@@ -144,7 +152,7 @@ export const fxRateIngestManual = inngest.createFunction(
     retries: 2,
   },
   { event: "fx/ingest.manual" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { baseCurrency = "MYR", targetCurrencies, forceUpdate = false } = event.data;
 
     // Step 1: Check if update is needed (unless forced)
@@ -180,24 +188,22 @@ export const fxRateIngestManual = inngest.createFunction(
 
       return {
         ...result,
-        rates: result.rates.map(rate => ({
-          ...rate,
-          timestamp: rate.timestamp.toISOString(),
-          validFrom: rate.validFrom.toISOString(),
-          validTo: rate.validTo?.toISOString(),
-        })),
+        rates: result.rates,
       };
     });
 
     // Step 3: Store rates
     const storageResult = await step.run("store-fx-rates", async () => {
       // Convert serialized dates back to Date objects
-      const ratesWithDates: FxRateData[] = ingestResult.rates.map(rate => ({
-        ...rate,
-        timestamp: new Date(rate.timestamp),
-        validFrom: new Date(rate.validFrom),
-        validTo: rate.validTo ? new Date(rate.validTo) : undefined,
-      }));
+      const ratesWithDates: FxRateData[] = ingestResult.rates.map((rate: unknown) => {
+        const r = rate as FxRateData;
+        return {
+          ...r,
+          timestamp: new Date(r.timestamp),
+          validFrom: new Date(r.validFrom),
+          validTo: r.validTo ? new Date(r.validTo) : undefined,
+        };
+      });
 
       const storedCount = await insertFxRates(ratesWithDates);
       return { storedCount };

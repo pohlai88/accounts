@@ -9,7 +9,7 @@ import {
   invoices,
   invoiceLines,
   taxCodes,
-} from "./schema";
+} from "./schema.js";
 import { eq, and, inArray, desc, asc, gte, lte, count } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;

@@ -30,8 +30,8 @@ export class IdempotencyService {
 
   private generateKey(key: string, tenantId?: string, userId?: string): string {
     const components = [key];
-    if (tenantId) components.push(tenantId);
-    if (userId) components.push(userId);
+    if (tenantId) { components.push(tenantId); }
+    if (userId) { components.push(userId); }
 
     const combined = components.join(":");
     return createHash("sha256").update(combined).digest("hex");

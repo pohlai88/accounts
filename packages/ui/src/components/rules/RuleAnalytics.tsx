@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../Card";
-import { Button } from "../../Button";
-import { Badge } from "../../Badge";
-import { Alert } from "../../Alert";
-import { Input } from "../../Input";
-import { cn } from "../../utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@aibos/ui/Card";
+import { Button } from "@aibos/ui/Button";
+import { Badge } from "@aibos/ui/Badge";
+import { Alert } from "@aibos/ui/Alert";
+import { Input } from "@aibos/ui/Input";
+import { cn } from "@aibos/ui/utils";
 import {
   Activity,
   AlertTriangle,

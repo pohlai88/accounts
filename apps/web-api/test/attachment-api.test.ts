@@ -3,16 +3,16 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { attachmentService } from "@aibos/utils/storage/attachment-service";
+import { attachmentService } from "@aibos/utils";
 import { createClient } from "@supabase/supabase-js";
 
 // Mock dependencies
-vi.mock("@aibos/utils/storage/attachment-service");
+vi.mock("@aibos/utils");
 vi.mock("@supabase/supabase-js");
 
 describe("Attachment API Endpoints - Unit Tests", () => {
-  let mockAttachmentService: unknown;
-  let mockSupabase: unknown;
+  let mockAttachmentService: any;
+  let mockSupabase: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -21,21 +21,20 @@ describe("Attachment API Endpoints - Unit Tests", () => {
     mockAttachmentService = {
       uploadFile: vi.fn(),
       downloadFile: vi.fn(),
-      deleteFile: vi.fn(),
+      deleteAttachment: vi.fn(),
       searchAttachments: vi.fn(),
       updateMetadata: vi.fn(),
       batchDelete: vi.fn(),
-      batchUpdate: vi.fn(),
-    };
+    } as any;
 
     // Mock the attachmentService module
     vi.mocked(attachmentService).uploadFile = mockAttachmentService.uploadFile;
     vi.mocked(attachmentService).downloadFile = mockAttachmentService.downloadFile;
-    vi.mocked(attachmentService).deleteFile = mockAttachmentService.deleteFile;
+    vi.mocked(attachmentService).deleteAttachment = mockAttachmentService.deleteAttachment;
     vi.mocked(attachmentService).searchAttachments = mockAttachmentService.searchAttachments;
     vi.mocked(attachmentService).updateMetadata = mockAttachmentService.updateMetadata;
     vi.mocked(attachmentService).batchDelete = mockAttachmentService.batchDelete;
-    vi.mocked(attachmentService).batchUpdate = mockAttachmentService.batchUpdate;
+    // vi.mocked(attachmentService).batchUpdate = mockAttachmentService.batchUpdate; // Method doesn't exist
 
     // Mock Supabase client
     mockSupabase = {
@@ -44,7 +43,7 @@ describe("Attachment API Endpoints - Unit Tests", () => {
       eq: vi.fn().mockReturnThis(),
       single: vi.fn(),
     };
-    vi.mocked(createClient).mockReturnValue(mockSupabase);
+    vi.mocked(createClient).mockReturnValue(mockSupabase as any);
   });
 
   afterEach(() => {

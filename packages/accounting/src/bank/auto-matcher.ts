@@ -1,5 +1,5 @@
 // D3 Bank Auto-Matching Engine - Intelligent Transaction Matching
-import { BankTransactionImport } from "./csv-import";
+import { BankTransactionImport } from "./csv-import.js";
 
 export interface MatchCandidate {
   type: "PAYMENT" | "RECEIPT" | "BILL" | "INVOICE";
@@ -282,8 +282,8 @@ function calculateMatchScore(
  * Calculate string similarity using Levenshtein distance
  */
 function calculateStringSimilarity(str1: string, str2: string): number {
-  if (str1 === str2) return 1;
-  if (str1.length === 0 || str2.length === 0) return 0;
+  if (str1 === str2) { return 1; }
+  if (str1.length === 0 || str2.length === 0) { return 0; }
 
   const matrix = Array(str2.length + 1)
     .fill(null)

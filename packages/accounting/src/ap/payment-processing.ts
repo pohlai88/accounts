@@ -1,6 +1,6 @@
 // D3 AP Payment Processing Engine - Payment to GL Integration
-import { validateJournalPosting, type JournalPostingInput, type PostingContext } from "../posting";
-import { validateFxPolicy } from "../fx/policy";
+import { validateJournalPosting, type JournalPostingInput, type PostingContext } from "../posting.js";
+import { validateFxPolicy } from "../fx/policy.js";
 
 export interface PaymentProcessingInput {
   tenantId: string;
@@ -70,7 +70,11 @@ export async function validatePaymentProcessing(
   try {
     // 1. Validate FX policy if foreign currency
     if (input.currency !== baseCurrency) {
-      validateFxPolicy(baseCurrency, input.currency);
+      const fxResult = validateFxPolicy(baseCurrency, input.currency);
+
+      if (!fxResult.requiresFxRate) {
+        throw new Error(`FX rate required for currency conversion from ${baseCurrency} to ${input.currency}`);
+      }
 
       // FX validation passed - we have the required rate info
     }

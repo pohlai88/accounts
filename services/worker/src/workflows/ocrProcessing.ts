@@ -1,5 +1,6 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { createServiceClient, logger, getV1AuditService, createV1AuditContext } from "@aibos/utils";
+import type { V1AuditAuditContext, V1AuditAuditEvent } from "@aibos/utils/types";
 // Note: These types will be used when implementing full OCR processing
 // import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from "@aibos/contracts";
 
@@ -14,7 +15,7 @@ export const ocrProcessing = inngest.createFunction(
     concurrency: 3, // Limit concurrent OCR processing for resource management
   },
   { event: "ocr/process" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const {
       tenantId,
       attachmentId,
@@ -30,12 +31,15 @@ export const ocrProcessing = inngest.createFunction(
     const auditService = getV1AuditService();
 
     // Create audit context for tracking
-    const auditContext = createV1AuditContext({
-      url: `/ocr/process/${attachmentId}`,
-      method: "POST",
-      headers: new globalThis.Headers(),
-      ip: "worker",
-    } as any);
+    const auditContext: V1AuditAuditContext = {
+      userId: event.user?.id || undefined,
+      tenantId: tenantId || undefined,
+      companyId: undefined,
+      sessionId: undefined,
+      ipAddress: "worker",
+      userAgent: undefined,
+      timestamp: new Date(),
+    };
 
     // Step 1: Validate input and fetch attachment
     const attachmentData = await step.run("validate-and-fetch-attachment", async () => {

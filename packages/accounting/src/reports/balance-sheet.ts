@@ -5,7 +5,7 @@ import {
   generateTrialBalance,
   type TrialBalanceAccount,
   type TrialBalanceResult,
-} from "./trial-balance";
+} from "./trial-balance.js";
 
 export interface BalanceSheetInput {
   tenantId: string;

@@ -39,7 +39,7 @@ export const emailAdapter: EmailPort = {
       html: p.html,
       headers,
     });
-    if (error) throw error;
+    if (error) { throw error; }
     return { id: data!.id };
   },
 };

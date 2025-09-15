@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPerformanceMiddleware } from "../../../../middleware/performance-middleware";
 import { createCacheMiddleware } from "../../../../middleware/cache-middleware";
-import { getCacheService } from "@aibos/cache";
+import { getCacheService, AdvancedCacheManager } from "@aibos/cache";
 
 // Initialize middleware
 const performanceMiddleware = createPerformanceMiddleware({
@@ -13,7 +13,7 @@ const performanceMiddleware = createPerformanceMiddleware({
 });
 
 const cacheMiddleware = createCacheMiddleware(
-  getCacheService(), // Use cache service
+  new AdvancedCacheManager(), // Use compatibility layer
   {
     enabled: true,
     defaultTTL: 300,
@@ -30,7 +30,10 @@ export async function GET(req: NextRequest) {
 
     // Get cache statistics
     const cacheStats = cacheMiddleware.getCacheStats();
-    const cacheHealth = await cacheMiddleware.healthCheck();
+    const cacheHealth = await cacheMiddleware.healthCheck() as {
+      status: "healthy" | "unhealthy" | "degraded";
+      details?: Record<string, unknown>;
+    };
 
     // Get system information
     const systemInfo = {

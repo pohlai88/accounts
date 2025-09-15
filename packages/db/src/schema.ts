@@ -858,7 +858,7 @@ export const auditLogs = pgTable(
 );
 
 // Re-export attachment schema for V1 compliance
-export * from "./schema-attachments";
+export * from "./schema-attachments.js";
 
 // Re-export user settings schema for multi-tenant support
-export * from "./schema-user-settings";
+export * from "./schema-user-settings.js";

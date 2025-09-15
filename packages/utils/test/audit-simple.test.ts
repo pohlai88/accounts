@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createAuditContext } from "../src/audit/service";
+import { createAuditContext } from "@aibos/utils/audit/service";
 
 describe("Audit Service - Core Functions", () => {
   describe("createAuditContext", () => {

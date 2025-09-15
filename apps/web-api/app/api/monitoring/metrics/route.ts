@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { getSecurityContext } from "../../_lib/request";
-import { ok, problem } from "../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Mock metrics data (in production, use real MetricsCollector)
 const mockMetrics = {
@@ -109,7 +109,16 @@ export async function GET(req: NextRequest) {
     const query = MetricsQuerySchema.parse(Object.fromEntries(url.searchParams));
 
     // Filter metrics based on query
-    const responseData: unknown = {};
+    const responseData: {
+      system?: any;
+      application?: any;
+      timeRange?: {
+        start: string;
+        end: string;
+        granularity: string;
+      };
+      health?: any;
+    } = {};
 
     if (query.type === "all" || query.type === "system") {
       responseData.system = mockMetrics.system;
@@ -121,14 +130,14 @@ export async function GET(req: NextRequest) {
 
     // Add time range information
     responseData.timeRange = {
-      start: new Date(Date.now() - this.getTimeRangeMs(query.timeRange)).toISOString(),
+      start: new Date(Date.now() - getTimeRangeMs(query.timeRange)).toISOString(),
       end: new Date().toISOString(),
       granularity: query.granularity,
     };
 
     // Add health status
     responseData.health = {
-      status: this.calculateHealthStatus(mockMetrics),
+      status: calculateHealthStatus(mockMetrics),
       timestamp: new Date().toISOString(),
     };
 
@@ -137,22 +146,23 @@ export async function GET(req: NextRequest) {
     console.error("Get metrics error:", error);
 
     if (error && typeof error === "object" && "status" in error) {
+      const apiError = error as { status: number; message: string };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: apiError.status,
+        title: apiError.message,
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: apiError.message,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
 
-    if (error.name === "ZodError") {
+    if (error && typeof error === "object" && "name" in error && error.name === "ZodError") {
+      const zodError = error as { name: string; errors: any[] };
       return problem({
         status: 400,
         title: "Validation error",
         code: "VALIDATION_ERROR",
-        detail: "Invalid query parameters",
-        errors: error.errors,
+        detail: `Invalid query parameters: ${zodError.errors.map(e => e.message).join(', ')}`,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
@@ -185,7 +195,8 @@ function getTimeRangeMs(timeRange: string): number {
 }
 
 function calculateHealthStatus(metrics: unknown): "healthy" | "degraded" | "unhealthy" {
-  const { system, application } = metrics;
+  const metricsData = metrics as { system: any; application: any };
+  const { system, application } = metricsData;
 
   // Check system health
   if (system.memory.usagePercent > 90 || system.cpu.usage > 90) {

@@ -1,5 +1,6 @@
-import { inngest } from "../inngestClient";
+import { inngest } from "../inngestClient.js";
 import { createServiceClient, logger, getV1AuditService, createV1AuditContext } from "@aibos/utils";
+import type { V1AuditAuditContext, V1AuditAuditEvent } from "@aibos/utils/types";
 // Note: These types will be used when implementing full document approval
 // import { DocumentApprovalReq, ApprovalDecisionReq, ApprovalStatusRes } from "@aibos/contracts";
 
@@ -13,7 +14,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
     retries: 3,
   },
   { event: "document/approval.start" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const {
       tenantId,
       attachmentId,
@@ -33,12 +34,15 @@ export const documentApprovalWorkflow = inngest.createFunction(
     const supabase = createServiceClient();
     const auditService = getV1AuditService();
 
-    const auditContext = createV1AuditContext({
-      url: `/document/approval/${attachmentId}`,
-      method: "POST",
-      headers: new globalThis.Headers(),
-      ip: "worker",
-    } as any);
+    const auditContext: V1AuditAuditContext = {
+      userId: event.user?.id || undefined,
+      tenantId: tenantId || undefined,
+      companyId: undefined,
+      sessionId: undefined,
+      ipAddress: "worker",
+      userAgent: undefined,
+      timestamp: new Date(),
+    };
 
     // Step 1: Validate input and fetch attachment
     const workflowData = await step.run("initialize-approval-workflow", async () => {
@@ -116,7 +120,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
         tenantId,
         workflowType,
         status: "in_progress",
-        approvers: approvers.map((approver, index) => ({
+        approvers: approvers.map((approver: any, index: number) => ({
           ...approver,
           id: crypto.randomUUID(),
           status: "pending",
@@ -131,7 +135,7 @@ export const documentApprovalWorkflow = inngest.createFunction(
         submittedAt: new Date().toISOString(),
         submittedBy: event.user?.id || "system",
         currentStage: 1,
-        totalStages: Math.max(...approvers.map(a => a.stage || 1)),
+        totalStages: Math.max(...approvers.map((a: any) => a.stage || 1)),
       };
 
       // Update attachment with approval workflow
@@ -259,7 +263,7 @@ export const documentApprovalDecision = inngest.createFunction(
     retries: 3,
   },
   { event: "document/approval.decision" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { tenantId, attachmentId, decision, comments, conditions, delegateTo, delegationReason } =
       event.data as any;
 
@@ -267,12 +271,15 @@ export const documentApprovalDecision = inngest.createFunction(
     const supabase = createServiceClient();
     const auditService = getV1AuditService();
 
-    const auditContext = createV1AuditContext({
-      url: `/document/approval/${attachmentId}/decision`,
-      method: "POST",
-      headers: new globalThis.Headers(),
-      ip: "worker",
-    } as any);
+    const auditContext: V1AuditAuditContext = {
+      userId: event.user?.id || undefined,
+      tenantId: tenantId || undefined,
+      companyId: undefined,
+      sessionId: undefined,
+      ipAddress: "worker",
+      userAgent: undefined,
+      timestamp: new Date(),
+    };
 
     // Step 1: Validate decision and fetch current workflow
     const decisionData = await step.run("validate-and-fetch-workflow", async () => {
@@ -574,7 +581,7 @@ export const documentApprovalReminder = inngest.createFunction(
     retries: 2,
   },
   { event: "document/approval.reminder" },
-  async ({ event, step }) => {
+  async ({ event, step }: WorkflowArgs) => {
     const { attachmentId, tenantId, workflowId, reminderInterval } = event.data;
 
     const supabase = createServiceClient();

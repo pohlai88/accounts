@@ -1,5 +1,5 @@
 // Idempotency Middleware - V1 Compliance
-import { NextRequest } from "next/server";
+import { NextRequest } from "next/server.js";
 import { createClient } from "@supabase/supabase-js";
 
 export interface IdempotencyResult {

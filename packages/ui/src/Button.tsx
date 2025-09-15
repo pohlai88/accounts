@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "./utils";
-import { useAccessibility, type DesignMode } from "./AccessibilityProvider";
+import { cn } from "./utils.js";
+import { useAccessibility, type DesignMode } from "./AccessibilityProvider.js";
 
 // ============================================================================
 // BUTTON VARIANTS - Dual Mode Support
@@ -62,7 +62,7 @@ export interface ButtonProps
 // BUTTON COMPONENT
 // ============================================================================
 
-export function Button({ className, variant, size, mode, asChild = false, ...props }: ButtonProps) {
+export function Button({ className, variant, size, mode, asChild: _asChild = false, ...props }: ButtonProps) {
   const { mode: currentMode } = useAccessibility();
   const effectiveMode = mode || currentMode;
 

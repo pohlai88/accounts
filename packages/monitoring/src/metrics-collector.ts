@@ -601,7 +601,7 @@ export class MetricsCollector extends EventEmitter {
    * Start metrics collection
    */
   private startCollection(): void {
-    if (!this.config.enableRealTime) return;
+    if (!this.config.enableRealTime) { return; }
 
     setInterval(() => {
       this.systemMetrics = this.getSystemMetrics();
@@ -616,7 +616,7 @@ export class MetricsCollector extends EventEmitter {
    * Start metrics aggregation
    */
   private startAggregation(): void {
-    if (!this.config.enableAggregation) return;
+    if (!this.config.enableAggregation) { return; }
 
     setInterval(() => {
       this.aggregateMetrics();
@@ -679,8 +679,8 @@ export class MetricsCollector extends EventEmitter {
     for (const metric of metrics) {
       const key = fields
         .map(field => {
-          if (field === "tenantId") return metric.tenantId;
-          if (field === "name") return metric.name;
+          if (field === "tenantId") { return metric.tenantId; }
+          if (field === "name") { return metric.name; }
           return "";
         })
         .join("|");
@@ -712,7 +712,7 @@ export class MetricsCollector extends EventEmitter {
    * Calculate average
    */
   private calculateAverage(values: number[]): number {
-    if (values.length === 0) return 0;
+    if (values.length === 0) { return 0; }
     return values.reduce((sum, val) => sum + val, 0) / values.length;
   }
 
@@ -720,7 +720,7 @@ export class MetricsCollector extends EventEmitter {
    * Calculate percentile
    */
   private calculatePercentile(values: number[], percentile: number): number {
-    if (values.length === 0) return 0;
+    if (values.length === 0) { return 0; }
 
     const sorted = values.sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
@@ -787,8 +787,8 @@ export class MetricsCollector extends EventEmitter {
    * Get error type from status code
    */
   private getErrorType(statusCode: number): string {
-    if (statusCode >= 500) return "server_error";
-    if (statusCode >= 400) return "client_error";
+    if (statusCode >= 500) { return "server_error"; }
+    if (statusCode >= 400) { return "client_error"; }
     return "unknown";
   }
 

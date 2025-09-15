@@ -5,12 +5,7 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "dist",
-    "noEmit": false,
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ]
+    "noEmit": false
   },
   "include": [
     "src/**/*"

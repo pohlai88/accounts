@@ -10,6 +10,9 @@
  * - Accessibility Mode: WCAG 2.2 AAA compliant design
  */
 
+// Type declaration for browser environment
+declare const window: Window & typeof globalThis;
+
 // ============================================================================
 // DESIGN MODES - Two Complete Systems
 // ============================================================================
@@ -309,12 +312,12 @@ export function getModeCssVars(mode: "aesthetic" | "accessibility"): Record<stri
  * Apply CSS variables to document root
  */
 export function applyModeToDocument(mode: "aesthetic" | "accessibility"): void {
-  // eslint-disable-next-line no-undef
-  if (typeof window === "undefined" || typeof window.document === "undefined") return;
+  if (typeof window === "undefined" || !window.document) {
+    return;
+  }
 
   const cssVars = getModeCssVars(mode);
-  // eslint-disable-next-line no-undef
-  const root = window.document.documentElement;
+  const root = (window as Window).document.documentElement;
 
   Object.entries(cssVars).forEach(([property, value]) => {
     root.style.setProperty(property, value);
@@ -325,25 +328,25 @@ export function applyModeToDocument(mode: "aesthetic" | "accessibility"): void {
  * Check if current mode is accessibility mode
  */
 export function isAccessibilityMode(): boolean {
-  // eslint-disable-next-line no-undef
-  if (typeof window === "undefined" || typeof window.document === "undefined") return false;
-  // eslint-disable-next-line no-undef
-  return window.document.documentElement.getAttribute("data-accessibility-mode") === "true";
+  if (typeof window === "undefined" || !window.document) {
+    return false;
+  }
+  return (window as Window).document.documentElement.getAttribute("data-accessibility-mode") === "true";
 }
 
 /**
  * Toggle between aesthetic and accessibility modes
  */
 export function toggleAccessibilityMode(): "aesthetic" | "accessibility" {
-  // eslint-disable-next-line no-undef
-  if (typeof window === "undefined" || typeof window.document === "undefined") return "aesthetic";
+  if (typeof window === "undefined" || !window.document) {
+    return "aesthetic";
+  }
 
   const currentMode = isAccessibilityMode() ? "accessibility" : "aesthetic";
   const newMode = currentMode === "aesthetic" ? "accessibility" : "aesthetic";
 
   applyModeToDocument(newMode);
-  // eslint-disable-next-line no-undef
-  window.document.documentElement.setAttribute(
+  (window as Window).document.documentElement.setAttribute(
     "data-accessibility-mode",
     newMode === "accessibility" ? "true" : "false",
   );
@@ -357,11 +360,9 @@ export function toggleAccessibilityMode(): "aesthetic" | "accessibility" {
 export function initializeDesignMode(
   defaultMode: "aesthetic" | "accessibility" = "aesthetic",
 ): void {
-  // eslint-disable-next-line no-undef
-  if (typeof window !== "undefined" && typeof window.document !== "undefined") {
+  if (typeof window !== "undefined" && window.document) {
     applyModeToDocument(defaultMode);
-    // eslint-disable-next-line no-undef
-    window.document.documentElement.setAttribute(
+    (window as Window).document.documentElement.setAttribute(
       "data-accessibility-mode",
       defaultMode === "accessibility" ? "true" : "false",
     );

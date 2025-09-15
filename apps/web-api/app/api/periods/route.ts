@@ -5,16 +5,21 @@ import {
   closeFiscalPeriod,
   openFiscalPeriod,
   createPeriodLock,
-} from "@aibos/accounting/src/periods/period-management";
+  type PeriodCloseResult,
+  type PeriodManagementError,
+} from "@aibos/accounting/periods/period-management";
 import { createClient } from "@supabase/supabase-js";
+import { SupabaseAdapter } from "@aibos/db";
 import { processIdempotencyKey } from "@aibos/utils/middleware/idempotency";
 import {
   getV1AuditService,
   createV1AuditContext,
   createV1RequestContext,
   extractV1UserContext,
+  getErrorMessage,
+  getErrorCode,
 } from "@aibos/utils";
-import { checkSoDCompliance } from "@aibos/auth/src/sod";
+import { checkSoDCompliance } from "@aibos/auth";
 
 // Period Close Request Schema
 const PeriodCloseRequestSchema = z.object({
@@ -84,7 +89,7 @@ export async function GET(request: NextRequest) {
 
     // Build query
     let query = `
-      SELECT 
+      SELECT
         fp.*,
         fc.calendar_name,
         fc.fiscal_year_start,
@@ -204,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     // 5. Execute period management operation with audit logging
     const startTime = Date.now();
-    let result;
+    let result: PeriodCloseResult | PeriodManagementError | { success: boolean; lockId?: string; error?: string };
 
     switch (action) {
       case "close":
@@ -216,19 +221,19 @@ export async function POST(request: NextRequest) {
           },
           supabase,
         );
-        result = operationResult;
+        result = operationResult as PeriodCloseResult | PeriodManagementError | { success: boolean; lockId?: string; error?: string };
         break;
 
       case "open":
         const openInput = PeriodOpenRequestSchema.parse(body);
         operationResult = await openFiscalPeriod(openInput, supabase);
-        result = operationResult;
+        result = operationResult as PeriodCloseResult | PeriodManagementError | { success: boolean; lockId?: string; error?: string };
         break;
 
       case "lock":
         const lockInput = PeriodLockRequestSchema.parse(body);
         operationResult = await createPeriodLock(lockInput, supabase);
-        result = operationResult;
+        result = operationResult as PeriodCloseResult | PeriodManagementError | { success: boolean; lockId?: string; error?: string };
         break;
 
       default:
@@ -250,18 +255,19 @@ export async function POST(request: NextRequest) {
     const endTime = Date.now();
 
     if (!result.success) {
+      const errorResult = result as PeriodManagementError | { success: false; error?: string };
       await auditService.logError(createV1AuditContext(request), "PERIOD_OPERATION_FAILED", {
         action,
-        error: result.error,
-        code: (result as unknown).code,
+        error: errorResult.error,
+        code: 'code' in errorResult ? errorResult.code : "PERIOD_MANAGEMENT_ERROR",
         executionTime: endTime - startTime,
       });
 
       return NextResponse.json(
         {
           success: false,
-          error: result.error || "Period management operation failed",
-          code: (result as unknown).code || "PERIOD_MANAGEMENT_ERROR",
+          error: errorResult.error || "Period management operation failed",
+          code: 'code' in errorResult ? errorResult.code : "PERIOD_MANAGEMENT_ERROR",
         },
         { status: 400 },
       );
@@ -288,10 +294,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error: unknown) {
+    const errorMessage = getErrorMessage(error);
+    const errorCode = getErrorCode(error);
+
     // Log error for audit trail (V1 requirement)
     await auditService.logError(createV1AuditContext(request), "PERIOD_API_ERROR", {
-      error: error.message,
-      stack: error.stack,
+      error: errorMessage,
+      code: errorCode,
     });
 
     console.error("Period Management API Error:", error);
@@ -399,7 +408,7 @@ export async function PUT(request: NextRequest) {
     params.push(periodId);
 
     const query = `
-      UPDATE fiscal_periods 
+      UPDATE fiscal_periods
       SET ${setClause.join(", ")}
       WHERE id = $${paramIndex}
       RETURNING *

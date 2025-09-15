@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": "Authentication and security utilities for AI-BOS Accounts",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p . --noEmit",
+    "build": "tsc -p .",
     "dev": "tsc -p . --watch",
     "test": "vitest run",
     "typecheck": "tsc -p . --noEmit",
@@ -28,8 +27,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    }
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./package.json": "./package.json"
   }
 }

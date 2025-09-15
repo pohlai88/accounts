@@ -1,7 +1,7 @@
 // D4 Cash Flow Statement Engine - Statement of Cash Flows
 // V1 Requirement: CF from GL only with operating/investing/financing classification
 
-import { generateTrialBalance, type TrialBalanceAccount } from "./trial-balance";
+import { generateTrialBalance, type TrialBalanceAccount } from "./trial-balance.js";
 
 export interface CashFlowInput {
   tenantId: string;
@@ -286,7 +286,7 @@ async function getCashFlowActivities(
 }> {
   // Query for current period cash flow activities
   const currentQuery = `
-    SELECT 
+    SELECT
       jl.account_id,
       coa.account_type,
       coa.account_category,
@@ -296,12 +296,12 @@ async function getCashFlowActivities(
     FROM gl_journal_lines jl
     JOIN gl_journal j ON jl.journal_id = j.id
     JOIN chart_of_accounts coa ON jl.account_id = coa.id
-    WHERE j.tenant_id = $1 
+    WHERE j.tenant_id = $1
       AND j.company_id = $2
       AND j.status = 'posted'
       AND j.journal_date >= $3
       AND j.journal_date <= $4
-      AND (coa.account_type IN ('ASSET', 'LIABILITY', 'EQUITY') 
+      AND (coa.account_type IN ('ASSET', 'LIABILITY', 'EQUITY')
            OR coa.account_category IN ('CASH', 'CASH_EQUIVALENTS'))
     GROUP BY jl.account_id, coa.account_type, coa.account_category, coa.normal_balance
   `;
@@ -518,13 +518,13 @@ async function calculateCashBalances(
 }> {
   // Query for cash account balances
   const cashBalanceQuery = `
-    SELECT 
-      SUM(CASE WHEN coa.normal_balance = 'DEBIT' THEN jl.debit_amount - jl.credit_amount 
+    SELECT
+      SUM(CASE WHEN coa.normal_balance = 'DEBIT' THEN jl.debit_amount - jl.credit_amount
                ELSE jl.credit_amount - jl.debit_amount END) as balance
     FROM gl_journal_lines jl
     JOIN gl_journal j ON jl.journal_id = j.id
     JOIN chart_of_accounts coa ON jl.account_id = coa.id
-    WHERE j.tenant_id = $1 
+    WHERE j.tenant_id = $1
       AND j.company_id = $2
       AND j.status = 'posted'
       AND j.journal_date < $3
@@ -1037,7 +1037,7 @@ function calculateSectionVariancePercent(activities: CashFlowActivity[]): number
     0,
   );
 
-  if (comparativeTotal === 0) return 0;
+  if (comparativeTotal === 0) {return 0;}
   return ((currentTotal - comparativeTotal) / Math.abs(comparativeTotal)) * 100;
 }
 

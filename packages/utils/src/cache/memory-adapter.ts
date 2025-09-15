@@ -1,5 +1,5 @@
 // Memory Cache Adapter (Fallback)
-import { CacheAdapter, CacheConfig, CacheOptions, CacheStats, CacheItem } from "./types";
+import { CacheAdapter, CacheConfig, CacheOptions, CacheStats, CacheItem } from "./types.js";
 
 export class MemoryCacheAdapter implements CacheAdapter {
   private cache = new Map<string, CacheItem>();

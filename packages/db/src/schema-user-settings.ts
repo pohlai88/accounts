@@ -1,6 +1,6 @@
 import { pgTable, uuid, timestamp, index } from "drizzle-orm/pg-core";
-import { users } from "./schema";
-import { tenants } from "./schema";
+import { users } from "./schema.js";
+import { tenants } from "./schema.js";
 
 // User settings for active tenant tracking
 export const userSettings = pgTable(

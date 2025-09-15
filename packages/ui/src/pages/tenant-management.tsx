@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { useTenantManagement } from "../hooks/use-tenant-management";
-import { TenantSwitcher } from "../components/tenant-switcher";
-import { MemberManagement } from "../components/member-management";
+import { useTenantManagement } from "@aibos/ui/hooks/use-tenant-management";
+import { TenantSwitcher } from "@aibos/ui/components/tenant-switcher";
+import { MemberManagement } from "@aibos/ui/components/member-management";
 
 export function TenantManagementPage() {
   const {

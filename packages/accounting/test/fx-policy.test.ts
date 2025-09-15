@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validateFxPolicy } from "../src/fx/policy";
+import { validateFxPolicy } from "@aibos/accounting/fx/policy";
 
 describe("FX Policy", () => {
   describe("validateFxPolicy", () => {

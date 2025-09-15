@@ -5,7 +5,7 @@
  * Does not use React hooks and can be used in server components
  */
 
-import { ApiRequestContext, apiClient, isSuccess } from "./api-client";
+import { ApiRequestContext, apiClient, isSuccess } from "./api-client.js";
 
 // ============================================================================
 // SERVER-SIDE DATA FETCHING FUNCTIONS

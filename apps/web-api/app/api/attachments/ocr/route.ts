@@ -12,7 +12,7 @@ import {
 import { ProcessOCRReq, ProcessOCRRes, OCRResultsRes } from "@aibos/contracts";
 
 // Lazy load Inngest to avoid circular dependencies during build
-let inngest: unknown = null;
+let inngest: { send: (params: { name: string; data: any }) => Promise<any> } | null = null;
 const getInngest = async () => {
   if (!inngest) {
     const { Inngest } = await import("inngest");

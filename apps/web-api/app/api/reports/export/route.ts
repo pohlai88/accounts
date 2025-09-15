@@ -160,7 +160,16 @@ async function generateReportData(request: ReportExportRequest) {
           includeZeroBalances: filters.includeInactive ?? false,
           accountFilter: filters.accountIds ? { accountIds: filters.accountIds } : undefined,
         },
-        supabase as unknown,
+        {
+          query: async (sql: string, params?: unknown[]) => {
+            const { data, error } = await supabase.rpc('execute_sql', {
+              query: sql,
+              params: params || []
+            });
+            if (error) throw error;
+            return data;
+          }
+        },
       );
 
       if (!result.success) {
@@ -195,7 +204,16 @@ async function generateReportData(request: ReportExportRequest) {
           asOfDate: filters.asOfDate ? new Date(filters.asOfDate) : new Date(),
           reportFormat: "STANDARD",
         },
-        supabase as unknown,
+        {
+          query: async (sql: string, params?: unknown[]) => {
+            const { data, error } = await supabase.rpc('execute_sql', {
+              query: sql,
+              params: params || []
+            });
+            if (error) throw error;
+            return data;
+          }
+        },
       );
 
       if (!result.success) {
@@ -258,7 +276,16 @@ async function generateReportData(request: ReportExportRequest) {
           endDate: filters.toDate ? new Date(filters.toDate) : new Date(),
           reportFormat: "STANDARD",
         },
-        supabase as unknown,
+        {
+          query: async (sql: string, params?: unknown[]) => {
+            const { data, error } = await supabase.rpc('execute_sql', {
+              query: sql,
+              params: params || []
+            });
+            if (error) throw error;
+            return data;
+          }
+        },
       );
 
       if (!result.success) {
@@ -327,7 +354,16 @@ async function generateReportData(request: ReportExportRequest) {
           endDate: filters.toDate ? new Date(filters.toDate) : new Date(),
           method: "INDIRECT",
         },
-        supabase as unknown,
+        {
+          query: async (sql: string, params?: unknown[]) => {
+            const { data, error } = await supabase.rpc('execute_sql', {
+              query: sql,
+              params: params || []
+            });
+            if (error) throw error;
+            return data;
+          }
+        },
       );
 
       if (!result.success) {

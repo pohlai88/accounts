@@ -6,18 +6,18 @@
  */
 
 // Empty States
-export { EmptyState } from "./empty-states/EmptyState";
-export { InvoiceEmptyState } from "./empty-states/InvoiceEmptyState";
-export { BillEmptyState } from "./empty-states/BillEmptyState";
+export { EmptyState } from "./empty-states/EmptyState.js";
+export { InvoiceEmptyState } from "./empty-states/InvoiceEmptyState.js";
+export { BillEmptyState } from "./empty-states/BillEmptyState.js";
 
 // App Shell
-export { AppShell } from "./app-shell/AppShell";
-export { StatusBar } from "./app-shell/StatusBar";
-export { Dock } from "./app-shell/Dock";
-export { CommandPalette } from "./app-shell/CommandPalette";
-export { UniversalInbox } from "./app-shell/UniversalInbox";
-export { TimelineDrawer } from "./app-shell/TimelineDrawer";
-export { UniversalCreate } from "./app-shell/UniversalCreate";
+export { AppShell } from "./app-shell/AppShell.js";
+export { StatusBar } from "./app-shell/StatusBar.js";
+export { Dock } from "./app-shell/Dock.js";
+export { CommandPalette } from "./app-shell/CommandPalette.js";
+export { UniversalInbox } from "./app-shell/UniversalInbox.js";
+export { TimelineDrawer } from "./app-shell/TimelineDrawer.js";
+export { UniversalCreate } from "./app-shell/UniversalCreate.js";
 
 // Typography
 export {
@@ -32,86 +32,86 @@ export {
   BodySmall,
   Caption,
   Link,
-} from "./typography/Typography";
+} from "./typography/Typography.js";
 
 // Theme
-export { ThemeProvider, useTheme } from "./theme/ThemeProvider";
-export { ThemeToggle } from "./theme/ThemeToggle";
+export { ThemeProvider, useTheme } from "./theme/ThemeProvider.js";
+export { ThemeToggle } from "./theme/ThemeToggle.js";
 
 // Invoice Components
-export { InvoiceWorkflow } from "./invoices/InvoiceWorkflow";
-export { InvoiceForm } from "./invoices/InvoiceForm";
-export { InvoiceList } from "./invoices/InvoiceList";
-export { CustomerSelector } from "./invoices/CustomerSelector";
-export { PaymentCapture } from "./invoices/PaymentCapture";
-export { InvoiceSender } from "./invoices/InvoiceSender";
-export { PaymentReminders } from "./invoices/PaymentReminders";
-export { InvoiceStatusTimeline } from "./invoices/InvoiceStatusTimeline";
+export { InvoiceWorkflow } from "./invoices/InvoiceWorkflow.js";
+export { InvoiceForm } from "./invoices/InvoiceForm.js";
+export { InvoiceList } from "./invoices/InvoiceList.js";
+export { CustomerSelector } from "./invoices/CustomerSelector.js";
+export { PaymentCapture } from "./invoices/PaymentCapture.js";
+export { InvoiceSender } from "./invoices/InvoiceSender.js";
+export { PaymentReminders } from "./invoices/PaymentReminders.js";
+export { InvoiceStatusTimeline } from "./invoices/InvoiceStatusTimeline.js";
 
 // Bill Components
-export { BillWorkflow } from "./bills/BillWorkflow";
-export { BillForm } from "./bills/BillForm";
-export { OCRDataExtractor } from "./bills/OCRDataExtractor";
-export { ApprovalWorkflow } from "./bills/ApprovalWorkflow";
-export { PaymentProcessor } from "./bills/PaymentProcessor";
-export { VendorManager } from "./bills/VendorManager";
-export { ExpenseCategorizer } from "./bills/ExpenseCategorizer";
+export { BillWorkflow } from "./bills/BillWorkflow.js";
+export { BillForm } from "./bills/BillForm.js";
+export { OCRDataExtractor } from "./bills/OCRDataExtractor.js";
+export { ApprovalWorkflow } from "./bills/ApprovalWorkflow.js";
+export { PaymentProcessor } from "./bills/PaymentProcessor.js";
+export { VendorManager } from "./bills/VendorManager.js";
+export { ExpenseCategorizer } from "./bills/ExpenseCategorizer.js";
 
 // Cash Components
-export { CashWorkflow } from "./cash/CashWorkflow";
-export { BankConnection } from "./cash/BankConnection";
-export { TransactionImport } from "./cash/TransactionImport";
-export { ReconciliationCanvas } from "./cash/ReconciliationCanvas";
-export { RuleEngine } from "./cash/RuleEngine";
-export { BankFeedManagement } from "./cash/BankFeedManagement";
-export { CashFlowAnalysis } from "./cash/CashFlowAnalysis";
+export { CashWorkflow } from "./cash/CashWorkflow.js";
+export { BankConnection } from "./cash/BankConnection.js";
+export { TransactionImport } from "./cash/TransactionImport.js";
+export { ReconciliationCanvas } from "./cash/ReconciliationCanvas.js";
+export { RuleEngine } from "./cash/RuleEngine.js";
+export { BankFeedManagement } from "./cash/BankFeedManagement.js";
+export { CashFlowAnalysis } from "./cash/CashFlowAnalysis.js";
 
 // Close Components
-export { CloseWorkflow } from "./close/CloseWorkflow";
-export { CloseRoom } from "./close/CloseRoom";
-export { CloseChecklist } from "./close/CloseChecklist";
-export { LockStates } from "./close/LockStates";
-export { AccrualHelpers } from "./close/AccrualHelpers";
-export { AdjustingEntries } from "./close/AdjustingEntries";
-export { ExportPackBuilder } from "./close/ExportPackBuilder";
+export { CloseWorkflow } from "./close/CloseWorkflow.js";
+export { CloseRoom } from "./close/CloseRoom.js";
+export { CloseChecklist } from "./close/CloseChecklist.js";
+export { LockStates } from "./close/LockStates.js";
+export { AccrualHelpers } from "./close/AccrualHelpers.js";
+export { AdjustingEntries } from "./close/AdjustingEntries.js";
+export { ExportPackBuilder } from "./close/ExportPackBuilder.js";
 
 // Reports Components
-export { ReportsWorkflow } from "./reports/ReportsWorkflow";
-export { ProfitLossReport } from "./reports/ProfitLossReport";
-export { BalanceSheetReport } from "./reports/BalanceSheetReport";
-export { CashFlowStatement } from "./reports/CashFlowStatement";
-export { TrialBalance } from "./reports/TrialBalance";
-export { ARAgingReport } from "./reports/ARAgingReport";
-export { APAgingReport } from "./reports/APAgingReport";
-export { CustomReportBuilder } from "./reports/CustomReportBuilder";
+export { ReportsWorkflow } from "./reports/ReportsWorkflow.js";
+export { ProfitLossReport } from "./reports/ProfitLossReport.js";
+export { BalanceSheetReport } from "./reports/BalanceSheetReport.js";
+export { CashFlowStatement } from "./reports/CashFlowStatement.js";
+export { TrialBalance } from "./reports/TrialBalance.js";
+export { ARAgingReport } from "./reports/ARAgingReport.js";
+export { APAgingReport } from "./reports/APAgingReport.js";
+export { CustomReportBuilder } from "./reports/CustomReportBuilder.js";
 
 // Enterprise Components
-export { EnterpriseWorkflow } from "./enterprise/EnterpriseWorkflow";
-export { MultiCompanyManager } from "./enterprise/MultiCompanyManager";
-export { UserRolesManager } from "./enterprise/UserRolesManager";
-export { ChartOfAccountsManager } from "./enterprise/ChartOfAccountsManager";
-export { CompanySettingsManager } from "./enterprise/CompanySettingsManager";
+export { EnterpriseWorkflow } from "./enterprise/EnterpriseWorkflow.js";
+export { MultiCompanyManager } from "./enterprise/MultiCompanyManager.js";
+export { UserRolesManager } from "./enterprise/UserRolesManager.js";
+export { ChartOfAccountsManager } from "./enterprise/ChartOfAccountsManager.js";
+export { CompanySettingsManager } from "./enterprise/CompanySettingsManager.js";
 
 // Performance & Security Components
-export { PerformanceSecurityWorkflow } from "./performance/PerformanceSecurityWorkflow";
-export { PerformanceMonitor } from "./performance/PerformanceMonitor";
-export { SecurityAudit } from "./performance/SecurityAudit";
-export { DataEncryption } from "./performance/DataEncryption";
-export { BackupRecovery } from "./performance/BackupRecovery";
-export { MonitoringAlerting } from "./performance/MonitoringAlerting";
-export { LoadTesting } from "./performance/LoadTesting";
+export { PerformanceSecurityWorkflow } from "./performance/PerformanceSecurityWorkflow.js";
+export { PerformanceMonitor } from "./performance/PerformanceMonitor.js";
+export { SecurityAudit } from "./performance/SecurityAudit.js";
+export { DataEncryption } from "./performance/DataEncryption.js";
+export { BackupRecovery } from "./performance/BackupRecovery.js";
+export { MonitoringAlerting } from "./performance/MonitoringAlerting.js";
+export { LoadTesting } from "./performance/LoadTesting.js";
 
 // Mobile & Offline Components
-export { MobileOfflineWorkflow } from "./mobile/MobileOfflineWorkflow";
-export { OfflineManager } from "./mobile/OfflineManager";
-export { ConflictResolver } from "./mobile/ConflictResolver";
-export { BackgroundSync } from "./mobile/BackgroundSync";
-export { MobileWorkflows } from "./mobile/MobileWorkflows";
-export { ProgressiveWebApp } from "./mobile/ProgressiveWebApp";
+export { MobileOfflineWorkflow } from "./mobile/MobileOfflineWorkflow.js";
+export { OfflineManager } from "./mobile/OfflineManager.js";
+export { ConflictResolver } from "./mobile/ConflictResolver.js";
+export { BackgroundSync } from "./mobile/BackgroundSync.js";
+export { MobileWorkflows } from "./mobile/MobileWorkflows.js";
+export { ProgressiveWebApp } from "./mobile/ProgressiveWebApp.js";
 
 // Rule Studio & Automation Components
-export { RuleWorkflow } from "./rules/RuleWorkflow";
-export { RuleStudio } from "./rules/RuleStudio";
-export { RuleTesting } from "./rules/RuleTesting";
-export { RuleAnalytics } from "./rules/RuleAnalytics";
-export { RuleVersioning } from "./rules/RuleVersioning";
+export { RuleWorkflow } from "./rules/RuleWorkflow.js";
+export { RuleStudio } from "./rules/RuleStudio.js";
+export { RuleTesting } from "./rules/RuleTesting.js";
+export { RuleAnalytics } from "./rules/RuleAnalytics.js";
+export { RuleVersioning } from "./rules/RuleVersioning.js";

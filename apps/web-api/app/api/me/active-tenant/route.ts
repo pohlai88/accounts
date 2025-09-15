@@ -1,12 +1,12 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
-import { getSecurityContext } from "../../_lib/request";
-import { ok, problem } from "../../_lib/response";
-import { withCache } from "../../middleware/cache-middleware";
-import { withPerformance } from "../../middleware/performance-middleware";
-import { createCacheMiddleware } from "../../middleware/cache-middleware";
-import { createPerformanceMiddleware } from "../../middleware/performance-middleware";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
+import { withCache } from "@aibos/web-api/middleware/cache-middleware";
+import { withPerformance } from "@aibos/web-api/middleware/performance-middleware";
+import { createCacheMiddleware } from "@aibos/web-api/middleware/cache-middleware";
+import { createPerformanceMiddleware } from "@aibos/web-api/middleware/performance-middleware";
 import { CacheFactory } from "@aibos/cache";
 
 // Switch active tenant request schema
@@ -122,10 +122,10 @@ export async function POST(req: NextRequest) {
         },
         company: company
           ? {
-              id: company.id,
-              name: company.name,
-              code: company.code,
-            }
+            id: company.id,
+            name: company.name,
+            code: company.code,
+          }
           : null,
         membership: {
           role: membership.role,
@@ -220,18 +220,18 @@ export async function GET(req: NextRequest) {
 
     const activeTenantId = userSettings?.active_tenant_id;
     const availableTenants =
-      memberships?.map((m: unknown) => ({
+      memberships?.map((m: any) => ({
         id: m.tenant_id,
-        name: m.tenants?.name || "Unknown Tenant",
-        slug: m.tenants?.slug || "",
+        name: m.tenants?.[0]?.name || "Unknown Tenant",
+        slug: m.tenants?.[0]?.slug || "",
         role: m.role,
         permissions: m.permissions,
-        company: m.companies
+        company: m.companies?.[0]
           ? {
-              id: m.companies.id,
-              name: m.companies.name,
-              code: m.companies.code,
-            }
+            id: m.companies[0].id,
+            name: m.companies[0].name,
+            code: m.companies[0].code,
+          }
           : null,
         isActive: m.tenant_id === activeTenantId,
       })) || [];

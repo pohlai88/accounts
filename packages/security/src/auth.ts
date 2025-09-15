@@ -1,20 +1,5 @@
 import { jwtVerify, createRemoteJWKSet } from "jose";
-
-export type SecurityContext = {
-  userId: string;
-  email: string;
-  tenantId: string;
-  companyId: string | null;
-  tenantName: string | null;
-  companyName: string | null;
-  scopes: string[];
-  requestId: string;
-  availableTenants?: Array<{
-    tenantId: string;
-    role: string;
-    permissions: any;
-  }>;
-};
+import type { SecurityContext } from "./types.js";
 
 const JWKS_URL = process.env.SUPABASE_JWKS_URL;
 const ISSUER = process.env.SUPABASE_ISSUER;
@@ -25,7 +10,7 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_K
 // Only create JWKS if environment variables are available
 const JWKS = JWKS_URL ? createRemoteJWKSet(new URL(JWKS_URL)) : null;
 
-export async function verifyAccessToken(authorization?: string) {
+export async function verifyAccessToken(authorization?: string): Promise<Record<string, string | number | boolean | Record<string, unknown>>> {
   if (!authorization?.startsWith("Bearer ")) {
     throw Object.assign(new Error("Missing token"), { status: 401 });
   }
@@ -77,26 +62,26 @@ export async function verifyAccessToken(authorization?: string) {
     audience: AUDIENCE,
   });
 
-  return payload as Record<string, any>;
+  return payload as Record<string, string | number | boolean | Record<string, unknown>>;
 }
 
 export function buildSecurityContext(
-  payload: Record<string, any>,
+  payload: Record<string, string | number | boolean | Record<string, unknown>>,
   requestId: string,
 ): SecurityContext {
-  const appMetadata = payload.app_metadata || {};
+  const appMetadata = (payload.app_metadata as unknown as Record<string, unknown>) || {};
 
   return {
     userId: String(payload.sub),
     email: String(payload.email ?? ""),
-    tenantId: String(appMetadata.tenant_id ?? payload["tenant_id"] ?? ""),
-    companyId: appMetadata.company_id ? String(appMetadata.company_id) : null,
-    tenantName: appMetadata.tenant_name ? String(appMetadata.tenant_name) : null,
-    companyName: appMetadata.company_name ? String(appMetadata.company_name) : null,
+    tenantId: String(appMetadata["tenant_id"] ?? payload["tenant_id"] ?? ""),
+    companyId: appMetadata["company_id"] ? String(appMetadata["company_id"]) : null,
+    tenantName: appMetadata["tenant_name"] ? String(appMetadata["tenant_name"]) : null,
+    companyName: appMetadata["company_name"] ? String(appMetadata["company_name"]) : null,
     scopes: Array.isArray(payload["scp"]) ? (payload["scp"] as string[]) : [],
     requestId,
-    availableTenants: Array.isArray(appMetadata.available_tenants)
-      ? appMetadata.available_tenants
+    availableTenants: Array.isArray(appMetadata["available_tenants"])
+      ? appMetadata["available_tenants"]
       : undefined,
   };
 }

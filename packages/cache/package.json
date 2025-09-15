@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "description": "Caching system with Redis support for AI-BOS Accounts",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "tsc -p . --noEmit",
+    "build": "tsc -p .",
     "dev": "tsc -p . --watch",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -26,12 +35,5 @@
     "@aibos/eslint-config": "workspace:*",
     "@aibos/vitest-config": "workspace:*",
     "@aibos/prettier-config": "workspace:*"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
   }
 }

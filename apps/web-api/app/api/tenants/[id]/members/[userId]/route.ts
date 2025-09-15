@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSecurityContext } from "../../../../_lib/request";
-import { ok, problem } from "../../../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Initialize Supabase client
 const supabase = createClient(

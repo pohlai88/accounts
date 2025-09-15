@@ -1,11 +1,8 @@
 // D4 Profit & Loss Report Engine - Income Statement
 // V1 Requirement: P&L from GL only with proper revenue/expense classification
 
-import {
-  generateTrialBalance,
-  type TrialBalanceAccount,
-  type TrialBalanceResult,
-} from "./trial-balance";
+import { generateTrialBalance } from "./trial-balance.js";
+import type { TrialBalanceAccount, TrialBalanceResult } from "./trial-balance.js";
 
 export interface ProfitLossInput {
   tenantId: string;
@@ -267,7 +264,7 @@ async function getPeriodActivity(
 }> {
   // Query for current period activity
   const currentQuery = `
-    SELECT 
+    SELECT
       jl.account_id,
       coa.account_type,
       coa.normal_balance,
@@ -276,7 +273,7 @@ async function getPeriodActivity(
     FROM gl_journal_lines jl
     JOIN gl_journal j ON jl.journal_id = j.id
     JOIN chart_of_accounts coa ON jl.account_id = coa.id
-    WHERE j.tenant_id = $1 
+    WHERE j.tenant_id = $1
       AND j.company_id = $2
       AND j.status = 'posted'
       AND j.journal_date >= $3
@@ -330,7 +327,7 @@ async function getPeriodActivity(
     | undefined = undefined;
   if (comparativePeriod) {
     const comparativeQuery = `
-      SELECT 
+      SELECT
         jl.account_id,
         coa.account_type,
         coa.normal_balance,
@@ -339,7 +336,7 @@ async function getPeriodActivity(
       FROM gl_journal_lines jl
       JOIN gl_journal j ON jl.journal_id = j.id
       JOIN chart_of_accounts coa ON jl.account_id = coa.id
-      WHERE j.tenant_id = $1 
+      WHERE j.tenant_id = $1
         AND j.company_id = $2
         AND j.status = 'posted'
         AND j.journal_date >= $3
@@ -476,7 +473,7 @@ function createRevenueSection(revenueAccounts: ProfitLossAccount[]): ProfitLossS
     isOperatingRevenue(account.accountCategory),
   );
 
-  if (operatingRevenue.length === 0) return [];
+  if (operatingRevenue.length === 0) {return [];}
 
   return [
     {
@@ -502,7 +499,7 @@ function createCostOfSalesSection(expenseAccounts: ProfitLossAccount[]): ProfitL
     isCostOfSales(account.accountCategory),
   );
 
-  if (costOfSalesAccounts.length === 0) return [];
+  if (costOfSalesAccounts.length === 0) {return [];}
 
   return [
     {
@@ -528,7 +525,7 @@ function createOperatingExpensesSection(expenseAccounts: ProfitLossAccount[]): P
     isOperatingExpense(account.accountCategory),
   );
 
-  if (operatingExpenseAccounts.length === 0) return [];
+  if (operatingExpenseAccounts.length === 0) {return [];}
 
   return [
     {
@@ -556,7 +553,7 @@ function createOtherIncomeSection(revenueAccounts: ProfitLossAccount[]): ProfitL
     isOtherIncome(account.accountCategory),
   );
 
-  if (otherIncomeAccounts.length === 0) return [];
+  if (otherIncomeAccounts.length === 0) {return [];}
 
   return [
     {
@@ -582,7 +579,7 @@ function createOtherExpensesSection(expenseAccounts: ProfitLossAccount[]): Profi
     isOtherExpense(account.accountCategory),
   );
 
-  if (otherExpenseAccounts.length === 0) return [];
+  if (otherExpenseAccounts.length === 0) {return [];}
 
   return [
     {
@@ -756,7 +753,7 @@ function calculateSectionVariancePercent(accounts: ProfitLossAccount[]): number 
     0,
   );
 
-  if (comparativeTotal === 0) return 0;
+  if (comparativeTotal === 0) {return 0;}
   return ((currentTotal - comparativeTotal) / Math.abs(comparativeTotal)) * 100;
 }
 

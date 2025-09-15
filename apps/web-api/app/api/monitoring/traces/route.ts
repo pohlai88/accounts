@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { getSecurityContext } from "../../_lib/request";
-import { ok, problem } from "../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Mock trace data (in production, use real TracingManager)
 const mockTraces = [
@@ -117,8 +117,16 @@ const TracesQuerySchema = z.object({
     .transform(val => new Date(val).getTime())
     .optional(),
   status: z.enum(["ok", "error", "partial"]).optional(),
-  limit: z.string().transform(Number).pipe(z.number().min(1).max(1000)).default(100),
-  offset: z.string().transform(Number).pipe(z.number().min(0)).default(0),
+  limit: z.string().optional().transform(val => {
+    const num = Number(val || "100");
+    if (num < 1 || num > 1000) throw new Error("Limit must be between 1 and 1000");
+    return num;
+  }),
+  offset: z.string().optional().transform(val => {
+    const num = Number(val || "0");
+    if (num < 0) throw new Error("Offset must be non-negative");
+    return num;
+  }),
 });
 
 export async function GET(req: NextRequest) {
@@ -142,12 +150,12 @@ export async function GET(req: NextRequest) {
       filteredTraces = filteredTraces.filter(t => t.serviceName === query.serviceName);
     }
 
-    if (query.startTime) {
-      filteredTraces = filteredTraces.filter(t => t.startTime >= query.startTime);
+    if (query.startTime !== undefined) {
+      filteredTraces = filteredTraces.filter(t => t.startTime >= (query.startTime as number));
     }
 
-    if (query.endTime) {
-      filteredTraces = filteredTraces.filter(t => t.endTime <= query.endTime);
+    if (query.endTime !== undefined) {
+      filteredTraces = filteredTraces.filter(t => t.endTime <= (query.endTime as number));
     }
 
     if (query.status) {
@@ -158,7 +166,7 @@ export async function GET(req: NextRequest) {
     filteredTraces.sort((a, b) => b.startTime - a.startTime);
 
     // Apply pagination
-    const paginatedTraces = filteredTraces.slice(query.offset, query.offset + query.limit);
+    const paginatedTraces = filteredTraces.slice(query.offset as number, (query.offset as number) + (query.limit as number));
 
     // Calculate statistics
     const stats = {
@@ -195,10 +203,10 @@ export async function GET(req: NextRequest) {
       {
         traces: paginatedTraces,
         pagination: {
-          limit: query.limit,
-          offset: query.offset,
+          limit: query.limit as number,
+          offset: query.offset as number,
           total: filteredTraces.length,
-          hasMore: query.offset + query.limit < filteredTraces.length,
+          hasMore: (query.offset as number) + (query.limit as number) < filteredTraces.length,
         },
         statistics: stats,
       },
@@ -208,22 +216,23 @@ export async function GET(req: NextRequest) {
     console.error("Get traces error:", error);
 
     if (error && typeof error === "object" && "status" in error) {
+      const apiError = error as { status: number; message: string };
       return problem({
-        status: error.status,
-        title: error.message,
+        status: apiError.status,
+        title: apiError.message,
         code: "AUTHENTICATION_ERROR",
-        detail: error.message,
+        detail: apiError.message,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
 
-    if (error.name === "ZodError") {
+    if (error && typeof error === "object" && "name" in error && error.name === "ZodError") {
+      const zodError = error as { name: string; errors: any[] };
       return problem({
         status: 400,
         title: "Validation error",
         code: "VALIDATION_ERROR",
-        detail: "Invalid query parameters",
-        errors: error.errors,
+        detail: `Invalid query parameters: ${zodError.errors.map(e => e.message).join(', ')}`,
         requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       });
     }
@@ -239,9 +248,9 @@ export async function GET(req: NextRequest) {
 }
 
 function calculatePercentile(values: number[], percentile: number): number {
-  if (values.length === 0) return 0;
+  if (values.length === 0) { return 0; }
 
   const sorted = values.sort((a, b) => a - b);
-  const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-  return sorted[Math.max(0, index)];
+  const index = Math.ceil((percentile / 100) * sorted.length) - 1 as number;
+  return sorted[Math.max(0, index)] || 0;
 }

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSecurityContext } from "../../../_lib/request";
-import { ok, problem } from "../../../_lib/response";
+import { getSecurityContext } from "@aibos/web-api/_lib/request";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 
     const formattedMembers =
-      members?.map((m: unknown) => ({
+      members?.map((m: any) => ({
         id: m.id,
         userId: m.users?.id || "",
         email: m.users?.email || "",
@@ -69,10 +69,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         permissions: m.permissions,
         company: m.companies
           ? {
-              id: m.companies.id,
-              name: m.companies.name,
-              code: m.companies.code,
-            }
+            id: m.companies.id,
+            name: m.companies.name,
+            code: m.companies.code,
+          }
           : null,
         joinedAt: m.created_at,
         isCurrentUser: m.users?.id === ctx.userId,

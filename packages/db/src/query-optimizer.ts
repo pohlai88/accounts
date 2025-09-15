@@ -98,7 +98,7 @@ export class QueryOptimizer {
         // Use SQL template to avoid column type headaches
         whereParts.push(sql`${table.tenantId} = ${tenantId}`);
       }
-      if (conditions.length > 0) whereParts.push(...conditions);
+      if (conditions.length > 0) { whereParts.push(...conditions); }
 
       const whereExpr = whereParts.length > 0 ? (and(...whereParts) as SQL) : sql`1=1`;
 
@@ -190,7 +190,7 @@ export class QueryOptimizer {
       if (hasTenantId(table)) {
         whereParts.push(sql`${table.tenantId} = ${tenantId}`);
       }
-      if (conditions.length > 0) whereParts.push(...conditions);
+      if (conditions.length > 0) { whereParts.push(...conditions); }
       const whereExpr = whereParts.length > 0 ? (and(...whereParts) as SQL) : sql`1=1`;
 
       let q = db.select(aggregations).from(table).where(whereExpr) as Executable<unknown>;
@@ -231,8 +231,8 @@ export class QueryOptimizer {
       if (hasTenantId(table)) {
         whereParts.push(sql`${getColumn(table, "tenantId")} = ${tenantId}`);
       }
-      if (likeConds.length > 0) whereParts.push(or(...likeConds) as SQL);
-      if (conditions.length > 0) whereParts.push(...conditions);
+      if (likeConds.length > 0) { whereParts.push(or(...likeConds) as SQL); }
+      if (conditions.length > 0) { whereParts.push(...conditions); }
       const whereExpr = whereParts.length > 0 ? (and(...whereParts) as SQL) : sql`1=1`;
 
       let q = db
@@ -287,7 +287,7 @@ export class QueryOptimizer {
 
   private getCachedQuery<T>(id: string): T | null {
     const entry = this.queryCache.get(id);
-    if (!entry) return null;
+    if (!entry) { return null; }
     const ageMs = Date.now() - entry.timestamp;
     const maxMs = this.config.cacheTTL * 1000;
     if (ageMs > maxMs) {
@@ -316,7 +316,7 @@ export class QueryOptimizer {
     ms: number,
     error?: unknown,
   ): void {
-    if (!this.config.enableQueryLogging) return;
+    if (!this.config.enableQueryLogging) { return; }
     const payload = {
       id,
       status,
@@ -325,9 +325,9 @@ export class QueryOptimizer {
       ...(error ? { error: (error as { message?: string }).message ?? "unknown" } : {}),
     };
     // keep console usage localized & opt-in via enableQueryLogging
-    if (status.includes("ERROR")) console.error("Query", payload);
-    else if (ms > 1000) console.warn("Query", payload);
-    else console.log("Query", payload);
+    if (status.includes("ERROR")) { console.error("Query", payload); }
+    else if (ms > 1000) { console.warn("Query", payload); }
+    else { console.log("Query", payload); }
   }
 
   clearCache(): void {

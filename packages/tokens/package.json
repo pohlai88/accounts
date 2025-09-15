@@ -17,6 +17,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
     "./tailwind.preset.cjs": "./tailwind.preset.cjs"
   },
   "files": [
@@ -25,7 +28,7 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p . --noEmit",
+    "build": "tsc -p .",
     "lint": "eslint .",
     "typecheck": "tsc -p . --noEmit",
     "dev": "tsc -p . --watch",
@@ -34,6 +37,5 @@
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
-  "type": "module",
-  "types": "dist/index.d.ts"
+  "type": "module"
 }

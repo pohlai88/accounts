@@ -168,11 +168,11 @@ export class Logger extends EventEmitter {
   ): void {
     const errorData = error
       ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack || "",
-          code: (error as any).code,
-        }
+        name: error.name,
+        message: error.message,
+        stack: error.stack || "",
+        code: (error as any).code,
+      }
       : undefined;
 
     this.log("error", message, metadata, { ...context, error: errorData });
@@ -197,11 +197,11 @@ export class Logger extends EventEmitter {
   ): void {
     const errorData = error
       ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack || "",
-          code: (error as any).code,
-        }
+        name: error.name,
+        message: error.message,
+        stack: error.stack || "",
+        code: (error as any).code,
+      }
       : undefined;
 
     this.log("fatal", message, metadata, { ...context, error: errorData });
@@ -360,19 +360,19 @@ export class Logger extends EventEmitter {
     // For now, we'll return a mock response
     return this.logBuffer
       .filter(entry => {
-        if (query.level && entry.level !== query.level) return false;
-        if (query.service && entry.service !== query.service) return false;
-        if (query.tenantId && entry.tenantId !== query.tenantId) return false;
-        if (query.userId && entry.userId !== query.userId) return false;
-        if (query.traceId && entry.traceId !== query.traceId) return false;
-        if (query.message && !entry.message.includes(query.message)) return false;
+        if (query.level && entry.level !== query.level) { return false; }
+        if (query.service && entry.service !== query.service) { return false; }
+        if (query.tenantId && entry.tenantId !== query.tenantId) { return false; }
+        if (query.userId && entry.userId !== query.userId) { return false; }
+        if (query.traceId && entry.traceId !== query.traceId) { return false; }
+        if (query.message && !entry.message.includes(query.message)) { return false; }
 
-        if (query.startTime && entry.timestamp < query.startTime) return false;
-        if (query.endTime && entry.timestamp > query.endTime) return false;
+        if (query.startTime && entry.timestamp < query.startTime) { return false; }
+        if (query.endTime && entry.timestamp > query.endTime) { return false; }
 
         if (query.tags) {
           for (const [key, value] of Object.entries(query.tags)) {
-            if (entry.tags[key] !== value) return false;
+            if (entry.tags[key] !== value) { return false; }
           }
         }
 
@@ -440,7 +440,7 @@ export class Logger extends EventEmitter {
     } = {},
   ): void {
     // Check log level
-    if (!this.shouldLog(level)) return;
+    if (!this.shouldLog(level)) { return; }
 
     // Check sampling
     if (this.config.enableSampling && Math.random() > this.config.sampleRate) {

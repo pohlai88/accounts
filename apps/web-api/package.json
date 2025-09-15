@@ -31,6 +31,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "build:lib": "tsc -p tsconfig.build.json",
     "dev": "next dev",
     "start": "next start",
     "typecheck": "tsc -p . --noEmit",

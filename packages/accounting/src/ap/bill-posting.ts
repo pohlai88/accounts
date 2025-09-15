@@ -1,6 +1,6 @@
 // D3 AP Bill Posting Engine - Bill to GL Integration
-import { validateJournalPosting, type JournalPostingInput } from "../posting";
-import { validateFxPolicy } from "../fx/policy";
+import { validateJournalPosting, type JournalPostingInput } from "../posting.js";
+import { validateFxPolicy } from "../fx/policy.js";
 
 // Database client interface
 interface DbClient {
@@ -88,7 +88,11 @@ export async function validateBillPosting(
   try {
     // 1. Validate FX policy if foreign currency
     if (input.currency !== baseCurrency) {
-      validateFxPolicy(baseCurrency, input.currency);
+      const fxResult = validateFxPolicy(baseCurrency, input.currency);
+
+      if (!fxResult.requiresFxRate) {
+        throw new Error(`FX rate required for currency conversion from ${baseCurrency} to ${input.currency}`);
+      }
 
       // FX validation passed - we have the required rate info
     }

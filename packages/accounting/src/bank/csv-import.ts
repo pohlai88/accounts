@@ -443,7 +443,7 @@ export function detectBankFormat(csvData: string): BankFormat | null {
   try {
     // Simple CSV parsing for format detection
     const lines = csvData.split("\n").filter(line => line.trim());
-    if (lines.length === 0) return null;
+    if (lines.length === 0) {return null;}
 
     const detectionHeaders = lines[0]?.split(",").map(h => h.trim().replace(/"/g, "")) || [];
     const detectionRecords = [{} as Record<string, string>];
@@ -459,16 +459,16 @@ export function detectBankFormat(csvData: string): BankFormat | null {
 
     // Try to match against known formats
     for (const [key, format] of Object.entries(BANK_FORMATS)) {
-      if (key === "GENERIC") continue; // Skip generic format in auto-detection
+      if (key === "GENERIC") {continue;} // Skip generic format in auto-detection
 
       const requiredColumns = [
         format.dateColumn.toLowerCase(),
         format.descriptionColumn.toLowerCase(),
       ];
 
-      if (format.debitColumn) requiredColumns.push(format.debitColumn.toLowerCase());
-      if (format.creditColumn) requiredColumns.push(format.creditColumn.toLowerCase());
-      if (format.amountColumn) requiredColumns.push(format.amountColumn.toLowerCase());
+      if (format.debitColumn) {requiredColumns.push(format.debitColumn.toLowerCase());}
+      if (format.creditColumn) {requiredColumns.push(format.creditColumn.toLowerCase());}
+      if (format.amountColumn) {requiredColumns.push(format.amountColumn.toLowerCase());}
 
       const matchCount = requiredColumns.filter(col =>
         detectionHeadersLower.some(header => header.includes(col) || col.includes(header)),
