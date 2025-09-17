@@ -58,16 +58,42 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error("Failed to get admin settings:", error);
+    // Log admin settings error to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.error("Failed to get admin settings:", error);
+    }
 
-    if ((error as any)?.status === 403) {
+    if ((error as Error & { status?: number }).status === 403) {
       return NextResponse.json(
-        { success: false, error: "Forbidden", message: (error as Error).message },
+        {
+          success: false,
+          error: {
+            type: "authorization_error",
+            title: "Forbidden",
+            status: 403,
+            code: "INSUFFICIENT_PERMISSIONS",
+            detail: (error as Error).message,
+          },
+          timestamp: new Date().toISOString(),
+          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
         { status: 403 },
       );
     }
 
-    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: {
+        type: "internal_error",
+        title: "Internal server error",
+        status: 500,
+        code: "INTERNAL_ERROR",
+        detail: "An unexpected error occurred",
+      },
+      timestamp: new Date().toISOString(),
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    }, { status: 500 });
   }
 }
 
@@ -127,23 +153,67 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error("Failed to update feature flags:", error);
+    // Log feature flags update error to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.error("Failed to update feature flags:", error);
+    }
 
-    if ((error as any)?.status === 403) {
+    if ((error as Error & { status?: number }).status === 403) {
       return NextResponse.json(
-        { success: false, error: "Forbidden", message: (error as Error).message },
+        {
+          success: false,
+          error: {
+            type: "authorization_error",
+            title: "Forbidden",
+            status: 403,
+            code: "INSUFFICIENT_PERMISSIONS",
+            detail: (error as Error).message,
+          },
+          timestamp: new Date().toISOString(),
+          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
         { status: 403 },
       );
     }
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: "Validation error", details: error.issues },
+        {
+          success: false,
+          error: {
+            type: "validation_error",
+            title: "Invalid request data",
+            status: 400,
+            code: "VALIDATION_ERROR",
+            detail: "Please check your request format",
+            errors: error.issues.reduce(
+              (acc, err) => {
+                acc[err.path.join(".")] = [err.message];
+                return acc;
+              },
+              {} as Record<string, string[]>,
+            ),
+          },
+          timestamp: new Date().toISOString(),
+          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
         { status: 400 },
       );
     }
 
-    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: {
+        type: "internal_error",
+        title: "Internal server error",
+        status: 500,
+        code: "INTERNAL_ERROR",
+        detail: "An unexpected error occurred",
+      },
+      timestamp: new Date().toISOString(),
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    }, { status: 500 });
   }
 }
 
@@ -203,22 +273,66 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error("Failed to update policy settings:", error);
+    // Log policy settings update error to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.error("Failed to update policy settings:", error);
+    }
 
-    if ((error as any)?.status === 403) {
+    if ((error as Error & { status?: number }).status === 403) {
       return NextResponse.json(
-        { success: false, error: "Forbidden", message: (error as Error).message },
+        {
+          success: false,
+          error: {
+            type: "authorization_error",
+            title: "Forbidden",
+            status: 403,
+            code: "INSUFFICIENT_PERMISSIONS",
+            detail: (error as Error).message,
+          },
+          timestamp: new Date().toISOString(),
+          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
         { status: 403 },
       );
     }
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: "Validation error", details: error.issues },
+        {
+          success: false,
+          error: {
+            type: "validation_error",
+            title: "Invalid request data",
+            status: 400,
+            code: "VALIDATION_ERROR",
+            detail: "Please check your request format",
+            errors: error.issues.reduce(
+              (acc, err) => {
+                acc[err.path.join(".")] = [err.message];
+                return acc;
+              },
+              {} as Record<string, string[]>,
+            ),
+          },
+          timestamp: new Date().toISOString(),
+          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        },
         { status: 400 },
       );
     }
 
-    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: {
+        type: "internal_error",
+        title: "Internal server error",
+        status: 500,
+        code: "INTERNAL_ERROR",
+        detail: "An unexpected error occurred",
+      },
+      timestamp: new Date().toISOString(),
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    }, { status: 500 });
   }
 }

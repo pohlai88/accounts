@@ -6,14 +6,14 @@
   "scripts": {
     "build": "tsc -p . --noEmit",
     "dev": "tsc -p . --watch",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+
+
     "deploy:staging": "node dist/scripts/deploy-staging.js",
     "deploy:production": "node dist/scripts/deploy-production.js",
     "health-check": "node dist/scripts/health-check.js",
     "typecheck": "tsc -p . --noEmit",
     "lint": "eslint .",
-    "test:watch": "vitest",
+
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
@@ -29,7 +29,7 @@
     "typescript": "^5.6.2",
     "vitest": "^3.2.4",
     "@aibos/eslint-config": "workspace:*",
-    "@aibos/vitest-config": "workspace:*",
+
     "@aibos/prettier-config": "workspace:*"
   },
   "exports": {

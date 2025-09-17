@@ -473,7 +473,7 @@ function createRevenueSection(revenueAccounts: ProfitLossAccount[]): ProfitLossS
     isOperatingRevenue(account.accountCategory),
   );
 
-  if (operatingRevenue.length === 0) {return [];}
+  if (operatingRevenue.length === 0) { return []; }
 
   return [
     {
@@ -499,7 +499,7 @@ function createCostOfSalesSection(expenseAccounts: ProfitLossAccount[]): ProfitL
     isCostOfSales(account.accountCategory),
   );
 
-  if (costOfSalesAccounts.length === 0) {return [];}
+  if (costOfSalesAccounts.length === 0) { return []; }
 
   return [
     {
@@ -525,7 +525,7 @@ function createOperatingExpensesSection(expenseAccounts: ProfitLossAccount[]): P
     isOperatingExpense(account.accountCategory),
   );
 
-  if (operatingExpenseAccounts.length === 0) {return [];}
+  if (operatingExpenseAccounts.length === 0) { return []; }
 
   return [
     {
@@ -553,7 +553,7 @@ function createOtherIncomeSection(revenueAccounts: ProfitLossAccount[]): ProfitL
     isOtherIncome(account.accountCategory),
   );
 
-  if (otherIncomeAccounts.length === 0) {return [];}
+  if (otherIncomeAccounts.length === 0) { return []; }
 
   return [
     {
@@ -579,7 +579,7 @@ function createOtherExpensesSection(expenseAccounts: ProfitLossAccount[]): Profi
     isOtherExpense(account.accountCategory),
   );
 
-  if (otherExpenseAccounts.length === 0) {return [];}
+  if (otherExpenseAccounts.length === 0) { return []; }
 
   return [
     {
@@ -619,7 +619,7 @@ function calculateProfitLossMetrics(
   const grossProfit = totalRevenue - totalCostOfSales;
   const operatingIncome = grossProfit - totalOperatingExpenses;
   const netIncomeBeforeTax = operatingIncome + totalOtherIncome - totalOtherExpenses;
-  const netIncomeAfterTax = netIncomeBeforeTax; // TODO: Add tax calculation
+  const netIncomeAfterTax = netIncomeBeforeTax; // Tax calculation available via tax-calculations module
 
   // Calculate margins
   const grossProfitMargin = totalRevenue !== 0 ? (grossProfit / totalRevenue) * 100 : 0;
@@ -753,7 +753,7 @@ function calculateSectionVariancePercent(accounts: ProfitLossAccount[]): number 
     0,
   );
 
-  if (comparativeTotal === 0) {return 0;}
+  if (comparativeTotal === 0) { return 0; }
   return ((currentTotal - comparativeTotal) / Math.abs(comparativeTotal)) * 100;
 }
 

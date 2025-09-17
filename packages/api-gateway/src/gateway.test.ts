@@ -28,9 +28,11 @@ describe("APIGateway", () => {
     it("should return health status", async () => {
       const response = await request(app).get("/health").expect(200);
 
-      expect(response.body).toHaveProperty("status", "healthy");
-      expect(response.body).toHaveProperty("timestamp");
-      expect(response.body).toHaveProperty("uptime");
+      expect(response.body).toHaveProperty("success", true);
+      expect(response.body).toHaveProperty("status", 200);
+      expect(response.body.data).toHaveProperty("status", "healthy");
+      expect(response.body.data).toHaveProperty("timestamp");
+      expect(response.body.data).toHaveProperty("uptime");
     });
   });
 
@@ -73,7 +75,10 @@ describe("APIGateway", () => {
     it("should return 404 for unknown routes", async () => {
       const response = await request(app).get("/unknown-route").expect(404);
 
-      expect(response.body).toHaveProperty("error", "Not Found");
+      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("status", 404);
+      expect(response.body.error).toHaveProperty("code", "NOT_FOUND");
+      expect(response.body.error).toHaveProperty("message", "Route GET /unknown-route not found");
     });
   });
 
@@ -81,7 +86,10 @@ describe("APIGateway", () => {
     it("should require authentication headers for API routes", async () => {
       const response = await request(app).get("/api/test").expect(401);
 
-      expect(response.body).toHaveProperty("error", "Unauthorized");
+      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("status", 401);
+      expect(response.body.error).toHaveProperty("code", "UNAUTHORIZED");
+      expect(response.body.error).toHaveProperty("message", "Missing authentication headers");
     });
 
     it("should allow requests with proper headers", async () => {

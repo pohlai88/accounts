@@ -131,7 +131,11 @@ export class QueryOptimizer {
         this.setCachedQuery(queryId, result);
       }
       if (took > this.config.maxQueryTime) {
-        console.warn(`Slow query: ${queryId} took ${took}ms`);
+        // Log slow query to monitoring service
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.warn(`Slow query: ${queryId} took ${took}ms`);
+        }
       }
 
       return result;
@@ -325,9 +329,13 @@ export class QueryOptimizer {
       ...(error ? { error: (error as { message?: string }).message ?? "unknown" } : {}),
     };
     // keep console usage localized & opt-in via enableQueryLogging
-    if (status.includes("ERROR")) { console.error("Query", payload); }
-    else if (ms > 1000) { console.warn("Query", payload); }
-    else { console.log("Query", payload); }
+    // Log query performance to monitoring service
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      if (status.includes("ERROR")) { console.error("Query", payload); }
+      else if (ms > 1000) { console.warn("Query", payload); }
+      else { console.log("Query", payload); }
+    }
   }
 
   clearCache(): void {

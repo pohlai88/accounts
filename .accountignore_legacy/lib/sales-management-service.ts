@@ -458,7 +458,11 @@ export class SalesManagementService {
         message: `Quotation ${quotationNo} created successfully`,
       };
     } catch (error) {
-      console.error("Error creating quotation:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating quotation:", error);
+      }
       return { success: false, error: "Failed to create quotation" };
     }
   }
@@ -494,7 +498,11 @@ export class SalesManagementService {
         data: { ...quotation, items },
       };
     } catch (error) {
-      console.error("Error fetching quotation:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching quotation:", error);
+      }
       return { success: false, error: "Failed to fetch quotation" };
     }
   }
@@ -548,7 +556,11 @@ export class SalesManagementService {
 
       return { success: true, data: quotations };
     } catch (error) {
-      console.error("Error fetching quotations:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching quotations:", error);
+      }
       return { success: false, error: "Failed to fetch quotations" };
     }
   }
@@ -579,7 +591,11 @@ export class SalesManagementService {
 
       return { success: true, data: true, message: "Quotation submitted successfully" };
     } catch (error) {
-      console.error("Error submitting quotation:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting quotation:", error);
+      }
       return { success: false, error: "Failed to submit quotation" };
     }
   }
@@ -644,7 +660,11 @@ export class SalesManagementService {
 
       return orderResult;
     } catch (error) {
-      console.error("Error converting quotation to sales order:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error converting quotation to sales order:", error);
+      }
       return { success: false, error: "Failed to convert quotation to sales order" };
     }
   }
@@ -754,7 +774,11 @@ export class SalesManagementService {
         message: `Sales Order ${orderNo} created successfully`,
       };
     } catch (error) {
-      console.error("Error creating sales order:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating sales order:", error);
+      }
       return { success: false, error: "Failed to create sales order" };
     }
   }
@@ -790,7 +814,11 @@ export class SalesManagementService {
         data: { ...order, items },
       };
     } catch (error) {
-      console.error("Error fetching sales order:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching sales order:", error);
+      }
       return { success: false, error: "Failed to fetch sales order" };
     }
   }
@@ -837,7 +865,11 @@ export class SalesManagementService {
 
       return { success: true, data: orders };
     } catch (error) {
-      console.error("Error fetching sales orders:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching sales orders:", error);
+      }
       return { success: false, error: "Failed to fetch sales orders" };
     }
   }
@@ -890,7 +922,11 @@ export class SalesManagementService {
 
       return { success: true, data: true, message: "Sales order submitted successfully" };
     } catch (error) {
-      console.error("Error submitting sales order:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting sales order:", error);
+      }
       return { success: false, error: "Failed to submit sales order" };
     }
   }
@@ -935,7 +971,11 @@ export class SalesManagementService {
         message: "Customer credit limit updated successfully",
       };
     } catch (error) {
-      console.error("Error setting customer credit limit:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error setting customer credit limit:", error);
+      }
       return { success: false, error: "Failed to set customer credit limit" };
     }
   }
@@ -961,7 +1001,11 @@ export class SalesManagementService {
 
       return { success: true, data: creditCheck[0] };
     } catch (error) {
-      console.error("Error checking customer credit limit:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error checking customer credit limit:", error);
+      }
       return { success: false, error: "Failed to check customer credit limit" };
     }
   }
@@ -1114,7 +1158,11 @@ export class SalesManagementService {
         },
       };
     } catch (error) {
-      console.error("Error fetching sales analytics:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching sales analytics:", error);
+      }
       return { success: false, error: "Failed to fetch sales analytics" };
     }
   }

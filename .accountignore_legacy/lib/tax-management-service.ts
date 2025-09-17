@@ -480,7 +480,11 @@ export class TaxManagementService {
 
       return { success: true, data: authority, message: "Tax authority created successfully" };
     } catch (error) {
-      console.error("Error creating tax authority:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating tax authority:", error);
+      }
       return { success: false, error: "Failed to create tax authority" };
     }
   }
@@ -503,7 +507,11 @@ export class TaxManagementService {
 
       return { success: true, data: authorities };
     } catch (error) {
-      console.error("Error fetching tax authorities:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching tax authorities:", error);
+      }
       return { success: false, error: "Failed to fetch tax authorities" };
     }
   }
@@ -540,7 +548,11 @@ export class TaxManagementService {
 
       return { success: true, data: category, message: "Tax category created successfully" };
     } catch (error) {
-      console.error("Error creating tax category:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating tax category:", error);
+      }
       return { success: false, error: "Failed to create tax category" };
     }
   }
@@ -563,7 +575,11 @@ export class TaxManagementService {
 
       return { success: true, data: categories };
     } catch (error) {
-      console.error("Error fetching tax categories:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching tax categories:", error);
+      }
       return { success: false, error: "Failed to fetch tax categories" };
     }
   }
@@ -619,7 +635,11 @@ export class TaxManagementService {
 
       return { success: true, data: rate, message: "Tax rate created successfully" };
     } catch (error) {
-      console.error("Error creating tax rate:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating tax rate:", error);
+      }
       return { success: false, error: "Failed to create tax rate" };
     }
   }
@@ -670,7 +690,11 @@ export class TaxManagementService {
 
       return { success: true, data: rates };
     } catch (error) {
-      console.error("Error fetching tax rates:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching tax rates:", error);
+      }
       return { success: false, error: "Failed to fetch tax rates" };
     }
   }
@@ -750,7 +774,11 @@ export class TaxManagementService {
         message: "Tax template created successfully",
       };
     } catch (error) {
-      console.error("Error creating tax template:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating tax template:", error);
+      }
       return { success: false, error: "Failed to create tax template" };
     }
   }
@@ -794,7 +822,11 @@ export class TaxManagementService {
 
       return { success: true, data: templates };
     } catch (error) {
-      console.error("Error fetching tax templates:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching tax templates:", error);
+      }
       return { success: false, error: "Failed to fetch tax templates" };
     }
   }
@@ -827,7 +859,11 @@ export class TaxManagementService {
 
       return { success: true, data: results };
     } catch (error) {
-      console.error("Error calculating tax:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error calculating tax:", error);
+      }
       return { success: false, error: "Failed to calculate tax" };
     }
   }
@@ -859,7 +895,11 @@ export class TaxManagementService {
 
       return { success: true, data: isExempt };
     } catch (error) {
-      console.error("Error checking tax exemption:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error checking tax exemption:", error);
+      }
       return { success: false, error: "Failed to check tax exemption" };
     }
   }
@@ -900,7 +940,11 @@ export class TaxManagementService {
 
       return { success: true, data: appliedTaxes, message: "Tax applied successfully" };
     } catch (error) {
-      console.error("Error applying tax to transaction:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error applying tax to transaction:", error);
+      }
       return { success: false, error: "Failed to apply tax to transaction" };
     }
   }
@@ -941,7 +985,11 @@ export class TaxManagementService {
 
       return { success: true, data: exemption, message: "Tax exemption created successfully" };
     } catch (error) {
-      console.error("Error creating tax exemption:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating tax exemption:", error);
+      }
       return { success: false, error: "Failed to create tax exemption" };
     }
   }
@@ -972,7 +1020,11 @@ export class TaxManagementService {
 
       return { success: true, data: exemptions };
     } catch (error) {
-      console.error("Error fetching tax exemptions:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching tax exemptions:", error);
+      }
       return { success: false, error: "Failed to fetch tax exemptions" };
     }
   }
@@ -1008,7 +1060,11 @@ export class TaxManagementService {
         message: `${periodsGenerated} filing periods generated`,
       };
     } catch (error) {
-      console.error("Error generating filing periods:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error generating filing periods:", error);
+      }
       return { success: false, error: "Failed to generate filing periods" };
     }
   }
@@ -1057,7 +1113,11 @@ export class TaxManagementService {
 
       return { success: true, data: periods };
     } catch (error) {
-      console.error("Error fetching filing periods:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching filing periods:", error);
+      }
       return { success: false, error: "Failed to fetch filing periods" };
     }
   }
@@ -1097,7 +1157,11 @@ export class TaxManagementService {
 
       return { success: true, data: summary as any };
     } catch (error) {
-      console.error("Error calculating filing summary:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error calculating filing summary:", error);
+      }
       return { success: false, error: "Failed to calculate filing summary" };
     }
   }
@@ -1126,7 +1190,11 @@ export class TaxManagementService {
 
       return { success: true, data: true, message: "Tax filing submitted successfully" };
     } catch (error) {
-      console.error("Error submitting tax filing:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting tax filing:", error);
+      }
       return { success: false, error: "Failed to submit tax filing" };
     }
   }
@@ -1210,7 +1278,11 @@ export class TaxManagementService {
         },
       };
     } catch (error) {
-      console.error("Error fetching tax analytics:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching tax analytics:", error);
+      }
       return { success: false, error: "Failed to fetch tax analytics" };
     }
   }

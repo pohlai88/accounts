@@ -7,7 +7,8 @@
     ".npmrc",
     ".cursorrules.json",
     "eslint.config.mjs",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    ".env.test"
   ],
   "ui": "stream",
   "tasks": {

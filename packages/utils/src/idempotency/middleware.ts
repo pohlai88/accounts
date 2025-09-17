@@ -96,7 +96,11 @@ export function createIdempotencyMiddleware(idempotencyManager: IdempotencyManag
         // Fallback to normal execution
         return await next();
       } catch (error) {
-        console.error("Idempotency middleware error:", error);
+        // Log idempotency middleware error to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Idempotency middleware error:", error);
+        }
 
         // If idempotency fails, continue without it
         return await next();

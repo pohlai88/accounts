@@ -61,7 +61,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log report generation:", error);
+      // Log report generation audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log report generation:", error);
+      }
     }
   }
 
@@ -89,7 +93,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log security violation:", error);
+      // Log security violation audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log security violation:", error);
+      }
     }
   }
 
@@ -115,7 +123,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log period operation:", error);
+      // Log period operation audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log period operation:", error);
+      }
     }
   }
 
@@ -141,7 +153,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log journal posting:", error);
+      // Log journal posting audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log journal posting:", error);
+      }
     }
   }
 
@@ -169,7 +185,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log error:", error);
+      // Log error audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log error:", error);
+      }
     }
   }
 
@@ -194,7 +214,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log authentication:", error);
+      // Log authentication audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log authentication:", error);
+      }
     }
   }
 
@@ -241,7 +265,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log SoD compliance:", error);
+      // Log SoD compliance audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log SoD compliance:", error);
+      }
     }
   }
 
@@ -288,7 +316,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log COA validation:", error);
+      // Log COA validation audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log COA validation:", error);
+      }
     }
   }
 
@@ -317,7 +349,11 @@ export class AuditService {
 
       await this.storeAuditEvent(event);
     } catch (error) {
-      console.error("Failed to log operation:", error);
+      // Log operation audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to log operation:", error);
+      }
     }
   }
 
@@ -342,10 +378,18 @@ export class AuditService {
       });
 
       if (error) {
-        console.error("Failed to store audit event:", error);
+        // Log audit event storage failure to monitoring service
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Failed to store audit event:", error);
+        }
       }
     } catch (error) {
-      console.error("Failed to store audit event:", error);
+      // Log audit event storage failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to store audit event:", error);
+      }
     }
   }
 
@@ -396,7 +440,11 @@ export class AuditService {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Failed to query audit events:", error);
+        // Log audit events query failure to monitoring service
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Failed to query audit events:", error);
+        }
         return [];
       }
 
@@ -419,7 +467,11 @@ export class AuditService {
         createdAt: new Date(row.created_at),
       }));
     } catch (error) {
-      console.error("Failed to query audit events:", error);
+      // Log audit events query failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to query audit events:", error);
+      }
       return [];
     }
   }

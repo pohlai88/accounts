@@ -55,3 +55,16 @@ export * from "./logger";
 // ============================================================================
 
 export * from "./tracing";
+
+// ============================================================================
+// CENTRALIZED MONITORING INTEGRATION
+// ============================================================================
+
+export * from "./integration";
+
+export {
+  MonitoringIntegration,
+  monitoring,
+  type MonitoringConfig,
+  type MonitoringContext
+} from "./integration";

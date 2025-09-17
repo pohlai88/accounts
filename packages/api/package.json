@@ -10,7 +10,7 @@
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "test": "vitest",
-    "test:ui": "vitest --ui",
+
     "test:run": "vitest run",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",

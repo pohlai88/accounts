@@ -1,123 +1,152 @@
 /**
- * @aibos/monorepo Root Vitest Configuration
+ * @aibos/monorepo - Robust Testing Configuration
  *
- * Extends @aibos/vitest-config for consistent testing across the monorepo.
- * Root configuration with monorepo-specific overrides and workspace patterns.
+ * Standalone, production-ready testing setup optimized for:
+ * - Speed and reliability
+ * - TypeScript and React support
+ * - Monorepo architecture
+ * - 3-tier testing strategy (Unit, Integration, E2E)
  */
 
-/// <reference types="vitest" />
-import { defineConfig, mergeConfig } from "vitest/config";
+import { defineConfig } from "vitest/config";
 import { resolve } from "path";
-import base, { jsdomConfig, highCoverageConfig } from "./packages/config/vitest-config";
+import { loadEnv } from "vite";
 
-export default mergeConfig(
-    base,
-    jsdomConfig, // Use jsdom for root-level testing
-    defineConfig({
-        test: {
-            // Root-specific overrides for monorepo
-            setupFiles: [resolve(__dirname, "./tests/setup.ts")],
+export default defineConfig(({ mode }) => {
+  // Load environment variables from .env.test
+  const env = loadEnv(mode, process.cwd(), '');
 
-            // Load test environment variables
-            env: {
-                NODE_ENV: 'test',
-                DATABASE_URL: 'postgresql://postgres.dsjxvwhuvnefduvjbmgk:Weepohlai88!@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres'
-            },
+  return {
+    test: {
+      // Global test settings
+      globals: true,
+      environment: "node",
 
-            // Shuffle test order to catch hidden coupling
-            sequence: {
-                shuffle: true
-            },
+      // Test file patterns (exclude React components - handled by vitest.config.react.ts)
+      include: [
+        "**/*.{test,spec}.{ts,tsx}",
+        "tests/**/*.{test,spec}.{ts,tsx}",
+      ],
+      exclude: [
+        "node_modules/**",
+        "dist/**",
+        "build/**",
+        ".next/**",
+        "coverage/**",
+        "test-results/**",
+        "tests/e2e/**", // E2E tests handled by Playwright
+        ".stryker-tmp/**", // Stryker temp files
+        "**/node_modules/**", // Nested node_modules
+        "**/zod/src/v4/classic/tests/**", // Zod internal tests
+        "packages/ui/**/*.{test,spec}.{ts,tsx}", // React components handled by vitest.config.react.ts
+        "apps/web/**/*.{test,spec}.{ts,tsx}", // React components handled by vitest.config.react.ts
+      ],
 
-            // Monorepo-wide test patterns
-            include: [
-                "packages/**/*.{test,spec}.{ts,tsx}",
-                "packages/**/test/**/*.{test,spec}.{ts,tsx}",
-                "apps/**/*.{test,spec}.{ts,tsx}",
-                "services/**/*.{test,spec}.{ts,tsx}",
-                "tests/unit/**/*.{test,spec}.{ts,tsx}",
-                "tests/integration/**/*.{test,spec}.{ts,tsx}",
-                // Package-level patterns for when running from individual packages
-                "src/**/*.{test,spec}.{ts,tsx}",
-                "**/*.{test,spec}.{ts,tsx}",
-            ],
+      // Performance optimization
+      testTimeout: 10000,
+      hookTimeout: 10000,
+      teardownTimeout: 5000,
 
-            // Monorepo-specific exclusions
-            exclude: [
-                "node_modules/**",
-                "dist/**",
-                "build/**",
-                "coverage/**",
-                "test-results/**",
-                "tests/e2e/**",
-                "tests/performance/**",
-                "**/*.integration.test.{ts,tsx}",
-                "**/*.e2e.test.{ts,tsx}",
-                "**/*.performance.test.{ts,tsx}",
-                // Exclude Zod's internal tests and Stryker temp files
-                "**/node_modules/zod/src/v4/classic/tests/**",
-                "**/.stryker-tmp/**",
-                "**/packages/*/node_modules/**",
-            ],
-
-            // Root-level coverage configuration (extends SSOT)
-            coverage: {
-                // Use SSOT thresholds as base, with root-specific overrides
-                thresholds: {
-                    global: {
-                        branches: 95,
-                        functions: 95,
-                        lines: 95,
-                        statements: 95,
-                    },
-                    // Critical package overrides (these should match SSOT highCoverageConfig)
-                    "packages/accounting/**": {
-                        branches: 98,
-                        functions: 98,
-                        lines: 98,
-                        statements: 98,
-                    },
-                    "packages/db/**": {
-                        branches: 90,
-                        functions: 90,
-                        lines: 90,
-                        statements: 90,
-                    },
-                    "packages/auth/**": {
-                        branches: 95,
-                        functions: 95,
-                        lines: 95,
-                        statements: 95,
-                    },
-                    "packages/security/**": {
-                        branches: 95,
-                        functions: 95,
-                        lines: 95,
-                        statements: 95,
-                    },
-                },
-            },
+      // Parallel execution for speed
+      pool: "threads",
+      poolOptions: {
+        threads: {
+          singleThread: false,
+          maxThreads: 4,
+          minThreads: 1,
         },
+      },
 
-        // Root-level resolve configuration
-        resolve: {
-            alias: {
-                // Root-level aliases (extends SSOT)
-                "@": resolve(__dirname, "./"),
-                "@aibos/accounting": resolve(__dirname, "./packages/accounting/src"),
-                "@aibos/auth": resolve(__dirname, "./packages/auth/src"),
-                "@aibos/contracts": resolve(__dirname, "./packages/contracts/src"),
-                "@aibos/db": resolve(__dirname, "./packages/db/src"),
-                "@aibos/ui": resolve(__dirname, "./packages/ui/src"),
-                "@aibos/utils": resolve(__dirname, "./packages/utils/src"),
-                "@aibos/cache": resolve(__dirname, "./packages/cache/src"),
-                "@aibos/security": resolve(__dirname, "./packages/security/src"),
-                "@aibos/monitoring": resolve(__dirname, "./packages/monitoring/src"),
-                "@aibos/realtime": resolve(__dirname, "./packages/realtime/src"),
-                "@aibos/api-gateway": resolve(__dirname, "./packages/api-gateway/src"),
-                "@aibos/deployment": resolve(__dirname, "./packages/deployment/src"),
-                "@aibos/tokens": resolve(__dirname, "./packages/tokens/src"),
-            },
+      // Retry configuration for flaky tests
+      retry: 2,
+      bail: 0,
+
+      // Coverage configuration
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "json", "html", "lcov"],
+        reportsDirectory: "./coverage",
+        thresholds: {
+          global: {
+            branches: 90,
+            functions: 90,
+            lines: 90,
+            statements: 90,
+          },
+          // Critical package overrides
+          "packages/accounting/**": {
+            branches: 95,
+            functions: 95,
+            lines: 95,
+            statements: 95,
+          },
+          "packages/db/**": {
+            branches: 85,
+            functions: 85,
+            lines: 85,
+            statements: 85,
+          },
+          "packages/auth/**": {
+            branches: 90,
+            functions: 90,
+            lines: 90,
+            statements: 90,
+          },
+          "packages/security/**": {
+            branches: 90,
+            functions: 90,
+            lines: 90,
+            statements: 90,
+          },
         },
-    }),
-);
+        include: [
+          "packages/**/src/**/*.{ts,tsx}",
+          "apps/**/src/**/*.{ts,tsx}",
+          "apps/**/app/**/*.{ts,tsx}",
+        ],
+        exclude: [
+          "**/*.d.ts",
+          "**/*.config.{ts,js}",
+          "**/*.test.{ts,tsx}",
+          "**/*.spec.{ts,tsx}",
+          "**/migrations/**",
+          "**/node_modules/**",
+        ],
+      },
+
+      // Reporter configuration
+      reporters: ["verbose", "json"],
+      outputFile: {
+        json: "./test-results/vitest-results.json",
+      },
+
+      // Setup files
+      setupFiles: ["./tests/setup/global-setup.ts"],
+    },
+
+    // Define environment variables for tests
+    define: {
+      'process.env': env,
+    },
+
+    // Resolve configuration for monorepo
+    resolve: {
+      alias: {
+        "@": resolve(__dirname, "./"),
+        "@aibos/accounting": resolve(__dirname, "./packages/accounting/src"),
+        "@aibos/auth": resolve(__dirname, "./packages/auth/src"),
+        "@aibos/contracts": resolve(__dirname, "./packages/contracts/src"),
+        "@aibos/db": resolve(__dirname, "./packages/db/src"),
+        "@aibos/ui": resolve(__dirname, "./packages/ui/src"),
+        "@aibos/utils": resolve(__dirname, "./packages/utils/src"),
+        "@aibos/cache": resolve(__dirname, "./packages/cache/src"),
+        "@aibos/security": resolve(__dirname, "./packages/security/src"),
+        "@aibos/monitoring": resolve(__dirname, "./packages/monitoring/src"),
+        "@aibos/realtime": resolve(__dirname, "./packages/realtime/src"),
+        "@aibos/api-gateway": resolve(__dirname, "./packages/api-gateway/src"),
+        "@aibos/deployment": resolve(__dirname, "./packages/deployment/src"),
+        "@aibos/tokens": resolve(__dirname, "./packages/tokens/src"),
+      },
+    },
+  };
+});

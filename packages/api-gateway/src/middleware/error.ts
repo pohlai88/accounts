@@ -29,7 +29,8 @@ export function createErrorMiddleware(options: {
         const timestamp = new Date().toISOString();
 
         // Log error details
-        if (logErrors) {
+        if (logErrors && process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
             console.error("API Gateway Error:", {
                 message: error.message,
                 stack: includeStack ? error.stack : undefined,

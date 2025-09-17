@@ -99,7 +99,7 @@ export interface PaymentProcessingError {
   success: false;
   error: string;
   code: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 // Helper functions for surgical fixes
@@ -430,12 +430,17 @@ export async function validatePaymentProcessingFixed(
 
     return result;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Payment processing failed";
+    const errorCode = error instanceof Error && 'code' in error ? (error as { code: string }).code : "PAYMENT_PROCESSING_ERROR";
     return {
       success: false,
-      error: error.message || "Payment processing failed",
-      code: error.code || "PAYMENT_PROCESSING_ERROR",
-      details: { error: error.message, stack: error.stack },
+      error: errorMessage,
+      code: errorCode,
+      details: {
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      },
     };
   }
 }

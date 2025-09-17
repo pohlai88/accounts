@@ -1,181 +1,156 @@
-import { NextRequest } from "next/server";
-import { z } from "zod";
+/**
+ * Security Audit API Routes
+ *
+ * Provides endpoints for managing security audits, viewing audit results,
+ * and generating security reports.
+ */
+
+import { NextRequest, NextResponse } from "next/server";
 import { getSecurityContext } from "@aibos/web-api/_lib/request";
 import { ok, problem } from "@aibos/web-api/_lib/response";
+import { SecurityAuditManager } from "@aibos/security";
+import { monitoring } from "@aibos/monitoring";
 
 // Force dynamic rendering to avoid build-time header access
 export const dynamic = 'force-dynamic';
 
-// Mock audit logger (in production, use real instance)
-const mockAuditEvents = [
-  {
-    id: "audit_1",
-    timestamp: Date.now() - 3600000,
-    tenantId: "tenant-1",
-    userId: "user-1",
-    action: "login",
-    resource: "authentication",
-    details: { ipAddress: "192.168.1.1", userAgent: "Mozilla/5.0" },
-    severity: "low",
-    category: "authentication",
-    outcome: "success",
-    riskScore: 20,
-    complianceFlags: [],
-    metadata: { eventType: "authentication" },
-  },
-  {
-    id: "audit_2",
-    timestamp: Date.now() - 1800000,
-    tenantId: "tenant-1",
-    userId: "user-1",
-    action: "data_export",
-    resource: "financial_data",
-    details: { recordCount: 1500, dataType: "transactions" },
-    severity: "high",
-    category: "data_access",
-    outcome: "success",
-    riskScore: 75,
-    complianceFlags: ["GDPR Data Export"],
-    metadata: { eventType: "data_access" },
-  },
-];
+// Create security audit manager instance
+const securityAuditManager = new SecurityAuditManager();
 
-const AuditQuerySchema = z.object({
-  category: z.string().optional(),
-  severity: z.enum(["low", "medium", "high", "critical"]).optional(),
-  action: z.string().optional(),
-  startDate: z
-    .string()
-    .transform(val => new Date(val).getTime())
-    .optional(),
-  endDate: z
-    .string()
-    .transform(val => new Date(val).getTime())
-    .optional(),
-  limit: z.string().optional().transform(val => {
-    const num = Number(val || "100");
-    if (num < 1 || num > 1000) throw new Error("Limit must be between 1 and 1000");
-    return num;
-  }),
-  offset: z.string().optional().transform(val => {
-    const num = Number(val || "0");
-    if (num < 0) throw new Error("Offset must be non-negative");
-    return num;
-  }),
-});
-
+/**
+ * GET /api/security/audit
+ * Get security audit results and status
+ */
 export async function GET(req: NextRequest) {
+  // Get security context
+  const ctx = await getSecurityContext(req);
+
   try {
-    const ctx = await getSecurityContext(req);
-    const url = new URL(req.url);
-    const query = AuditQuerySchema.parse(Object.fromEntries(url.searchParams));
 
-    // Filter events by tenant
-    let events = mockAuditEvents.filter(event => event.tenantId === ctx.tenantId);
+    // Get audit history
+    const auditHistory = securityAuditManager.getAuditHistory();
+    const latestAudit = auditHistory[auditHistory.length - 1];
 
-    // Apply filters
-    if (query.category) {
-      events = events.filter(event => event.category === query.category);
-    }
-
-    if (query.severity) {
-      events = events.filter(event => event.severity === query.severity);
-    }
-
-    if (query.action) {
-      events = events.filter(event => event.action.includes(query.action as string));
-    }
-
-    if (query.startDate) {
-      events = events.filter(event => event.timestamp >= (query.startDate as number));
-    }
-
-    if (query.endDate) {
-      events = events.filter(event => event.timestamp <= (query.endDate as number));
-    }
-
-    // Sort by timestamp (newest first)
-    events.sort((a, b) => b.timestamp - a.timestamp);
-
-    // Apply pagination
-    const paginatedEvents = events.slice(query.offset as number, (query.offset as number) + (query.limit as number));
-
-    // Calculate statistics
-    const stats = {
-      total: events.length,
-      byCategory: events.reduce(
-        (acc, event) => {
-          acc[event.category] = (acc[event.category] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>,
-      ),
-      bySeverity: events.reduce(
-        (acc, event) => {
-          acc[event.severity] = (acc[event.severity] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>,
-      ),
-      byOutcome: events.reduce(
-        (acc, event) => {
-          acc[event.outcome] = (acc[event.outcome] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>,
-      ),
-      averageRiskScore:
-        events.length > 0
-          ? events.reduce((sum, event) => sum + event.riskScore, 0) / events.length
-          : 0,
-      highRiskEvents: events.filter(event => event.riskScore > 70).length,
-      complianceViolations: events.filter(event => event.complianceFlags.length > 0).length,
+    // Get vulnerabilities by severity
+    const vulnerabilities = {
+      critical: securityAuditManager.getVulnerabilitiesBySeverity("critical"),
+      high: securityAuditManager.getVulnerabilitiesBySeverity("high"),
+      medium: securityAuditManager.getVulnerabilitiesBySeverity("medium"),
+      low: securityAuditManager.getVulnerabilitiesBySeverity("low"),
     };
 
-    return ok(
-      {
-        events: paginatedEvents,
-        pagination: {
-          limit: query.limit as number,
-          offset: query.offset as number,
-          total: events.length,
-          hasMore: (query.offset as number) + (query.limit as number) < events.length,
-        },
-        statistics: stats,
+    // Get vulnerabilities by category
+    const vulnerabilitiesByCategory = {
+      injection: securityAuditManager.getVulnerabilitiesByCategory("injection"),
+      authentication: securityAuditManager.getVulnerabilitiesByCategory("authentication"),
+      authorization: securityAuditManager.getVulnerabilitiesByCategory("authorization"),
+      data_protection: securityAuditManager.getVulnerabilitiesByCategory("data_protection"),
+      configuration: securityAuditManager.getVulnerabilitiesByCategory("configuration"),
+      dependencies: securityAuditManager.getVulnerabilitiesByCategory("dependencies"),
+      encryption: securityAuditManager.getVulnerabilitiesByCategory("encryption"),
+      logging: securityAuditManager.getVulnerabilitiesByCategory("logging"),
+    };
+
+    const response = {
+      auditHistory: auditHistory.map(audit => ({
+        auditId: audit.auditId,
+        timestamp: audit.timestamp,
+        duration: audit.duration,
+        riskScore: audit.riskScore,
+        summary: audit.summary,
+        compliance: audit.compliance,
+      })),
+      latestAudit: latestAudit ? {
+        auditId: latestAudit.auditId,
+        timestamp: latestAudit.timestamp,
+        duration: latestAudit.duration,
+        riskScore: latestAudit.riskScore,
+        summary: latestAudit.summary,
+        compliance: latestAudit.compliance,
+        recommendations: latestAudit.recommendations,
+      } : null,
+      vulnerabilities,
+      vulnerabilitiesByCategory,
+      statistics: {
+        totalAudits: auditHistory.length,
+        averageRiskScore: auditHistory.length > 0
+          ? Math.round(auditHistory.reduce((sum, audit) => sum + audit.riskScore, 0) / auditHistory.length)
+          : 0,
+        lastAuditDate: latestAudit ? new Date(latestAudit.timestamp) : null,
+        nextAuditRecommended: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       },
-      ctx.requestId,
-    );
-  } catch (error: unknown) {
-    console.error("Get audit events error:", error);
+    };
 
-    if (error && typeof error === "object" && "status" in error && "message" in error) {
-      const errorObj = error as { status: unknown; message: unknown };
-      return problem({
-        status: Number(errorObj.status) || 500,
-        title: String(errorObj.message),
-        code: "AUTHENTICATION_ERROR",
-        detail: String(errorObj.message),
-        requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      });
-    }
-
-    if (error instanceof Error && error.name === "ZodError") {
-      const zodError = error as any; // ZodError has errors property
-      return problem({
-        status: 400,
-        title: "Validation error",
-        code: "VALIDATION_ERROR",
-        detail: `Invalid query parameters: ${zodError.errors.map((e: z.ZodIssue) => e.message).join(', ')}`,
-        requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      });
-    }
+    return ok(response, ctx.requestId);
+  } catch (error) {
+    monitoring.error("Failed to get security audit data", error instanceof Error ? error : new Error(String(error)));
 
     return problem({
       status: 500,
-      title: "Internal server error",
-      code: "INTERNAL_ERROR",
-      detail: "Failed to get audit events",
-      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      title: "Failed to retrieve security audit data",
+      code: "SECURITY_AUDIT_FETCH_FAILED",
+      detail: "An unexpected error occurred while retrieving security audit data",
+      requestId: ctx.requestId,
+    });
+  }
+}
+
+/**
+ * POST /api/security/audit
+ * Run a new security audit
+ */
+export async function POST(req: NextRequest) {
+  // Get security context
+  const ctx = await getSecurityContext(req);
+
+  try {
+
+    // TODO: Add proper permission checking when user context is available
+
+    // Run security audit
+    monitoring.info("Starting security audit", { userId: ctx.userId, tenantId: ctx.tenantId });
+
+    const auditResult = await securityAuditManager.runSecurityAudit();
+
+    const response = {
+      auditId: auditResult.auditId,
+      timestamp: auditResult.timestamp,
+      duration: auditResult.duration,
+      riskScore: auditResult.riskScore,
+      summary: auditResult.summary,
+      compliance: auditResult.compliance,
+      recommendations: auditResult.recommendations,
+      vulnerabilities: auditResult.vulnerabilities.map(v => ({
+        id: v.id,
+        severity: v.severity,
+        category: v.category,
+        title: v.title,
+        description: v.description,
+        impact: v.impact,
+        recommendation: v.recommendation,
+        status: v.status,
+        detectedAt: v.detectedAt,
+        cwe: v.cwe,
+        owasp: v.owasp,
+      })),
+    };
+
+    monitoring.info("Security audit completed", {
+      auditId: auditResult.auditId,
+      riskScore: auditResult.riskScore,
+      vulnerabilities: auditResult.summary.total
+    });
+
+    return ok(response, ctx.requestId);
+  } catch (error) {
+    monitoring.error("Security audit failed", error instanceof Error ? error : new Error(String(error)));
+
+    return problem({
+      status: 500,
+      title: "Security audit failed",
+      code: "SECURITY_AUDIT_FAILED",
+      detail: "An unexpected error occurred while running the security audit",
+      requestId: ctx.requestId,
     });
   }
 }

@@ -255,22 +255,42 @@ export async function processScheduledExports(): Promise<void> {
 
     for (const schedule of dueSchedules) {
       try {
-        console.log(`Executing scheduled export: ${schedule.name} (${schedule.id})`);
+        // Log scheduled export execution to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.log(`Executing scheduled export: ${schedule.name} (${schedule.id})`);
+        }
         const result = await scheduleService.executeSchedule(schedule.id);
 
         if (result.success) {
-          console.log(`Export completed: ${result.filename}, ${result.recordCount} records`);
+          // Log export completion to monitoring service
+          if ((process.env.NODE_ENV as string) === 'development') {
+            // eslint-disable-next-line no-console
+            console.log(`Export completed: ${result.filename}, ${result.recordCount} records`);
+          }
 
           // TODO: Send email to recipients with export file
           // await sendExportEmail(schedule.recipients, result);
         } else {
-          console.error(`Export failed for schedule ${schedule.id}: ${result.error}`);
+          // Log export failure to monitoring service
+          if ((process.env.NODE_ENV as string) === 'development') {
+            // eslint-disable-next-line no-console
+            console.error(`Export failed for schedule ${schedule.id}: ${result.error}`);
+          }
         }
       } catch (error) {
-        console.error(`Error executing schedule ${schedule.id}:`, error);
+        // Log schedule execution error to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.error(`Error executing schedule ${schedule.id}:`, error);
+        }
       }
     }
   } catch (error) {
-    console.error("Error processing scheduled exports:", error);
+    // Log scheduled exports processing error to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.error("Error processing scheduled exports:", error);
+    }
   }
 }

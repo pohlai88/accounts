@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
-import { getSecurityContext } from "@aibos/web-api/_lib/request";
-import { ok, problem } from "@aibos/web-api/_lib/response";
+import { getSecurityContext } from "../../../_lib/request";
+import { ok, problem } from "../../../_lib/response";
 
 // Invite user request schema
 const InviteUserSchema = z.object({

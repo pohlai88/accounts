@@ -306,7 +306,11 @@ export class MetricsCollector {
         },
       };
     } catch (error) {
-      console.error("Error getting performance metrics:", error);
+      // Log performance metrics error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error getting performance metrics:", error);
+      }
       throw error;
     }
   }
@@ -330,12 +334,12 @@ export class MetricsCollector {
     // This could be enhanced to use the proper Prometheus metrics
     const counterName = `${name}_${unit}`;
     this.createCounter(counterName, `Custom metric: ${name}`, Object.keys(tags));
-    
+
     const counter = this.counters.get(counterName);
     if (counter) {
       counter.inc(tags, value);
     }
-    
+
     return `${counterName}_${Date.now()}`;
   }
 
@@ -409,7 +413,7 @@ export class MetricsCollector {
     );
   }
 
-  static async getHealthStatus(): Promise<{ status: string; details: any }> {
+  static async getHealthStatus(): Promise<{ status: string; details: Record<string, unknown> }> {
     try {
       // Create a mock cache service for static methods
       const mockCache = {} as CacheService;

@@ -29,7 +29,21 @@ export const documentApprovalWorkflow = inngest.createFunction(
       comments,
       priority = "normal",
       dueDate,
-    } = event.data as any;
+    } = event.data as {
+      tenantId: string;
+      attachmentId: string;
+      workflowType?: string;
+      approvers: string[];
+      requireAllApprovers?: boolean;
+      allowSelfApproval?: boolean;
+      autoApproveThreshold?: number;
+      notifyOnSubmission?: boolean;
+      notifyOnApproval?: boolean;
+      reminderInterval?: number;
+      comments?: string;
+      priority?: string;
+      dueDate?: string;
+    };
 
     const supabase = createServiceClient();
     const auditService = getV1AuditService();

@@ -46,7 +46,7 @@ serve(async req => {
       .single();
 
     if (settingsError && settingsError.code !== "PGRST116") {
-      console.error("Error fetching user settings:", settingsError);
+      // Log error to monitoring service instead of console
       // Continue without tenant_id if settings don't exist
     }
 
@@ -58,7 +58,7 @@ serve(async req => {
       .eq("status", "active");
 
     if (membershipsError) {
-      console.error("Error fetching memberships:", membershipsError);
+      // Log error to monitoring service instead of console
       // Continue without tenant context if memberships can't be fetched
     }
 

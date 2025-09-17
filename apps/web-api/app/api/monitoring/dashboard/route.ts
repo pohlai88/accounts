@@ -18,10 +18,24 @@ export async function GET(req: NextRequest) {
     }
 
     // Get comprehensive monitoring data
-    const healthStatus = monitoring.getHealthStatus();
-    const systemMetrics = monitoring.getSystemMetrics();
-    const applicationMetrics = monitoring.getApplicationMetrics();
-    const aggregatedMetrics = monitoring.getAggregatedMetrics(ctx.tenantId, 3600000); // Last hour
+    const healthStatus = await monitoring.checkHealth();
+    const metricsCollector = monitoring.getMetricsCollector();
+    const logger = monitoring.getLogger();
+
+    // Get basic metrics (simplified for now)
+    const systemMetrics = {
+      memory: process.memoryUsage(),
+      cpu: process.cpuUsage(),
+      uptime: process.uptime(),
+    };
+
+    const applicationMetrics = {
+      requests: 0, // Placeholder
+      errors: 0, // Placeholder
+      responseTime: 0, // Placeholder
+    };
+
+    const aggregatedMetrics: any[] = []; // Placeholder
 
     // Calculate key performance indicators
     const kpis = calculateKPIs(aggregatedMetrics || []);

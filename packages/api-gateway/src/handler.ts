@@ -16,16 +16,16 @@ export async function handle(req: Request): Promise<Response> {
         const path = url.pathname;
         const method = req.method;
 
-    // Add CORS headers and rate limiting headers
-    const headers = new Headers({
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Tenant-ID,X-User-ID,X-Request-ID",
-      "Content-Type": "application/json",
-      "X-RateLimit-Limit": "100",
-      "X-RateLimit-Remaining": "99",
-      "X-RateLimit-Reset": String(Date.now() + 900000), // 15 minutes from now
-    });
+        // Add CORS headers and rate limiting headers
+        const headers = new Headers({
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Tenant-ID,X-User-ID,X-Request-ID",
+            "Content-Type": "application/json",
+            "X-RateLimit-Limit": "100",
+            "X-RateLimit-Remaining": "99",
+            "X-RateLimit-Reset": String(Date.now() + 900000), // 15 minutes from now
+        });
 
         // Handle preflight OPTIONS requests
         if (method === "OPTIONS") {
@@ -68,11 +68,16 @@ export async function handle(req: Request): Promise<Response> {
         const errorResponse = notFound("NOT_FOUND", `Route ${method} ${path} not found`);
         return new Response(JSON.stringify(errorResponse), { status: 404, headers });
 
-    } catch (error: any) {
-        console.error("Gateway handler error:", error);
+    } catch (error: unknown) {
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Gateway handler error:", error);
+        }
 
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorResponse = serverErr("INTERNAL_ERROR", "An unexpected error occurred", {
-            error: error.message,
+            error: errorMessage,
         });
 
         return new Response(JSON.stringify(errorResponse), {
@@ -85,7 +90,7 @@ export async function handle(req: Request): Promise<Response> {
 /**
  * Initialize the API Gateway handler (simplified for testing)
  */
-export async function initializeGateway(config?: {
+export async function initializeGateway(_config?: {
     port?: number;
     corsOrigin?: string | string[];
     enableLogging?: boolean;

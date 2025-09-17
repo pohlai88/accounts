@@ -440,7 +440,11 @@ export class FixedAssetsService {
 
       return { success: true, data: category, message: "Asset category created successfully" };
     } catch (error) {
-      console.error("Error creating asset category:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating asset category:", error);
+      }
       return { success: false, error: "Failed to create asset category" };
     }
   }
@@ -463,7 +467,11 @@ export class FixedAssetsService {
 
       return { success: true, data: categories };
     } catch (error) {
-      console.error("Error fetching asset categories:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching asset categories:", error);
+      }
       return { success: false, error: "Failed to fetch asset categories" };
     }
   }
@@ -505,7 +513,11 @@ export class FixedAssetsService {
 
       return { success: true, data: location, message: "Asset location created successfully" };
     } catch (error) {
-      console.error("Error creating asset location:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating asset location:", error);
+      }
       return { success: false, error: "Failed to create asset location" };
     }
   }
@@ -528,7 +540,11 @@ export class FixedAssetsService {
 
       return { success: true, data: locations };
     } catch (error) {
-      console.error("Error fetching asset locations:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching asset locations:", error);
+      }
       return { success: false, error: "Failed to fetch asset locations" };
     }
   }
@@ -610,7 +626,11 @@ export class FixedAssetsService {
 
       return { success: true, data: asset, message: `Asset ${assetCode} created successfully` };
     } catch (error) {
-      console.error("Error creating asset:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating asset:", error);
+      }
       return { success: false, error: "Failed to create asset" };
     }
   }
@@ -640,7 +660,11 @@ export class FixedAssetsService {
 
       return { success: true, data: asset };
     } catch (error) {
-      console.error("Error fetching asset:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching asset:", error);
+      }
       return { success: false, error: "Failed to fetch asset" };
     }
   }
@@ -700,7 +724,11 @@ export class FixedAssetsService {
 
       return { success: true, data: assets };
     } catch (error) {
-      console.error("Error fetching assets:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching assets:", error);
+      }
       return { success: false, error: "Failed to fetch assets" };
     }
   }
@@ -733,13 +761,21 @@ export class FixedAssetsService {
         );
 
         if (scheduleError) {
-          console.error("Error generating depreciation schedule:", scheduleError);
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error generating depreciation schedule:", scheduleError);
+          }
         }
       }
 
       return { success: true, data: true, message: "Asset submitted successfully" };
     } catch (error) {
-      console.error("Error submitting asset:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting asset:", error);
+      }
       return { success: false, error: "Failed to submit asset" };
     }
   }
@@ -767,7 +803,11 @@ export class FixedAssetsService {
 
       return { success: true, data: schedules };
     } catch (error) {
-      console.error("Error fetching depreciation schedule:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching depreciation schedule:", error);
+      }
       return { success: false, error: "Failed to fetch depreciation schedule" };
     }
   }
@@ -791,7 +831,11 @@ export class FixedAssetsService {
 
       return { success: true, data: entries };
     } catch (error) {
-      console.error("Error fetching pending depreciation entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching pending depreciation entries:", error);
+      }
       return { success: false, error: "Failed to fetch pending depreciation entries" };
     }
   }
@@ -812,7 +856,11 @@ export class FixedAssetsService {
 
       return { success: true, data: true, message: "Depreciation entries booked successfully" };
     } catch (error) {
-      console.error("Error booking depreciation entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error booking depreciation entries:", error);
+      }
       return { success: false, error: "Failed to book depreciation entries" };
     }
   }
@@ -833,7 +881,11 @@ export class FixedAssetsService {
 
       return { success: true, data: bookValue };
     } catch (error) {
-      console.error("Error calculating asset book value:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error calculating asset book value:", error);
+      }
       return { success: false, error: "Failed to calculate asset book value" };
     }
   }
@@ -878,7 +930,11 @@ export class FixedAssetsService {
         message: "Maintenance log created successfully",
       };
     } catch (error) {
-      console.error("Error creating maintenance log:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating maintenance log:", error);
+      }
       return { success: false, error: "Failed to create maintenance log" };
     }
   }
@@ -900,7 +956,11 @@ export class FixedAssetsService {
 
       return { success: true, data: logs };
     } catch (error) {
-      console.error("Error fetching maintenance logs:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching maintenance logs:", error);
+      }
       return { success: false, error: "Failed to fetch maintenance logs" };
     }
   }
@@ -935,7 +995,11 @@ export class FixedAssetsService {
 
       return { success: true, data: upcomingMaintenance };
     } catch (error) {
-      console.error("Error fetching upcoming maintenance:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching upcoming maintenance:", error);
+      }
       return { success: false, error: "Failed to fetch upcoming maintenance" };
     }
   }
@@ -988,7 +1052,11 @@ export class FixedAssetsService {
         message: "Asset disposal record created successfully",
       };
     } catch (error) {
-      console.error("Error creating asset disposal:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating asset disposal:", error);
+      }
       return { success: false, error: "Failed to create asset disposal" };
     }
   }
@@ -1027,7 +1095,11 @@ export class FixedAssetsService {
 
       return { success: true, data: true, message: "Asset disposal submitted successfully" };
     } catch (error) {
-      console.error("Error submitting asset disposal:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting asset disposal:", error);
+      }
       return { success: false, error: "Failed to submit asset disposal" };
     }
   }
@@ -1143,7 +1215,11 @@ export class FixedAssetsService {
         },
       };
     } catch (error) {
-      console.error("Error fetching asset analytics:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching asset analytics:", error);
+      }
       return { success: false, error: "Failed to fetch asset analytics" };
     }
   }

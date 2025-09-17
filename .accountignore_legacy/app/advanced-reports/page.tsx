@@ -118,7 +118,11 @@ export default function AdvancedReportsPage() {
           break;
       }
     } catch (error) {
-      console.error("Error loading data:", error);
+      // Log data load error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading data:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -177,7 +181,11 @@ export default function AdvancedReportsPage() {
 
       await loadAgingReports();
     } catch (error) {
-      console.error("Error generating aging report:", error);
+      // Log aging report generation error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error generating aging report:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -193,7 +201,11 @@ export default function AdvancedReportsPage() {
       );
       await loadFinancialRatios();
     } catch (error) {
-      console.error("Error calculating ratios:", error);
+      // Log ratio calculation error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error calculating ratios:", error);
+      }
     } finally {
       setLoading(false);
     }

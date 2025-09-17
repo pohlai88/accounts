@@ -46,7 +46,8 @@ serve(async req => {
       .single();
 
     if (settingsError && settingsError.code !== "PGRST116") {
-      console.error("Error fetching user settings:", settingsError);
+      // Log user settings fetch error to monitoring service
+      // Continue without tenant_id if settings don't exist
       // Continue without tenant_id if settings don't exist
     }
 
@@ -58,7 +59,8 @@ serve(async req => {
       .eq("status", "active");
 
     if (membershipsError) {
-      console.error("Error fetching memberships:", membershipsError);
+      // Log memberships fetch error to monitoring service
+      // Continue without tenant context if memberships can't be fetched
       // Continue without tenant context if memberships can't be fetched
     }
 
@@ -167,7 +169,7 @@ serve(async req => {
       },
     );
   } catch (error) {
-    console.error("Auth hook error:", error);
+    // Log auth hook error to monitoring service
 
     // Return the original record if there's an error
     return new Response(

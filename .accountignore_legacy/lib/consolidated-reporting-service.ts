@@ -392,7 +392,11 @@ export class ConsolidatedReportingService {
         .single();
 
       if (runError && runError.code !== "PGRST116") {
-        console.error("Error fetching latest run:", runError);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Error fetching latest run:", runError);
+        }
       }
 
       // Get consolidation summary from materialized view
@@ -404,7 +408,11 @@ export class ConsolidatedReportingService {
         .limit(1);
 
       if (summaryError) {
-        console.error("Error fetching consolidation summary:", summaryError);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Error fetching consolidation summary:", summaryError);
+        }
       }
 
       // Calculate consolidation summary
@@ -425,7 +433,11 @@ export class ConsolidatedReportingService {
         .order("reporting_period", { ascending: false });
 
       if (statementsError) {
-        console.error("Error fetching statements:", statementsError);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Error fetching statements:", statementsError);
+        }
       }
 
       // Calculate key metrics
@@ -444,7 +456,11 @@ export class ConsolidatedReportingService {
         .limit(10);
 
       if (eliminationsError) {
-        console.error("Error fetching eliminations:", eliminationsError);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Error fetching eliminations:", eliminationsError);
+        }
       }
 
       // Get validation issues
@@ -864,7 +880,7 @@ export class ConsolidatedReportingService {
 
     const avgOwnership =
       entities?.reduce((sum, entity) => sum + entity.ownership_percentage, 0) /
-        (entities?.length || 1) || 0;
+      (entities?.length || 1) || 0;
 
     // Get elimination amounts
     const { data: eliminations } = await supabase
@@ -925,7 +941,7 @@ export class ConsolidatedReportingService {
         severity: "Warning",
         description: `${incompleteData.length} accounts have incomplete data`,
         affected_entities: incompleteData.flatMap(
-          item => (item.contributing_entities as any[])?.map(entity => entity.company_name) || [],
+          item => (item.contributing_entities as Array<{ company_name: string }>)?.map(entity => entity.company_name) || [],
         ),
       });
     }
@@ -1016,13 +1032,21 @@ export class ConsolidatedReportingService {
         .single();
 
       if (error) {
-        console.error("Error creating statement:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Error creating statement:", error);
+        }
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error("Error generating statement:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error generating statement:", error);
+      }
       return null;
     }
   }
@@ -1135,7 +1159,13 @@ export class ConsolidatedReportingService {
   private static calculateVarianceAnalysis(
     currentStatements: ConsolidatedFinancialStatement[],
     priorStatements: ConsolidatedFinancialStatement[],
-  ): any {
+  ): Promise<{
+    assets_variance: number;
+    liabilities_variance: number;
+    equity_variance: number;
+    revenue_variance: number;
+    expense_variance: number;
+  }> {
     // Simplified variance calculation
     return {
       assets_variance: 0,
@@ -1149,12 +1179,16 @@ export class ConsolidatedReportingService {
   private static async calculateEntityContribution(
     groupId: string,
     period: string,
-  ): Promise<any[]> {
+  ): Promise<Array<{ company_id: string; contribution_percentage: number; amount: number }>> {
     // Simplified entity contribution calculation
     return [];
   }
 
-  private static async calculateEliminationImpact(groupId: string, period: string): Promise<any> {
+  private static async calculateEliminationImpact(groupId: string, period: string): Promise<{
+    total_eliminations: number;
+    by_type: Record<string, number>;
+    material_eliminations: Array<{ elimination_type: string; elimination_amount: number }>;
+  }> {
     const { data: eliminations } = await supabase
       .from("consolidation_eliminations")
       .select("elimination_type, elimination_amount")

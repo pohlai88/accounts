@@ -112,7 +112,11 @@ export class RateLimitService {
 
         next();
       } catch (error) {
-        console.error("Rate limit error:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Rate limit error:", error);
+        }
         // Fail open - allow request if rate limiting fails
         next();
       }

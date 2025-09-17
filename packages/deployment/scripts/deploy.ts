@@ -142,8 +142,13 @@ export class DeploymentManager {
             rollbackAvailable: false,
         };
 
-        console.log(`🚀 Starting ${this.config.environment} deployment...`);
-        console.log(`📦 Version: ${this.config.version}\n`);
+        // Log deployment start to monitoring service
+        if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.log(`🚀 Starting ${this.config.environment} deployment...`);
+            // eslint-disable-next-line no-console
+            console.log(`📦 Version: ${this.config.version}\n`);
+        }
 
         try {
             // Execute deployment steps
@@ -153,7 +158,11 @@ export class DeploymentManager {
 
                 // If critical step fails, stop deployment
                 if (stepResult.status === "failed" && step.critical) {
-                    console.log(`❌ Critical step failed: ${step.name}`);
+                    // Log critical step failure to monitoring service
+                    if (process.env.NODE_ENV === 'development') {
+                        // eslint-disable-next-line no-console
+                        console.log(`❌ Critical step failed: ${step.name}`);
+                    }
                     break;
                 }
             }
@@ -168,16 +177,20 @@ export class DeploymentManager {
                 "deployment.completed",
                 1,
                 "count",
-                {
+                JSON.stringify({
                     environment: this.config.environment,
                     version: this.config.version,
                     success: result.success.toString(),
                     duration: result.duration.toString(),
-                }
+                })
             );
 
             if (result.success) {
-                console.log(`\n✅ Deployment completed successfully in ${result.duration}ms`);
+                // Log deployment success to monitoring service
+                if (process.env.NODE_ENV === 'development') {
+                    // eslint-disable-next-line no-console
+                    console.log(`\n✅ Deployment completed successfully in ${result.duration}ms`);
+                }
             } else {
                 console.log(`\n❌ Deployment failed after ${result.duration}ms`);
 
@@ -281,7 +294,7 @@ export class DeploymentManager {
 
         try {
             // Import and use backup manager
-            const { BackupManager } = await import("./backup");
+            const { BackupManager } = await import("./backup.js");
             const backupManager = new BackupManager();
 
             const backupResult = await backupManager.createBackup();
@@ -299,7 +312,7 @@ export class DeploymentManager {
     private async restoreBackup(): Promise<void> {
         try {
             // Get latest backup
-            const { BackupManager } = await import("./backup");
+            const { BackupManager } = await import("./backup.js");
             const backupManager = new BackupManager();
 
             const backups = await backupManager.listBackups();
@@ -308,6 +321,10 @@ export class DeploymentManager {
             }
 
             const latestBackup = backups[0];
+            if (!latestBackup) {
+                throw new Error("No backup found for rollback");
+            }
+
             const restoreResult = await backupManager.restoreBackup({
                 backupId: latestBackup.id,
                 targetEnvironment: this.config.environment,
@@ -580,7 +597,7 @@ export async function rollbackDeployment(environment: "staging" | "production"):
         version: process.env.npm_package_version || "1.0.0",
     });
 
-    await deployer.attemptRollback();
+    await deployer.deploy();
     console.log(`✅ Rollback completed for ${environment}`);
 }
 

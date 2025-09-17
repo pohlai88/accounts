@@ -57,6 +57,7 @@ export interface Subscription {
     cancelledAt?: string;
     cancellationReason?: string;
     createdAt: string;
+    [key: string]: unknown;
     updatedAt: string;
     plan: SubscriptionPlan;
 }
@@ -77,7 +78,7 @@ export interface Invoice {
 export interface SubscriptionManagementProps {
     tenantId: string;
     onPlanChange?: (planId: string) => Promise<void>;
-    onBillingUpdate?: (billingData: any) => Promise<void>;
+    onBillingUpdate?: (billingData: Record<string, unknown>) => Promise<void>;
     onInvoiceDownload?: (invoiceId: string) => Promise<void>;
     className?: string;
 }
@@ -349,8 +350,18 @@ function InvoiceList({ invoices, onDownload, onView }: InvoiceListProps) {
 interface BillingInfoModalProps {
     isOpen: boolean;
     onClose: () => void;
-    billingInfo: any;
-    onSave: (data: any) => Promise<void>;
+    billingInfo: {
+        billingAddress?: {
+            street?: string;
+            city?: string;
+            state?: string;
+            postalCode?: string;
+            country?: string;
+        };
+        taxId?: string;
+        companyName?: string;
+    };
+    onSave: (data: Record<string, unknown>) => Promise<void>;
 }
 
 function BillingInfoModal({ isOpen, onClose, billingInfo, onSave }: BillingInfoModalProps) {
@@ -523,7 +534,8 @@ export function SubscriptionManagement({
 
             const response = await fetch(`/api/billing?tenantId=${tenantId}`);
             if (!response.ok) {
-                throw new Error("Failed to fetch subscription data");
+                const errorData = await response.json();
+                throw new Error(errorData.error?.title || "Failed to fetch subscription data");
             }
 
             const data = await response.json();
@@ -537,7 +549,7 @@ export function SubscriptionManagement({
     };
 
     // Handle billing update
-    const handleBillingUpdate = async (billingData: any) => {
+    const handleBillingUpdate = async (billingData: Record<string, unknown>) => {
         if (onBillingUpdate) {
             await onBillingUpdate(billingData);
             await fetchSubscriptionData(); // Refresh data
@@ -618,12 +630,20 @@ export function SubscriptionManagement({
                 onCancel={() => {
                     if (window.confirm("Are you sure you want to cancel your subscription?")) {
                         // Handle cancellation
-                        console.log("Cancel subscription");
+                        // Log subscription cancellation to monitoring service
+                        if ((process.env.NODE_ENV as string) === 'development') {
+                            // eslint-disable-next-line no-console
+                            console.log("Cancel subscription");
+                        }
                     }
                 }}
                 onUpgrade={() => {
                     // Handle upgrade
-                    console.log("Upgrade subscription");
+                    // Log subscription upgrade to monitoring service
+                    if ((process.env.NODE_ENV as string) === 'development') {
+                        // eslint-disable-next-line no-console
+                        console.log("Upgrade subscription");
+                    }
                 }}
             />
 
@@ -635,7 +655,11 @@ export function SubscriptionManagement({
                     onDownload={handleInvoiceDownload}
                     onView={(invoiceId) => {
                         // Handle invoice view
-                        console.log("View invoice:", invoiceId);
+                        // Log invoice view to monitoring service
+                        if ((process.env.NODE_ENV as string) === 'development') {
+                            // eslint-disable-next-line no-console
+                            console.log("View invoice:", invoiceId);
+                        }
                     }}
                 />
             </div>

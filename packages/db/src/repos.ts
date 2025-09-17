@@ -31,8 +31,8 @@ function getDb() {
         update: () => ({ set: () => ({ where: () => Promise.resolve([]) }) }),
         delete: () => ({ where: () => Promise.resolve([]) }),
         raw: () => Promise.resolve([]),
-        transaction: (callback: any) => callback(_db),
-      } as any;
+        transaction: (callback: (db: typeof _db) => Promise<unknown>) => callback(_db),
+      } as unknown as typeof _db;
     } else {
       const connectionString = process.env.DATABASE_URL;
       if (!connectionString) {
@@ -288,7 +288,11 @@ export async function getAccountsInfo(
     ];
 
     // Only return accounts that were requested
-    console.log('Requested account IDs:', accountIds);
+    // Log account IDs request to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('Requested account IDs:', accountIds);
+    }
     for (const accountId of accountIds) {
       const account = accountData.find(a => a.id === accountId);
       if (account) {
@@ -302,9 +306,17 @@ export async function getAccountsInfo(
           level: 1,
           parentId: undefined
         });
-        console.log('Found account:', accountId);
+        // Log found account to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Found account:', accountId);
+        }
       } else {
-        console.log('Missing account:', accountId);
+        // Log missing account to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.log('Missing account:', accountId);
+        }
       }
     }
 
@@ -376,15 +388,15 @@ export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {
       ),
     );
 
-  return accounts.map((account: any) => ({
-    id: account.id,
-    code: account.code,
-    name: account.name,
-    accountType: account.accountType,
-    currency: account.currency,
-    isActive: account.isActive,
+  return accounts.map((account: Record<string, unknown>) => ({
+    id: account.id as string,
+    code: account.code as string,
+    name: account.name as string,
+    accountType: account.accountType as string,
+    currency: account.currency as string,
+    isActive: account.isActive as boolean,
     level: Number(account.level),
-    parentId: account.parentId || undefined,
+    parentId: account.parentId as string | undefined,
   }));
 }
 
@@ -1463,13 +1475,13 @@ export async function getWithholdingTaxConfig(
       )
     );
 
-  return result.map((row: any) => ({
-    id: row.id,
-    taxCode: row.taxCode,
-    taxName: row.taxName,
+  return result.map((row: Record<string, unknown>) => ({
+    id: row.id as string,
+    taxCode: row.taxCode as string,
+    taxName: row.taxName as string,
     taxRate: Number(row.taxRate),
-    payableAccountId: row.payableAccountId,
-    expenseAccountId: row.expenseAccountId,
+    payableAccountId: row.payableAccountId as string,
+    expenseAccountId: row.expenseAccountId as string,
     applicableTo: row.applicableTo as 'SUPPLIERS' | 'CUSTOMERS' | 'BOTH',
     minThreshold: Number(row.minThreshold),
   }));

@@ -78,9 +78,15 @@ describe("CacheService", () => {
 
   describe("Statistics", () => {
     it("should track cache hits and misses", async () => {
-      mockRedis.get.mockResolvedValue('{"test": "value"}');
+      // Reset stats before test
+      cache.resetStats();
 
+      // First call - hit
+      mockRedis.get.mockResolvedValueOnce('{"test": "value"}');
       await cache.get("test-key");
+
+      // Second call - miss
+      mockRedis.get.mockResolvedValueOnce(null);
       await cache.get("non-existent");
 
       const stats = cache.getStats();

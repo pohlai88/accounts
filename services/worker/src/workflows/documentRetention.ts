@@ -29,7 +29,21 @@ export const documentRetentionPolicy = inngest.createFunction(
       complianceNotes,
       effectiveFrom,
       effectiveUntil,
-    } = event.data as any;
+    } = event.data as {
+      tenantId: string;
+      companyId: string;
+      policyName: string;
+      description: string;
+      retentionPeriod: number;
+      category: string;
+      entityType: string;
+      actionAfterRetention: string;
+      notifyBeforeExpiry: number;
+      legalHoldOverride: boolean;
+      complianceNotes: string;
+      effectiveFrom: string;
+      effectiveUntil: string;
+    };
 
     const supabase = createServiceClient();
     const auditService = getV1AuditService();
@@ -169,9 +183,9 @@ export const documentRetentionPolicy = inngest.createFunction(
         const batch = attachments.slice(i, i + batchSize);
 
         const updates = batch.map((attachment: unknown) => {
-          const a = attachment as { id: string; created_at: string; metadata: any };
+          const a = attachment as { id: string; created_at: string; metadata: Record<string, unknown> };
           const retentionUntil = new Date(a.created_at);
-          retentionUntil.setDate(retentionUntil.getDate() + (policyData as any).retentionPeriod);
+          retentionUntil.setDate(retentionUntil.getDate() + (policyData as { retentionPeriod: number }).retentionPeriod);
           return {
             id: a.id,
             metadata: {
@@ -280,8 +294,8 @@ export const documentRetentionMonitor = inngest.createFunction(
         throw new Error(`Failed to query attachments: ${queryError.message}`);
       }
 
-      const expiring: any[] = [];
-      const expired: any[] = [];
+      const expiring: Record<string, unknown>[] = [];
+      const expired: Record<string, unknown>[] = [];
 
       for (const attachment of attachments || []) {
         const retentionPolicy = attachment.metadata?.retentionPolicy;
@@ -558,7 +572,7 @@ export const documentLegalHold = inngest.createFunction(
         requestId: event.id,
       });
 
-      const results: any[] = [];
+      const results: Record<string, unknown>[] = [];
 
       for (const attachmentId of attachmentIds) {
         try {
@@ -649,7 +663,7 @@ export const documentLegalHold = inngest.createFunction(
 
     // Step 2: Send notifications
     await step.run("send-legal-hold-notifications", async () => {
-  const successfulHolds = holdResult.results.filter((r: { success: boolean }) => r.success);
+      const successfulHolds = holdResult.results.filter((r: { success: boolean }) => r.success);
 
       if (successfulHolds.length > 0) {
         await inngest.send({
@@ -664,7 +678,7 @@ export const documentLegalHold = inngest.createFunction(
               reason,
               legalCase,
               requestedBy,
-              attachmentIds: successfulHolds.map((r: any) => r.attachmentId),
+              attachmentIds: successfulHolds.map((r: Record<string, unknown>) => r.attachmentId),
               processedAt: new Date().toISOString(),
             },
             tenantId,

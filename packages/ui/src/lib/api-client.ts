@@ -1,401 +1,335 @@
-// Centralized API Client with Error Handling
-// DoD: Centralized API client with error handling
-// SSOT: Use existing API contracts from @aibos/contracts
-// Tech Stack: Fetch API + Zod validation
+/**
+ * @aibos/ui - Centralized API Client
+ *
+ * Provides a robust, type-safe API client with:
+ * - Automatic authentication token injection
+ * - Request/response interceptors
+ * - Retry logic for failed requests
+ * - Consistent error handling
+ * - Type-safe responses
+ */
 
-import { z } from "zod";
-import { TCreateInvoiceReq, TCreateInvoiceRes } from "@aibos/contracts";
+import { AuthUser } from "../AuthProvider.js";
 
-// Custom API Error Class
-export class ApiError extends Error {
-    constructor(
-        public status: number,
-        public message: string,
-        public details?: any,
-    ) {
-        super(message);
-        this.name = "ApiError";
-    }
-}
-
-// API Response Schema
-const ApiResponseSchema = z.object({
-    success: z.boolean(),
-    data: z.any().optional(),
-    error: z.string().optional(),
-    message: z.string().optional(),
-});
-
-type ApiResponse<T = any> = {
+// API Response Types
+export interface ApiResponse<T = any> {
     success: boolean;
     data?: T;
-    error?: string;
-    message?: string;
-};
-
-// API Client Configuration
-interface ApiClientConfig {
-    baseUrl: string;
-    timeout: number;
-    retries: number;
-    retryDelay: number;
+    error?: {
+        type: string;
+        title: string;
+        status: number;
+        code?: string;
+        detail?: string;
+        errors?: Record<string, string[]>;
+    };
+    timestamp: string;
+    requestId: string;
 }
 
-// Default Configuration
-const defaultConfig: ApiClientConfig = {
-    baseUrl: "/api",
-    timeout: 30000, // 30 seconds
-    retries: 3,
-    retryDelay: 1000, // 1 second
-};
+// API Error Class
+export class ApiError extends Error {
+    public readonly status: number;
+    public readonly code?: string;
+    public readonly detail?: string;
+    public readonly errors?: Record<string, string[]>;
+    public readonly requestId: string;
 
-// API Client Class
+    constructor(response: ApiResponse) {
+        super(response.error?.title || "API Error");
+        this.name = "ApiError";
+        this.status = response.error?.status || 500;
+        this.code = response.error?.code;
+        this.detail = response.error?.detail;
+        this.errors = response.error?.errors;
+        this.requestId = response.requestId;
+    }
+}
+
+// Request Configuration
+export interface RequestConfig {
+    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    headers?: Record<string, string>;
+    body?: any;
+    timeout?: number;
+    retries?: number;
+    retryDelay?: number;
+}
+
+// API Client Configuration
+export interface ApiClientConfig {
+    baseUrl: string;
+    timeout?: number;
+    retries?: number;
+    retryDelay?: number;
+    onAuthError?: () => void;
+    onNetworkError?: (error: Error) => void;
+}
+
+// Request Interceptor
+export type RequestInterceptor = (config: RequestConfig & { url: string }) => RequestConfig & { url: string };
+
+// Response Interceptor
+export type ResponseInterceptor = (response: Response) => Response | Promise<Response>;
+
+/**
+ * Centralized API Client
+ */
 export class ApiClient {
     private config: ApiClientConfig;
-    private abortController: AbortController | null = null;
+    private requestInterceptors: RequestInterceptor[] = [];
+    private responseInterceptors: ResponseInterceptor[] = [];
+    private authToken: string | null = null;
+    private refreshToken: string | null = null;
+    private isRefreshing = false;
+    private refreshPromise: Promise<void> | null = null;
 
-    constructor(config: Partial<ApiClientConfig> = {}) {
-        this.config = { ...defaultConfig, ...config };
+    constructor(config: ApiClientConfig) {
+        this.config = {
+            timeout: 10000,
+            retries: 3,
+            retryDelay: 1000,
+            ...config,
+        };
     }
 
-    // Generic request method
-    async request<T>(
-        endpoint: string,
-        options: RequestInit = {},
-        schema?: z.ZodSchema<T>,
-    ): Promise<T> {
+    /**
+     * Set authentication tokens
+     */
+    setAuthTokens(accessToken: string | null, refreshToken: string | null) {
+        this.authToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
+
+    /**
+     * Add request interceptor
+     */
+    addRequestInterceptor(interceptor: RequestInterceptor) {
+        this.requestInterceptors.push(interceptor);
+    }
+
+    /**
+     * Add response interceptor
+     */
+    addResponseInterceptor(interceptor: ResponseInterceptor) {
+        this.responseInterceptors.push(interceptor);
+    }
+
+    /**
+     * Make authenticated request
+     */
+    async request<T = any>(endpoint: string, config: RequestConfig = {}): Promise<T> {
         const url = `${this.config.baseUrl}${endpoint}`;
 
-        // Create abort controller for timeout
-        this.abortController = new AbortController();
-        const timeoutId = setTimeout(() => this.abortController?.abort(), this.config.timeout);
-
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    "Content-Type": "application/json",
-                    ...options.headers,
-                },
-                signal: this.abortController.signal,
-                ...options,
-            });
-
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new ApiError(
-                    response.status,
-                    errorData.message || errorData.error || `HTTP ${response.status}`,
-                    errorData,
-                );
-            }
-
-            const data = await response.json();
-
-            // Validate response structure
-            const validatedResponse = ApiResponseSchema.parse(data);
-
-            if (!validatedResponse.success) {
-                throw new ApiError(
-                    response.status,
-                    validatedResponse.error || "API request failed",
-                    validatedResponse,
-                );
-            }
-
-            // Validate data with schema if provided
-            if (schema) {
-                return schema.parse(validatedResponse.data);
-            }
-
-            return validatedResponse.data;
-        } catch (error) {
-            clearTimeout(timeoutId);
-
-            if (error instanceof ApiError) {
-                throw error;
-            }
-
-            if (error instanceof Error) {
-                if (error.name === 'AbortError') {
-                    throw new ApiError(408, "Request timeout");
-                }
-                throw new ApiError(0, error.message);
-            }
-
-            throw new ApiError(0, "Unknown error occurred");
+        // Apply request interceptors
+        let requestConfig = { ...config, url };
+        for (const interceptor of this.requestInterceptors) {
+            requestConfig = interceptor(requestConfig);
         }
+
+        // Add authentication headers
+        const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+            ...requestConfig.headers,
+        };
+
+        if (this.authToken) {
+            headers.Authorization = `Bearer ${this.authToken}`;
+        }
+
+        // Add request ID for tracking
+        const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        headers["X-Request-ID"] = requestId;
+
+        // Prepare request
+        const requestInit: RequestInit = {
+            method: requestConfig.method || "GET",
+            headers,
+            signal: this.createAbortSignal(requestConfig.timeout),
+        };
+
+        if (requestConfig.body && requestConfig.method !== "GET") {
+            requestInit.body = JSON.stringify(requestConfig.body);
+        }
+
+        // Execute request with retry logic
+        return this.executeWithRetry(url, requestInit, requestConfig.retries || this.config.retries!);
     }
 
-    // Retry wrapper for failed requests
-    async requestWithRetry<T>(
-        endpoint: string,
-        options: RequestInit = {},
-        schema?: z.ZodSchema<T>,
+    /**
+     * Execute request with retry logic
+     */
+    private async executeWithRetry<T>(
+        url: string,
+        requestInit: RequestInit,
+        retries: number
     ): Promise<T> {
-        let lastError: ApiError;
+        let lastError: Error;
 
-        for (let attempt = 0; attempt <= this.config.retries; attempt++) {
+        for (let attempt = 0; attempt <= retries; attempt++) {
             try {
-                return await this.request(endpoint, options, schema);
+                const response = await fetch(url, requestInit);
+
+                // Apply response interceptors
+                let processedResponse = response;
+                for (const interceptor of this.responseInterceptors) {
+                    processedResponse = await interceptor(response);
+                }
+
+                const data: ApiResponse<T> = await processedResponse.json();
+
+                if (!data.success) {
+                    throw new ApiError(data);
+                }
+
+                return data.data as T;
             } catch (error) {
-                lastError = error as ApiError;
+                lastError = error as Error;
 
-                // Don't retry on client errors (4xx) except 408 (timeout)
-                if (lastError.status >= 400 && lastError.status < 500 && lastError.status !== 408) {
-                    throw lastError;
+                // Handle authentication errors
+                if (error instanceof ApiError && error.status === 401) {
+                    if (attempt === 0 && this.refreshToken) {
+                        try {
+                            await this.refreshAuthToken();
+                            continue; // Retry with new token
+                        } catch (refreshError) {
+                            this.config.onAuthError?.();
+                            throw refreshError;
+                        }
+                    } else {
+                        this.config.onAuthError?.();
+                        throw error;
+                    }
                 }
 
-                // Don't retry on last attempt
-                if (attempt === this.config.retries) {
-                    throw lastError;
+                // Handle network errors
+                if (error instanceof TypeError && error.message.includes("fetch")) {
+                    this.config.onNetworkError?.(error);
+
+                    if (attempt < retries) {
+                        await this.delay(this.config.retryDelay! * Math.pow(2, attempt));
+                        continue;
+                    }
                 }
 
-                // Wait before retry
-                await new Promise(resolve => setTimeout(resolve, this.config.retryDelay * (attempt + 1)));
+                // For other errors, don't retry
+                throw error;
             }
         }
 
         throw lastError!;
     }
 
-    // Invoice API methods
-    async getInvoices(params?: { page?: number; limit?: number; status?: string }) {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.status) queryParams.append('status', params.status);
-
-        const endpoint = `/invoices${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.requestWithRetry<TCreateInvoiceRes[]>(endpoint);
-    }
-
-    async getInvoice(id: string) {
-        return this.requestWithRetry<TCreateInvoiceRes>(`/invoices/${id}`);
-    }
-
-    async createInvoice(data: TCreateInvoiceReq) {
-        return this.requestWithRetry<TCreateInvoiceRes>("/invoices", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updateInvoice(id: string, data: Partial<TCreateInvoiceReq>) {
-        return this.requestWithRetry<TCreateInvoiceRes>(`/invoices/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deleteInvoice(id: string) {
-        return this.requestWithRetry<void>(`/invoices/${id}`, {
-            method: "DELETE",
-        });
-    }
-
-    // Customer API methods
-    async getCustomers(params?: { page?: number; limit?: number; search?: string }) {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.search) queryParams.append('search', params.search);
-
-        const endpoint = `/customers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.requestWithRetry<any[]>(endpoint);
-    }
-
-    async getCustomer(id: string) {
-        return this.requestWithRetry<any>(`/customers/${id}`);
-    }
-
-    async createCustomer(data: any) {
-        return this.requestWithRetry<any>("/customers", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updateCustomer(id: string, data: any) {
-        return this.requestWithRetry<any>(`/customers/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deleteCustomer(id: string) {
-        return this.requestWithRetry<void>(`/customers/${id}`, {
-            method: "DELETE",
-        });
-    }
-
-    // Vendor API methods
-    async getVendors(params?: { page?: number; limit?: number; search?: string }) {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.search) queryParams.append('search', params.search);
-
-        const endpoint = `/vendors${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.requestWithRetry<any[]>(endpoint);
-    }
-
-    async getVendor(id: string) {
-        return this.requestWithRetry<any>(`/vendors/${id}`);
-    }
-
-    async createVendor(data: any) {
-        return this.requestWithRetry<any>("/vendors", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updateVendor(id: string, data: any) {
-        return this.requestWithRetry<any>(`/vendors/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deleteVendor(id: string) {
-        return this.requestWithRetry<void>(`/vendors/${id}`, {
-            method: "DELETE",
-        });
-    }
-
-    // Bill API methods
-    async getBills(params?: { page?: number; limit?: number; status?: string }) {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.status) queryParams.append('status', params.status);
-
-        const endpoint = `/bills${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.requestWithRetry<any[]>(endpoint);
-    }
-
-    async getBill(id: string) {
-        return this.requestWithRetry<any>(`/bills/${id}`);
-    }
-
-    async createBill(data: any) {
-        return this.requestWithRetry<any>("/bills", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updateBill(id: string, data: any) {
-        return this.requestWithRetry<any>(`/bills/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deleteBill(id: string) {
-        return this.requestWithRetry<void>(`/bills/${id}`, {
-            method: "DELETE",
-        });
-    }
-
-    // Payment API methods
-    async getPayments(params?: { page?: number; limit?: number; search?: string }) {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.search) queryParams.append('search', params.search);
-
-        const endpoint = `/payments${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.requestWithRetry<any[]>(endpoint);
-    }
-
-    async getPayment(id: string) {
-        return this.requestWithRetry<any>(`/payments/${id}`);
-    }
-
-    async createPayment(data: any) {
-        return this.requestWithRetry<any>("/payments", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updatePayment(id: string, data: any) {
-        return this.requestWithRetry<any>(`/payments/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deletePayment(id: string) {
-        return this.requestWithRetry<void>(`/payments/${id}`, {
-            method: "DELETE",
-        });
-    }
-
-    // Bank Account API methods
-    async getBankAccounts(params?: { page?: number; limit?: number; search?: string }) {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.search) queryParams.append('search', params.search);
-
-        const endpoint = `/bank-accounts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.requestWithRetry<any[]>(endpoint);
-    }
-
-    async getBankAccount(id: string) {
-        return this.requestWithRetry<any>(`/bank-accounts/${id}`);
-    }
-
-    async createBankAccount(data: any) {
-        return this.requestWithRetry<any>("/bank-accounts", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updateBankAccount(id: string, data: any) {
-        return this.requestWithRetry<any>(`/bank-accounts/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deleteBankAccount(id: string) {
-        return this.requestWithRetry<void>(`/bank-accounts/${id}`, {
-            method: "DELETE",
-        });
-    }
-
-    // Company Settings API methods
-    async getCompanySettings() {
-        return this.requestWithRetry<any>("/company-settings");
-    }
-
-    async updateCompanySettings(data: any) {
-        return this.requestWithRetry<any>("/company-settings", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    }
-
-    // Health check
-    async healthCheck() {
-        return this.requestWithRetry<any>("/health");
-    }
-
-    // Cancel ongoing requests
-    cancel() {
-        if (this.abortController) {
-            this.abortController.abort();
+    /**
+     * Refresh authentication token
+     */
+    private async refreshAuthToken(): Promise<void> {
+        if (this.isRefreshing && this.refreshPromise) {
+            return this.refreshPromise;
         }
+
+        this.isRefreshing = true;
+        this.refreshPromise = this.performTokenRefresh();
+
+        try {
+            await this.refreshPromise;
+        } finally {
+            this.isRefreshing = false;
+            this.refreshPromise = null;
+        }
+    }
+
+    /**
+     * Perform token refresh
+     */
+    private async performTokenRefresh(): Promise<void> {
+        if (!this.refreshToken) {
+            throw new Error("No refresh token available");
+        }
+
+        try {
+            const response = await fetch(`${this.config.baseUrl}/auth/refresh`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    refreshToken: this.refreshToken,
+                }),
+            });
+
+            const data: ApiResponse<{
+                accessToken: string;
+                refreshToken: string;
+                expiresAt: string;
+            }> = await response.json();
+
+            if (!data.success) {
+                throw new ApiError(data);
+            }
+
+            this.authToken = data.data!.accessToken;
+            this.refreshToken = data.data!.refreshToken;
+        } catch (error) {
+            this.authToken = null;
+            this.refreshToken = null;
+            throw error;
+        }
+    }
+
+    /**
+     * Create abort signal for timeout
+     */
+    private createAbortSignal(timeout?: number): AbortSignal {
+        const controller = new AbortController();
+        const timeoutMs = timeout || this.config.timeout!;
+
+        setTimeout(() => controller.abort(), timeoutMs);
+        return controller.signal;
+    }
+
+    /**
+     * Delay utility for retry logic
+     */
+    private delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Convenience methods
+    async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
+        return this.request<T>(endpoint, { ...config, method: "GET" });
+    }
+
+    async post<T>(endpoint: string, body?: any, config?: RequestConfig): Promise<T> {
+        return this.request<T>(endpoint, { ...config, method: "POST", body });
+    }
+
+    async put<T>(endpoint: string, body?: any, config?: RequestConfig): Promise<T> {
+        return this.request<T>(endpoint, { ...config, method: "PUT", body });
+    }
+
+    async delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
+        return this.request<T>(endpoint, { ...config, method: "DELETE" });
+    }
+
+    async patch<T>(endpoint: string, body?: any, config?: RequestConfig): Promise<T> {
+        return this.request<T>(endpoint, { ...config, method: "PATCH", body });
     }
 }
 
-// Create default API client instance
-export const apiClient = new ApiClient();
+/**
+ * Create API client instance
+ */
+export function createApiClient(config: ApiClientConfig): ApiClient {
+    return new ApiClient(config);
+}
 
-// ApiError is already exported as a class above
+/**
+ * Default API client instance
+ */
+export const apiClient = createApiClient({
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || "/api",
+    timeout: 10000,
+    retries: 3,
+    retryDelay: 1000,
+});

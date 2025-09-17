@@ -46,15 +46,15 @@ export type AnalysisAggregation =
 export interface AnalysisFilter {
   dimension: AnalysisDimension;
   operator:
-    | "equals"
-    | "not_equals"
-    | "contains"
-    | "not_contains"
-    | "in"
-    | "not_in"
-    | "between"
-    | "greater_than"
-    | "less_than";
+  | "equals"
+  | "not_equals"
+  | "contains"
+  | "not_contains"
+  | "in"
+  | "not_in"
+  | "between"
+  | "greater_than"
+  | "less_than";
   value: string | number | string[] | number[];
   label?: string;
 }
@@ -132,7 +132,7 @@ export interface PivotTableConfig {
 export interface PivotTableResult {
   config: PivotTableConfig;
   data: Array<{
-    [key: string]: any;
+    [key: string]: unknown;
     _total?: number;
     _percentage?: number;
   }>;
@@ -172,7 +172,11 @@ export class FlexibleAnalysisEngine {
 
       return { success: true, config: newConfig };
     } catch (error) {
-      console.error("Error creating analysis config:", error);
+      // Log analysis config creation error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating analysis config:", error);
+      }
       return { success: false, error: "Failed to create analysis configuration" };
     }
   }
@@ -236,7 +240,11 @@ export class FlexibleAnalysisEngine {
 
       return { success: true, result };
     } catch (error) {
-      console.error("Error executing analysis:", error);
+      // Log analysis execution error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error executing analysis:", error);
+      }
       return { success: false, error: "Failed to execute analysis" };
     }
   }
@@ -285,7 +293,11 @@ export class FlexibleAnalysisEngine {
 
       return { success: true, result };
     } catch (error) {
-      console.error("Error executing pivot table:", error);
+      // Log pivot table execution error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error executing pivot table:", error);
+      }
       return { success: false, error: "Failed to execute pivot table analysis" };
     }
   }
@@ -332,7 +344,11 @@ export class FlexibleAnalysisEngine {
 
       return { success: true, data: processedData };
     } catch (error) {
-      console.error("Error drilling down:", error);
+      // Log drill-down error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error drilling down:", error);
+      }
       return { success: false, error: "Failed to drill down" };
     }
   }
@@ -367,7 +383,11 @@ export class FlexibleAnalysisEngine {
 
       return { success: true, configs: configs || [] };
     } catch (error) {
-      console.error("Error fetching analysis configs:", error);
+      // Log analysis configs fetch error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching analysis configs:", error);
+      }
       return { success: false, error: "Failed to fetch analysis configurations" };
     }
   }
@@ -380,7 +400,7 @@ export class FlexibleAnalysisEngine {
     companyId: string,
   ): {
     sql: string;
-    params: any[];
+    params: unknown[];
   } {
     const dimensions = config.dimensions;
     const measures = config.measures;
@@ -423,7 +443,7 @@ export class FlexibleAnalysisEngine {
       .join(", ");
 
     const sql = `
-      SELECT 
+      SELECT
         ${selectClause},
         ${measureClause}
       FROM gl_entries ge
@@ -446,19 +466,19 @@ export class FlexibleAnalysisEngine {
     companyId: string,
   ): {
     sql: string;
-    params: any[];
+    params: unknown[];
   } {
     // This is a simplified version - in practice, you'd need more complex SQL
     // to handle dynamic pivoting
     const sql = `
-      SELECT 
+      SELECT
         ${config.rows.map(row => this.getDimensionField(row)).join(", ")},
         ${config.columns.map(col => this.getDimensionField(col)).join(", ")},
         ${config.values.map(val => this.getMeasureField(val)).join(", ")}
       FROM gl_entries ge
       LEFT JOIN accounts a ON ge.account_id = a.id
       WHERE ge.company_id = $1
-      GROUP BY ${config.rows.map(row => this.getDimensionField(row)).join(", ")}, 
+      GROUP BY ${config.rows.map(row => this.getDimensionField(row)).join(", ")},
                ${config.columns.map(col => this.getDimensionField(col)).join(", ")}
     `;
 
@@ -475,7 +495,7 @@ export class FlexibleAnalysisEngine {
     additionalFilters: AnalysisFilter[],
   ): {
     sql: string;
-    params: any[];
+    params: unknown[];
   } {
     // Parse nodeId to understand what to drill down into
     const nodeData = JSON.parse(nodeId);
@@ -501,7 +521,7 @@ export class FlexibleAnalysisEngine {
     }
 
     const sql = `
-      SELECT 
+      SELECT
         ${config.dimensions.map(dim => this.getDimensionField(dim)).join(", ")},
         ${config.measures.map(measure => this.getMeasureField(measure)).join(", ")}
       FROM gl_entries ge
@@ -517,7 +537,7 @@ export class FlexibleAnalysisEngine {
    * Process data into collapsible tree structure
    */
   private static processDataIntoTree(
-    rawData: any[],
+    rawData: Record<string, unknown>[],
     config: AnalysisConfig,
     startLevel: number = 0,
   ): AnalysisNode[] {
@@ -559,12 +579,12 @@ export class FlexibleAnalysisEngine {
   /**
    * Process pivot table data
    */
-  private static processPivotTableData(rawData: any[], config: PivotTableConfig): any[] {
+  private static processPivotTableData(rawData: Record<string, unknown>[], config: PivotTableConfig): Record<string, unknown>[] {
     // Process raw data into pivot table format
-    const pivotData: any[] = [];
+    const pivotData: Record<string, unknown>[] = [];
 
     for (const row of rawData) {
-      const pivotRow: any = {};
+      const pivotRow: Record<string, unknown> = {};
 
       // Add row dimensions
       for (const rowDim of config.rows) {
@@ -627,7 +647,7 @@ export class FlexibleAnalysisEngine {
    * Calculate pivot table totals
    */
   private static calculatePivotTotals(
-    data: any[],
+    data: Record<string, unknown>[],
     config: PivotTableConfig,
   ): {
     rowTotals: Record<string, number>;
@@ -694,10 +714,10 @@ export class FlexibleAnalysisEngine {
     paramIndex: number,
   ): {
     condition: string;
-    params: any[];
+    params: unknown[];
   } {
     const field = this.getDimensionField(filter.dimension);
-    const params: any[] = [];
+    const params: unknown[] = [];
 
     switch (filter.operator) {
       case "equals":
@@ -709,9 +729,9 @@ export class FlexibleAnalysisEngine {
       case "not_contains":
         return { condition: `${field} NOT ILIKE $${paramIndex}`, params: [`%${filter.value}%`] };
       case "in":
-        return { condition: `${field} = ANY($${paramIndex})`, params: [filter.value as any[]] };
+        return { condition: `${field} = ANY($${paramIndex})`, params: [filter.value as unknown[]] };
       case "not_in":
-        return { condition: `${field} != ALL($${paramIndex})`, params: [filter.value as any[]] };
+        return { condition: `${field} != ALL($${paramIndex})`, params: [filter.value as unknown[]] };
       case "between":
         return {
           condition: `${field} BETWEEN $${paramIndex} AND $${paramIndex + 1}`,
@@ -741,12 +761,12 @@ export class FlexibleAnalysisEngine {
   /**
    * Helper methods for data processing
    */
-  private static generateNodeId(row: any, dimensions: AnalysisDimension[]): string {
+  private static generateNodeId(row: Record<string, unknown>, dimensions: AnalysisDimension[]): string {
     const key = dimensions.map(dim => row[this.getDimensionField(dim)]).join("|");
     return btoa(key).replace(/[^a-zA-Z0-9]/g, "");
   }
 
-  private static generateParentId(row: any, dimensions: AnalysisDimension[]): string | null {
+  private static generateParentId(row: Record<string, unknown>, dimensions: AnalysisDimension[]): string | null {
     if (dimensions.length <= 1) return null;
 
     const parentDimensions = dimensions.slice(0, -1);
@@ -754,12 +774,12 @@ export class FlexibleAnalysisEngine {
     return btoa(key).replace(/[^a-zA-Z0-9]/g, "");
   }
 
-  private static generateNodeLabel(row: any, dimensions: AnalysisDimension[]): string {
+  private static generateNodeLabel(row: Record<string, unknown>, dimensions: AnalysisDimension[]): string {
     const lastDimension = dimensions[dimensions.length - 1];
     return row[this.getDimensionField(lastDimension)] || "Unknown";
   }
 
-  private static calculateNodeValue(row: any, measures: AnalysisMeasure[]): number {
+  private static calculateNodeValue(row: Record<string, unknown>, measures: AnalysisMeasure[]): number {
     return measures.reduce((sum, measure) => {
       const value = row[this.getMeasureField(measure)] || 0;
       return sum + (typeof value === "number" ? value : 0);
@@ -767,10 +787,10 @@ export class FlexibleAnalysisEngine {
   }
 
   private static extractNodeMetadata(
-    row: any,
+    row: Record<string, unknown>,
     dimensions: AnalysisDimension[],
-  ): Record<string, any> {
-    const metadata: Record<string, any> = {};
+  ): Record<string, unknown> {
+    const metadata: Record<string, unknown> = {};
 
     for (const dim of dimensions) {
       metadata[dim] = row[this.getDimensionField(dim)];

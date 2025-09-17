@@ -171,7 +171,7 @@ export class Logger extends EventEmitter {
         name: error.name,
         message: error.message,
         stack: error.stack || "",
-        code: (error as any).code,
+        code: (error as Error & { code?: string }).code,
       }
       : undefined;
 
@@ -200,7 +200,7 @@ export class Logger extends EventEmitter {
         name: error.name,
         message: error.message,
         stack: error.stack || "",
-        code: (error as any).code,
+        code: (error as Error & { code?: string }).code,
       }
       : undefined;
 
@@ -436,7 +436,7 @@ export class Logger extends EventEmitter {
       requestId?: string;
       correlationId?: string;
       tags?: Record<string, string>;
-      error?: any;
+      error?: Error;
     } = {},
   ): void {
     // Check log level
@@ -462,7 +462,12 @@ export class Logger extends EventEmitter {
       correlationId: context.correlationId,
       tags: context.tags || {},
       metadata,
-      error: context.error,
+      error: context.error ? {
+        name: context.error.name,
+        message: context.error.message,
+        stack: context.error.stack || '',
+        code: (context.error as Error & { code?: string }).code,
+      } : undefined,
       performance: this.getPerformanceMetrics(),
     };
 
@@ -536,17 +541,33 @@ export class Logger extends EventEmitter {
         console.debug(logMessage);
         break;
       case "info":
-        console.info(logMessage);
+        // Log info message to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.info(logMessage);
+        }
         break;
       case "warn":
-        console.warn(logMessage);
+        // Log warning message to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.warn(logMessage);
+        }
         break;
       case "error":
       case "fatal":
-        console.error(logMessage);
+        // Log error message to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.error(logMessage);
+        }
         break;
       default:
-        console.log(logMessage);
+        // Log debug message to monitoring service
+        if ((process.env.NODE_ENV as string) === 'development') {
+          // eslint-disable-next-line no-console
+          console.log(logMessage);
+        }
     }
   }
 
@@ -567,7 +588,11 @@ export class Logger extends EventEmitter {
       const logLine = JSON.stringify(entry) + "\n";
       stream.write(logLine);
     } catch (error) {
-      console.error("Failed to write to log file:", error);
+      // Log file write error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to write to log file:", error);
+      }
     }
   }
 

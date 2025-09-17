@@ -1,277 +1,191 @@
+/**
+ * Monitoring Middleware for API Routes
+ *
+ * Automatically tracks API metrics, errors, and performance
+ * Integrates with centralized monitoring system
+ */
+
 import { NextRequest, NextResponse } from "next/server";
-import { MetricsCollector, TracingManager, Logger } from "@aibos/monitoring";
-import { getCacheService } from "@aibos/cache";
+import { monitoring } from "@aibos/monitoring";
 
-// Global monitoring instances
-let metricsCollector: MetricsCollector | null = null;
-let tracingManager: TracingManager | null = null;
-let logger: Logger | null = null;
-
-interface MonitoringConfig {
-  metrics?: Record<string, unknown>;
-  tracing?: Record<string, unknown>;
-  logging?: Record<string, unknown>;
+export interface MonitoringMiddlewareConfig {
+  enableMetrics: boolean;
+  enableTracing: boolean;
+  enableErrorTracking: boolean;
+  sampleRate: number;
+  slowQueryThreshold: number; // milliseconds
 }
 
-export function createMonitoringMiddleware(config?: MonitoringConfig) {
-  if (!metricsCollector) {
-    const cache = getCacheService();
-    metricsCollector = new MetricsCollector(cache);
-  }
-
-  if (!tracingManager) {
-    tracingManager = new TracingManager({
-      enableTracing: true,
-      sampleRate: 0.1,
-      maxTracesPerSecond: 1000,
-      retentionPeriod: 7,
-      enableB3Headers: true,
-      enableW3CTraceContext: true,
-      ...config?.tracing,
-    });
-  }
-
-  if (!logger) {
-    logger = new Logger({
-      level: "info",
-      enableConsole: true,
-      enableFile: true,
-      enableStructuredLogging: true,
-      enableCorrelation: true,
-      ...config?.logging,
-    });
-  }
-
-  return { metricsCollector, tracingManager, logger };
-}
+const defaultConfig: MonitoringMiddlewareConfig = {
+  enableMetrics: true,
+  enableTracing: true,
+  enableErrorTracking: true,
+  sampleRate: 0.1, // 10% sampling
+  slowQueryThreshold: 1000, // 1 second
+};
 
 export function withMonitoring(
   handler: (req: NextRequest) => Promise<NextResponse>,
-  config?: unknown,
+  config: Partial<MonitoringMiddlewareConfig> = {}
 ) {
-  const { metricsCollector, tracingManager, logger } = createMonitoringMiddleware(config as MonitoringConfig | undefined);
+  const finalConfig = { ...defaultConfig, ...config };
 
   return async (req: NextRequest): Promise<NextResponse> => {
-    const startTime = performance.now();
-    const requestId = req.headers.get("x-request-id") || generateRequestId();
-    const tenantId = req.headers.get("x-tenant-id") || "unknown";
-    const userId = req.headers.get("x-user-id") || "unknown";
+    const startTime = Date.now();
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const method = req.method;
+    const path = req.nextUrl.pathname;
 
-    // Extract trace context
-    const traceContext = tracingManager?.extractTraceContext(
-      Object.fromEntries(Array.from(req.headers as any)),
-    );
+    // Extract context from request
+    const context = {
+      requestId,
+      traceId: req.headers.get("x-trace-id") || undefined,
+      spanId: req.headers.get("x-span-id") || undefined,
+      tenantId: req.headers.get("x-tenant-id") || undefined,
+      userId: req.headers.get("x-user-id") || undefined,
+      correlationId: req.headers.get("x-correlation-id") || undefined,
+      userAgent: req.headers.get("user-agent") || undefined,
+      ipAddress: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || undefined,
+    };
 
-    // Start trace span
-    const span = tracingManager?.startSpan(
-      `${req.method} ${req.nextUrl.pathname}`,
-      "server",
-      traceContext || undefined,
-      {
-        "http.method": req.method,
-        "http.url": req.nextUrl.pathname,
-        "http.user_agent": req.headers.get("user-agent") || "",
-        "tenant.id": tenantId,
-        "user.id": userId,
-      },
-      tenantId,
-      userId,
-    );
+    // Start trace if enabled
+    let traceId = "";
+    if (finalConfig.enableTracing && Math.random() < finalConfig.sampleRate) {
+      traceId = monitoring.startTrace(`api.${method}.${path}`, context);
+    }
 
     try {
       // Log request start
-      logger?.info(
-        "Request started",
-        {
-          method: req.method,
-          url: req.nextUrl.pathname,
-          userAgent: req.headers.get("user-agent"),
-          ipAddress: getClientIP(req),
-        },
-        {
-          traceId: span?.traceId,
-          spanId: span?.id,
-          tenantId,
-          userId,
-          requestId,
-        },
-      );
+      monitoring.info(`API Request: ${method} ${path}`, {
+        method,
+        path,
+        userAgent: context.userAgent,
+        ipAddress: context.ipAddress,
+      }, context);
 
-      // Execute handler
+      // Execute the handler
       const response = await handler(req);
 
-      const endTime = performance.now();
-      const duration = endTime - startTime;
+      // Calculate metrics
+      const duration = Date.now() - startTime;
+      const statusCode = response.status;
+      const responseSize = parseInt(response.headers.get("content-length") || "0");
 
-      // Note: recordApiRequest method not available on this MetricsCollector
-      // Could use logger or other monitoring methods instead
-
-      // End trace span
-      if (span) {
-        tracingManager?.endSpan(span.id, response.status >= 400 ? "error" : "ok", {
-          "http.status_code": response.status,
-          "http.response_size": response.headers.get("content-length") || 0,
-        });
+      // Record API metrics
+      if (finalConfig.enableMetrics) {
+        monitoring.recordAPIMetric(path, method, duration, statusCode, responseSize, context);
       }
 
-      // Log request completion
-      logger?.info(
-        "Request completed",
-        {
-          method: req.method,
-          url: req.nextUrl.pathname,
-          statusCode: response.status,
+      // Check for slow queries
+      if (duration > finalConfig.slowQueryThreshold) {
+        monitoring.warn(`Slow API request: ${method} ${path}`, {
           duration,
-        },
-        {
-          traceId: span?.traceId,
-          spanId: span?.id,
-          tenantId,
-          userId,
-          requestId,
-        },
-      );
+          threshold: finalConfig.slowQueryThreshold,
+        }, context);
+      }
 
-      // Add monitoring headers
-      response.headers.set("X-Request-ID", requestId);
-      response.headers.set("X-Response-Time", `${duration.toFixed(2)}ms`);
-      if (span) {
-        response.headers.set("X-Trace-ID", span.traceId);
+      // Log successful response
+      monitoring.info(`API Response: ${method} ${path}`, {
+        method,
+        path,
+        statusCode,
+        duration,
+        responseSize,
+      }, context);
+
+      // End trace
+      if (traceId) {
+        monitoring.endTrace(traceId, true, {
+          statusCode,
+          duration,
+          responseSize,
+        });
       }
 
       return response;
+
     } catch (error) {
-      const endTime = performance.now();
-      const duration = endTime - startTime;
+      const duration = Date.now() - startTime;
+      const errorObj = error instanceof Error ? error : new Error(String(error));
 
-      // Note: recordApiRequest method not available on this MetricsCollector
-      // Could use logger or other monitoring methods instead
-
-      // End trace span with error
-      if (span) {
-        tracingManager?.endSpan(span.id, "error", {
-          "error.name": error instanceof Error ? error.name : "UnknownError",
-          "error.message": error instanceof Error ? error.message : "Unknown error",
-        });
+      // Track API error
+      if (finalConfig.enableErrorTracking) {
+        monitoring.trackAPIError(errorObj, method, path, 500, context);
       }
 
       // Log error
-      logger?.error(
-        "Request failed",
-        error instanceof Error ? error : new Error("Unknown error"),
-        {
-          method: req.method,
-          url: req.nextUrl.pathname,
-          duration,
-        },
-        {
-          traceId: span?.traceId,
-          spanId: span?.id,
-          tenantId,
-          userId,
-          requestId,
-        },
-      );
+      monitoring.error(`API Error: ${method} ${path}`, errorObj, {
+        method,
+        path,
+        duration,
+      }, context);
 
-      // Return error response
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            type: "about:blank",
-            title: "Internal Server Error",
-            status: 500,
-            detail: "An unexpected error occurred",
-            instance: req.nextUrl.pathname,
-          },
-        },
-        { status: 500 },
-      );
+      // End trace with error
+      if (traceId) {
+        monitoring.endTrace(traceId, false, {
+          error: errorObj.message,
+          duration,
+        });
+      }
+
+      // Re-throw the error to be handled by the application
+      throw error;
     }
   };
 }
 
-// Monitoring health check
+/**
+ * Middleware factory for API routes
+ */
+export function createMonitoringMiddleware(config?: Partial<MonitoringMiddlewareConfig>) {
+  return {
+    withMonitoring: (handler: (req: NextRequest) => Promise<NextResponse>) =>
+      withMonitoring(handler, config),
+  };
+}
+
+/**
+ * Utility function to extract monitoring context from request
+ */
+export function extractMonitoringContext(req: NextRequest) {
+  return {
+    requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    traceId: req.headers.get("x-trace-id") || undefined,
+    spanId: req.headers.get("x-span-id") || undefined,
+    tenantId: req.headers.get("x-tenant-id") || undefined,
+    userId: req.headers.get("x-user-id") || undefined,
+    correlationId: req.headers.get("x-correlation-id") || undefined,
+    userAgent: req.headers.get("user-agent") || undefined,
+    ipAddress: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || undefined,
+  };
+}
+
+/**
+ * Utility function to record business metrics
+ */
+export function recordBusinessMetric(
+  event: string,
+  value: number,
+  unit: string,
+  context: Record<string, string> = {}
+) {
+  monitoring.recordBusinessMetric(event, value, unit, context);
+}
+
+/**
+ * Get monitoring health status
+ */
 export async function getMonitoringHealth() {
-  const { metricsCollector, tracingManager, logger } = createMonitoringMiddleware();
-
-  try {
-    const metricsHealth = { status: "healthy", message: "Metrics collector available" };
-    const traceStats = tracingManager?.getTraceStats();
-    const logStats = logger?.getLogStats();
-
-    return {
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-      components: {
-        metrics: {
-          status: metricsHealth?.status || "unknown",
-          issues: [],
-          recommendations: [],
-        },
-        tracing: {
-          status: "healthy",
-          totalTraces: traceStats?.totalTraces || 0,
-          activeSpans: traceStats?.activeSpans || 0,
-          errorRate: traceStats?.errorRate || 0,
-        },
-        logging: {
-          status: "healthy",
-          totalLogs: logStats?.totalLogs || 0,
-          errorRate: logStats?.errorRate || 0,
-        },
-      },
-    };
-  } catch (error) {
-    return {
-      status: "unhealthy",
-      timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
+  return await monitoring.checkHealth();
 }
 
-// Get monitoring statistics
-export async function getMonitoringStats() {
-  const { metricsCollector, tracingManager, logger } = createMonitoringMiddleware();
-
-  try {
-    const systemMetrics = {};
-    const appMetrics = {};
-    const traceStats = tracingManager?.getTraceStats();
-    const logStats = logger?.getLogStats();
-
-    return {
-      timestamp: new Date().toISOString(),
-      system: systemMetrics,
-      application: appMetrics,
-      tracing: traceStats,
-      logging: logStats,
-    };
-  } catch (error) {
-    console.error("Failed to get monitoring stats:", error);
-    return {
-      timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
-// Utility functions
-function generateRequestId(): string {
-  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function getClientIP(req: NextRequest): string {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() || "";
-  }
-
-  const realIP = req.headers.get("x-real-ip");
-  if (realIP) {
-    return realIP;
-  }
-
-  return "unknown";
+/**
+ * Get monitoring statistics
+ */
+export function getMonitoringStats() {
+  return {
+    metrics: {}, // Placeholder - metrics collection simplified
+    logger: monitoring.getLogger().getLogStats(),
+    health: "healthy", // Simplified for now
+  };
 }

@@ -65,7 +65,7 @@ export const fxRateIngestJob = inngest.createFunction(
       );
 
       if (!result.success) {
-        throw new Error(`FX ingest failed: ${(result as any).error}`);
+        throw new Error(`FX ingest failed: ${(result as { error: string }).error}`);
       }
 
       return {
@@ -79,42 +79,42 @@ export const fxRateIngestJob = inngest.createFunction(
     // Step 3: Store FX rates in database
     const storageResult = await step.run("store-fx-rates", async () => {
       // Convert serialized dates back to Date objects
-  const ratesWithDates: FxRateData[] = (ingestResult.rates as unknown[]).map((rate: unknown) => {
-    const r = rate as Record<string, any>;
-    return {
-      fromCurrency: r.fromCurrency,
-      toCurrency: r.toCurrency,
-      rate: r.rate,
-      source: r.source,
-      timestamp: typeof r.timestamp === "string" ? new Date(r.timestamp) : r.timestamp,
-      validFrom: typeof r.validFrom === "string" ? new Date(r.validFrom) : r.validFrom,
-      validTo: r.validTo ? (typeof r.validTo === "string" ? new Date(r.validTo) : r.validTo) : undefined,
-    };
-  });
+      const ratesWithDates: FxRateData[] = (ingestResult.rates as unknown[]).map((rate: unknown) => {
+        const r = rate as Record<string, any>;
+        return {
+          fromCurrency: r.fromCurrency,
+          toCurrency: r.toCurrency,
+          rate: r.rate,
+          source: r.source,
+          timestamp: typeof r.timestamp === "string" ? new Date(r.timestamp) : r.timestamp,
+          validFrom: typeof r.validFrom === "string" ? new Date(r.validFrom) : r.validFrom,
+          validTo: r.validTo ? (typeof r.validTo === "string" ? new Date(r.validTo) : r.validTo) : undefined,
+        };
+      });
 
       const storedCount = await insertFxRates(ratesWithDates);
 
       return {
         storedCount,
-  totalRates: ingestResult.rates.length,
+        totalRates: ingestResult.rates.length,
       };
     });
 
     // Step 4: Validate stored rates
     const validationResult = await step.run("validate-stored-rates", async () => {
       // Convert serialized dates back to Date objects for validation
-  const ratesWithDates: FxRateData[] = (ingestResult.rates as unknown[]).map((rate: unknown) => {
-    const r = rate as Record<string, any>;
-    return {
-      fromCurrency: r.fromCurrency,
-      toCurrency: r.toCurrency,
-      rate: r.rate,
-      source: r.source,
-      timestamp: typeof r.timestamp === "string" ? new Date(r.timestamp) : r.timestamp,
-      validFrom: typeof r.validFrom === "string" ? new Date(r.validFrom) : r.validFrom,
-      validTo: r.validTo ? (typeof r.validTo === "string" ? new Date(r.validTo) : r.validTo) : undefined,
-    };
-  });
+      const ratesWithDates: FxRateData[] = (ingestResult.rates as unknown[]).map((rate: unknown) => {
+        const r = rate as Record<string, any>;
+        return {
+          fromCurrency: r.fromCurrency,
+          toCurrency: r.toCurrency,
+          rate: r.rate,
+          source: r.source,
+          timestamp: typeof r.timestamp === "string" ? new Date(r.timestamp) : r.timestamp,
+          validFrom: typeof r.validFrom === "string" ? new Date(r.validFrom) : r.validFrom,
+          validTo: r.validTo ? (typeof r.validTo === "string" ? new Date(r.validTo) : r.validTo) : undefined,
+        };
+      });
 
       const validation = await validateStoredRates(ratesWithDates);
 
@@ -183,7 +183,7 @@ export const fxRateIngestManual = inngest.createFunction(
       );
 
       if (!result.success) {
-        throw new Error(`Manual FX ingest failed: ${(result as any).error}`);
+        throw new Error(`Manual FX ingest failed: ${(result as { error: string }).error}`);
       }
 
       return {
@@ -301,20 +301,36 @@ async function validateStoredRates(rates: FxRateData[]): Promise<{
   };
 }
 
-async function sendFallbackNotification(ingestResult: any): Promise<void> {
+async function sendFallbackNotification(ingestResult: {
+  source: string;
+  rateCount: number;
+  staleness: unknown;
+}): Promise<void> {
   // TODO: Implement notification service
-  console.warn("FX rates ingested from fallback source:", {
-    source: ingestResult.source,
-    rateCount: ingestResult.rateCount,
-    staleness: ingestResult.staleness,
-  });
+  // Log FX rates ingested from fallback source to monitoring service
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.warn("FX rates ingested from fallback source:", {
+      source: ingestResult.source,
+      rateCount: ingestResult.rateCount,
+      staleness: ingestResult.staleness,
+    });
+  }
 }
 
-async function sendStalnessAlert(stalenessCheck: any): Promise<void> {
+async function sendStalnessAlert(stalenessCheck: {
+  ageMinutes: number;
+  threshold: number;
+  needsAlert: boolean;
+}): Promise<void> {
   // TODO: Implement alert service
-  console.error("FX rates are stale:", {
-    ageMinutes: stalenessCheck.ageMinutes,
-    threshold: stalenessCheck.threshold,
-    needsUpdate: true,
-  });
+  // Log FX rates staleness alert to monitoring service
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.error("FX rates are stale:", {
+      ageMinutes: stalenessCheck.ageMinutes,
+      threshold: stalenessCheck.threshold,
+      needsAlert: true,
+    });
+  }
 }

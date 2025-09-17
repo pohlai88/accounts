@@ -317,7 +317,16 @@ export async function POST(request: NextRequest) {
 /**
  * Calculate depreciation details for new asset
  */
-function calculateDepreciationDetails(assetData: any) {
+function calculateDepreciationDetails(assetData: {
+  purchase_amount: number;
+  expected_value_after_useful_life: number;
+  useful_life_in_months: number;
+  depreciation_method: string;
+  frequency_of_depreciation: number;
+  opening_accumulated_depreciation?: number;
+  available_for_use_date?: string;
+  purchase_date: string;
+}) {
   const purchaseAmount = assetData.purchase_amount;
   const expectedValue = assetData.expected_value_after_useful_life;
   const usefulLifeMonths = assetData.useful_life_in_months;

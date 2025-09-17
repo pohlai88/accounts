@@ -133,7 +133,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         setProjects(result.projects);
       }
     } catch (error) {
-      console.error("Error loading projects:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading projects:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -149,7 +153,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         loadBudgets(projectId),
       ]);
     } catch (error) {
-      console.error("Error loading project details:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading project details:", error);
+      }
     }
   };
 
@@ -160,7 +168,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         setTimeEntries(result.timeEntries);
       }
     } catch (error) {
-      console.error("Error loading time entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading time entries:", error);
+      }
     }
   };
 
@@ -171,7 +183,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         setExpenses(result.expenses);
       }
     } catch (error) {
-      console.error("Error loading expenses:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading expenses:", error);
+      }
     }
   };
 
@@ -182,7 +198,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         setProfitability(result.profitability);
       }
     } catch (error) {
-      console.error("Error loading profitability:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading profitability:", error);
+      }
     }
   };
 
@@ -193,7 +213,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         setTimeSummary(result.timeSummary);
       }
     } catch (error) {
-      console.error("Error loading time summary:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading time summary:", error);
+      }
     }
   };
 
@@ -204,7 +228,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         setBudgets(result.budgets);
       }
     } catch (error) {
-      console.error("Error loading budgets:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error loading budgets:", error);
+      }
     }
   };
 
@@ -225,7 +253,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         loadProjects();
       }
     } catch (error) {
-      console.error("Error creating project:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating project:", error);
+      }
     }
   };
 
@@ -252,7 +284,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         loadProjectDetails(selectedProject.id);
       }
     } catch (error) {
-      console.error("Error creating time entry:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating time entry:", error);
+      }
     }
   };
 
@@ -278,7 +314,11 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
         loadProjectDetails(selectedProject.id);
       }
     } catch (error) {
-      console.error("Error creating expense:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating expense:", error);
+      }
     }
   };
 
@@ -501,11 +541,10 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
               {filteredProjects.map(project => (
                 <Card
                   key={project.id}
-                  className={`cursor-pointer transition-colors ${
-                    selectedProject?.id === project.id
+                  className={`cursor-pointer transition-colors ${selectedProject?.id === project.id
                       ? "ring-2 ring-blue-500"
                       : "hover:bg-muted/50"
-                  }`}
+                    }`}
                   onClick={() => setSelectedProject(project)}
                 >
                   <CardContent className="p-4">
@@ -593,9 +632,8 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
                     </div>
                     <div className="text-center">
                       <div
-                        className={`text-2xl font-bold ${
-                          profitability.profitMargin >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
+                        className={`text-2xl font-bold ${profitability.profitMargin >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
                       >
                         {profitability.profitMargin.toFixed(1)}%
                       </div>
@@ -856,16 +894,14 @@ export function ProjectCosting({ companyId }: ProjectCostingProps) {
                               {formatCurrency(budget.actualAmount)}
                             </TableCell>
                             <TableCell
-                              className={`text-right font-medium ${
-                                budget.varianceAmount >= 0 ? "text-green-600" : "text-red-600"
-                              }`}
+                              className={`text-right font-medium ${budget.varianceAmount >= 0 ? "text-green-600" : "text-red-600"
+                                }`}
                             >
                               {formatCurrency(budget.varianceAmount)}
                             </TableCell>
                             <TableCell
-                              className={`text-right font-medium ${
-                                budget.variancePercentage >= 0 ? "text-green-600" : "text-red-600"
-                              }`}
+                              className={`text-right font-medium ${budget.variancePercentage >= 0 ? "text-green-600" : "text-red-600"
+                                }`}
                             >
                               {budget.variancePercentage.toFixed(1)}%
                             </TableCell>

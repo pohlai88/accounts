@@ -74,7 +74,11 @@ export function TenantSwitcher({
       await onTenantSwitch(tenantId);
       setIsOpen(false);
     } catch (error) {
-      console.error("Failed to switch tenant:", error);
+      // Log tenant switch error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to switch tenant:", error);
+      }
       // You might want to show a toast notification here
     } finally {
       setSwitching(null);

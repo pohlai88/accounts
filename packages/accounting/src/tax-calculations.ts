@@ -57,7 +57,11 @@ export async function calculateLineTax(
     };
   } catch (error) {
     // If tax code not found, default to zero tax but log the error
-    console.warn(`Tax code lookup failed for '${input.taxCode}':`, error);
+    // Log tax code lookup failure to monitoring service
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn(`Tax code lookup failed for '${input.taxCode}':`, error);
+    }
 
     return {
       taxRate: 0,
@@ -90,7 +94,11 @@ export async function calculateInvoiceTaxes(
         taxCodeMap.set(info.code, info);
       }
     } catch (error) {
-      console.warn("Failed to fetch tax codes:", error);
+      // Log tax codes fetch failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to fetch tax codes:", error);
+      }
     }
   }
 

@@ -11,10 +11,11 @@ export async function GET(req: NextRequest) {
     const stats = await getMonitoringStats();
 
     // Determine overall health status
+    const healthData = health as any; // Type assertion for health data
     const overallStatus =
-      health.status === "unhealthy"
+      healthData.status === "unhealthy"
         ? "unhealthy"
-        : health.components?.metrics?.status === "degraded"
+        : healthData.components?.metrics?.status === "degraded"
           ? "degraded"
           : "healthy";
 
@@ -25,18 +26,18 @@ export async function GET(req: NextRequest) {
         health,
         statistics: stats,
       },
-      issues: health.components
+      issues: healthData.components
         ? [
-            ...(health.components.metrics?.issues || []),
-            ...(health.components.tracing?.status === "unhealthy"
-              ? ["Tracing system unhealthy"]
-              : []),
-            ...(health.components.logging?.status === "unhealthy"
-              ? ["Logging system unhealthy"]
-              : []),
-          ]
+          ...(healthData.components.metrics?.issues || []),
+          ...(healthData.components.tracing?.status === "unhealthy"
+            ? ["Tracing system unhealthy"]
+            : []),
+          ...(healthData.components.logging?.status === "unhealthy"
+            ? ["Logging system unhealthy"]
+            : []),
+        ]
         : [],
-      recommendations: health.components?.metrics?.recommendations || [],
+      recommendations: healthData.components?.metrics?.recommendations || [],
     };
 
     return NextResponse.json(response, {
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Monitoring health check error:", error);
+    // Error will be handled by standardized error response below
 
     return NextResponse.json(
       {

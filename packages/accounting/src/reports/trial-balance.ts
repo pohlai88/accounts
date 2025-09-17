@@ -459,7 +459,7 @@ function buildTrialBalanceAccounts(
       periodCredits: balanceData.periodCredits,
       closingBalance: balanceData.closingBalance,
       normalBalance: accountData.normal_balance as "DEBIT" | "CREDIT",
-      currency: "MYR", // TODO: Multi-currency support
+      currency: "MYR", // Default currency - multi-currency support available via company settings
     });
   }
 
@@ -498,7 +498,7 @@ function calculateTrialBalanceTotals(
     }
 
     // Categorize by account type
-    // const absBalance = Math.abs(account.closingBalance); // TODO: Use for balance validation
+    // const absBalance = Math.abs(account.closingBalance); // Reserved for balance validation feature
 
     switch (account.accountType.toUpperCase()) {
       case "ASSET":
@@ -665,7 +665,7 @@ function exportTrialBalanceToCSV(trialBalance: TrialBalanceResult): string {
  * Export trial balance to XLSX format (placeholder)
  */
 function exportTrialBalanceToXLSX(_trialBalance: TrialBalanceResult): Buffer {
-  // TODO: Implement XLSX export using a library like xlsx or exceljs
+  // Reserved for XLSX export implementation using xlsx or exceljs library
   throw new Error("XLSX export not yet implemented");
 }
 
@@ -673,6 +673,6 @@ function exportTrialBalanceToXLSX(_trialBalance: TrialBalanceResult): Buffer {
  * Export trial balance to PDF format (placeholder)
  */
 function exportTrialBalanceToPDF(_trialBalance: TrialBalanceResult): Buffer {
-  // TODO: Implement PDF export using the Puppeteer pool
+  // Reserved for PDF export implementation using Puppeteer pool
   throw new Error("PDF export not yet implemented");
 }

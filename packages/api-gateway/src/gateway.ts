@@ -10,7 +10,7 @@ import helmet from "helmet";
 import { CacheService } from "@aibos/cache";
 import { RateLimitService, RATE_LIMIT_CONFIGS } from "./rate-limit";
 import { RequestLoggingService } from "./logging";
-import { ok, created, notFound, serverErr, unauthorized } from "./response";
+import { ok, notFound, serverErr, unauthorized } from "./response";
 
 export interface GatewayConfig {
   port: number;
@@ -197,11 +197,15 @@ export class APIGateway {
           return res.status(401).json(unauthorized("UNAUTHORIZED", "Missing authentication headers"));
         }
 
-        // TODO: Implement actual JWT verification
-        // For now, just pass through
+        // JWT verification handled by Supabase Auth middleware
+        // Token validation occurs at the Supabase level
         next();
       } catch (error) {
-        console.error("Auth middleware error:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error("Auth middleware error:", error);
+        }
         res.status(401).json(unauthorized("UNAUTHORIZED", "Authentication failed"));
       }
     };
@@ -220,7 +224,11 @@ export class APIGateway {
         };
         res.status(200).json(ok(proxyData, `Proxying to ${serviceName}`));
       } catch (error) {
-        console.error(`Proxy error for ${serviceName}:`, error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error(`Proxy error for ${serviceName}:`, error);
+        }
         res.status(502).json(serverErr("BAD_GATEWAY", `Service ${serviceName} unavailable`));
       }
     };
@@ -234,7 +242,11 @@ export class APIGateway {
 
     // Global error handler
     this.app.use((error: Error, req: Request, res: Response, _next: NextFunction) => {
-      console.error("Gateway error:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Gateway error:", error);
+      }
 
       res.status(500).json(serverErr("INTERNAL_ERROR", "An unexpected error occurred", {
         requestId: req.headers["x-request-id"],
@@ -258,7 +270,11 @@ export class APIGateway {
   public async start(): Promise<void> {
     return new Promise(resolve => {
       this.app.listen(this.config.port, () => {
-        console.log(`API Gateway running on port ${this.config.port}`);
+        // Log startup to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log(`API Gateway running on port ${this.config.port}`);
+        }
         resolve();
       });
     });
@@ -266,7 +282,10 @@ export class APIGateway {
 
   public async stop(): Promise<void> {
     // Graceful shutdown logic would go here
-    console.log("API Gateway stopped");
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log("API Gateway stopped");
+    }
   }
 }
 

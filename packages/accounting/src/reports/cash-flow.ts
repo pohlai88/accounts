@@ -174,7 +174,7 @@ export async function generateCashFlow(
         };
       }
 
-      // comparativeTrialBalance = comparativeResult; // TODO: Use for comparative analysis
+      // comparativeTrialBalance = comparativeResult; // Reserved for future comparative analysis feature
     }
 
     // 4. Get cash flow activity data from GL
@@ -1037,7 +1037,7 @@ function calculateSectionVariancePercent(activities: CashFlowActivity[]): number
     0,
   );
 
-  if (comparativeTotal === 0) {return 0;}
+  if (comparativeTotal === 0) { return 0; }
   return ((currentTotal - comparativeTotal) / Math.abs(comparativeTotal)) * 100;
 }
 

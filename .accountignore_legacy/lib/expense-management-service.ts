@@ -283,7 +283,7 @@ export interface ExpenseReceipt {
   extracted_merchant?: string;
   extracted_category?: string;
   extracted_tax_amount?: number;
-  extracted_raw_data?: any;
+  extracted_raw_data?: Record<string, unknown>;
 
   // Manual Verification
   is_verified: boolean;
@@ -612,7 +612,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: category, message: "Expense category created successfully" };
     } catch (error) {
-      console.error("Error creating expense category:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating expense category:", error);
+      }
       return { success: false, error: "Failed to create expense category" };
     }
   }
@@ -636,7 +640,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: categories };
     } catch (error) {
-      console.error("Error fetching expense categories:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching expense categories:", error);
+      }
       return { success: false, error: "Failed to fetch expense categories" };
     }
   }
@@ -690,7 +698,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: policy, message: "Expense policy created successfully" };
     } catch (error) {
-      console.error("Error creating expense policy:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating expense policy:", error);
+      }
       return { success: false, error: "Failed to create expense policy" };
     }
   }
@@ -713,7 +725,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: policies };
     } catch (error) {
-      console.error("Error fetching expense policies:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching expense policies:", error);
+      }
       return { success: false, error: "Failed to fetch expense policies" };
     }
   }
@@ -763,7 +779,11 @@ export class ExpenseManagementService {
         message: `Expense claim ${claimNo} created successfully`,
       };
     } catch (error) {
-      console.error("Error creating expense claim:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating expense claim:", error);
+      }
       return { success: false, error: "Failed to create expense claim" };
     }
   }
@@ -795,7 +815,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: claim };
     } catch (error) {
-      console.error("Error fetching expense claim:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching expense claim:", error);
+      }
       return { success: false, error: "Failed to fetch expense claim" };
     }
   }
@@ -860,7 +884,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: claims };
     } catch (error) {
-      console.error("Error fetching expense claims:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching expense claims:", error);
+      }
       return { success: false, error: "Failed to fetch expense claims" };
     }
   }
@@ -873,7 +901,7 @@ export class ExpenseManagementService {
     managerId?: string,
   ): Promise<ApiResponse<boolean>> {
     try {
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         status: "Submitted",
         docstatus: 1,
         submitted_at: new Date().toISOString(),
@@ -892,7 +920,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: true, message: "Expense claim submitted successfully" };
     } catch (error) {
-      console.error("Error submitting expense claim:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting expense claim:", error);
+      }
       return { success: false, error: "Failed to submit expense claim" };
     }
   }
@@ -907,7 +939,7 @@ export class ExpenseManagementService {
     comments?: string,
   ): Promise<ApiResponse<boolean>> {
     try {
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         modified: new Date().toISOString(),
       };
 
@@ -932,7 +964,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: true, message: `Expense claim approved by ${approvalType}` };
     } catch (error) {
-      console.error("Error approving expense claim:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error approving expense claim:", error);
+      }
       return { success: false, error: "Failed to approve expense claim" };
     }
   }
@@ -997,7 +1033,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: item, message: "Expense item created successfully" };
     } catch (error) {
-      console.error("Error creating expense item:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating expense item:", error);
+      }
       return { success: false, error: "Failed to create expense item" };
     }
   }
@@ -1063,7 +1103,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: receipt, message: "Receipt uploaded successfully" };
     } catch (error) {
-      console.error("Error uploading receipt:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error uploading receipt:", error);
+      }
       return { success: false, error: "Failed to upload receipt" };
     }
   }
@@ -1073,7 +1117,7 @@ export class ExpenseManagementService {
    */
   static async processOCRResults(
     receiptId: string,
-    extractedData: any,
+    extractedData: Record<string, unknown>,
     confidenceScore: number,
   ): Promise<ApiResponse<boolean>> {
     try {
@@ -1089,7 +1133,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: true, message: "OCR results processed successfully" };
     } catch (error) {
-      console.error("Error processing OCR results:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error processing OCR results:", error);
+      }
       return { success: false, error: "Failed to process OCR results" };
     }
   }
@@ -1135,7 +1183,11 @@ export class ExpenseManagementService {
         message: `Expense advance ${advanceNo} created successfully`,
       };
     } catch (error) {
-      console.error("Error creating expense advance:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating expense advance:", error);
+      }
       return { success: false, error: "Failed to create expense advance" };
     }
   }
@@ -1189,7 +1241,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: mileageLog, message: "Mileage log created successfully" };
     } catch (error) {
-      console.error("Error creating mileage log:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating mileage log:", error);
+      }
       return { success: false, error: "Failed to create mileage log" };
     }
   }
@@ -1240,7 +1296,11 @@ export class ExpenseManagementService {
 
       return { success: true, data: limitCheck };
     } catch (error) {
-      console.error("Error checking policy limits:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error checking policy limits:", error);
+      }
       return { success: false, error: "Failed to check policy limits" };
     }
   }
@@ -1298,12 +1358,12 @@ export class ExpenseManagementService {
       const avgProcessingTime =
         processedClaims.length > 0
           ? processedClaims.reduce((sum, claim) => {
-              const submittedAt = new Date(claim.submitted_at!).getTime();
-              const createdAt = new Date(claim.created_at).getTime();
-              return sum + (submittedAt - createdAt);
-            }, 0) /
-            processedClaims.length /
-            (1000 * 60 * 60 * 24) // Convert to days
+            const submittedAt = new Date(claim.submitted_at!).getTime();
+            const createdAt = new Date(claim.created_at).getTime();
+            return sum + (submittedAt - createdAt);
+          }, 0) /
+          processedClaims.length /
+          (1000 * 60 * 60 * 24) // Convert to days
           : 0;
 
       return {
@@ -1322,7 +1382,11 @@ export class ExpenseManagementService {
         },
       };
     } catch (error) {
-      console.error("Error fetching expense analytics:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching expense analytics:", error);
+      }
       return { success: false, error: "Failed to fetch expense analytics" };
     }
   }

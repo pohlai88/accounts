@@ -26,7 +26,7 @@ export class SupabaseAdapter implements DbAdapter {
 
         if (opts.eq) {
             for (const [k, v] of Object.entries(opts.eq)) {
-                q = q.eq(k, v as any) as any;
+                q = q.eq(k, v as string | number | boolean) as typeof q;
             }
         }
 
@@ -70,7 +70,7 @@ export class SupabaseAdapter implements DbAdapter {
 
         if (opts.eq) {
             for (const [k, v] of Object.entries(opts.eq)) {
-                q = q.eq(k, v as any);
+                q = q.eq(k, v as string | number | boolean);
             }
         }
 
@@ -87,7 +87,7 @@ export class SupabaseAdapter implements DbAdapter {
 
         if (opts.eq) {
             for (const [k, v] of Object.entries(opts.eq)) {
-                q = q.eq(k, v as any) as any;
+                q = q.eq(k, v as string | number | boolean) as typeof q;
             }
         }
 

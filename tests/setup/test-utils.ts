@@ -1,240 +1,147 @@
-import { createClient } from "@supabase/supabase-js";
-
-export interface TestUser {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-}
-
-export interface TestTenant {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface TestSetup {
-  supabase: any;
-  testUser: TestUser;
-  testTenant: TestTenant | null;
-  authToken: string;
-}
-
 /**
- * Create a Supabase client for testing
+ * Test Utilities
+ *
+ * Common utilities and helpers for testing across the monorepo.
+ * Provides consistent testing patterns and mock data.
  */
-export function createTestClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Missing Supabase environment variables");
-  }
+import { vi } from "vitest";
+import { faker } from "@faker-js/faker";
 
-  return createClient(supabaseUrl, supabaseKey);
-}
+// Mock data generators
+export const mockData = {
+  // User and tenant data
+  user: () => ({
+    id: faker.string.uuid(),
+    email: faker.internet.email(),
+    name: faker.person.fullName(),
+    role: faker.helpers.arrayElement(["admin", "user", "viewer"]),
+    tenantId: faker.string.uuid(),
+    companyId: faker.string.uuid(),
+  }),
 
-/**
- * Create a test user with profile
- */
-export async function createTestUser(supabase: any): Promise<TestUser> {
-  const email = `test-${Date.now()}@example.com`;
+  // Accounting data
+  invoice: () => ({
+    id: faker.string.uuid(),
+    number: faker.string.alphanumeric(10),
+    customerId: faker.string.uuid(),
+    amount: faker.number.float({ min: 100, max: 10000, fractionDigits: 2 }),
+    currency: "MYR",
+    status: faker.helpers.arrayElement(["draft", "sent", "paid", "overdue"]),
+    issueDate: faker.date.recent().toISOString(),
+    dueDate: faker.date.future().toISOString(),
+  }),
 
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-    email,
-    password: "testpassword123",
-    email_confirm: true,
-  });
+  // Database data
+  account: () => ({
+    id: faker.string.uuid(),
+    code: faker.string.numeric(4),
+    name: faker.company.name(),
+    accountType: faker.helpers.arrayElement(["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"]),
+    currency: "MYR",
+    isActive: true,
+    level: faker.number.int({ min: 1, max: 5 }),
+  }),
 
-  if (authError) {
-    throw new Error(`Failed to create test user: ${authError.message}`);
-  }
+  // API request data
+  apiRequest: () => ({
+    method: faker.helpers.arrayElement(["GET", "POST", "PUT", "DELETE"]),
+    url: faker.internet.url(),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${faker.string.alphanumeric(32)}`,
+    },
+    body: faker.datatype.json(),
+  }),
+};
 
-  const testUser = authData.user;
+// Mock functions
+export const mockFunctions = {
+  // Database mocks
+  db: {
+    insert: vi.fn().mockResolvedValue({ id: faker.string.uuid() }),
+    select: vi.fn().mockResolvedValue([]),
+    update: vi.fn().mockResolvedValue({ id: faker.string.uuid() }),
+    delete: vi.fn().mockResolvedValue({ id: faker.string.uuid() }),
+  },
 
-  // Create user profile
-  const { error: profileError } = await supabase.from("users").insert({
-    id: testUser.id,
-    email: testUser.email,
-    first_name: "Test",
-    last_name: "User",
-  });
+  // API mocks
+  api: {
+    get: vi.fn().mockResolvedValue({ data: {}, status: 200 }),
+    post: vi.fn().mockResolvedValue({ data: {}, status: 201 }),
+    put: vi.fn().mockResolvedValue({ data: {}, status: 200 }),
+    delete: vi.fn().mockResolvedValue({ data: {}, status: 204 }),
+  },
 
-  // Handle potential duplicate key error
-  if (profileError && profileError.code !== "23505") {
-    throw new Error(`Failed to create user profile: ${profileError.message}`);
-  }
+  // External service mocks
+  external: {
+    email: vi.fn().mockResolvedValue({ success: true }),
+    webhook: vi.fn().mockResolvedValue({ success: true }),
+    payment: vi.fn().mockResolvedValue({ success: true }),
+  },
+};
 
-  return {
-    id: testUser.id,
-    email: testUser.email,
-    first_name: "Test",
-    last_name: "User",
-  };
-}
+// Test helpers
+export const testHelpers = {
+  // Wait for async operations
+  waitFor: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
 
-/**
- * Create a test tenant with fallback handling
- */
-export async function createTestTenant(supabase: any): Promise<TestTenant | null> {
-  const tenantData = {
-    name: "Test Tenant",
-    slug: "test-tenant-" + Date.now(),
-  };
+  // Create test context
+  createTestContext: (overrides = {}) => ({
+    user: mockData.user(),
+    tenant: { id: faker.string.uuid(), name: faker.company.name() },
+    company: { id: faker.string.uuid(), name: faker.company.name() },
+    ...overrides,
+  }),
 
-  const { data, error } = await supabase.from("tenants").insert(tenantData).select().single();
+  // Mock Supabase client
+  createMockSupabase: () => ({
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: null, error: null }),
+        }),
+      }),
+      insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      update: vi.fn().mockResolvedValue({ data: null, error: null }),
+      delete: vi.fn().mockResolvedValue({ data: null, error: null }),
+    }),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: mockData.user() }, error: null }),
+      signIn: vi.fn().mockResolvedValue({ data: { user: mockData.user() }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+    },
+  }),
 
-  if (error && error.code === "42703") {
-    console.log("Tenant creation failed due to trigger error, creating fallback tenant");
+  // Assertion helpers
+  expectValidUUID: (value: string) => {
+    expect(value).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  },
 
-    // Try creating a simple tenant
-    const { data: simpleTenant, error: simpleError } = await supabase
-      .from("tenants")
-      .insert({
-        name: "Simple Test Tenant",
-        slug: "simple-test-tenant-" + Date.now(),
-      })
-      .select()
-      .single();
+  expectValidDate: (value: string) => {
+    expect(new Date(value)).toBeInstanceOf(Date);
+    expect(new Date(value).getTime()).not.toBeNaN();
+  },
 
-    if (simpleError) {
-      console.log("Fallback tenant creation also failed:", simpleError);
-      console.log("Using fallback tenant object for testing");
-      return null; // Return null to indicate fallback needed
-    }
+  expectValidCurrency: (value: string) => {
+    expect(value).toMatch(/^[A-Z]{3}$/);
+  },
+};
 
-    return simpleTenant;
-  }
+// Cleanup utilities
+export const cleanup = {
+  // Clear all mocks
+  clearAllMocks: () => {
+    vi.clearAllMocks();
+  },
 
-  if (error) {
-    throw new Error(`Failed to create test tenant: ${error.message}`);
-  }
+  // Reset all mocks
+  resetAllMocks: () => {
+    vi.resetAllMocks();
+  },
 
-  return data;
-}
-
-/**
- * Create membership for user and tenant
- */
-export async function createTestMembership(
-  supabase: any,
-  testUser: TestUser,
-  testTenant: TestTenant,
-): Promise<void> {
-  if (!testTenant) {
-    console.log("Skipping membership creation - no valid tenant available");
-    return;
-  }
-
-  const { error } = await supabase.from("memberships").insert({
-    user_id: testUser.id,
-    tenant_id: testTenant.id,
-    role: "admin",
-  });
-
-  if (error && error.code !== "23505") {
-    // Ignore duplicate key errors
-    throw new Error(`Failed to create membership: ${error.message}`);
-  }
-}
-
-/**
- * Set active tenant for user
- */
-export async function setActiveTenant(
-  supabase: any,
-  testUser: TestUser,
-  testTenant: TestTenant,
-): Promise<void> {
-  if (!testTenant) {
-    console.log("Skipping active tenant setting - no valid tenant available");
-    return;
-  }
-
-  const { error } = await supabase.from("user_settings").upsert({
-    user_id: testUser.id,
-    active_tenant_id: testTenant.id,
-  });
-
-  if (error) {
-    throw new Error(`Failed to set active tenant: ${error.message}`);
-  }
-}
-
-/**
- * Get auth token for test user
- */
-export async function getAuthToken(supabase: any, testUser: TestUser): Promise<string> {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: testUser.email,
-    password: "testpassword123",
-  });
-
-  if (error) {
-    throw new Error(`Failed to authenticate user: ${error.message}`);
-  }
-
-  if (!data.session?.access_token) {
-    throw new Error("No access token received");
-  }
-
-  return data.session.access_token;
-}
-
-/**
- * Complete test setup with user, tenant, and auth
- */
-export async function setupTestEnvironment(): Promise<TestSetup> {
-  const supabase = createTestClient();
-  const testUser = await createTestUser(supabase);
-  const testTenant = await createTestTenant(supabase);
-
-  if (testTenant) {
-    await createTestMembership(supabase, testUser, testTenant);
-    await setActiveTenant(supabase, testUser, testTenant);
-  }
-
-  const authToken = await getAuthToken(supabase, testUser);
-
-  return {
-    supabase,
-    testUser,
-    testTenant,
-    authToken,
-  };
-}
-
-/**
- * Clean up test data
- */
-export async function cleanupTestData(
-  supabase: any,
-  testUser: TestUser,
-  testTenant: TestTenant | null,
-): Promise<void> {
-  if (testUser) {
-    try {
-      await supabase.auth.admin.deleteUser(testUser.id);
-    } catch (error) {
-      console.log("Error cleaning up test user:", error);
-    }
-  }
-
-  if (testTenant) {
-    try {
-      await supabase.from("tenants").delete().eq("id", testTenant.id);
-    } catch (error) {
-      console.log("Error cleaning up test tenant:", error);
-    }
-  }
-}
-
-/**
- * Skip test if no valid tenant available
- */
-export function skipIfNoTenant(testTenant: TestTenant | null, testName: string): void {
-  if (!testTenant) {
-    console.log(`Skipping ${testName} - no valid tenant available`);
-    return;
-  }
-}
+  // Restore all mocks
+  restoreAllMocks: () => {
+    vi.restoreAllMocks();
+  },
+};

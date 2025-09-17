@@ -9,6 +9,17 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from "react";
 
+// Extend Window interface for aibos logger
+declare global {
+  interface Window {
+    aibos?: {
+      logger?: {
+        error: (message: string, error?: unknown) => void;
+      };
+    };
+  }
+}
+
 // Define User type locally to avoid dependency issues
 export interface User {
   id: string;
@@ -162,7 +173,10 @@ export function AuthProvider({ children, apiBaseUrl }: AuthProviderProps) {
           }
         }
       } catch (error) {
-        console.error("Failed to initialize auth:", error);
+        // Log error to monitoring service instead of console
+        if (typeof window !== 'undefined' && window.aibos?.logger) {
+          window.aibos.logger.error("Failed to initialize auth:", error);
+        }
         localStorage.removeItem("aibos_session");
       }
 
@@ -192,10 +206,10 @@ export function AuthProvider({ children, apiBaseUrl }: AuthProviderProps) {
 
       const sessionData = await response.json();
       const session: Session = {
-        user: sessionData.user,
-        accessToken: sessionData.accessToken,
-        refreshToken: sessionData.refreshToken,
-        expiresAt: new Date(sessionData.expiresAt),
+        user: sessionData.data.user,
+        accessToken: sessionData.data.accessToken,
+        refreshToken: sessionData.data.refreshToken,
+        expiresAt: new Date(sessionData.data.expiresAt),
         isAuthenticated: true,
       };
 
@@ -253,17 +267,20 @@ export function AuthProvider({ children, apiBaseUrl }: AuthProviderProps) {
 
       const sessionData = await response.json();
       const session: Session = {
-        user: sessionData.user,
-        accessToken: sessionData.accessToken,
-        refreshToken: sessionData.refreshToken,
-        expiresAt: new Date(sessionData.expiresAt),
+        user: sessionData.data.user,
+        accessToken: sessionData.data.accessToken,
+        refreshToken: sessionData.data.refreshToken,
+        expiresAt: new Date(sessionData.data.expiresAt),
         isAuthenticated: true,
       };
 
       localStorage.setItem("aibos_session", JSON.stringify(session));
       dispatch({ type: "AUTH_SUCCESS", payload: session });
     } catch (error) {
-      console.error("Session refresh failed:", error);
+      // Log error to monitoring service instead of console
+      if (typeof window !== 'undefined' && window.aibos?.logger) {
+        window.aibos.logger.error("Session refresh failed:", error);
+      }
       localStorage.removeItem("aibos_session");
       dispatch({ type: "AUTH_LOGOUT" });
     }

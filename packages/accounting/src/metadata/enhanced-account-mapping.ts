@@ -563,7 +563,7 @@ export function getJournalAccountId(
     if (template.DEBIT_ACCOUNT === 'AP') return apAccountId;
     return '';
   } else {
-    const creditAccount = (template as any).CREDIT_ACCOUNT;
+    const creditAccount = (template as { CREDIT_ACCOUNT?: string }).CREDIT_ACCOUNT;
     if (creditAccount === 'BANK') return bankAccountId;
     if (creditAccount === 'AR') return arAccountId;
     if (creditAccount === 'AP') return apAccountId;

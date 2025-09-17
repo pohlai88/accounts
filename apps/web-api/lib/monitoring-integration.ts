@@ -1,12 +1,6 @@
 // Production Monitoring Integration
-import { MetricsCollector, TracingManager, Logger } from "@aibos/monitoring";
-import { getCacheService } from "@aibos/cache";
+import { monitoring, MonitoringIntegration } from "@aibos/monitoring";
 import { EventEmitter } from "events";
-
-// Global monitoring instances
-let metricsCollector: MetricsCollector | null = null;
-let tracingManager: TracingManager | null = null;
-let logger: Logger | null = null;
 
 export class ProductionMonitoringIntegration extends EventEmitter {
   private isInitialized = false;
@@ -17,306 +11,124 @@ export class ProductionMonitoringIntegration extends EventEmitter {
     }
 
     try {
-      // Type guard for config
-      const configObj = config && typeof config === "object" ? config as Record<string, unknown> : {};
-
-      // Initialize Metrics Collector
-      const cache = getCacheService();
-      metricsCollector = new MetricsCollector(cache);
-
-      // Initialize Tracing Manager
-      tracingManager = new TracingManager({
-        enableTracing: true,
-        sampleRate: 0.1, // 10% sampling
-        maxTracesPerSecond: 1000,
-        retentionPeriod: 7, // 7 days
-        enableB3Headers: true,
-        enableW3CTraceContext: true,
-        ...(configObj.tracing && typeof configObj.tracing === "object" ? configObj.tracing : {}),
-      });
-
-      // Initialize Logger
-      logger = new Logger({
-        level: "info",
-        enableConsole: true,
-        enableFile: true,
-        enableStructuredLogging: true,
-        enableCorrelation: true,
-        enableSampling: true,
-        sampleRate: 0.1, // 10% sampling
-        logDirectory: "./logs",
-        maxFileSize: 10 * 1024 * 1024, // 10MB
-        maxFiles: 5,
-        enableRotation: true,
-        enableCompression: true,
-        ...(configObj.logging && typeof configObj.logging === "object" ? configObj.logging : {}),
-      });
-
-      // Set up monitoring event handlers
-      this.setupMonitoringHandlers();
+      // Initialize centralized monitoring system
+      await monitoring.initialize();
 
       this.isInitialized = true;
-      console.log("✅ Production monitoring system initialized");
+      monitoring.info("Production monitoring system initialized", { component: "monitoring-integration" });
     } catch (error) {
-      console.error("Failed to initialize monitoring system:", error);
+      monitoring.error("Failed to initialize monitoring system", error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
 
+  // Monitoring handlers are now handled by the centralized monitoring system
+  // This method is kept for backward compatibility but delegates to the centralized system
   private setupMonitoringHandlers() {
-    if (!metricsCollector || !tracingManager || !logger) {
-      return;
-    }
-
-    // Set up error handling
-    process.on("uncaughtException", error => {
-      logger!.error("Uncaught Exception", error);
-      // Note: recordMetric method not available on this MetricsCollector
-    });
-
-    process.on("unhandledRejection", (reason, promise) => {
-      logger!.error("Unhandled Rejection", new Error(String(reason)));
-      // Note: recordMetric method not available on this MetricsCollector
-    });
-
-    // Set up performance monitoring
-    this.setupPerformanceMonitoring();
+    // All monitoring is now handled by the centralized MonitoringIntegration
+    // Global error handlers, performance monitoring, and health checks are automatically set up
   }
 
   private setupPerformanceMonitoring() {
-    if (!metricsCollector) { return; }
-
-    // Monitor memory usage
-    setInterval(() => {
-      const memUsage = process.memoryUsage();
-      // Note: recordMetric method not available on this MetricsCollector
-      // Could use logger or other monitoring methods instead
-    }, 30000); // Every 30 seconds
-
-    // Monitor CPU usage
-    setInterval(() => {
-      const cpuUsage = process.cpuUsage();
-      // Note: recordMetric method not available on this MetricsCollector
-      // Could use logger or other monitoring methods instead
-    }, 30000); // Every 30 seconds
-
-    // Monitor event loop lag
-    setInterval(() => {
-      const start = process.hrtime.bigint();
-      setImmediate(() => {
-        const lag = Number(process.hrtime.bigint() - start) / 1000000; // Convert to milliseconds
-        // Note: recordMetric method not available on this MetricsCollector
-        // Could use logger or other monitoring methods instead
-      });
-    }, 10000); // Every 10 seconds
+    // Performance monitoring is now handled by the centralized MonitoringIntegration
+    // Memory usage, CPU usage, and other system metrics are automatically tracked
   }
 
-  // API Request Monitoring
-  recordAPIRequest(
-    endpoint: string,
-    method: string,
-    statusCode: number,
-    duration: number,
-    tenantId: string,
-    userId?: string,
-  ) {
-    if (!metricsCollector) { return; }
+  // ============================================================================
+  // PUBLIC API METHODS (Delegate to centralized monitoring)
+  // ============================================================================
 
-    const tags = {
-      endpoint,
-      method,
-      status: statusCode.toString(),
-      tenant: tenantId,
-      ...(userId && { user: userId }),
-    };
-
-    // Note: recordMetric method not available on this MetricsCollector
-    // Could use logger or other monitoring methods instead
-  }
-
-  // Cache Monitoring
-  recordCacheOperation(
-    operation: "hit" | "miss" | "set" | "delete",
-    key: string,
-    tenantId: string,
-    duration?: number,
-  ) {
-    if (!metricsCollector) { return; }
-
-    const tags = {
-      operation,
-      tenant: tenantId,
-      key: key.substring(0, 50), // Truncate long keys
-    };
-
-    // Note: recordMetric method not available on this MetricsCollector
-    // Could use logger or other monitoring methods instead
-  }
-
-  // Database Monitoring
-  recordDatabaseOperation(
-    operation: string,
-    table: string,
-    duration: number,
-    tenantId: string,
-    success: boolean,
-  ) {
-    if (!metricsCollector) { return; }
-
-    const tags = {
-      operation,
-      table,
-      tenant: tenantId,
-      success: success.toString(),
-    };
-
-    // Note: recordMetric method not available on this MetricsCollector
-    // Could use logger or other monitoring methods instead
-  }
-
-  // Real-time Events Monitoring
-  recordRealtimeEvent(
-    eventType: string,
-    tenantId: string,
-    userId?: string,
-    success: boolean = true,
-  ) {
-    if (!metricsCollector) { return; }
-
-    const tags = {
-      event_type: eventType,
-      tenant: tenantId,
-      success: success.toString(),
-      ...(userId && { user: userId }),
-    };
-
-    // Note: recordMetric method not available on this MetricsCollector
-    // Could use logger or other monitoring methods instead
-  }
-
-  // Security Events Monitoring
-  recordSecurityEvent(
-    eventType: string,
-    severity: "low" | "medium" | "high" | "critical",
-    tenantId: string,
-    userId?: string,
-    details?: unknown,
-  ) {
-    if (!metricsCollector || !logger) { return; }
-
-    const tags = {
-      event_type: eventType,
-      severity,
-      tenant: tenantId,
-      ...(userId && { user: userId }),
-    };
-
-    // Note: recordMetric method not available on this MetricsCollector
-    // Could use logger or other monitoring methods instead
-
-    // Log security event
-    logger.warn("Security event detected", {
-      eventType,
-      severity,
-      tenantId,
-      userId,
-      details,
-    });
-  }
-
-  // Business Metrics
-  recordBusinessMetric(
-    metricName: string,
+  public recordMetric(
+    name: string,
     value: number,
     unit: string,
-    tenantId: string,
     tags: Record<string, string> = {},
-  ) {
-    if (!metricsCollector) { return; }
-
-    // Note: recordMetric method not available on this MetricsCollector
-    // Could use logger or other monitoring methods instead
+    context: Record<string, string> = {}
+  ): void {
+    monitoring.recordMetric(name, value, unit, tags, context);
   }
 
-  // Health Check
-  getHealthStatus() {
-    if (!this.isInitialized) {
-      return {
-        status: "unhealthy",
-        message: "Monitoring system not initialized",
-        components: {
-          metrics: "not_initialized",
-          tracing: "not_initialized",
-          logging: "not_initialized",
-        },
-      };
-    }
-
-    const metricsHealth = metricsCollector ? { status: "healthy" } : { status: "unknown" };
-    const tracingHealth = tracingManager ? { status: "healthy" } : { status: "unknown" };
-    const loggingHealth = logger ? { status: "healthy" } : { status: "unknown" };
-
-    const overallStatus = [metricsHealth.status, tracingHealth.status, loggingHealth.status].every(
-      status => status === "healthy",
-    )
-      ? "healthy"
-      : "degraded";
-
-    return {
-      status: overallStatus,
-      message: "Monitoring system operational",
-      components: {
-        metrics: metricsHealth.status,
-        tracing: tracingHealth.status,
-        logging: loggingHealth.status,
-      },
-      metrics: metricsCollector ? { status: "active" } : null,
-      traces: tracingManager?.getTraceStats(),
-      logs: logger?.getLogStats(),
-    };
+  public recordAPIMetric(
+    endpoint: string,
+    method: string,
+    duration: number,
+    statusCode: number,
+    responseSize: number,
+    context: Record<string, string> = {}
+  ): void {
+    monitoring.recordAPIMetric(endpoint, method, duration, statusCode, responseSize, context);
   }
 
-  // Get aggregated metrics
-  getAggregatedMetrics(tenantId?: string, timeWindow?: number) {
-    if (!metricsCollector) { return []; }
-
-    // Note: getAggregatedMetrics method not available on this MetricsCollector
-    return null;
+  public log(
+    level: "debug" | "info" | "warn" | "error" | "fatal",
+    message: string,
+    metadata: Record<string, unknown> = {},
+    context: Record<string, string> = {}
+  ): void {
+    monitoring.log(level, message, metadata, context);
   }
 
-  // Get system metrics
-  getSystemMetrics() {
-    if (!metricsCollector) { return null; }
-
-    // Note: getSystemMetrics method not available on this MetricsCollector
-    return null;
+  public trackError(
+    error: Error | string,
+    context: Record<string, string> = {},
+    level: "error" | "warning" | "info" = "error",
+    tags: string[] = []
+  ): string {
+    return monitoring.trackError(error, context, level, tags);
   }
 
-  // Get application metrics
-  getApplicationMetrics() {
-    if (!metricsCollector) { return null; }
-
-    // Note: getApplicationMetrics method not available on this MetricsCollector
-    return null;
+  public trackAPIError(
+    error: Error | string,
+    method: string,
+    path: string,
+    statusCode: number,
+    context: Record<string, string> = {}
+  ): string {
+    return monitoring.trackAPIError(error, method, path, statusCode, context);
   }
 
-  // Logging methods
-  info(message: string, metadata?: unknown, context?: unknown) {
-    logger?.info(message, context as Error | undefined, metadata as Record<string, any> | undefined);
+  public startTrace(
+    operation: string,
+    context: Record<string, string> = {}
+  ): string {
+    return monitoring.startTrace(operation, context);
   }
 
-  warn(message: string, metadata?: unknown, context?: unknown) {
-    logger?.warn(message, context as Error | undefined, metadata as Record<string, any> | undefined);
+  public endTrace(traceId: string, success: boolean = true, metadata: Record<string, unknown> = {}): void {
+    monitoring.endTrace(traceId, success, metadata);
   }
 
-  error(message: string, metadata?: unknown, context?: unknown) {
-    logger?.error(message, context as Error | undefined, metadata as Record<string, any> | undefined);
+  public async checkHealth(): Promise<Record<string, unknown>> {
+    return await monitoring.checkHealth();
   }
 
-  debug(message: string, metadata?: unknown, context?: unknown) {
-    logger?.debug(message, context as Error | undefined, metadata as Record<string, any> | undefined);
+  // ============================================================================
+  // GETTERS
+  // ============================================================================
+
+  public getMetricsCollector() {
+    return monitoring.getMetricsCollector();
+  }
+
+  public getLogger() {
+    return monitoring.getLogger();
+  }
+
+  public getTracingManager() {
+    return monitoring.getTracingManager();
+  }
+
+  public getHealthChecker() {
+    return monitoring.getHealthChecker();
+  }
+
+  public isReady(): boolean {
+    return this.isInitialized && monitoring.isReady();
   }
 }
 
-// Export singleton instance
-export const monitoring = new ProductionMonitoringIntegration();
+// Export singleton instance for backward compatibility
+export const productionMonitoring = new ProductionMonitoringIntegration();
+
+// Export monitoring instance for direct access
+export { monitoring } from "@aibos/monitoring";

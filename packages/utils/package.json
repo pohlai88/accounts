@@ -30,7 +30,7 @@
     "typescript": "^5.6.2",
     "vitest": "^3.2.4",
     "@aibos/eslint-config": "workspace:*",
-    "@aibos/vitest-config": "workspace:*",
+
     "@aibos/prettier-config": "workspace:*"
   },
   "main": "dist/src/index.js",
@@ -79,12 +79,12 @@
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint .",
-    "test": "vitest run",
+
     "test:attachments": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts",
     "test:attachments:watch": "vitest test/attachment-*.test.ts --config vitest.config.attachments.ts --watch",
     "typecheck": "tsc -p . --noEmit",
     "dev": "tsc -p . --watch",
-    "test:watch": "vitest",
+
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },

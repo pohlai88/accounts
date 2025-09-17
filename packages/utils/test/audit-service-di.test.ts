@@ -183,7 +183,11 @@ describe("Audit Service - Dependency Injection Tests", () => {
     it("should handle database errors gracefully", async () => {
       mockValues.mockRejectedValue(new Error("Database error"));
 
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      // Set NODE_ENV to development to trigger console.error
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => { });
 
       const entry: AuditEntry = {
         scope: mockScope,
@@ -197,6 +201,8 @@ describe("Audit Service - Dependency Injection Tests", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith("Audit logging failed:", expect.any(Error));
 
+      // Restore original environment
+      process.env.NODE_ENV = originalEnv;
       consoleSpy.mockRestore();
     });
   });

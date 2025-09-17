@@ -26,7 +26,11 @@ export class ProductionWebSocketServer extends EventEmitter {
 
   async start(port: number = 8080) {
     if (this.isRunning) {
-      console.log("WebSocket server already running");
+      // Log WebSocket server status to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.log("WebSocket server already running");
+      }
       return;
     }
 
@@ -54,10 +58,19 @@ export class ProductionWebSocketServer extends EventEmitter {
       this.setupBusinessLogicIntegration();
 
       this.isRunning = true;
-      console.log(`🚀 Production WebSocket server started on port ${port}`);
-      console.log(`📊 Real-time features: Presence, Events, Notifications`);
+      // Log WebSocket server startup to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.log(`🚀 Production WebSocket server started on port ${port}`);
+        // eslint-disable-next-line no-console
+        console.log(`📊 Real-time features: Presence, Events, Notifications`);
+      }
     } catch (error) {
-      console.error("Failed to start WebSocket server:", error);
+      // Log WebSocket server startup error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Failed to start WebSocket server:", error);
+      }
       throw error;
     }
   }
@@ -72,9 +85,17 @@ export class ProductionWebSocketServer extends EventEmitter {
         await wsManager.stop();
       }
       this.isRunning = false;
-      console.log("WebSocket server stopped");
+      // Log WebSocket server stop to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.log("WebSocket server stopped");
+      }
     } catch (error) {
-      console.error("Error stopping WebSocket server:", error);
+      // Log WebSocket server stop error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error stopping WebSocket server:", error);
+      }
     }
   }
 
@@ -89,7 +110,11 @@ export class ProductionWebSocketServer extends EventEmitter {
     this.setupTenantEvents();
     this.setupNotificationEvents();
 
-    console.log("✅ Business logic integration configured");
+    // Log business logic integration to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.log("✅ Business logic integration configured");
+    }
   }
 
   private setupAccountingEvents() {
@@ -98,7 +123,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     // Journal entry events
     eventSystem.subscribe("system", ["journal.created"], data => {
       console.log("📝 Journal entry created:", data);
-      const eventData = data.data as any;
+      const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "journal.created",
         data: eventData,
@@ -109,7 +134,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     // Invoice events
     eventSystem.subscribe("system", ["invoice.updated"], data => {
       console.log("🧾 Invoice updated:", data);
-      const eventData = data.data as any;
+      const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "invoice.updated",
         data: eventData,
@@ -120,7 +145,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     // Rule events
     eventSystem.subscribe("system", ["rule.created"], data => {
       console.log("📋 Rule created:", data);
-      const eventData = data.data as any;
+      const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "rule.created",
         data: eventData,
@@ -149,7 +174,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     // Tenant switching events
     eventSystem.subscribe("system", ["tenant.switched"], data => {
       console.log("🏢 Tenant switched:", data);
-      const eventData = data.data as any;
+      const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToUser(eventData.userId, {
         type: "tenant.switched",
         data: eventData,
@@ -160,7 +185,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     // Member invitation events
     eventSystem.subscribe("system", ["member.invited"], data => {
       console.log("👥 Member invited:", data);
-      const eventData = data.data as any;
+      const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "member.invited",
         data: eventData,
@@ -294,7 +319,14 @@ export class ProductionWebSocketServer extends EventEmitter {
           category: "system",
           type: "info",
           ...(typeof notification === "object" && notification !== null ? notification : {}),
-        } as any
+        } as {
+          type: "system" | "info" | "success" | "warning" | "error";
+          priority: "normal" | "low" | "high" | "urgent";
+          title: string;
+          message: string;
+          category: string;
+          [key: string]: unknown;
+        }
       );
     }
   }

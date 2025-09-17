@@ -9,6 +9,6 @@
     "moduleResolution": "nodenext",
     "module": "NodeNext"
   },
-  "include": ["src"],
+  "include": ["src", "scripts"],
   "exclude": ["dist", "node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }

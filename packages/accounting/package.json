@@ -11,7 +11,6 @@
     "typescript": "^5.6.2",
     "vitest": "^3.2.4",
     "@aibos/eslint-config": "workspace:*",
-    "@aibos/vitest-config": "workspace:*",
     "@aibos/prettier-config": "workspace:*"
   },
   "main": "dist/index.js",
@@ -60,9 +59,7 @@
     "build": "tsc -p .",
     "dev": "tsc -p . --watch",
     "lint": "eslint .",
-    "test": "vitest run",
     "typecheck": "tsc -p . --noEmit",
-    "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },

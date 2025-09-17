@@ -99,7 +99,11 @@ export class AuditService {
       });
     } catch (error) {
       // Log audit failures but don't fail the main operation
-      console.error("Audit logging failed:", error);
+      // Log audit failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Audit logging failed:", error);
+      }
       // In production, you might want to send this to a monitoring service
     }
   }

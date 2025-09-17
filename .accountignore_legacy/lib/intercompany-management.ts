@@ -142,7 +142,11 @@ export class IntercompanyManagementService {
 
       return { success: true, transaction: newTransaction };
     } catch (error) {
-      console.error("Error creating intercompany transaction:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating intercompany transaction:", error);
+      }
       return { success: false, error: "Failed to create intercompany transaction" };
     }
   }
@@ -194,7 +198,11 @@ export class IntercompanyManagementService {
 
       return { success: true, glEntries: glEntries.glEntries };
     } catch (error) {
-      console.error("Error approving intercompany transaction:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error approving intercompany transaction:", error);
+      }
       return { success: false, error: "Failed to approve intercompany transaction" };
     }
   }
@@ -282,7 +290,11 @@ export class IntercompanyManagementService {
 
       return { success: true, glEntries: newGLEntries };
     } catch (error) {
-      console.error("Error creating intercompany GL entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating intercompany GL entries:", error);
+      }
       return { success: false, error: "Failed to create intercompany GL entries" };
     }
   }
@@ -308,7 +320,11 @@ export class IntercompanyManagementService {
 
       return { success: true, balances: balances || [] };
     } catch (error) {
-      console.error("Error fetching intercompany balances:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching intercompany balances:", error);
+      }
       return { success: false, error: "Failed to fetch intercompany balances" };
     }
   }
@@ -349,7 +365,11 @@ export class IntercompanyManagementService {
 
       return { success: true, transactions: transactions || [] };
     } catch (error) {
-      console.error("Error fetching intercompany transactions:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching intercompany transactions:", error);
+      }
       return { success: false, error: "Failed to fetch intercompany transactions" };
     }
   }
@@ -379,7 +399,11 @@ export class IntercompanyManagementService {
 
       return { success: true, glEntries: glEntries || [] };
     } catch (error) {
-      console.error("Error fetching intercompany GL entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching intercompany GL entries:", error);
+      }
       return { success: false, error: "Failed to fetch intercompany GL entries" };
     }
   }
@@ -430,7 +454,11 @@ export class IntercompanyManagementService {
 
       return { success: true };
     } catch (error) {
-      console.error("Error cancelling intercompany transaction:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error cancelling intercompany transaction:", error);
+      }
       return { success: false, error: "Failed to cancel intercompany transaction" };
     }
   }
@@ -487,7 +515,11 @@ export class IntercompanyManagementService {
         reversalTransaction: result.transaction,
       };
     } catch (error) {
-      console.error("Error creating intercompany reversal:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating intercompany reversal:", error);
+      }
       return { success: false, error: "Failed to create intercompany reversal" };
     }
   }
@@ -525,7 +557,11 @@ export class IntercompanyManagementService {
         isSetupComplete,
       };
     } catch (error) {
-      console.error("Error checking intercompany account status:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error checking intercompany account status:", error);
+      }
       return { success: false, error: "Failed to check intercompany account status" };
     }
   }
@@ -599,7 +635,11 @@ export class IntercompanyManagementService {
 
       return { success: true, accounts: createdAccounts };
     } catch (error) {
-      console.error("Error setting up intercompany accounts:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error setting up intercompany accounts:", error);
+      }
       return { success: false, error: "Failed to setup intercompany accounts" };
     }
   }

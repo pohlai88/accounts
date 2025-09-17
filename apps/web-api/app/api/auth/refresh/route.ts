@@ -1,172 +1,148 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
+import { ok, problem } from "@aibos/web-api/_lib/response";
 
 // Refresh request schema
 const RefreshRequestSchema = z.object({
   refreshToken: z.string().min(1),
 });
 
-// Mock refresh token storage - In production, this would be in your database
-const REFRESH_TOKENS = new Map<
-  string,
-  {
-    userId: string;
-    expiresAt: Date;
-  }
->();
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
+
+// Helper function to get permissions for a role
+function getPermissionsForRole(role: string): string[] {
+  const rolePermissions: Record<string, string[]> = {
+    admin: ["read", "write", "delete", "approve", "manage_users", "manage_billing"],
+    manager: ["read", "write", "delete", "approve", "manage_users"],
+    accountant: ["read", "write", "delete", "approve"],
+    clerk: ["read", "write"],
+    viewer: ["read"],
+    user: ["read", "write"],
+  };
+
+  return rolePermissions[role] || ["read"];
+}
 
 export async function POST(req: NextRequest) {
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   try {
     const body = await req.json();
     const { refreshToken } = RefreshRequestSchema.parse(body);
 
-    // Check if refresh token exists and is valid
-    const tokenData = REFRESH_TOKENS.get(refreshToken);
-
-    if (!tokenData || tokenData.expiresAt < new Date()) {
-      // Clean up expired token
-      if (tokenData) {
-        REFRESH_TOKENS.delete(refreshToken);
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            type: "authentication_error",
-            title: "Invalid or expired refresh token",
-            status: 401,
-            detail: "Please log in again",
-          },
-          timestamp: new Date().toISOString(),
-          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        },
-        { status: 401 },
-      );
-    }
-
-    // Mock user data - In production, fetch from database using tokenData.userId
-    const MOCK_USERS = [
-      {
-        id: "user_1",
-        email: "admin@aibos.com",
-        firstName: "Admin",
-        lastName: "User",
-        role: "admin",
-        permissions: ["read", "write", "delete", "approve"],
-        tenantId: "tenant_1",
-        companyId: "company_1",
-        companyName: "AIBOS Demo Company",
-        tenantName: "AIBOS Demo Tenant",
-      },
-      {
-        id: "user_2",
-        email: "user@aibos.com",
-        firstName: "Regular",
-        lastName: "User",
-        role: "user",
-        permissions: ["read", "write"],
-        tenantId: "tenant_1",
-        companyId: "company_1",
-        companyName: "AIBOS Demo Company",
-        tenantName: "AIBOS Demo Tenant",
-      },
-    ];
-
-    const user = MOCK_USERS.find(u => u.id === tokenData.userId);
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            type: "authentication_error",
-            title: "User not found",
-            status: 401,
-            detail: "User associated with refresh token not found",
-          },
-          timestamp: new Date().toISOString(),
-          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        },
-        { status: 401 },
-      );
-    }
-
-    // Generate new tokens
-    const newAccessToken = `access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const newRefreshToken = `refresh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Store new refresh token and remove old one
-    REFRESH_TOKENS.delete(refreshToken);
-    REFRESH_TOKENS.set(newRefreshToken, {
-      userId: user.id,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    // Use Supabase to refresh the session
+    const { data: sessionData, error: refreshError } = await supabase.auth.refreshSession({
+      refresh_token: refreshToken,
     });
+
+    if (refreshError || !sessionData.session || !sessionData.user) {
+      return problem({
+        status: 401,
+        title: "Invalid or expired refresh token",
+        code: "INVALID_REFRESH_TOKEN",
+        detail: "Please log in again",
+        requestId,
+      });
+    }
+
+    // Get user data from our actual database schema
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select(`
+        id,
+        email,
+        first_name,
+        last_name,
+        role,
+        preferences,
+        memberships!inner(
+          tenant_id,
+          company_id,
+          role,
+          tenants(name, slug),
+          companies(name, code)
+        )
+      `)
+      .eq("id", sessionData.user.id)
+      .single();
+
+    if (userError || !userData) {
+      return problem({
+        status: 500,
+        title: "User data retrieval failed",
+        code: "USER_DATA_ERROR",
+        detail: "Unable to retrieve user data from database",
+        requestId,
+      });
+    }
+
+    // Get the first membership (primary tenant/company)
+    const primaryMembership = userData.memberships?.[0];
+    if (!primaryMembership) {
+      return problem({
+        status: 403,
+        title: "No tenant access",
+        code: "NO_TENANT_ACCESS",
+        detail: "User has no tenant or company access",
+        requestId,
+      });
+    }
+
+    // Extract company and tenant data (they come as arrays from the join)
+    const company = Array.isArray(primaryMembership.companies)
+      ? primaryMembership.companies[0]
+      : primaryMembership.companies;
+    const tenant = Array.isArray(primaryMembership.tenants)
+      ? primaryMembership.tenants[0]
+      : primaryMembership.tenants;
 
     // Return new tokens and user data
-    return NextResponse.json({
-      success: true,
-      data: {
+    return ok(
+      {
         user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          permissions: user.permissions,
-          tenantId: user.tenantId,
-          companyId: user.companyId,
-          companyName: user.companyName,
-          tenantName: user.tenantName,
+          id: userData.id,
+          email: userData.email,
+          firstName: userData.first_name || "",
+          lastName: userData.last_name || "",
+          role: primaryMembership.role || "user",
+          permissions: getPermissionsForRole(primaryMembership.role || "user"),
+          tenantId: primaryMembership.tenant_id,
+          companyId: primaryMembership.company_id,
+          companyName: company?.name || "",
+          tenantName: tenant?.name || "",
         },
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-        expiresAt: expiresAt.toISOString(),
+        accessToken: sessionData.session.access_token,
+        refreshToken: sessionData.session.refresh_token,
+        expiresAt: sessionData.session.expires_at
+          ? new Date(sessionData.session.expires_at * 1000).toISOString()
+          : null,
       },
-      timestamp: new Date().toISOString(),
-      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    });
+      requestId,
+    );
   } catch (error) {
-    console.error("Token refresh error:", error);
+    // Error will be handled by standardized error response below
 
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            type: "validation_error",
-            title: "Invalid request data",
-            status: 400,
-            detail: "Please provide a valid refresh token",
-            errors: error.issues.reduce(
-              (acc, err) => {
-                acc[err.path.join(".")] = [err.message];
-                return acc;
-              },
-              {} as Record<string, string[]>,
-            ),
-          },
-          timestamp: new Date().toISOString(),
-          requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        },
-        { status: 400 },
-      );
+      return problem({
+        status: 400,
+        title: "Invalid request data",
+        code: "VALIDATION_ERROR",
+        detail: "Please provide a valid refresh token",
+        requestId,
+      });
     }
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          type: "internal_error",
-          title: "Token refresh failed",
-          status: 500,
-          detail: "An unexpected error occurred",
-        },
-        timestamp: new Date().toISOString(),
-        requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      },
-      { status: 500 },
-    );
+    return problem({
+      status: 500,
+      title: "Token refresh failed",
+      code: "INTERNAL_ERROR",
+      detail: "An unexpected error occurred",
+      requestId,
+    });
   }
 }

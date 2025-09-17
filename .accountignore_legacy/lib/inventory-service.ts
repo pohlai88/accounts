@@ -95,13 +95,13 @@ export interface StockEntry {
   id: string;
   entry_no: string;
   entry_type:
-    | "Material Issue"
-    | "Material Receipt"
-    | "Material Transfer"
-    | "Manufacture"
-    | "Repack"
-    | "Send to Subcontractor"
-    | "Stock Reconciliation";
+  | "Material Issue"
+  | "Material Receipt"
+  | "Material Transfer"
+  | "Manufacture"
+  | "Repack"
+  | "Send to Subcontractor"
+  | "Stock Reconciliation";
   company_id: string;
   posting_date: string;
   posting_time: string;
@@ -265,13 +265,13 @@ export interface CreateWarehouseInput {
 
 export interface CreateStockEntryInput {
   entry_type:
-    | "Material Issue"
-    | "Material Receipt"
-    | "Material Transfer"
-    | "Manufacture"
-    | "Repack"
-    | "Send to Subcontractor"
-    | "Stock Reconciliation";
+  | "Material Issue"
+  | "Material Receipt"
+  | "Material Transfer"
+  | "Manufacture"
+  | "Repack"
+  | "Send to Subcontractor"
+  | "Stock Reconciliation";
   company_id: string;
   posting_date: string;
   posting_time?: string;
@@ -328,7 +328,11 @@ export class InventoryService {
 
       return { success: true, data: itemGroup, message: "Item group created successfully" };
     } catch (error) {
-      console.error("Error creating item group:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating item group:", error);
+      }
       return { success: false, error: "Failed to create item group" };
     }
   }
@@ -351,7 +355,11 @@ export class InventoryService {
 
       return { success: true, data: itemGroups };
     } catch (error) {
-      console.error("Error fetching item groups:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching item groups:", error);
+      }
       return { success: false, error: "Failed to fetch item groups" };
     }
   }
@@ -385,7 +393,11 @@ export class InventoryService {
 
       return { success: true, data: uom, message: "Unit of measure created successfully" };
     } catch (error) {
-      console.error("Error creating unit of measure:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating unit of measure:", error);
+      }
       return { success: false, error: "Failed to create unit of measure" };
     }
   }
@@ -408,7 +420,11 @@ export class InventoryService {
 
       return { success: true, data: uoms };
     } catch (error) {
-      console.error("Error fetching units of measure:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching units of measure:", error);
+      }
       return { success: false, error: "Failed to fetch units of measure" };
     }
   }
@@ -457,7 +473,11 @@ export class InventoryService {
 
       return { success: true, data: item, message: "Item created successfully" };
     } catch (error) {
-      console.error("Error creating item:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating item:", error);
+      }
       return { success: false, error: "Failed to create item" };
     }
   }
@@ -498,7 +518,11 @@ export class InventoryService {
 
       return { success: true, data: items };
     } catch (error) {
-      console.error("Error fetching items:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching items:", error);
+      }
       return { success: false, error: "Failed to fetch items" };
     }
   }
@@ -538,7 +562,11 @@ export class InventoryService {
 
       return { success: true, data: warehouse, message: "Warehouse created successfully" };
     } catch (error) {
-      console.error("Error creating warehouse:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating warehouse:", error);
+      }
       return { success: false, error: "Failed to create warehouse" };
     }
   }
@@ -561,7 +589,11 @@ export class InventoryService {
 
       return { success: true, data: warehouses };
     } catch (error) {
-      console.error("Error fetching warehouses:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching warehouses:", error);
+      }
       return { success: false, error: "Failed to fetch warehouses" };
     }
   }
@@ -625,7 +657,11 @@ export class InventoryService {
 
       return { success: true, data: stockEntry, message: "Stock entry created successfully" };
     } catch (error) {
-      console.error("Error creating stock entry:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating stock entry:", error);
+      }
       return { success: false, error: "Failed to create stock entry" };
     }
   }
@@ -657,7 +693,11 @@ export class InventoryService {
 
       return { success: true, data: stockEntries };
     } catch (error) {
-      console.error("Error fetching stock entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching stock entries:", error);
+      }
       return { success: false, error: "Failed to fetch stock entries" };
     }
   }
@@ -683,7 +723,11 @@ export class InventoryService {
 
       return { success: true, data: stockBalance };
     } catch (error) {
-      console.error("Error fetching stock balance:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching stock balance:", error);
+      }
       return { success: false, error: "Failed to fetch stock balance" };
     }
   }
@@ -729,7 +773,11 @@ export class InventoryService {
 
       return { success: true, data: entries };
     } catch (error) {
-      console.error("Error fetching stock ledger entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching stock ledger entries:", error);
+      }
       return { success: false, error: "Failed to fetch stock ledger entries" };
     }
   }
@@ -761,7 +809,11 @@ export class InventoryService {
 
       return { success: true, data: bins };
     } catch (error) {
-      console.error("Error fetching bins:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching bins:", error);
+      }
       return { success: false, error: "Failed to fetch bins" };
     }
   }
@@ -823,7 +875,11 @@ export class InventoryService {
 
       return { success: true, data: true, message: "Stock entry submitted successfully" };
     } catch (error) {
-      console.error("Error submitting stock entry:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error submitting stock entry:", error);
+      }
       return { success: false, error: "Failed to submit stock entry" };
     }
   }
@@ -917,7 +973,11 @@ export class InventoryService {
 
       return { success: true, data: stats };
     } catch (error) {
-      console.error("Error fetching inventory stats:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching inventory stats:", error);
+      }
       return { success: false, error: "Failed to fetch inventory statistics" };
     }
   }

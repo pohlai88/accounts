@@ -11,8 +11,6 @@ ALTER PUBLICATION supabase_realtime ADD TABLE tenant_invitations;
 
 -- Enable realtime for business data tables
 ALTER PUBLICATION supabase_realtime ADD TABLE chart_of_accounts;
-ALTER PUBLICATION supabase_realtime ADD TABLE gl_journal;
-ALTER PUBLICATION supabase_realtime ADD TABLE gl_journal_lines;
 ALTER PUBLICATION supabase_realtime ADD TABLE audit_logs;
 
 -- Create realtime channels for tenant-specific updates
@@ -53,15 +51,15 @@ DECLARE
 BEGIN
   -- Get tenant_id from the record
   tenant_id := COALESCE(NEW.tenant_id, OLD.tenant_id);
-  
+
   -- Skip if no tenant_id
   IF tenant_id IS NULL THEN
     RETURN COALESCE(NEW, OLD);
   END IF;
-  
+
   -- Construct channel name
   channel_name := 'tenant:' || tenant_id;
-  
+
   -- Determine event type
   IF TG_OP = 'INSERT' THEN
     event_type := 'INSERT';
@@ -76,10 +74,10 @@ BEGIN
     event_type := 'DELETE';
     payload := to_jsonb(OLD);
   END IF;
-  
+
   -- Broadcast the update
   PERFORM broadcast_tenant_update(channel_name, event_type, payload);
-  
+
   RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -105,9 +103,6 @@ CREATE TRIGGER realtime_chart_of_accounts
   AFTER INSERT OR UPDATE OR DELETE ON chart_of_accounts
   FOR EACH ROW EXECUTE FUNCTION notify_tenant_changes();
 
-CREATE TRIGGER realtime_gl_journal
-  AFTER INSERT OR UPDATE OR DELETE ON gl_journal
-  FOR EACH ROW EXECUTE FUNCTION notify_tenant_changes();
 
 -- Function to subscribe to tenant-specific channels
 CREATE OR REPLACE FUNCTION subscribe_to_tenant_channel(tenant_id TEXT)
@@ -115,13 +110,13 @@ RETURNS TEXT AS $$
 BEGIN
   -- Verify user has access to this tenant
   IF NOT EXISTS (
-    SELECT 1 FROM memberships 
-    WHERE user_id = (auth.jwt() ->> 'sub')::uuid
-      AND tenant_id = subscribe_to_tenant_channel.tenant_id::uuid
+    SELECT 1 FROM memberships m
+    WHERE m.user_id = (auth.jwt() ->> 'sub')::uuid
+      AND m.tenant_id = subscribe_to_tenant_channel.tenant_id::uuid
   ) THEN
     RAISE EXCEPTION 'Access denied to tenant channel';
   END IF;
-  
+
   RETURN 'tenant:' || tenant_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

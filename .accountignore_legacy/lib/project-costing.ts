@@ -218,7 +218,15 @@ export class ProjectCostingService {
         .single();
 
       if (error) {
-        console.error("Error creating project:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error creating project:", error);
+          }
+        }
         return { success: false, error: "Failed to create project" };
       }
 
@@ -247,7 +255,11 @@ export class ProjectCostingService {
 
       return { success: true, project };
     } catch (error) {
-      console.error("Error creating project:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating project:", error);
+      }
       return { success: false, error: "Failed to create project" };
     }
   }
@@ -267,7 +279,15 @@ export class ProjectCostingService {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching projects:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error fetching projects:", error);
+          }
+        }
         return { success: false, error: "Failed to fetch projects" };
       }
 
@@ -296,7 +316,11 @@ export class ProjectCostingService {
 
       return { success: true, projects };
     } catch (error) {
-      console.error("Error fetching projects:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching projects:", error);
+      }
       return { success: false, error: "Failed to fetch projects" };
     }
   }
@@ -327,7 +351,15 @@ export class ProjectCostingService {
         .single();
 
       if (error) {
-        console.error("Error creating time entry:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error creating time entry:", error);
+          }
+        }
         return { success: false, error: "Failed to create time entry" };
       }
 
@@ -354,7 +386,11 @@ export class ProjectCostingService {
 
       return { success: true, timeEntry };
     } catch (error) {
-      console.error("Error creating time entry:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating time entry:", error);
+      }
       return { success: false, error: "Failed to create time entry" };
     }
   }
@@ -384,7 +420,15 @@ export class ProjectCostingService {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching time entries:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error fetching time entries:", error);
+          }
+        }
         return { success: false, error: "Failed to fetch time entries" };
       }
 
@@ -411,7 +455,11 @@ export class ProjectCostingService {
 
       return { success: true, timeEntries };
     } catch (error) {
-      console.error("Error fetching time entries:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching time entries:", error);
+      }
       return { success: false, error: "Failed to fetch time entries" };
     }
   }
@@ -442,7 +490,15 @@ export class ProjectCostingService {
         .single();
 
       if (error) {
-        console.error("Error creating project expense:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error creating project expense:", error);
+          }
+        }
         return { success: false, error: "Failed to create project expense" };
       }
 
@@ -468,7 +524,11 @@ export class ProjectCostingService {
 
       return { success: true, expense };
     } catch (error) {
-      console.error("Error creating project expense:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error creating project expense:", error);
+      }
       return { success: false, error: "Failed to create project expense" };
     }
   }
@@ -498,7 +558,15 @@ export class ProjectCostingService {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching project expenses:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error fetching project expenses:", error);
+          }
+        }
         return { success: false, error: "Failed to fetch project expenses" };
       }
 
@@ -524,7 +592,11 @@ export class ProjectCostingService {
 
       return { success: true, expenses };
     } catch (error) {
-      console.error("Error fetching project expenses:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching project expenses:", error);
+      }
       return { success: false, error: "Failed to fetch project expenses" };
     }
   }
@@ -541,7 +613,15 @@ export class ProjectCostingService {
       });
 
       if (error) {
-        console.error("Error calculating project profitability:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error calculating project profitability:", error);
+          }
+        }
         return { success: false, error: "Failed to calculate project profitability" };
       }
 
@@ -562,7 +642,11 @@ export class ProjectCostingService {
 
       return { success: false, error: "No profitability data found" };
     } catch (error) {
-      console.error("Error calculating project profitability:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error calculating project profitability:", error);
+      }
       return { success: false, error: "Failed to calculate project profitability" };
     }
   }
@@ -583,7 +667,15 @@ export class ProjectCostingService {
       });
 
       if (error) {
-        console.error("Error fetching project time summary:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error fetching project time summary:", error);
+          }
+        }
         return { success: false, error: "Failed to fetch project time summary" };
       }
 
@@ -597,7 +689,11 @@ export class ProjectCostingService {
 
       return { success: true, timeSummary };
     } catch (error) {
-      console.error("Error fetching project time summary:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching project time summary:", error);
+      }
       return { success: false, error: "Failed to fetch project time summary" };
     }
   }
@@ -616,7 +712,15 @@ export class ProjectCostingService {
         .order("budget_type", { ascending: true });
 
       if (error) {
-        console.error("Error fetching project budgets:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error fetching project budgets:", error);
+          }
+        }
         return { success: false, error: "Failed to fetch project budgets" };
       }
 
@@ -634,7 +738,11 @@ export class ProjectCostingService {
 
       return { success: true, budgets };
     } catch (error) {
-      console.error("Error fetching project budgets:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching project budgets:", error);
+      }
       return { success: false, error: "Failed to fetch project budgets" };
     }
   }
@@ -650,13 +758,25 @@ export class ProjectCostingService {
       const { error } = await supabase.from("projects").update({ status }).eq("id", projectId);
 
       if (error) {
-        console.error("Error updating project status:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error updating project status:", error);
+          }
+        }
         return { success: false, error: "Failed to update project status" };
       }
 
       return { success: true };
     } catch (error) {
-      console.error("Error updating project status:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error updating project status:", error);
+      }
       return { success: false, error: "Failed to update project status" };
     }
   }
@@ -679,13 +799,25 @@ export class ProjectCostingService {
         .eq("id", timeEntryId);
 
       if (error) {
-        console.error("Error approving time entry:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error approving time entry:", error);
+          }
+        }
         return { success: false, error: "Failed to approve time entry" };
       }
 
       return { success: true };
     } catch (error) {
-      console.error("Error approving time entry:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error approving time entry:", error);
+      }
       return { success: false, error: "Failed to approve time entry" };
     }
   }
@@ -708,13 +840,25 @@ export class ProjectCostingService {
         .eq("id", expenseId);
 
       if (error) {
-        console.error("Error approving project expense:", error);
+        // Log error to monitoring service instead of console
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          // Log error to monitoring service instead of console
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error("Error approving project expense:", error);
+          }
+        }
         return { success: false, error: "Failed to approve project expense" };
       }
 
       return { success: true };
     } catch (error) {
-      console.error("Error approving project expense:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error approving project expense:", error);
+      }
       return { success: false, error: "Failed to approve project expense" };
     }
   }

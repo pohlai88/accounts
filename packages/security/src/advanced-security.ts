@@ -144,7 +144,11 @@ export class AdvancedSecurityManager extends EventEmitter {
 
       return null; // No security violations detected
     } catch (error) {
-      console.error("Security middleware error:", error);
+      // Log security middleware error to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Security middleware error:", error);
+      }
       return this.createSecurityResponse(500, "Security check failed");
     }
   }

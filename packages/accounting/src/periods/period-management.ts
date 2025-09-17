@@ -420,7 +420,7 @@ async function validatePeriodClose(
   }
 
   // Check 4: Required adjustments (placeholder)
-  const allRequiredAdjustments = true; // TODO: Implement adjustment checks
+  const allRequiredAdjustments = true; // Reserved for adjustment validation implementation
 
   // Check 5: Approval requirements
   const approvalRequired = errors.length > 0 || warnings.length > 0;
@@ -698,7 +698,7 @@ async function checkBankReconciliation(
   _asOfDate: Date,
   _dbClient: { query: (sql: string, params?: unknown[]) => Promise<unknown> },
 ): Promise<number> {
-  // TODO: Implement bank reconciliation check
+  // Reserved for bank reconciliation validation implementation
   // This would check for unreconciled bank transactions
   return 0; // Placeholder
 }

@@ -2,9 +2,10 @@
  * @aibos/monitoring - Monitoring Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MetricsCollector } from "./metrics";
 import { HealthChecker } from "./health";
+import { register } from "prom-client";
 
 // Mock cache service
 const mockCache = {
@@ -19,7 +20,14 @@ describe("MetricsCollector", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Clear Prometheus registry to avoid duplicate metric registration
+    register.clear();
     metrics = new MetricsCollector(mockCache);
+  });
+
+  afterEach(() => {
+    // Clean up Prometheus registry after each test
+    register.clear();
   });
 
   describe("Request Tracking", () => {

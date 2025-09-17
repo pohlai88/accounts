@@ -54,7 +54,7 @@ export class RequestLoggingService {
 
       // Override res.end to capture response data
       const originalEnd = res.end.bind(res);
-      res.end = function (chunk?: any, encoding?: any) {
+      res.end = function (chunk?: unknown, encoding?: unknown) {
         const responseTime = Date.now() - startTime;
 
         // Log the request
@@ -79,7 +79,7 @@ export class RequestLoggingService {
         self.storeLog(logEntry);
 
         // Call original end
-        return originalEnd(chunk, encoding);
+        return originalEnd(chunk as any, encoding as any);
       };
 
       next();
@@ -111,7 +111,11 @@ export class RequestLoggingService {
         ttl: 30 * 24 * 60 * 60, // 30 days
       });
     } catch (error) {
-      console.error("Log storage error:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Log storage error:", error);
+      }
     }
   }
 
@@ -163,7 +167,11 @@ export class RequestLoggingService {
 
       return filteredLogs;
     } catch (error) {
-      console.error("Get logs error:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Get logs error:", error);
+      }
       return [];
     }
   }
@@ -175,7 +183,11 @@ export class RequestLoggingService {
         namespace: "request-logs",
       });
     } catch (error) {
-      console.error("Get log by ID error:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Get log by ID error:", error);
+      }
       return null;
     }
   }
@@ -224,7 +236,11 @@ export class RequestLoggingService {
       this.logs = [];
       await this.cache.clear("request-logs");
     } catch (error) {
-      console.error("Clear logs error:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Clear logs error:", error);
+      }
     }
   }
 
@@ -258,7 +274,11 @@ export class RequestLoggingService {
         return JSON.stringify(this.logs, null, 2);
       }
     } catch (error) {
-      console.error("Export logs error:", error);
+      // Log error to monitoring service instead of console
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Export logs error:", error);
+      }
       return "";
     }
   }

@@ -98,10 +98,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     console.error("Failed to fetch invoices:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to fetch invoices" },
-      { status: 500 },
-    );
+    return NextResponse.json({
+      success: false,
+      error: {
+        type: "internal_error",
+        title: "Failed to fetch invoices",
+        status: 500,
+        code: "INVOICE_FETCH_FAILED",
+        detail: "An unexpected error occurred while fetching invoices",
+      },
+      timestamp: new Date().toISOString(),
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    }, { status: 500 });
   }
 }
 
@@ -440,9 +448,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     console.error("Invoice creation error:", error);
 
     if (error instanceof Error && error.message.includes("already exists")) {
-      return NextResponse.json({ error: "Invoice number already exists" }, { status: 409 });
+      return NextResponse.json({
+        success: false,
+        error: {
+          type: "conflict_error",
+          title: "Invoice number already exists",
+          status: 409,
+          code: "INVOICE_NUMBER_EXISTS",
+          detail: "An invoice with this number already exists",
+        },
+        timestamp: new Date().toISOString(),
+        requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      }, { status: 409 });
     }
 
-    return NextResponse.json({ error: "Failed to create invoice" }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: {
+        type: "internal_error",
+        title: "Failed to create invoice",
+        status: 500,
+        code: "INVOICE_CREATION_FAILED",
+        detail: "An unexpected error occurred while creating the invoice",
+      },
+      timestamp: new Date().toISOString(),
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    }, { status: 500 });
   }
 }

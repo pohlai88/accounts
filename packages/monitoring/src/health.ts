@@ -285,7 +285,11 @@ export class HealthChecker {
       });
       return history ? history.slice(-limit) : [];
     } catch (error) {
-      console.error("Error getting health history:", error);
+      // Log health history error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error getting health history:", error);
+      }
       return [];
     }
   }
@@ -304,7 +308,11 @@ export class HealthChecker {
         ttl: 7 * 24 * 60 * 60, // 7 days
       });
     } catch (error) {
-      console.error("Error storing health result:", error);
+      // Log health result storage error to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.error("Error storing health result:", error);
+      }
     }
   }
 }

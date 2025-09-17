@@ -115,31 +115,34 @@ export async function GET(req: NextRequest) {
             });
         }
 
-        const formattedSubscriptions = subscriptions?.map((s: any) => ({
-            id: s.id,
-            status: s.status,
-            startDate: s.start_date,
-            endDate: s.end_date,
-            nextBillingDate: s.next_billing_date,
-            autoRenew: s.auto_renew,
-            billingAddress: s.billing_address,
-            trialEndsAt: s.trial_ends_at,
-            cancelledAt: s.cancelled_at,
-            cancellationReason: s.cancellation_reason,
-            createdAt: s.created_at,
-            updatedAt: s.updated_at,
-            plan: {
-                id: s.subscription_plans.id,
-                name: s.subscription_plans.name,
-                description: s.subscription_plans.description,
-                planType: s.subscription_plans.plan_type,
-                price: s.subscription_plans.price,
-                currency: s.subscription_plans.currency,
-                billingCycle: s.subscription_plans.billing_cycle,
-                features: s.subscription_plans.features,
-                limits: s.subscription_plans.limits,
-            },
-        })) || [];
+        const formattedSubscriptions = subscriptions?.map((s: Record<string, unknown>) => {
+            const plan = s.subscription_plans as Record<string, unknown>;
+            return {
+                id: s.id,
+                status: s.status,
+                startDate: s.start_date,
+                endDate: s.end_date,
+                nextBillingDate: s.next_billing_date,
+                autoRenew: s.auto_renew,
+                billingAddress: s.billing_address,
+                trialEndsAt: s.trial_ends_at,
+                cancelledAt: s.cancelled_at,
+                cancellationReason: s.cancellation_reason,
+                createdAt: s.created_at,
+                updatedAt: s.updated_at,
+                plan: {
+                    id: plan.id,
+                    name: plan.name,
+                    description: plan.description,
+                    planType: plan.plan_type,
+                    price: plan.price,
+                    currency: plan.currency,
+                    billingCycle: plan.billing_cycle,
+                    features: plan.features,
+                    limits: plan.limits,
+                },
+            };
+        }) || [];
 
         return ok(
             {

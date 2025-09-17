@@ -163,12 +163,13 @@ async function postRulesHandler(req: NextRequest) {
       ctx = await getSecurityContext(req);
     } catch (error: unknown) {
       if (error && typeof error === "object" && "status" in error && error.status === 401) {
-        monitoring.recordAPIRequest(
+        monitoring.recordAPIMetric(
           "/api/rules",
           "GET",
-          401,
           Date.now() - startTime,
-          ctx?.tenantId || "unknown"
+          401,
+          0,
+          { tenantId: ctx?.tenantId || "unknown" }
         );
         return problem({
           status: 401,
@@ -253,17 +254,18 @@ async function postRulesHandler(req: NextRequest) {
       201,
     );
   } catch (error) {
-    console.error("Rules POST API error:", error);
+    // Error will be handled by standardized error response below
 
     // Record error
-    monitoring.recordAPIRequest(
+    monitoring.recordAPIMetric(
       "/api/rules",
       "POST",
-      500,
       Date.now() - startTime,
-      ctx?.tenantId || "unknown"
+      500,
+      0,
+      { tenantId: ctx?.tenantId || "unknown" }
     );
-    monitoring.error("Rules POST API error", { error: getErrorMessage(error), stack: error instanceof Error ? error.stack : undefined });
+    monitoring.error("Rules POST API error", error instanceof Error ? error : new Error(getErrorMessage(error)), { stack: error instanceof Error ? error.stack : undefined });
 
     return problem({
       status: 500,

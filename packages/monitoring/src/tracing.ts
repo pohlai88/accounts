@@ -155,7 +155,11 @@ export class TracingManager extends EventEmitter {
   ): TraceSpan | null {
     const span = this.activeSpans.get(spanId);
     if (!span) {
-      console.warn(`Span ${spanId} not found`);
+      // Log span not found to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn(`Span ${spanId} not found`);
+      }
       return null;
     }
 
@@ -184,7 +188,7 @@ export class TracingManager extends EventEmitter {
     attributes: Record<string, string | number | boolean> = {},
   ): boolean {
     const span = this.activeSpans.get(spanId);
-    if (!span) {return false;}
+    if (!span) { return false; }
 
     const event: TraceEvent = {
       name,
@@ -206,7 +210,7 @@ export class TracingManager extends EventEmitter {
     attributes: Record<string, string | number | boolean>,
   ): boolean {
     const span = this.activeSpans.get(spanId);
-    if (!span) {return false;}
+    if (!span) { return false; }
 
     span.attributes = { ...span.attributes, ...attributes };
     this.emit("spanAttributes", { spanId, attributes });
@@ -224,7 +228,7 @@ export class TracingManager extends EventEmitter {
     attributes: Record<string, string | number | boolean> = {},
   ): boolean {
     const span = this.activeSpans.get(spanId);
-    if (!span) {return false;}
+    if (!span) { return false; }
 
     const link: TraceLink = {
       traceId,
@@ -424,7 +428,7 @@ export class TracingManager extends EventEmitter {
     const spans =
       Array.from(this.completedTraces.values()).find(t => t.traceId === traceId)?.spans || [];
 
-    if (spans.length === 0) {return;}
+    if (spans.length === 0) { return; }
 
     const startTime = Math.min(...spans.map(s => s.startTime));
     const endTime = Math.max(...spans.map(s => s.endTime || s.startTime));
@@ -469,10 +473,10 @@ export class TracingManager extends EventEmitter {
    */
   private parseW3CTraceContext(traceparent: string): TraceContext | null {
     const parts = traceparent.split("-");
-    if (parts.length !== 4) {return null;}
+    if (parts.length !== 4) { return null; }
 
     const [version, traceId, parentId, flags] = parts;
-    if (version !== "00") {return null;}
+    if (version !== "00") { return null; }
 
     return {
       traceId: traceId || "",
@@ -546,7 +550,7 @@ export class TracingManager extends EventEmitter {
    * Calculate percentile
    */
   private calculatePercentile(values: number[], percentile: number): number {
-    if (values.length === 0) {return 0;}
+    if (values.length === 0) { return 0; }
 
     const sorted = values.sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;

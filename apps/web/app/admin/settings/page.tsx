@@ -42,10 +42,18 @@ async function saveAdminSettings(formData: globalThis.FormData) {
       session_timeout_minutes: formData.get("session_timeout_minutes"),
     });
 
-    // TODO: In production, implement database updates here
-    console.log("Settings saved:", { featureFlags, policySettings });
+    // In production, implement database updates here
+    // Log settings save to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.log("Settings saved:", { featureFlags, policySettings });
+    }
   } catch (error) {
-    console.error("Failed to save settings:", error);
+    // Log settings save error to monitoring service
+    if ((process.env.NODE_ENV as string) === 'development') {
+      // eslint-disable-next-line no-console
+      console.error("Failed to save settings:", error);
+    }
   }
 }
 

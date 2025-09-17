@@ -1,372 +1,208 @@
-// Playwright End-to-End Tests for Invoice Workflow
-// Tests complete user journey from invoice creation to payment
+/**
+ * End-to-End Tests: Invoice Management Workflow
+ *
+ * Tests the complete invoice management flow including:
+ * - Creating invoices
+ * - Viewing invoice list
+ * - Editing invoices
+ * - Invoice validation
+ * - Error handling
+ */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-// Test configuration
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-const TEST_USER = {
-    email: 'test@example.com',
-    password: 'testpassword123',
-};
-
-// Test data
-const TEST_CUSTOMER = {
-    name: 'Test Customer',
-    email: 'customer@test.com',
-    phone: '+1234567890',
-};
-
-const TEST_INVOICE = {
-    amount: 1000.00,
-    currency: 'USD',
-    dueDate: '2024-02-01',
-    description: 'Test Invoice',
-    lineItems: [
-        {
-            description: 'Test Item',
-            quantity: 1,
-            unitPrice: 1000.00,
-            total: 1000.00,
-        },
-    ],
-};
-
-const TEST_PAYMENT = {
-    amount: 1000.00,
-    paymentMethod: 'CASH',
-    paymentDate: new Date().toISOString().split('T')[0],
-    description: 'Test Payment',
-};
-
-// Helper functions
-async function login(page: Page) {
-    await page.goto(`${BASE_URL}/login`);
-    await page.fill('[data-testid="email-input"]', TEST_USER.email);
-    await page.fill('[data-testid="password-input"]', TEST_USER.password);
-    await page.click('[data-testid="login-button"]');
-    await expect(page).toHaveURL(`${BASE_URL}/dashboard`);
-}
-
-async function createCustomer(page: Page) {
-    await page.goto(`${BASE_URL}/customers`);
-    await page.click('[data-testid="create-customer-button"]');
-
-    await page.fill('[data-testid="customer-name-input"]', TEST_CUSTOMER.name);
-    await page.fill('[data-testid="customer-email-input"]', TEST_CUSTOMER.email);
-    await page.fill('[data-testid="customer-phone-input"]', TEST_CUSTOMER.phone);
-
-    await page.click('[data-testid="save-customer-button"]');
-    await expect(page.locator('[data-testid="customer-success-message"]')).toBeVisible();
-}
-
-async function createInvoice(page: Page, customerId: string) {
-    await page.goto(`${BASE_URL}/invoices`);
-    await page.click('[data-testid="create-invoice-button"]');
-
-    await page.selectOption('[data-testid="customer-select"]', customerId);
-    await page.fill('[data-testid="invoice-amount-input"]', TEST_INVOICE.amount.toString());
-    await page.selectOption('[data-testid="currency-select"]', TEST_INVOICE.currency);
-    await page.fill('[data-testid="due-date-input"]', TEST_INVOICE.dueDate);
-    await page.fill('[data-testid="invoice-description-input"]', TEST_INVOICE.description);
-
-    // Add line item
-    await page.click('[data-testid="add-line-item-button"]');
-    await page.fill('[data-testid="line-item-description-input"]', TEST_INVOICE.lineItems[0].description);
-    await page.fill('[data-testid="line-item-quantity-input"]', TEST_INVOICE.lineItems[0].quantity.toString());
-    await page.fill('[data-testid="line-item-unit-price-input"]', TEST_INVOICE.lineItems[0].unitPrice.toString());
-
-    await page.click('[data-testid="save-invoice-button"]');
-    await expect(page.locator('[data-testid="invoice-success-message"]')).toBeVisible();
-}
-
-async function sendInvoice(page: Page, invoiceId: string) {
-    await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-    await page.click('[data-testid="send-invoice-button"]');
-    await expect(page.locator('[data-testid="invoice-sent-message"]')).toBeVisible();
-}
-
-async function createPayment(page: Page, invoiceId: string) {
-    await page.goto(`${BASE_URL}/payments`);
-    await page.click('[data-testid="create-payment-button"]');
-
-    await page.fill('[data-testid="payment-amount-input"]', TEST_PAYMENT.amount.toString());
-    await page.selectOption('[data-testid="payment-method-select"]', TEST_PAYMENT.paymentMethod);
-    await page.fill('[data-testid="payment-date-input"]', TEST_PAYMENT.paymentDate);
-    await page.fill('[data-testid="payment-description-input"]', TEST_PAYMENT.description);
-
-    // Add allocation
-    await page.click('[data-testid="add-allocation-button"]');
-    await page.selectOption('[data-testid="allocation-type-select"]', 'INVOICE');
-    await page.fill('[data-testid="allocation-entity-id-input"]', invoiceId);
-    await page.fill('[data-testid="allocation-amount-input"]', TEST_PAYMENT.amount.toString());
-
-    await page.click('[data-testid="save-payment-button"]');
-    await expect(page.locator('[data-testid="payment-success-message"]')).toBeVisible();
-}
-
-// Test suite
-test.describe('Invoice Workflow', () => {
+test.describe("Invoice Management Workflow", () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        // Login first
+        await page.goto("/login");
+        await page.fill('[data-testid="email-input"]', "admin@demo-accounting.com");
+        await page.fill('[data-testid="password-input"]', "password123");
+        await page.click('[data-testid="login-button"]');
+        await page.waitForURL("/dashboard");
     });
 
-    test('should complete full invoice workflow', async ({ page }) => {
-        // Step 1: Create customer
-        await createCustomer(page);
+    test("should create a new invoice", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
 
-        // Get customer ID from the success message or URL
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
-        expect(customerId).toBeTruthy();
-
-        // Step 2: Create invoice
-        await createInvoice(page, customerId!);
-
-        // Get invoice ID from the success message or URL
-        const invoiceId = await page.locator('[data-testid="invoice-id"]').textContent();
-        expect(invoiceId).toBeTruthy();
-
-        // Step 3: Send invoice
-        await sendInvoice(page, invoiceId!);
-
-        // Verify invoice status is 'sent'
-        await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-        await expect(page.locator('[data-testid="invoice-status"]')).toHaveText('sent');
-
-        // Step 4: Create payment
-        await createPayment(page, invoiceId!);
-
-        // Step 5: Verify invoice is marked as paid
-        await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-        await expect(page.locator('[data-testid="invoice-status"]')).toHaveText('paid');
-
-        // Step 6: Verify payment appears in payments list
-        await page.goto(`${BASE_URL}/payments`);
-        await expect(page.locator('[data-testid="payment-list"]')).toContainText(TEST_PAYMENT.description);
-    });
-
-    test('should handle invoice creation validation', async ({ page }) => {
-        await page.goto(`${BASE_URL}/invoices`);
+        // Click create invoice button
         await page.click('[data-testid="create-invoice-button"]');
 
-        // Try to save without required fields
+        // Wait for create invoice modal/form
+        await expect(page.locator('[data-testid="create-invoice-modal"]')).toBeVisible();
+
+        // Fill in invoice details
+        await page.fill('[data-testid="invoice-number"]', "INV-2024-001");
+        await page.fill('[data-testid="customer-name"]', "Test Customer");
+        await page.fill('[data-testid="customer-email"]', "customer@example.com");
+        await page.fill('[data-testid="invoice-date"]', "2024-01-15");
+        await page.fill('[data-testid="due-date"]', "2024-02-15");
+
+        // Add invoice line items
+        await page.click('[data-testid="add-line-item"]');
+        await page.fill('[data-testid="line-description"]', "Consulting Services");
+        await page.fill('[data-testid="line-quantity"]', "10");
+        await page.fill('[data-testid="line-unit-price"]', "100.00");
+
+        // Save invoice
+        await page.click('[data-testid="save-invoice-button"]');
+
+        // Verify success message
+        await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
+        await expect(page.locator('[data-testid="success-message"]')).toContainText("Invoice created successfully");
+
+        // Verify invoice appears in list
+        await expect(page.locator('[data-testid="invoice-item"]')).toContainText("INV-2024-001");
+    });
+
+    test("should validate invoice form inputs", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
+
+        // Click create invoice button
+        await page.click('[data-testid="create-invoice-button"]');
+
+        // Wait for create invoice modal/form
+        await expect(page.locator('[data-testid="create-invoice-modal"]')).toBeVisible();
+
+        // Try to save with invalid data
+        await page.fill('[data-testid="invoice-number"]', ""); // Required field
+        await page.fill('[data-testid="customer-name"]', ""); // Required field
         await page.click('[data-testid="save-invoice-button"]');
 
         // Verify validation errors
-        await expect(page.locator('[data-testid="customer-error"]')).toBeVisible();
-        await expect(page.locator('[data-testid="amount-error"]')).toBeVisible();
-        await expect(page.locator('[data-testid="due-date-error"]')).toBeVisible();
+        await expect(page.locator('[data-testid="validation-error"]')).toBeVisible();
+        await expect(page.locator('[data-testid="validation-error"]')).toContainText("Invoice number is required");
     });
 
-    test('should handle invoice editing', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
+    test("should display invoice list with pagination", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
 
-        // Create invoice
-        await createInvoice(page, customerId!);
-        const invoiceId = await page.locator('[data-testid="invoice-id"]').textContent();
+        // Verify invoice list is displayed
+        await expect(page.locator('[data-testid="invoices-list"]')).toBeVisible();
 
-        // Edit invoice
-        await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-        await page.click('[data-testid="edit-invoice-button"]');
-
-        await page.fill('[data-testid="invoice-description-input"]', 'Updated Test Invoice');
-        await page.click('[data-testid="save-invoice-button"]');
-
-        // Verify changes
-        await expect(page.locator('[data-testid="invoice-description"]')).toHaveText('Updated Test Invoice');
+        // Check pagination if there are many invoices
+        const paginationExists = await page.locator('[data-testid="pagination"]').isVisible();
+        if (paginationExists) {
+            // Test pagination
+            await page.click('[data-testid="next-page"]');
+            await expect(page.locator('[data-testid="current-page"]')).toContainText("2");
+        }
     });
 
-    test('should handle invoice cancellation', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
+    test("should filter invoices by status", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
 
-        // Create invoice
-        await createInvoice(page, customerId!);
-        const invoiceId = await page.locator('[data-testid="invoice-id"]').textContent();
+        // Apply status filter
+        await page.selectOption('[data-testid="status-filter"]', "paid");
 
-        // Cancel invoice
-        await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-        await page.click('[data-testid="cancel-invoice-button"]');
+        // Verify filtered results
+        await expect(page.locator('[data-testid="invoice-item"]')).toContainText("Paid");
 
-        // Confirm cancellation
-        await page.click('[data-testid="confirm-cancel-button"]');
+        // Clear filter
+        await page.selectOption('[data-testid="status-filter"]', "all");
 
-        // Verify invoice status is 'cancelled'
-        await expect(page.locator('[data-testid="invoice-status"]')).toHaveText('cancelled');
+        // Verify all invoices are shown again
+        await expect(page.locator('[data-testid="invoices-list"]')).toBeVisible();
     });
 
-    test('should handle partial payment', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
+    test("should search invoices by customer name", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
 
-        // Create invoice
-        await createInvoice(page, customerId!);
-        const invoiceId = await page.locator('[data-testid="invoice-id"]').textContent();
-
-        // Send invoice
-        await sendInvoice(page, invoiceId!);
-
-        // Create partial payment
-        await page.goto(`${BASE_URL}/payments`);
-        await page.click('[data-testid="create-payment-button"]');
-
-        const partialAmount = TEST_PAYMENT.amount / 2;
-        await page.fill('[data-testid="payment-amount-input"]', partialAmount.toString());
-        await page.selectOption('[data-testid="payment-method-select"]', TEST_PAYMENT.paymentMethod);
-        await page.fill('[data-testid="payment-date-input"]', TEST_PAYMENT.paymentDate);
-        await page.fill('[data-testid="payment-description-input"]', 'Partial Payment');
-
-        // Add allocation
-        await page.click('[data-testid="add-allocation-button"]');
-        await page.selectOption('[data-testid="allocation-type-select"]', 'INVOICE');
-        await page.fill('[data-testid="allocation-entity-id-input"]', invoiceId!);
-        await page.fill('[data-testid="allocation-amount-input"]', partialAmount.toString());
-
-        await page.click('[data-testid="save-payment-button"]');
-        await expect(page.locator('[data-testid="payment-success-message"]')).toBeVisible();
-
-        // Verify invoice is still 'sent' (not fully paid)
-        await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-        await expect(page.locator('[data-testid="invoice-status"]')).toHaveText('sent');
-    });
-
-    test('should handle overpayment', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
-
-        // Create invoice
-        await createInvoice(page, customerId!);
-        const invoiceId = await page.locator('[data-testid="invoice-id"]').textContent();
-
-        // Send invoice
-        await sendInvoice(page, invoiceId!);
-
-        // Create overpayment
-        await page.goto(`${BASE_URL}/payments`);
-        await page.click('[data-testid="create-payment-button"]');
-
-        const overAmount = TEST_PAYMENT.amount * 1.5;
-        await page.fill('[data-testid="payment-amount-input"]', overAmount.toString());
-        await page.selectOption('[data-testid="payment-method-select"]', TEST_PAYMENT.paymentMethod);
-        await page.fill('[data-testid="payment-date-input"]', TEST_PAYMENT.paymentDate);
-        await page.fill('[data-testid="payment-description-input"]', 'Overpayment');
-
-        // Add allocation
-        await page.click('[data-testid="add-allocation-button"]');
-        await page.selectOption('[data-testid="allocation-type-select"]', 'INVOICE');
-        await page.fill('[data-testid="allocation-entity-id-input"]', invoiceId!);
-        await page.fill('[data-testid="allocation-amount-input"]', overAmount.toString());
-
-        await page.click('[data-testid="save-payment-button"]');
-        await expect(page.locator('[data-testid="payment-success-message"]')).toBeVisible();
-
-        // Verify invoice is marked as 'paid'
-        await page.goto(`${BASE_URL}/invoices/${invoiceId}`);
-        await expect(page.locator('[data-testid="invoice-status"]')).toHaveText('paid');
-    });
-
-    test('should display invoice in dashboard', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
-
-        // Create invoice
-        await createInvoice(page, customerId!);
-        const invoiceId = await page.locator('[data-testid="invoice-id"]').textContent();
-
-        // Check dashboard
-        await page.goto(`${BASE_URL}/dashboard`);
-
-        // Verify invoice appears in recent invoices
-        await expect(page.locator('[data-testid="recent-invoices"]')).toContainText(TEST_INVOICE.description);
-
-        // Verify invoice count increased
-        await expect(page.locator('[data-testid="total-invoices"]')).toContainText('1');
-    });
-
-    test('should handle invoice search and filtering', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
-
-        // Create invoice
-        await createInvoice(page, customerId!);
-
-        // Test search
-        await page.goto(`${BASE_URL}/invoices`);
-        await page.fill('[data-testid="search-input"]', TEST_INVOICE.description);
+        // Search for specific customer
+        await page.fill('[data-testid="search-input"]', "Test Customer");
         await page.click('[data-testid="search-button"]');
 
         // Verify search results
-        await expect(page.locator('[data-testid="invoice-list"]')).toContainText(TEST_INVOICE.description);
-
-        // Test filtering by status
-        await page.selectOption('[data-testid="status-filter"]', 'draft');
-        await expect(page.locator('[data-testid="invoice-list"]')).toContainText(TEST_INVOICE.description);
+        await expect(page.locator('[data-testid="invoice-item"]')).toContainText("Test Customer");
     });
 
-    test('should handle invoice export', async ({ page }) => {
-        // Create customer first
-        await createCustomer(page);
-        const customerId = await page.locator('[data-testid="customer-id"]').textContent();
+    test("should edit existing invoice", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
 
-        // Create invoice
-        await createInvoice(page, customerId!);
+        // Click edit button on first invoice
+        await page.click('[data-testid="edit-invoice-button"]').first();
 
-        // Test export
-        await page.goto(`${BASE_URL}/invoices`);
-        await page.click('[data-testid="export-button"]');
-        await page.selectOption('[data-testid="export-format"]', 'PDF');
-        await page.click('[data-testid="confirm-export-button"]');
+        // Wait for edit modal/form
+        await expect(page.locator('[data-testid="edit-invoice-modal"]')).toBeVisible();
 
-        // Verify download started
-        const download = await page.waitForEvent('download');
-        expect(download.suggestedFilename()).toContain('invoices');
-    });
-});
+        // Update invoice details
+        await page.fill('[data-testid="customer-name"]', "Updated Customer Name");
 
-// Test suite for error handling
-test.describe('Invoice Error Handling', () => {
-    test.beforeEach(async ({ page }) => {
-        await login(page);
-    });
-
-    test('should handle network errors gracefully', async ({ page }) => {
-        // Mock network error
-        await page.route('**/api/invoices', route => route.abort());
-
-        await page.goto(`${BASE_URL}/invoices`);
-        await page.click('[data-testid="create-invoice-button"]');
-
-        // Try to create invoice
-        await page.fill('[data-testid="invoice-amount-input"]', '1000');
+        // Save changes
         await page.click('[data-testid="save-invoice-button"]');
 
-        // Verify error message
-        await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
+        // Verify success message
+        await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
+        await expect(page.locator('[data-testid="success-message"]')).toContainText("Invoice updated successfully");
     });
 
-    test('should handle server errors gracefully', async ({ page }) => {
-        // Mock server error
-        await page.route('**/api/invoices', route => route.fulfill({
-            status: 500,
-            contentType: 'application/json',
-            body: JSON.stringify({ error: 'Internal Server Error' }),
-        }));
+    test("should handle invoice API errors gracefully", async ({ page }) => {
+        // Mock invoice API error
+        await page.route("**/api/invoices**", route => {
+            route.fulfill({
+                status: 500,
+                contentType: "application/json",
+                body: JSON.stringify({
+                    success: false,
+                    error: {
+                        type: "internal_error",
+                        title: "Invoice service unavailable",
+                        status: 500,
+                        code: "INVOICE_SERVICE_ERROR",
+                        detail: "The invoice service is temporarily unavailable",
+                    },
+                    timestamp: new Date().toISOString(),
+                    requestId: "test-request-id",
+                }),
+            });
+        });
 
-        await page.goto(`${BASE_URL}/invoices`);
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
+
+        // Verify error message is displayed
+        await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
+        await expect(page.locator('[data-testid="error-message"]')).toContainText("Invoice service unavailable");
+
+        // Verify retry button is available
+        await expect(page.locator('[data-testid="retry-button"]')).toBeVisible();
+    });
+
+    test("should prevent duplicate invoice numbers", async ({ page }) => {
+        // Navigate to invoices page
+        await page.click('[data-testid="invoices-menu"]');
+        await page.waitForURL("/invoices");
+
+        // Click create invoice button
         await page.click('[data-testid="create-invoice-button"]');
 
-        // Try to create invoice
-        await page.fill('[data-testid="invoice-amount-input"]', '1000');
+        // Wait for create invoice modal/form
+        await expect(page.locator('[data-testid="create-invoice-modal"]')).toBeVisible();
+
+        // Fill in invoice with duplicate number
+        await page.fill('[data-testid="invoice-number"]', "INV-2024-001"); // Assuming this already exists
+        await page.fill('[data-testid="customer-name"]', "Test Customer");
+        await page.fill('[data-testid="customer-email"]', "customer@example.com");
+        await page.fill('[data-testid="invoice-date"]', "2024-01-15");
+        await page.fill('[data-testid="due-date"]', "2024-02-15");
+
+        // Save invoice
         await page.click('[data-testid="save-invoice-button"]');
 
-        // Verify error message
+        // Verify error message for duplicate number
         await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
+        await expect(page.locator('[data-testid="error-message"]')).toContainText("Invoice number already exists");
     });
 });

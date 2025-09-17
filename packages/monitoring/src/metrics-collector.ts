@@ -801,9 +801,13 @@ export class MetricsCollector extends EventEmitter {
     const recentMetrics = this.metrics.filter(m => m.timestamp > oneMinuteAgo);
 
     if (recentMetrics.length > this.config.maxMetricsPerMinute) {
-      console.warn(
-        `Metrics rate limit exceeded: ${recentMetrics.length} metrics in the last minute`,
-      );
+      // Log metrics collector warning to monitoring service
+      if ((process.env.NODE_ENV as string) === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Metrics rate limit exceeded: ${recentMetrics.length} metrics in the last minute`
+        );
+      }
     }
   }
 

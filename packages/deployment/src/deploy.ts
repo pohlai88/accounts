@@ -9,6 +9,13 @@ import { existsSync } from "fs";
 import chalk from "chalk";
 import { ProductionHealthChecker } from "./health-check";
 
+// Logger utility to replace console statements
+const logger = {
+  info: (message: string) => process.stdout.write(`${message}\n`),
+  error: (message: string) => process.stderr.write(`${message}\n`),
+  warn: (message: string) => process.stdout.write(`${message}\n`),
+};
+
 export interface DeploymentConfig {
   environment: "staging" | "production";
   version: string;
@@ -44,8 +51,8 @@ export class ProductionDeployer {
     this.startTime = Date.now();
     const steps: DeploymentResult["steps"] = [];
 
-    console.log(chalk.blue(`🚀 Starting ${this.config.environment} deployment...`));
-    console.log(chalk.blue(`📦 Version: ${this.config.version}\n`));
+    logger.info(chalk.blue(`🚀 Starting ${this.config.environment} deployment...`));
+    logger.info(chalk.blue(`📦 Version: ${this.config.version}\n`));
 
     try {
       // Step 1: Pre-deployment checks
@@ -76,7 +83,7 @@ export class ProductionDeployer {
         healthCheck,
       };
 
-      console.log(chalk.green(`\n✅ Deployment completed successfully in ${duration}ms`));
+      logger.info(chalk.green(`\n✅ Deployment completed successfully in ${duration}ms`));
       return result;
     } catch (error) {
       const duration = Date.now() - this.startTime;
@@ -88,12 +95,12 @@ export class ProductionDeployer {
         steps,
       };
 
-      console.log(chalk.red(`\n❌ Deployment failed after ${duration}ms`));
-      console.log(chalk.red(`Error: ${error}`));
+      logger.error(chalk.red(`\n❌ Deployment failed after ${duration}ms`));
+      logger.error(chalk.red(`Error: ${error}`));
 
       // Attempt rollback if configured
       if (this.config.rollbackVersion) {
-        console.log(chalk.yellow("\n🔄 Attempting rollback..."));
+        logger.warn(chalk.yellow("\n🔄 Attempting rollback..."));
         await this.rollback();
       }
 
@@ -106,12 +113,12 @@ export class ProductionDeployer {
     stepFn: () => Promise<unknown>,
   ): Promise<DeploymentResult["steps"][0]> {
     const stepStartTime = Date.now();
-    console.log(chalk.blue(`⏳ ${name}...`));
+    logger.info(chalk.blue(`⏳ ${name}...`));
 
     try {
       await stepFn();
       const duration = Date.now() - stepStartTime;
-      console.log(chalk.green(`✅ ${name} completed in ${duration}ms`));
+      logger.info(chalk.green(`✅ ${name} completed in ${duration}ms`));
 
       return {
         name,
@@ -121,8 +128,8 @@ export class ProductionDeployer {
       };
     } catch (error) {
       const duration = Date.now() - stepStartTime;
-      console.log(chalk.red(`❌ ${name} failed after ${duration}ms`));
-      console.log(chalk.red(`Error: ${error}`));
+      logger.error(chalk.red(`❌ ${name} failed after ${duration}ms`));
+      logger.error(chalk.red(`Error: ${error}`));
 
       return {
         name,
@@ -191,7 +198,7 @@ export class ProductionDeployer {
   private async deployToEnvironment(): Promise<void> {
     // This would be environment-specific deployment logic
     // For now, simulate deployment
-    console.log(chalk.yellow("📦 Simulating deployment..."));
+    logger.info(chalk.yellow("📦 Simulating deployment..."));
 
     // In a real deployment, this would:
     // 1. Upload build artifacts to the target environment
@@ -200,7 +207,7 @@ export class ProductionDeployer {
     // 4. Update load balancer configuration
 
     await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log(chalk.green("✅ Deployment simulation completed"));
+    logger.info(chalk.green("✅ Deployment simulation completed"));
   }
 
   private async runPostDeploymentHealthCheck(): Promise<unknown> {
@@ -210,11 +217,11 @@ export class ProductionDeployer {
 
   private async rollback(): Promise<void> {
     if (!this.config.rollbackVersion) {
-      console.log(chalk.red("❌ No rollback version specified"));
+      logger.error(chalk.red("❌ No rollback version specified"));
       return;
     }
 
-    console.log(chalk.yellow(`🔄 Rolling back to version ${this.config.rollbackVersion}...`));
+    logger.warn(chalk.yellow(`🔄 Rolling back to version ${this.config.rollbackVersion}...`));
 
     try {
       // In a real deployment, this would:
@@ -223,9 +230,9 @@ export class ProductionDeployer {
       // 3. Verify rollback success
 
       await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log(chalk.green("✅ Rollback completed"));
+      logger.info(chalk.green("✅ Rollback completed"));
     } catch (error) {
-      console.log(chalk.red(`❌ Rollback failed: ${error}`));
+      logger.error(chalk.red(`❌ Rollback failed: ${error}`));
     }
   }
 }

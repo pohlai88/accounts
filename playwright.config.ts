@@ -1,103 +1,58 @@
-import { defineConfig, devices } from "@playwright/test";
-
 /**
- * V1 Playwright Configuration with Live Supabase RLS Testing
- * Target: 80% E2E coverage for core flows + RLS verification
- * Performance: p95 < 500ms, error rate < 1%
+ * Playwright Configuration for AI-BOS E2E Tests
+ *
+ * Configures Playwright for end-to-end testing of the AI-BOS platform
  */
+
+import { defineConfig, devices } from '@playwright/test';
+
 export default defineConfig({
-  testDir: "./tests/e2e",
-  outputDir: "./test-results/playwright-results",
-
-  // V1 Performance Requirements (increased for RLS testing)
-  timeout: 60 * 1000, // 60 seconds max per test (RLS setup takes time)
-  expect: {
-    timeout: 10 * 1000, // 10 seconds for assertions (database operations)
-  },
-
-  // Global setup for Supabase RLS
-  globalSetup: require.resolve("./tests/e2e/supabase-rls-setup.ts"),
-  globalTeardown: require.resolve("./tests/e2e/global-teardown.ts"),
-
-  // Fail fast on CI, retry locally
-  fullyParallel: false, // Sequential for RLS testing to avoid conflicts
+  testDir: './tests/e2e',
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0, // Reduced retries for RLS tests
-  workers: process.env.CI ? 1 : 2, // Limited workers for database testing
-
-  // Comprehensive reporting
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
   reporter: [
-    ["html", { outputFolder: "./test-results/playwright-report" }],
-    ["json", { outputFile: "./test-results/playwright-results.json" }],
-    ["junit", { outputFile: "./test-results/playwright-junit.xml" }],
-    process.env.CI ? ["github"] : ["list"],
+    ['html'],
+    ['json', { outputFile: 'test-results/results.json' }],
+    ['junit', { outputFile: 'test-results/results.xml' }],
   ],
-
   use: {
-    // Base URL for testing
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000",
-
-    // V1 Performance tracking
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
-
-    // Browser settings
-    actionTimeout: 10 * 1000,
-    navigationTimeout: 15 * 1000,
-
-    // Locale settings (V1 requirement: Malaysia default)
-    locale: "en-MY",
-    timezoneId: "Asia/Kuala_Lumpur",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
-
   projects: [
-    // Desktop browsers
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
     },
     {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
     },
     {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
-
-    // Mobile devices (V1 requirement: mobile excellence)
-    {
-      name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] },
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
     },
     {
-      name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] },
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
     },
-
-    // Tablet
     {
-      name: "Tablet",
-      use: { ...devices["iPad Pro"] },
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'] },
     },
   ],
-
-  // Development server setup
-  webServer: process.env.CI
-    ? undefined
-    : [
-        {
-          command: "pnpm --filter @aibos/web dev",
-          port: 3000,
-          reuseExistingServer: !process.env.CI,
-          timeout: 120 * 1000,
-        },
-        {
-          command: "pnpm --filter @aibos/web-api dev",
-          port: 3001,
-          reuseExistingServer: !process.env.CI,
-          timeout: 120 * 1000,
-        },
-      ],
+  webServer: {
+    command: 'pnpm dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
+  expect: {
+    timeout: 10000,
+  },
+  timeout: 30000,
 });

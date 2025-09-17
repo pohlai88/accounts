@@ -124,7 +124,11 @@ export async function ingestFxRates(
       };
     }
   } catch (error) {
-    console.warn("Primary FX source failed:", error);
+    // Log FX source failure to monitoring service
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn("Primary FX source failed:", error);
+    }
   }
 
   // 3. Try fallback sources
@@ -151,7 +155,11 @@ export async function ingestFxRates(
     } catch (error) {
       const errorMsg = `${source.name}: ${error instanceof Error ? error.message : "Unknown error"}`;
       errors.push(errorMsg);
-      console.warn("Fallback FX source failed:", errorMsg);
+      // Log fallback FX source failure to monitoring service
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn("Fallback FX source failed:", errorMsg);
+      }
     }
   }
 
