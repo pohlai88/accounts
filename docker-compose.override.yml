@@ -1,0 +1,44 @@
+# ============================================================================
+# AI-BOS Accounting SaaS - Docker Compose Override
+# ============================================================================
+# Local development overrides and environment-specific configurations
+# This file is automatically loaded by docker-compose
+
+version: "3.8"
+
+# ============================================================================
+# Override Services for Local Development
+# ============================================================================
+services:
+  app:
+    # Override for local development
+    environment:
+      - NODE_ENV=development
+      - DEBUG=aibos:*
+      - LOG_LEVEL=debug
+    volumes:
+      # Mount source code for hot reload
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    command: pnpm dev
+    ports:
+      - "3001:3001"
+      - "9229:9229"  # Debug port
+
+  redis:
+    # Override Redis for local development
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_local_data:/data
+
+# ============================================================================
+# Local Development Volumes
+# ============================================================================
+volumes:
+  redis_local_data:
+    driver: local

@@ -1,0 +1,70 @@
+{
+  "name": "@aibos/accounting",
+  "version": "0.1.0",
+  "dependencies": {
+    "@aibos/auth": "workspace:*",
+    "@aibos/db": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.3",
+    "typescript": "^5.6.2",
+    "vitest": "^3.2.4",
+    "@aibos/eslint-config": "workspace:*",
+    "@aibos/vitest-config": "workspace:*",
+    "@aibos/prettier-config": "workspace:*"
+  },
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./posting": {
+      "types": "./dist/posting.d.ts",
+      "import": "./dist/posting.js"
+    },
+    "./fx/policy": {
+      "types": "./dist/fx/policy.d.ts",
+      "import": "./dist/fx/policy.js"
+    },
+    "./fx/ingest": {
+      "types": "./dist/fx/ingest.d.ts",
+      "import": "./dist/fx/ingest.js"
+    },
+    "./periods/period-management": {
+      "types": "./dist/periods/period-management.d.ts",
+      "import": "./dist/periods/period-management.js"
+    },
+    "./reports/balance-sheet": {
+      "types": "./dist/reports/balance-sheet.d.ts",
+      "import": "./dist/reports/balance-sheet.js"
+    },
+    "./reports/cash-flow": {
+      "types": "./dist/reports/cash-flow.d.ts",
+      "import": "./dist/reports/cash-flow.js"
+    },
+    "./reports/trial-balance": {
+      "types": "./dist/reports/trial-balance.d.ts",
+      "import": "./dist/reports/trial-balance.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./types-entry": {
+      "types": "./dist/types-entry.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsc -p . --watch",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc -p . --noEmit",
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
+  },
+  "type": "module"
+}

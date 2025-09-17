@@ -10,6 +10,7 @@ import helmet from "helmet";
 import { CacheService } from "@aibos/cache";
 import { RateLimitService, RATE_LIMIT_CONFIGS } from "./rate-limit";
 import { RequestLoggingService } from "./logging";
+import { ok, created, notFound, serverErr, unauthorized } from "./response";
 
 export interface GatewayConfig {
   port: number;
@@ -142,23 +143,26 @@ export class APIGateway {
   private setupRoutes(): void {
     // Health check endpoint
     this.app.get("/health", (req: Request, res: Response) => {
-      res.json({
+      const healthData = {
+        service: "api-gateway",
         status: "healthy",
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         memory: process.memoryUsage(),
         stats: this.getStats(),
-      });
+      };
+      res.status(200).json(ok(healthData, "Service healthy"));
     });
 
     // Metrics endpoint
     if (this.config.enableMetrics) {
       this.app.get("/metrics", (req: Request, res: Response) => {
-        res.json({
+        const metricsData = {
           requests: this.stats,
           cache: this.cache.getStats(),
           rateLimit: this.rateLimitService.getStats(req),
-        });
+        };
+        res.status(200).json(ok(metricsData, "Metrics retrieved"));
       });
     }
 
@@ -190,10 +194,7 @@ export class APIGateway {
 
         // Basic validation
         if (!authHeader || !tenantId) {
-          return res.status(401).json({
-            error: "Unauthorized",
-            message: "Missing authentication headers",
-          });
+          return res.status(401).json(unauthorized("UNAUTHORIZED", "Missing authentication headers"));
         }
 
         // TODO: Implement actual JWT verification
@@ -201,10 +202,7 @@ export class APIGateway {
         next();
       } catch (error) {
         console.error("Auth middleware error:", error);
-        res.status(401).json({
-          error: "Unauthorized",
-          message: "Authentication failed",
-        });
+        res.status(401).json(unauthorized("UNAUTHORIZED", "Authentication failed"));
       }
     };
   }
@@ -214,18 +212,16 @@ export class APIGateway {
       try {
         // TODO: Implement actual service proxying
         // For now, return a placeholder response
-        res.json({
-          message: `Proxying to ${serviceName}`,
+        const proxyData = {
+          service: serviceName,
           path: req.path,
           method: req.method,
           headers: req.headers,
-        });
+        };
+        res.status(200).json(ok(proxyData, `Proxying to ${serviceName}`));
       } catch (error) {
         console.error(`Proxy error for ${serviceName}:`, error);
-        res.status(502).json({
-          error: "Bad Gateway",
-          message: `Service ${serviceName} unavailable`,
-        });
+        res.status(502).json(serverErr("BAD_GATEWAY", `Service ${serviceName} unavailable`));
       }
     };
   }
@@ -233,21 +229,17 @@ export class APIGateway {
   private setupErrorHandling(): void {
     // 404 handler
     this.app.use("*", (req: Request, res: Response) => {
-      res.status(404).json({
-        error: "Not Found",
-        message: `Route ${req.method} ${req.originalUrl} not found`,
-      });
+      res.status(404).json(notFound("NOT_FOUND", `Route ${req.method} ${req.originalUrl} not found`));
     });
 
     // Global error handler
     this.app.use((error: Error, req: Request, res: Response, _next: NextFunction) => {
       console.error("Gateway error:", error);
 
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "An unexpected error occurred",
+      res.status(500).json(serverErr("INTERNAL_ERROR", "An unexpected error occurred", {
         requestId: req.headers["x-request-id"],
-      });
+        error: error.message,
+      }));
     });
   }
 
@@ -257,6 +249,10 @@ export class APIGateway {
 
   public getApp(): Express {
     return this.app;
+  }
+
+  public getPort(): number {
+    return this.config.port;
   }
 
   public async start(): Promise<void> {

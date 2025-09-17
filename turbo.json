@@ -30,6 +30,18 @@
       ],
       "outputLogs": "full"
     },
+    "@aibos/deployment#build": {
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "@aibos/api-gateway#build": {
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "@aibos/worker#build": {
+      "outputs": [],
+      "outputLogs": "full"
+    },
     "test": {
       "dependsOn": [
         "build"

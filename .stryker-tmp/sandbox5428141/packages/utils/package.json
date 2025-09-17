@@ -1,0 +1,92 @@
+{
+  "name": "@aibos/utils",
+  "dependencies": {
+    "@aibos/auth": "workspace:*",
+    "@aibos/contracts": "workspace:*",
+    "@aibos/db": "workspace:*",
+    "@axiomhq/winston": "^1.3.1",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "@tanstack/react-query": "^5.59.0",
+    "@types/crypto-js": "^4.2.2",
+    "@types/uuid": "^10.0.0",
+    "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.33.0",
+    "exceljs": "^4.4.0",
+    "pg": "^8.16.3",
+    "playwright": "^1.55.0",
+    "react": "^18.3.1",
+    "redis": "^5.8.2",
+    "resend": "^3.1.0",
+    "uuid": "^13.0.0",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.3",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^18.3.5",
+    "next": "^14.2.32",
+    "typescript": "^5.6.2",
+    "vitest": "^3.2.4",
+    "@aibos/eslint-config": "workspace:*",
+    "@aibos/vitest-config": "workspace:*",
+    "@aibos/prettier-config": "workspace:*"
+  },
+  "main": "dist/src/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./pdf": {
+      "types": "./dist/pdf.d.ts",
+      "import": "./dist/pdf.js"
+    },
+    "./context/request-context": {
+      "types": "./dist/context/request-context.d.ts",
+      "import": "./dist/context/request-context.js"
+    },
+    "./audit/service": {
+      "types": "./dist/audit/service.d.ts",
+      "import": "./dist/audit/service.js"
+    },
+    "./axiom": {
+      "types": "./dist/axiom.d.ts",
+      "import": "./dist/axiom.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware/index.d.ts",
+      "import": "./dist/middleware/index.js"
+    },
+    "./middleware/idempotency": {
+      "types": "./dist/middleware/idempotency.d.ts",
+      "import": "./dist/middleware/idempotency.js"
+    },
+    "./api-gateway": {
+      "types": "./dist/api-gateway.d.ts",
+      "import": "./dist/api-gateway.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:attachments": "vitest run test/attachment-*.test.ts --config vitest.config.attachments.ts",
+    "test:attachments:watch": "vitest test/attachment-*.test.ts --config vitest.config.attachments.ts --watch",
+    "typecheck": "tsc -p . --noEmit",
+    "dev": "tsc -p . --watch",
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
+  },
+  "type": "module"
+}

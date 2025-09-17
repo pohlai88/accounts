@@ -9,6 +9,7 @@
  */
 
 /* eslint-env node */
+/* eslint-disable no-undef */
 const fs = require("fs");
 const path = require("path");
 const { pathToFileURL } = require("url");
@@ -47,9 +48,9 @@ const { pathToFileURL } = require("url");
   // Generate Tailwind preset
   const presetContent = `/**
  * @aibos/tokens Tailwind Preset - Dual-Mode Design System
- * 
+ *
  * Accessibility is not a compromise, it's a fundamental need that we respect and fully support.
- * 
+ *
  * Auto-generated from tokens.ts - DO NOT EDIT MANUALLY
  * This preset provides CSS variables for dual-mode design system:
  * - Aesthetic Mode: Beautiful, subtle, modern design
@@ -132,7 +133,7 @@ const commonVars = {
   '--space-12': semanticTokens.spacing[12],
   '--space-16': semanticTokens.spacing[16],
   '--space-20': semanticTokens.spacing[20],
-  
+
   // Border radius
   '--radius-none': semanticTokens.radius.none,
   '--radius-sm': semanticTokens.radius.sm,
@@ -141,7 +142,7 @@ const commonVars = {
   '--radius-xl': semanticTokens.radius.xl,
   '--radius-2xl': semanticTokens.radius['2xl'],
   '--radius-full': semanticTokens.radius.full,
-  
+
   // Typography
   '--font-sans': semanticTokens.typography.font.sans,
   '--font-mono': semanticTokens.typography.font.mono,
@@ -160,7 +161,7 @@ const commonVars = {
   '--line-height-tight': semanticTokens.typography.lineHeight.tight,
   '--line-height-normal': semanticTokens.typography.lineHeight.normal,
   '--line-height-relaxed': semanticTokens.typography.lineHeight.relaxed,
-  
+
   // Z-index
   '--z-dropdown': semanticTokens.zIndex.dropdown,
   '--z-sticky': semanticTokens.zIndex.sticky,
@@ -184,34 +185,34 @@ module.exports = {
         'sys-text-tertiary': 'var(--sys-text-tertiary)',
         'sys-text-quaternary': 'var(--sys-text-quaternary)',
         'sys-text-link': 'var(--sys-text-link)',
-        
+
         'sys-bg-base': 'var(--sys-bg-base)',
         'sys-bg-subtle': 'var(--sys-bg-subtle)',
         'sys-bg-raised': 'var(--sys-bg-raised)',
-        
+
         'sys-fill-low': 'var(--sys-fill-low)',
         'sys-fill-med': 'var(--sys-fill-med)',
         'sys-fill-high': 'var(--sys-fill-high)',
-        
+
         'sys-border-hairline': 'var(--sys-border-hairline)',
         'sys-accent': 'var(--sys-accent)',
-        
+
         // Brand colors
         'brand-primary': 'var(--brand-primary)',
         'brand-primary-pressed': 'var(--brand-primary-pressed)',
         'brand-accent': 'var(--brand-accent)',
-        
+
         // Status colors
         'sys-status-success': 'var(--sys-status-success)',
         'sys-status-warning': 'var(--sys-status-warning)',
         'sys-status-error': 'var(--sys-status-error)',
-        
+
         // Material colors
         'sys-material-ultra-thin': 'var(--sys-material-ultra-thin)',
         'sys-material-thin': 'var(--sys-material-thin)',
         'sys-material-regular': 'var(--sys-material-regular)',
         'sys-material-thick': 'var(--sys-material-thick)',
-        
+
         // Legacy support
         "bg-base": "var(--sys-bg-base)",
         "bg-elevated": "var(--sys-bg-raised)",

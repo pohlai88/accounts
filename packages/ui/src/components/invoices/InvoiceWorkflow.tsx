@@ -23,6 +23,8 @@ import { PaymentCapture, Payment } from "./PaymentCapture.js";
 import { InvoiceSender } from "./InvoiceSender.js";
 import { PaymentReminders, PaymentReminder } from "./PaymentReminders.js";
 import { InvoiceStatusTimeline, TimelineEvent } from "./InvoiceStatusTimeline.js";
+import { useInvoices, useCustomers } from "../../store/index.js";
+import { apiClient } from "../../lib/api-client.js";
 
 export interface InvoiceWorkflowProps {
   className?: string;
@@ -53,77 +55,68 @@ export const InvoiceWorkflow: React.FC<InvoiceWorkflowProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState<WorkflowStep>("list");
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(initialInvoice || null);
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [reminders, setReminders] = useState<PaymentReminder[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data
-  const mockCustomers: Customer[] = [
-    {
-      id: "1",
-      name: "Acme Corporation",
-      email: "billing@acme.com",
-      phone: "+1 (555) 123-4567",
-      address: {
-        street: "123 Business Ave",
-        city: "New York",
-        state: "NY",
-        zipCode: "10001",
-        country: "USA",
-      },
-      isActive: true,
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-01T00:00:00Z",
-    },
-    {
-      id: "2",
-      name: "Tech Solutions Ltd",
-      email: "accounts@techsolutions.com",
-      phone: "+1 (555) 987-6543",
-      address: {
-        street: "456 Tech Street",
-        city: "San Francisco",
-        state: "CA",
-        zipCode: "94105",
-        country: "USA",
-      },
-      isActive: true,
-      createdAt: "2024-01-02T00:00:00Z",
-      updatedAt: "2024-01-02T00:00:00Z",
-    },
-  ];
+  // Use Zustand store for real data
+  const {
+    invoices,
+    loading: storeLoading,
+    error: storeError,
+    fetchInvoices,
+    createInvoice,
+    updateInvoice,
+    deleteInvoice,
+  } = useInvoices();
 
-  const mockInvoices: Invoice[] = [
-    {
-      id: "1",
-      number: "INV-2024-001",
-      customerName: "Acme Corporation",
-      customerEmail: "billing@acme.com",
-      issueDate: "2024-01-15",
-      dueDate: "2024-02-15",
-      amount: 2500.0,
-      status: "sent",
-      createdAt: "2024-01-15T10:30:00Z",
-      updatedAt: "2024-01-15T10:30:00Z",
-    },
-    {
-      id: "2",
-      number: "INV-2024-002",
-      customerName: "Tech Solutions Ltd",
-      customerEmail: "accounts@techsolutions.com",
-      issueDate: "2024-01-16",
-      dueDate: "2024-02-16",
-      amount: 1800.0,
-      status: "paid",
-      createdAt: "2024-01-16T14:20:00Z",
-      updatedAt: "2024-01-16T14:20:00Z",
-    },
-  ];
+  const {
+    customers,
+    fetchCustomers,
+  } = useCustomers();
 
+  // Transform store invoices to match InvoiceList Invoice type
+  const transformedInvoices: Invoice[] = invoices.map(invoice => ({
+    id: invoice.id,
+    number: invoice.invoiceNumber,
+    customerName: invoice.customerName || "Unknown Customer",
+    customerEmail: "", // Will need to fetch from customer data
+    issueDate: invoice.invoiceDate || invoice.createdAt,
+    dueDate: invoice.dueDate,
+    amount: invoice.totalAmount,
+    status: invoice.status as "draft" | "sent" | "paid" | "overdue",
+    createdAt: invoice.createdAt,
+    updatedAt: invoice.createdAt, // Use createdAt as fallback
+  }));
+
+  // Load data on component mount
   useEffect(() => {
-    setCustomers(mockCustomers);
-  }, []);
+    const loadData = async () => {
+      try {
+        setError(null);
+        await Promise.all([
+          fetchInvoices(),
+          fetchCustomers(),
+        ]);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to load data");
+        }
+      }
+    };
+
+    loadData();
+  }, [fetchInvoices, fetchCustomers]);
+
+  // Handle errors from store
+  useEffect(() => {
+    if (storeError) {
+      setError(storeError);
+    }
+  }, [storeError]);
 
   const handleInvoiceSelect = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -140,9 +133,49 @@ export const InvoiceWorkflow: React.FC<InvoiceWorkflowProps> = ({
     setCurrentStep("create");
   };
 
-  const handleInvoiceSave = (invoiceData: InvoiceFormData) => {
-    onInvoiceSave?.(invoiceData);
-    setCurrentStep("list");
+  const handleInvoiceSave = async (invoiceData: InvoiceFormData) => {
+    try {
+      setError(null);
+      await createInvoice(invoiceData);
+      onInvoiceSave?.(invoiceData);
+      setCurrentStep("list");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to save invoice");
+      }
+    }
+  };
+
+  const handleInvoiceUpdate = async (invoiceId: string, updates: Partial<InvoiceFormData>) => {
+    try {
+      setError(null);
+      await updateInvoice(invoiceId, updates);
+      onInvoiceUpdate?.(invoiceId, updates);
+      setCurrentStep("list");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to update invoice");
+      }
+    }
+  };
+
+  const handleInvoiceDelete = async (invoiceId: string) => {
+    try {
+      setError(null);
+      await deleteInvoice(invoiceId);
+      onInvoiceDelete?.(invoiceId);
+      setCurrentStep("list");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to delete invoice");
+      }
+    }
   };
 
   const handlePaymentCapture = (payment: Payment) => {
@@ -204,7 +237,7 @@ export const InvoiceWorkflow: React.FC<InvoiceWorkflowProps> = ({
       case "list":
         return (
           <InvoiceList
-            invoices={mockInvoices}
+            invoices={transformedInvoices}
             onInvoiceSelect={handleInvoiceSelect}
             onInvoiceEdit={handleInvoiceEdit}
             onInvoiceSend={invoice => {
@@ -214,7 +247,7 @@ export const InvoiceWorkflow: React.FC<InvoiceWorkflowProps> = ({
             onInvoiceDownload={invoice => {
               console.log("Download invoice:", invoice);
             }}
-            isLoading={isLoading}
+            isLoading={isLoading || storeLoading}
           />
         );
 
@@ -409,6 +442,23 @@ export const InvoiceWorkflow: React.FC<InvoiceWorkflowProps> = ({
 
   return (
     <div className={cn("space-y-6", className)}>
+      {/* Error Display */}
+      {error && (
+        <div className="bg-sys-status-error/10 border border-sys-status-error/20 rounded-lg p-4">
+          <div className="flex items-center space-x-2">
+            <AlertCircle className="h-5 w-5 text-sys-status-error" />
+            <span className="text-sys-status-error font-medium">Error</span>
+          </div>
+          <p className="text-sys-status-error mt-1">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="mt-2 text-sm text-sys-status-error hover:text-sys-status-error/80 underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">

@@ -1,0 +1,192 @@
+name: Test Robustness
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  error-coverage:
+    name: Error Code Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check error code coverage
+        run: pnpm test:error-codes
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: error-coverage-report
+          path: error-coverage-report.json
+
+  invariant-testing:
+    name: Invariant Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run invariant tests
+        run: pnpm test:invariants
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: invariant-test-results
+          path: test-results/
+
+  mutation-testing:
+    name: Mutation Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run mutation testing
+        run: pnpm test:mutation
+
+      - name: Upload mutation report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: mutation-report
+          path: reports/mutation/
+
+  integration-testing:
+    name: Integration Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run integration tests
+        run: pnpm test:integration:all
+
+      - name: Upload integration test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: integration-test-results
+          path: test-results/
+
+  robustness-summary:
+    name: Robustness Summary
+    runs-on: ubuntu-latest
+    needs: [error-coverage, invariant-testing, mutation-testing, integration-testing]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Generate robustness report
+        run: |
+          echo "# Test Robustness Report" > robustness-report.md
+          echo "Generated: $(date)" >> robustness-report.md
+          echo "" >> robustness-report.md
+
+          echo "## Error Code Coverage" >> robustness-report.md
+          if [ -f "artifacts/error-coverage-report/error-coverage-report.json" ]; then
+            echo "✅ Error code coverage check completed" >> robustness-report.md
+          else
+            echo "❌ Error code coverage check failed" >> robustness-report.md
+          fi
+
+          echo "" >> robustness-report.md
+          echo "## Invariant Testing" >> robustness-report.md
+          if [ -d "artifacts/invariant-test-results" ]; then
+            echo "✅ Invariant tests completed" >> robustness-report.md
+          else
+            echo "❌ Invariant tests failed" >> robustness-report.md
+          fi
+
+          echo "" >> robustness-report.md
+          echo "## Mutation Testing" >> robustness-report.md
+          if [ -d "artifacts/mutation-report" ]; then
+            echo "✅ Mutation testing completed" >> robustness-report.md
+          else
+            echo "❌ Mutation testing failed" >> robustness-report.md
+          fi
+
+          echo "" >> robustness-report.md
+          echo "## Integration Testing" >> robustness-report.md
+          if [ -d "artifacts/integration-test-results" ]; then
+            echo "✅ Integration tests completed" >> robustness-report.md
+          else
+            echo "❌ Integration tests failed" >> robustness-report.md
+          fi
+
+      - name: Upload robustness report
+        uses: actions/upload-artifact@v4
+        with:
+          name: robustness-report
+          path: robustness-report.md
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('robustness-report.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });

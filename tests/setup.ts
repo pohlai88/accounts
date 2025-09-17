@@ -1,139 +1,177 @@
-// V1 Testing Setup - Global test configuration
-import "@testing-library/jest-dom";
-import { vi, afterEach } from "vitest";
+// Global test setup - Single source of truth for mocks
+import { afterEach, vi } from 'vitest';
 
-// Mock environment variables for testing
-if (!process.env.NODE_ENV) {
-  (process.env as any).NODE_ENV = "test";
+// Stable time and UUIDs for deterministic tests
+vi.spyOn(Date, "now").mockReturnValue(new Date("2025-01-01T00:00:00Z").valueOf());
+vi.spyOn(Date.prototype, "toISOString").mockReturnValue("2025-01-01T00:00:00.000Z");
+
+// Mock crypto.randomUUID for deterministic IDs in tests
+if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+  vi.spyOn(crypto, "randomUUID").mockReturnValue("00000000-0000-0000-0000-000000000000");
 }
-// Use local Supabase for testing (safer than live database)
-process.env.NEXT_PUBLIC_SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:54321";
-process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
-process.env.SUPABASE_SERVICE_ROLE_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU";
-process.env.DATABASE_URL =
-  process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:54322/postgres";
-process.env.RESEND_API_KEY = "test-resend-key";
-process.env.RESEND_FROM_EMAIL = "test@aibos.com";
-process.env.AXIOM_TOKEN = "test-axiom-token";
-process.env.AXIOM_ORG_ID = "test-org";
 
-// Mock console methods to reduce noise in tests
-global.console = {
-  ...console,
-  log: vi.fn(),
-  debug: vi.fn(),
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-};
+// Mock database functions that the business logic actually uses
+vi.mock('@aibos/db', () => {
+  console.log('Mocking @aibos/db');
 
-// Mock fetch for API calls
-global.fetch = vi.fn();
+  // Create mock functions that can be used with vi.mocked()
+  const mockGetAccountsInfo = vi.fn().mockResolvedValue(new Map([
+    ['test-ar-account', {
+      id: 'test-ar-account',
+      code: '1100',
+      name: 'Accounts Receivable',
+      type: 'ASSET',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['test-revenue-account', {
+      id: 'test-revenue-account',
+      code: '4000',
+      name: 'Sales Revenue',
+      type: 'REVENUE',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['test-tax-account', {
+      id: 'test-tax-account',
+      code: '2100',
+      name: 'Tax Payable',
+      type: 'LIABILITY',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['test-ap-account', {
+      id: 'test-ap-account',
+      code: '2100',
+      name: 'Accounts Payable',
+      type: 'LIABILITY',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['test-expense-account', {
+      id: 'test-expense-account',
+      code: '5000',
+      name: 'Office Supplies',
+      type: 'EXPENSE',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['bank-1000', {
+      id: 'bank-1000',
+      code: '1000',
+      name: 'Bank Account',
+      type: 'ASSET',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['exp-bank-fee-6000', {
+      id: 'exp-bank-fee-6000',
+      code: '6000',
+      name: 'Bank Fees',
+      type: 'EXPENSE',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['wht-payable-2100', {
+      id: 'wht-payable-2100',
+      code: '2100',
+      name: 'Withholding Tax Payable',
+      type: 'LIABILITY',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['bank-1', {
+      id: 'bank-1',
+      code: '1001',
+      name: 'USD Bank Account',
+      type: 'ASSET',
+      isActive: true,
+      currency: 'USD'
+    }],
+    ['advance-account-1100', {
+      id: 'advance-account-1100',
+      code: '1100',
+      name: 'Advance Payments',
+      type: 'ASSET',
+      isActive: true,
+      currency: 'MYR'
+    }],
+    ['test-cash-account', {
+      id: 'test-cash-account',
+      code: '1000',
+      name: 'Cash',
+      type: 'ASSET',
+      isActive: true,
+      currency: 'MYR'
+    }]
+  ]));
 
-// Mock ResizeObserver (often needed for UI tests)
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+  const mockGetAllAccountsInfo = vi.fn().mockResolvedValue([]);
+  const mockGetCustomerById = vi.fn().mockResolvedValue({ id: 'cust-1', currency: 'MYR', name: 'Test Customer', email: 'test@example.com' });
+  const mockGetSupplierById = vi.fn().mockResolvedValue({ id: 'vend-1', currency: 'MYR', name: 'Test Supplier', email: 'supplier@example.com' });
+  const mockGetVendorById = vi.fn().mockResolvedValue({ id: 'vend-1', currency: 'MYR' });
+  const mockGetOpenInvoicesForCustomer = vi.fn().mockResolvedValue([{ id: 'inv-1', currency: 'MYR', openAmount: 100 }]);
+  const mockGetOpenBillsForVendor = vi.fn().mockResolvedValue([{ id: 'bill-1', currency: 'MYR', openAmount: 100 }]);
+  const mockGetBankAccountById = vi.fn().mockResolvedValue({ id: 'bank-1000', currency: 'MYR', accountNumber: '123456', accountName: 'Test Bank' });
+  const mockCreatePaymentLedger = vi.fn().mockResolvedValue({ id: 'payment-ledger-1' });
+  const mockGetOrCreateAdvanceAccount = vi.fn().mockResolvedValue({
+    id: 'advance-1',
+    accountId: 'advance-account-1100',
+    partyType: 'CUSTOMER',
+    partyId: 'cust-1',
+    currency: 'MYR',
+    balanceAmount: 0
+  });
+  const mockUpdateAdvanceAccountBalance = vi.fn().mockResolvedValue(undefined);
+  const mockCalculateBankCharges = vi.fn().mockResolvedValue([]);
+  const mockCalculateWithholdingTax = vi.fn().mockResolvedValue([]);
+  const mockGetBankChargeConfig = vi.fn().mockResolvedValue(null);
+  const mockGetWithholdingTaxConfig = vi.fn().mockResolvedValue([]);
 
-// Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+  // Make sure the mocked functions have the mockResolvedValue method
+  mockGetCustomerById.mockResolvedValue = mockGetCustomerById.mockResolvedValue || vi.fn().mockResolvedValue;
+  mockGetSupplierById.mockResolvedValue = mockGetSupplierById.mockResolvedValue || vi.fn().mockResolvedValue;
+  mockGetBankAccountById.mockResolvedValue = mockGetBankAccountById.mockResolvedValue || vi.fn().mockResolvedValue;
+  mockGetOrCreateAdvanceAccount.mockResolvedValue = mockGetOrCreateAdvanceAccount.mockResolvedValue || vi.fn().mockResolvedValue;
+  mockUpdateAdvanceAccountBalance.mockResolvedValue = mockUpdateAdvanceAccountBalance.mockResolvedValue || vi.fn().mockResolvedValue;
+  mockCalculateBankCharges.mockResolvedValue = mockCalculateBankCharges.mockResolvedValue || vi.fn().mockResolvedValue;
+  mockCalculateWithholdingTax.mockResolvedValue = mockCalculateWithholdingTax.mockResolvedValue || vi.fn().mockResolvedValue;
 
-// Mock matchMedia
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
+  return {
+    getAccountsInfo: mockGetAccountsInfo,
+    getAllAccountsInfo: mockGetAllAccountsInfo,
+    getCustomerById: mockGetCustomerById,
+    getSupplierById: mockGetSupplierById,
+    getVendorById: mockGetVendorById,
+    getOpenInvoicesForCustomer: mockGetOpenInvoicesForCustomer,
+    getOpenBillsForVendor: mockGetOpenBillsForVendor,
+    getBankAccountById: mockGetBankAccountById,
+    createPaymentLedger: mockCreatePaymentLedger,
+    getOrCreateAdvanceAccount: mockGetOrCreateAdvanceAccount,
+    updateAdvanceAccountBalance: mockUpdateAdvanceAccountBalance,
+    calculateBankCharges: mockCalculateBankCharges,
+    calculateWithholdingTax: mockCalculateWithholdingTax,
+    getBankChargeConfig: mockGetBankChargeConfig,
+    getWithholdingTaxConfig: mockGetWithholdingTaxConfig,
+  };
 });
 
-// Mock crypto for UUID generation in tests
-Object.defineProperty(global, "crypto", {
-  value: {
-    randomUUID: () => "test-uuid-" + Math.random().toString(36).substring(2, 15),
-    getRandomValues: (arr: any) => {
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 256);
-      }
-      return arr;
-    },
-  },
-});
+// Mock other packages that might be imported
+vi.mock('@aibos/contracts', () => ({
+  // Add contract mocks as needed
+}));
 
-// Mock Date.now for consistent timestamps in tests
-const mockNow = new Date("2024-01-01T00:00:00.000Z").getTime();
-vi.spyOn(Date, "now").mockReturnValue(mockNow);
+// Silence console logs during tests to reduce noise (temporarily disabled for debugging)
+// vi.spyOn(console, 'error').mockImplementation(() => { });
+// vi.spyOn(console, 'warn').mockImplementation(() => { });
+// vi.spyOn(console, 'log').mockImplementation(() => { });
 
-// Setup cleanup after each test
+// Stable clocks & IDs for deterministic tests
+vi.spyOn(Date, 'now').mockReturnValue(new Date('2025-01-01T00:00:00Z').valueOf());
+vi.spyOn(crypto, 'randomUUID').mockReturnValue('00000000-0000-0000-0000-000000000000');
+
+// Reset all mocks between tests to prevent test pollution
 afterEach(() => {
   vi.clearAllMocks();
-});
-
-// Global test utilities
-export const createMockTenant = () => ({
-  id: "test-tenant-id",
-  name: "Test Tenant",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-});
-
-export const createMockCompany = () => ({
-  id: "test-company-id",
-  tenant_id: "test-tenant-id",
-  name: "Test Company",
-  currency: "MYR",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-});
-
-export const createMockUser = () => ({
-  id: "test-user-id",
-  email: "test@example.com",
-  role: "accountant" as const,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-});
-
-export const createMockJournal = () => ({
-  id: "test-journal-id",
-  tenant_id: "test-tenant-id",
-  company_id: "test-company-id",
-  journal_number: "JE-001",
-  description: "Test Journal Entry",
-  reference: "TEST-REF",
-  journal_date: new Date().toISOString().split("T")[0],
-  currency: "MYR",
-  status: "draft" as const,
-  created_by: "test-user-id",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-});
-
-export const createMockJournalLine = () => ({
-  id: "test-line-id",
-  journal_id: "test-journal-id",
-  account_id: "test-account-id",
-  description: "Test Line",
-  debit: "100.00",
-  credit: "0.00",
-  line_order: 1,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
+  vi.resetModules();
 });

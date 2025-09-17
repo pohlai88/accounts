@@ -21,6 +21,8 @@ import {
   TrendingUp,
   Loader2,
 } from "lucide-react";
+import { useBankAccounts, usePayments } from "../../store/index.js";
+import { apiClient } from "../../lib/api-client.js";
 
 // Import the cash workflow components
 import { BankConnection } from "./BankConnection.js";
@@ -144,9 +146,52 @@ export function CashWorkflow({ onWorkflowComplete, onStepChange, className }: Ca
   });
   const [steps, setSteps] = useState<WorkflowStep[]>(workflowSteps);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Use Zustand store for real data
+  const {
+    bankAccounts,
+    loading: bankAccountsLoading,
+    error: bankAccountsError,
+    fetchBankAccounts,
+  } = useBankAccounts();
+
+  const {
+    payments,
+    loading: paymentsLoading,
+    error: paymentsError,
+    fetchPayments,
+  } = usePayments();
 
   const currentStep = steps[currentStepIndex];
   const CurrentComponent = currentStep?.component;
+
+  // Load data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setError(null);
+        await Promise.all([
+          fetchBankAccounts(),
+          fetchPayments(),
+        ]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      }
+    };
+
+    loadData();
+  }, [fetchBankAccounts, fetchPayments]);
+
+  // Update workflow data when real data is loaded
+  useEffect(() => {
+    setWorkflowData(prev => ({
+      ...prev,
+      bankAccounts: bankAccounts || [],
+      transactions: payments || [],
+      cashFlowData: payments || [], // Use payments as cash flow data
+    }));
+  }, [bankAccounts, payments]);
 
   // Update step completion status
   const updateStepCompletion = (stepId: string, isCompleted: boolean) => {
@@ -381,6 +426,16 @@ export function CashWorkflow({ onWorkflowComplete, onStepChange, className }: Ca
           Complete your banking integration and reconciliation setup step by step.
         </p>
       </div>
+
+      {/* Error Display */}
+      {(error || bankAccountsError || paymentsError) && (
+        <Alert className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error || bankAccountsError || paymentsError}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Progress Overview */}
       <Card>

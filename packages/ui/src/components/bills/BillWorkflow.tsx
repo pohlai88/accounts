@@ -15,6 +15,8 @@ import { ApprovalWorkflow } from "./ApprovalWorkflow.js";
 import { PaymentProcessor } from "./PaymentProcessor.js";
 import { VendorManager } from "./VendorManager.js";
 import { ExpenseCategorizer } from "./ExpenseCategorizer.js";
+import { useBills, useVendors } from "../../store/index.js";
+import { apiClient } from "../../lib/api-client.js";
 
 export interface BillWorkflowProps {
   className?: string;
@@ -32,6 +34,22 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [billData, setBillData] = useState<any>(null);
   const [workflowData, setWorkflowData] = useState<any>({});
+  const [error, setError] = useState<string | null>(null);
+
+  // Use Zustand store for real data
+  const {
+    bills,
+    loading: storeLoading,
+    error: storeError,
+    fetchBills,
+    createBill,
+    updateBill,
+  } = useBills();
+
+  const {
+    vendors,
+    fetchVendors,
+  } = useVendors();
 
   const steps = [
     { id: "create", label: "Create Bill", icon: FileText },
@@ -43,6 +61,23 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
   ];
 
   const currentStepIndex = steps.findIndex(step => step.id === currentStep);
+
+  // Load data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setError(null);
+        await Promise.all([
+          fetchBills(),
+          fetchVendors(),
+        ]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      }
+    };
+
+    loadData();
+  }, [fetchBills, fetchVendors]);
 
   const handleStepChange = (stepId: string) => {
     setCurrentStep(stepId as any);
@@ -66,10 +101,16 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
     }
   };
 
-  const handleBillSave = (data: any) => {
-    setBillData(data);
-    setWorkflowData((prev: any) => ({ ...prev, bill: data }));
-    handleNext();
+  const handleBillSave = async (data: any) => {
+    try {
+      setError(null);
+      await createBill(data);
+      setBillData(data);
+      setWorkflowData((prev: any) => ({ ...prev, bill: data }));
+      handleNext();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save bill");
+    }
   };
 
   const handleOCRDataExtracted = (data: any) => {
@@ -92,10 +133,21 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
     handleNext();
   };
 
-  const handleCategorizationComplete = (data: any) => {
-    setWorkflowData((prev: any) => ({ ...prev, categorization: data }));
-    if (onWorkflowComplete) {
-      onWorkflowComplete("bill_001");
+  const handleCategorizationComplete = async (data: any) => {
+    try {
+      setError(null);
+      setWorkflowData((prev: any) => ({ ...prev, categorization: data }));
+
+      // Update bill with categorization data
+      if (billData?.id) {
+        await updateBill(billData.id, { ...billData, categorization: data });
+      }
+
+      if (onWorkflowComplete) {
+        onWorkflowComplete(billData?.id || "bill_001");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to complete categorization");
     }
   };
 
@@ -261,6 +313,16 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
         </div>
       </div>
 
+      {/* Error Display */}
+      {(error || storeError) && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <p className="text-red-700">{error || storeError}</p>
+          </div>
+        </div>
+      )}
+
       {/* Progress Steps */}
       <div className="bg-sys-bg-raised border border-sys-border-hairline rounded-lg p-6">
         <div className="flex items-center justify-between">
@@ -302,7 +364,16 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
 
       {/* Current Step Content */}
       <div className="bg-sys-bg-raised border border-sys-border-hairline rounded-lg p-6">
-        {renderCurrentStep()}
+        {(isLoading || storeLoading) ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sys-status-info mx-auto mb-4"></div>
+              <p className="text-sys-text-secondary">Loading...</p>
+            </div>
+          </div>
+        ) : (
+          renderCurrentStep()
+        )}
       </div>
 
       {/* Workflow Summary */}

@@ -19,6 +19,23 @@ export { UniversalInbox } from "./app-shell/UniversalInbox.js";
 export { TimelineDrawer } from "./app-shell/TimelineDrawer.js";
 export { UniversalCreate } from "./app-shell/UniversalCreate.js";
 
+// Common Components
+export { ErrorBoundary, ErrorBoundaryProvider, DefaultErrorFallback, MinimalErrorFallback, useErrorHandler } from "./common/index.js";
+export { AccessibilityProvider, AccessibilityToolbar, useAccessibility, useAccessibilityPreferences, useAccessibilityAnnouncements } from "./common/index.js";
+export { ResponsiveProvider, ResponsiveComponent, ResponsiveHide, ResponsiveShow, ResponsiveGrid, ResponsiveDebug, useResponsive, useBreakpoint, useDeviceType, useOrientation, useScreenSize, useTouchEnabled, ResponsiveUtils } from "./common/index.js";
+
+// Account Management Components
+export { ChartOfAccounts } from "./accounts/index.js";
+
+// Period Management Components
+export { PeriodManagement } from "./periods/index.js";
+
+// Payment Processing Components
+export { PaymentProcessing } from "./payments/index.js";
+
+// Dashboard Components
+export { Dashboard } from "./dashboard/index.js";
+
 // Typography
 export {
   Typography,
@@ -115,3 +132,16 @@ export { RuleStudio } from "./rules/RuleStudio.js";
 export { RuleTesting } from "./rules/RuleTesting.js";
 export { RuleAnalytics } from "./rules/RuleAnalytics.js";
 export { RuleVersioning } from "./rules/RuleVersioning.js";
+
+// Tenant Management Components
+export { TenantOnboarding } from "./onboarding/TenantOnboarding.js";
+export { UserManagement } from "./users/UserManagement.js";
+export { default as TenantSwitcher } from "./tenant-switcher.js";
+export { default as MemberManagement } from "./member-management.js";
+
+// SaaS Features Components
+export { SubscriptionManagement } from "./subscriptions/SubscriptionManagement.js";
+export { UsageDashboard } from "./usage/UsageDashboard.js";
+export { FeatureFlags } from "./features/FeatureFlags.js";
+
+// Common Components (already exported above)

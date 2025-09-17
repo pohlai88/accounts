@@ -37,7 +37,7 @@ export default function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AccessibilityProvider defaultMode="aesthetic" persistMode={true}>
+      <AccessibilityProvider>
         <AuthProvider apiBaseUrl={process.env.NEXT_PUBLIC_API_URL}>{children}</AuthProvider>
       </AccessibilityProvider>
       <ReactQueryDevtools initialIsOpen={false} />

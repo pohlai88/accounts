@@ -52,20 +52,22 @@ export interface TaxLineInput {
 }
 
 export interface BillPostingResult {
-  success: true;
-  journalId: string;
-  journalNumber: string;
+  validated: true;
+  journalInput: JournalPostingInput;
   totalAmount: number;
-  lines: Array<{
+  requiresApproval?: boolean;
+  approverRoles?: string[];
+  coaWarnings?: Array<{
     accountId: string;
-    debit: number;
-    credit: number;
-    description: string;
+    warning: string;
+    accountType: string;
+    amount: number;
+    side: "debit" | "credit";
   }>;
 }
 
 export interface BillPostingError {
-  success: false;
+  validated: false;
   error: string;
   code: string;
   details?: Record<string, unknown>;
@@ -166,7 +168,7 @@ export async function validateBillPosting(
 
     if (!validation.validated) {
       return {
-        success: false,
+        validated: false,
         error: "Journal validation failed",
         code: "JOURNAL_VALIDATION_FAILED",
         details: validation,
@@ -175,20 +177,16 @@ export async function validateBillPosting(
 
     // 7. Return successful validation result
     return {
-      success: true,
-      journalId: "", // Will be set when actually posted
-      journalNumber: journalInput.journalNumber,
+      validated: true,
+      journalInput,
       totalAmount: convertedTotal,
-      lines: journalLines.map(line => ({
-        accountId: line.accountId,
-        debit: line.debit,
-        credit: line.credit,
-        description: line.description,
-      })),
+      requiresApproval: validation.requiresApproval,
+      approverRoles: validation.approverRoles,
+      coaWarnings: validation.coaWarnings,
     };
   } catch (error) {
     return {
-      success: false,
+      validated: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",
       code: "BILL_POSTING_ERROR",
       details: error as Record<string, unknown>,

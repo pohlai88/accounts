@@ -1,0 +1,154 @@
+{
+  "extends": "./packages/config/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ],
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@aibos/contracts": [
+        "packages/contracts/dist/index.d.ts"
+      ],
+      "@aibos/db": [
+        "packages/db/dist/index.d.ts"
+      ],
+      "@aibos/accounting": [
+        "packages/accounting/dist/index.d.ts"
+      ],
+      "@aibos/auth": [
+        "packages/auth/dist/index.d.ts"
+      ],
+      "@aibos/ui": [
+        "packages/ui/dist/index.d.ts"
+      ],
+      "@aibos/utils": [
+        "packages/utils/dist/index.d.ts"
+      ],
+      "@aibos/realtime": [
+        "packages/realtime/dist/index.d.ts"
+      ],
+      "@aibos/monitoring": [
+        "packages/monitoring/dist/index.d.ts"
+      ],
+      "@aibos/security": [
+        "packages/security/dist/index.d.ts"
+      ],
+      "@aibos/cache": [
+        "packages/cache/dist/index.d.ts"
+      ],
+      "@aibos/tokens": [
+        "packages/tokens/dist/index.d.ts"
+      ],
+      "@aibos/api-gateway": [
+        "packages/api-gateway/dist/index.d.ts"
+      ],
+      "@aibos/deployment": [
+        "packages/deployment/dist/index.d.ts"
+      ],
+      "@aibos/worker": [
+        "services/worker/dist/index.d.ts"
+      ],
+      "@aibos/web-api": [
+        "apps/web-api/dist/index.d.ts"
+      ],
+      "@aibos/eslint-config": [
+        "packages/config/eslint-config"
+      ],
+      "@aibos/tsconfig/*": [
+        "packages/config/tsconfig/*"
+      ],
+      "@aibos/tsconfig/react-lib.json": [
+        "packages/config/tsconfig/react-lib.json"
+      ],
+      "@aibos/tsconfig/node-lib.json": [
+        "packages/config/tsconfig/node-lib.json"
+      ],
+      "@aibos/tsconfig/next-app.json": [
+        "packages/config/tsconfig/next-app.json"
+      ],
+      "@aibos/tsconfig/vitest.json": [
+        "packages/config/tsconfig/vitest.json"
+      ],
+      "@aibos/tailwind-preset": [
+        "packages/config/tailwind-preset"
+      ],
+      "@aibos/vitest-config": [
+        "packages/config/vitest-config"
+      ],
+      "@aibos/prettier-config": [
+        "packages/config/prettier-config"
+      ],
+      "@aibos/contracts/*": [
+        "packages/contracts/src/*",
+        "packages/contracts/dist/src/*"
+      ],
+      "@aibos/db/*": [
+        "packages/db/src/*",
+        "packages/db/dist/src/*"
+      ],
+      "@aibos/accounting/*": [
+        "packages/accounting/src/*",
+        "packages/accounting/dist/src/*"
+      ],
+      "@aibos/auth/*": [
+        "packages/auth/src/*",
+        "packages/auth/dist/src/*"
+      ],
+      "@aibos/ui/*": [
+        "packages/ui/src/*",
+        "packages/ui/dist/*"
+      ],
+      "@aibos/utils/*": [
+        "packages/utils/src/*",
+        "packages/utils/dist/src/*"
+      ],
+      "@aibos/realtime/*": [
+        "packages/realtime/src/*",
+        "packages/realtime/dist/src/*"
+      ],
+      "@aibos/monitoring/*": [
+        "packages/monitoring/src/*",
+        "packages/monitoring/dist/src/*"
+      ],
+      "@aibos/security/*": [
+        "packages/security/src/*",
+        "packages/security/dist/src/*"
+      ],
+      "@aibos/cache/*": [
+        "packages/cache/src/*",
+        "packages/cache/dist/src/*"
+      ],
+      "@aibos/tokens/*": [
+        "packages/tokens/src/*",
+        "packages/tokens/dist/src/*"
+      ],
+      "@aibos/api-gateway/*": [
+        "packages/api-gateway/src/*",
+        "packages/api-gateway/dist/src/*"
+      ],
+      "@aibos/deployment/*": [
+        "packages/deployment/src/*",
+        "packages/deployment/dist/src/*"
+      ],
+      "@aibos/worker/*": [
+        "services/worker/src/*",
+        "services/worker/dist/src/*"
+      ],
+      "@aibos/web-api/*": [
+        "apps/web-api/*",
+        "apps/web-api/dist/*"
+      ]
+    }
+  }
+}

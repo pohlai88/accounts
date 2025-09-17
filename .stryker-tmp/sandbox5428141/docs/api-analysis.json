@@ -1,0 +1,5392 @@
+{
+  "summary": {
+    "totalPackages": 12,
+    "totalExports": 548,
+    "totalClasses": 35,
+    "totalInterfaces": 121,
+    "totalFunctions": 96,
+    "totalIssues": 0
+  },
+  "packages": {
+    "contracts": {
+      "name": "contracts",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./journal\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./invoice\";",
+              "type": "other"
+            },
+            {
+              "line": 3,
+              "content": "export * from \"./reports\";",
+              "type": "other"
+            },
+            {
+              "line": 4,
+              "content": "export * from \"./events\";",
+              "type": "other"
+            },
+            {
+              "line": 5,
+              "content": "export * from \"./enums\";",
+              "type": "other"
+            },
+            {
+              "line": 6,
+              "content": "export * from \"./attachments\";",
+              "type": "other"
+            },
+            {
+              "line": 7,
+              "content": "export * from \"./types/api\";",
+              "type": "other"
+            },
+            {
+              "line": 8,
+              "content": "export * from \"./types/entities\";",
+              "type": "other"
+            },
+            {
+              "line": 9,
+              "content": "export * from \"./types/errors\";",
+              "type": "other"
+            },
+            {
+              "line": 10,
+              "content": "export * from \"./types/branded\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "attachments.ts": {
+          "exports": [
+            {
+              "line": 11,
+              "content": "export const AttachmentCategory = z.enum([",
+              "type": "const"
+            },
+            {
+              "line": 25,
+              "content": "export const AttachmentStatus = z.enum([\"active\", \"archived\", \"deleted\", \"processing\", \"failed\"]);",
+              "type": "const"
+            },
+            {
+              "line": 28,
+              "content": "export const RelationshipType = z.enum([",
+              "type": "const"
+            },
+            {
+              "line": 37,
+              "content": "export const EntityType = z.enum([",
+              "type": "const"
+            },
+            {
+              "line": 54,
+              "content": "export const UploadAttachmentReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 71,
+              "content": "export const UploadAttachmentRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 81,
+              "content": "export const GetAttachmentReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 87,
+              "content": "export const AttachmentDetailsRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 152,
+              "content": "export const ListAttachmentsReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 187,
+              "content": "export const ListAttachmentsRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 205,
+              "content": "export const UpdateAttachmentReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 218,
+              "content": "export const BatchAttachmentOperationReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 234,
+              "content": "export const ProcessOCRReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 254,
+              "content": "export const ProcessOCRRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 263,
+              "content": "export const OCRResultsRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 315,
+              "content": "export const DocumentApprovalReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 352,
+              "content": "export const ApprovalDecisionReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 369,
+              "content": "export const ApprovalStatusRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 408,
+              "content": "export const RetentionPolicyReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 435,
+              "content": "export const ApplyRetentionPolicyReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 446,
+              "content": "export const RetentionStatusRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 470,
+              "content": "export type TUploadAttachmentReq = z.infer<typeof UploadAttachmentReq>;",
+              "type": "type"
+            },
+            {
+              "line": 471,
+              "content": "export type TUploadAttachmentRes = z.infer<typeof UploadAttachmentRes>;",
+              "type": "type"
+            },
+            {
+              "line": 472,
+              "content": "export type TGetAttachmentReq = z.infer<typeof GetAttachmentReq>;",
+              "type": "type"
+            },
+            {
+              "line": 473,
+              "content": "export type TAttachmentDetailsRes = z.infer<typeof AttachmentDetailsRes>;",
+              "type": "type"
+            },
+            {
+              "line": 474,
+              "content": "export type TListAttachmentsReq = z.infer<typeof ListAttachmentsReq>;",
+              "type": "type"
+            },
+            {
+              "line": 475,
+              "content": "export type TListAttachmentsRes = z.infer<typeof ListAttachmentsRes>;",
+              "type": "type"
+            },
+            {
+              "line": 476,
+              "content": "export type TUpdateAttachmentReq = z.infer<typeof UpdateAttachmentReq>;",
+              "type": "type"
+            },
+            {
+              "line": 477,
+              "content": "export type TBatchAttachmentOperationReq = z.infer<typeof BatchAttachmentOperationReq>;",
+              "type": "type"
+            },
+            {
+              "line": 478,
+              "content": "export type TProcessOCRReq = z.infer<typeof ProcessOCRReq>;",
+              "type": "type"
+            },
+            {
+              "line": 479,
+              "content": "export type TProcessOCRRes = z.infer<typeof ProcessOCRRes>;",
+              "type": "type"
+            },
+            {
+              "line": 480,
+              "content": "export type TOCRResultsRes = z.infer<typeof OCRResultsRes>;",
+              "type": "type"
+            },
+            {
+              "line": 481,
+              "content": "export type TDocumentApprovalReq = z.infer<typeof DocumentApprovalReq>;",
+              "type": "type"
+            },
+            {
+              "line": 482,
+              "content": "export type TApprovalDecisionReq = z.infer<typeof ApprovalDecisionReq>;",
+              "type": "type"
+            },
+            {
+              "line": 483,
+              "content": "export type TApprovalStatusRes = z.infer<typeof ApprovalStatusRes>;",
+              "type": "type"
+            },
+            {
+              "line": 484,
+              "content": "export type TRetentionPolicyReq = z.infer<typeof RetentionPolicyReq>;",
+              "type": "type"
+            },
+            {
+              "line": 485,
+              "content": "export type TApplyRetentionPolicyReq = z.infer<typeof ApplyRetentionPolicyReq>;",
+              "type": "type"
+            },
+            {
+              "line": 486,
+              "content": "export type TRetentionStatusRes = z.infer<typeof RetentionStatusRes>;",
+              "type": "type"
+            },
+            {
+              "line": 489,
+              "content": "export type TAttachmentCategory = z.infer<typeof AttachmentCategory>;",
+              "type": "type"
+            },
+            {
+              "line": 490,
+              "content": "export type TAttachmentStatus = z.infer<typeof AttachmentStatus>;",
+              "type": "type"
+            },
+            {
+              "line": 491,
+              "content": "export type TRelationshipType = z.infer<typeof RelationshipType>;",
+              "type": "type"
+            },
+            {
+              "line": 492,
+              "content": "export type TEntityType = z.infer<typeof EntityType>;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            }
+          ],
+          "issues": []
+        },
+        "enums.ts": {
+          "exports": [
+            {
+              "line": 2,
+              "content": "export const CurrencyEnum = z.enum([",
+              "type": "const"
+            },
+            {
+              "line": 20,
+              "content": "export type Currency = z.infer<typeof CurrencyEnum>;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            }
+          ],
+          "issues": []
+        },
+        "events.ts": {
+          "exports": [
+            {
+              "line": 2,
+              "content": "export const InvoiceApprovedEvt = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 8,
+              "content": "export type TInvoiceApprovedEvt = z.infer<typeof InvoiceApprovedEvt>;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            }
+          ],
+          "issues": []
+        },
+        "invoice.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export const CreateCustomerReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 38,
+              "content": "export const CreateCustomerRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 49,
+              "content": "export const InvoiceLineReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 59,
+              "content": "export const CreateInvoiceReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 73,
+              "content": "export const CreateInvoiceRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 101,
+              "content": "export const PostInvoiceReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 109,
+              "content": "export const PostInvoiceRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 129,
+              "content": "export const GetInvoiceRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 173,
+              "content": "export const ListInvoicesReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 184,
+              "content": "export const ListInvoicesRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 206,
+              "content": "export const ApproveInvoiceReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 212,
+              "content": "export const ApproveInvoiceRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 218,
+              "content": "export type TCreateCustomerReq = z.infer<typeof CreateCustomerReq>;",
+              "type": "type"
+            },
+            {
+              "line": 219,
+              "content": "export type TCreateCustomerRes = z.infer<typeof CreateCustomerRes>;",
+              "type": "type"
+            },
+            {
+              "line": 220,
+              "content": "export type TInvoiceLineReq = z.infer<typeof InvoiceLineReq>;",
+              "type": "type"
+            },
+            {
+              "line": 221,
+              "content": "export type TCreateInvoiceReq = z.infer<typeof CreateInvoiceReq>;",
+              "type": "type"
+            },
+            {
+              "line": 222,
+              "content": "export type TCreateInvoiceRes = z.infer<typeof CreateInvoiceRes>;",
+              "type": "type"
+            },
+            {
+              "line": 223,
+              "content": "export type TPostInvoiceReq = z.infer<typeof PostInvoiceReq>;",
+              "type": "type"
+            },
+            {
+              "line": 224,
+              "content": "export type TPostInvoiceRes = z.infer<typeof PostInvoiceRes>;",
+              "type": "type"
+            },
+            {
+              "line": 225,
+              "content": "export type TGetInvoiceRes = z.infer<typeof GetInvoiceRes>;",
+              "type": "type"
+            },
+            {
+              "line": 226,
+              "content": "export type TListInvoicesReq = z.infer<typeof ListInvoicesReq>;",
+              "type": "type"
+            },
+            {
+              "line": 227,
+              "content": "export type TListInvoicesRes = z.infer<typeof ListInvoicesRes>;",
+              "type": "type"
+            },
+            {
+              "line": 228,
+              "content": "export type TApproveInvoiceReq = z.infer<typeof ApproveInvoiceReq>;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            }
+          ],
+          "issues": []
+        },
+        "journal.ts": {
+          "exports": [
+            {
+              "line": 3,
+              "content": "export const JournalLine = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 11,
+              "content": "export const PostJournalReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 20,
+              "content": "export const PostJournalRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 31,
+              "content": "export const PostingErrorRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 40,
+              "content": "export const CreateJournalReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 48,
+              "content": "export const CreateJournalRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 55,
+              "content": "export type TPostJournalReq = z.infer<typeof PostJournalReq>;",
+              "type": "type"
+            },
+            {
+              "line": 56,
+              "content": "export type TPostJournalRes = z.infer<typeof PostJournalRes>;",
+              "type": "type"
+            },
+            {
+              "line": 57,
+              "content": "export type TPostingErrorRes = z.infer<typeof PostingErrorRes>;",
+              "type": "type"
+            },
+            {
+              "line": 58,
+              "content": "export type TCreateJournalReq = z.infer<typeof CreateJournalReq>;",
+              "type": "type"
+            },
+            {
+              "line": 59,
+              "content": "export type TCreateJournalRes = z.infer<typeof CreateJournalRes>;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            }
+          ],
+          "issues": []
+        },
+        "reports.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export const ReportFilterSchema = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 20,
+              "content": "export const TrialBalanceReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 30,
+              "content": "export const TrialBalanceAccountSchema = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 43,
+              "content": "export const TrialBalanceRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 63,
+              "content": "export const BalanceSheetReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 73,
+              "content": "export const BalanceSheetLineSchema = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 87,
+              "content": "export const BalanceSheetRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 112,
+              "content": "export const ProfitLossReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 124,
+              "content": "export const ProfitLossLineSchema = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 138,
+              "content": "export const ProfitLossRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 163,
+              "content": "export const CashFlowReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 173,
+              "content": "export const CashFlowLineSchema = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 181,
+              "content": "export const CashFlowRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 206,
+              "content": "export const ReportExportReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 216,
+              "content": "export const ReportExportRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 227,
+              "content": "export const ReportCacheReq = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 235,
+              "content": "export const ReportCacheRes = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 244,
+              "content": "export type TTrialBalanceReq = z.infer<typeof TrialBalanceReq>;",
+              "type": "type"
+            },
+            {
+              "line": 245,
+              "content": "export type TTrialBalanceRes = z.infer<typeof TrialBalanceRes>;",
+              "type": "type"
+            },
+            {
+              "line": 246,
+              "content": "export type TBalanceSheetReq = z.infer<typeof BalanceSheetReq>;",
+              "type": "type"
+            },
+            {
+              "line": 247,
+              "content": "export type TBalanceSheetRes = z.infer<typeof BalanceSheetRes>;",
+              "type": "type"
+            },
+            {
+              "line": 248,
+              "content": "export type TProfitLossReq = z.infer<typeof ProfitLossReq>;",
+              "type": "type"
+            },
+            {
+              "line": 249,
+              "content": "export type TProfitLossRes = z.infer<typeof ProfitLossRes>;",
+              "type": "type"
+            },
+            {
+              "line": 250,
+              "content": "export type TCashFlowReq = z.infer<typeof CashFlowReq>;",
+              "type": "type"
+            },
+            {
+              "line": 251,
+              "content": "export type TCashFlowRes = z.infer<typeof CashFlowRes>;",
+              "type": "type"
+            },
+            {
+              "line": 252,
+              "content": "export type TReportExportReq = z.infer<typeof ReportExportReq>;",
+              "type": "type"
+            },
+            {
+              "line": 253,
+              "content": "export type TReportExportRes = z.infer<typeof ReportExportRes>;",
+              "type": "type"
+            },
+            {
+              "line": 254,
+              "content": "export type TReportCacheReq = z.infer<typeof ReportCacheReq>;",
+              "type": "type"
+            },
+            {
+              "line": 255,
+              "content": "export type TReportCacheRes = z.infer<typeof ReportCacheRes>;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 119,
+      "totalClasses": 0,
+      "totalInterfaces": 0,
+      "totalFunctions": 0,
+      "issues": []
+    },
+    "db": {
+      "name": "db",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./schema\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./repos\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "query-optimizer.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface QueryOptimizerConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 29,
+              "content": "export type DrizzleLikeDb = {",
+              "type": "type"
+            },
+            {
+              "line": 55,
+              "content": "export class QueryOptimizer {",
+              "type": "class"
+            },
+            {
+              "line": 347,
+              "content": "export const QueryUtils = {",
+              "type": "const"
+            }
+          ],
+          "classes": [
+            {
+              "line": 55,
+              "name": "QueryOptimizer",
+              "content": "export class QueryOptimizer {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "QueryOptimizerConfig",
+              "content": "export interface QueryOptimizerConfig {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { sql, and, or, asc, desc, type SQL, type AnyColumn, getTableName } from \"drizzle-orm\";"
+            },
+            {
+              "line": 2,
+              "content": "import type { PgTable } from \"drizzle-orm/pg-core\";"
+            }
+          ],
+          "issues": []
+        },
+        "repos.ts": {
+          "exports": [
+            {
+              "line": 29,
+              "content": "export interface Scope {",
+              "type": "interface"
+            },
+            {
+              "line": 36,
+              "content": "export interface JournalInput {",
+              "type": "interface"
+            },
+            {
+              "line": 52,
+              "content": "export class DatabaseError extends Error {",
+              "type": "class"
+            },
+            {
+              "line": 63,
+              "content": "export async function checkIdempotency(scope: Scope, idempotencyKey: string) {",
+              "type": "function"
+            },
+            {
+              "line": 76,
+              "content": "export async function insertJournal(scope: Scope, input: JournalInput) {",
+              "type": "function"
+            },
+            {
+              "line": 188,
+              "content": "export async function getJournal(scope: Scope, journalId: string) {",
+              "type": "function"
+            },
+            {
+              "line": 217,
+              "content": "export interface AccountInfo {",
+              "type": "interface"
+            },
+            {
+              "line": 231,
+              "content": "export async function getAccountsInfo(",
+              "type": "function"
+            },
+            {
+              "line": 278,
+              "content": "export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {",
+              "type": "function"
+            },
+            {
+              "line": 315,
+              "content": "export async function storeIdempotencyResult(",
+              "type": "function"
+            },
+            {
+              "line": 350,
+              "content": "export interface Address {",
+              "type": "interface"
+            },
+            {
+              "line": 358,
+              "content": "export interface CustomerInput {",
+              "type": "interface"
+            },
+            {
+              "line": 370,
+              "content": "export interface InvoiceInput {",
+              "type": "interface"
+            },
+            {
+              "line": 395,
+              "content": "export async function insertCustomer(scope: Scope, input: CustomerInput) {",
+              "type": "function"
+            },
+            {
+              "line": 450,
+              "content": "export async function getCustomer(scope: Scope, customerId: string) {",
+              "type": "function"
+            },
+            {
+              "line": 477,
+              "content": "export async function getTaxCode(scope: Scope, taxCodeString: string) {",
+              "type": "function"
+            },
+            {
+              "line": 513,
+              "content": "export async function getTaxCodes(scope: Scope, taxCodeStrings: string[]) {",
+              "type": "function"
+            },
+            {
+              "line": 546,
+              "content": "export async function insertInvoice(scope: Scope, input: InvoiceInput) {",
+              "type": "function"
+            },
+            {
+              "line": 651,
+              "content": "export interface InvoiceWithLines {",
+              "type": "interface"
+            },
+            {
+              "line": 702,
+              "content": "export async function getInvoice(scope: Scope, invoiceId: string): Promise<InvoiceWithLines> {",
+              "type": "function"
+            },
+            {
+              "line": 814,
+              "content": "export async function updateInvoicePosting(",
+              "type": "function"
+            },
+            {
+              "line": 857,
+              "content": "export async function listInvoices(",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 52,
+              "name": "DatabaseError",
+              "content": "export class DatabaseError extends Error {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 29,
+              "name": "Scope",
+              "content": "export interface Scope {"
+            },
+            {
+              "line": 36,
+              "name": "JournalInput",
+              "content": "export interface JournalInput {"
+            },
+            {
+              "line": 217,
+              "name": "AccountInfo",
+              "content": "export interface AccountInfo {"
+            },
+            {
+              "line": 350,
+              "name": "Address",
+              "content": "export interface Address {"
+            },
+            {
+              "line": 358,
+              "name": "CustomerInput",
+              "content": "export interface CustomerInput {"
+            },
+            {
+              "line": 370,
+              "name": "InvoiceInput",
+              "content": "export interface InvoiceInput {"
+            },
+            {
+              "line": 651,
+              "name": "InvoiceWithLines",
+              "content": "export interface InvoiceWithLines {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 63,
+              "name": "checkIdempotency",
+              "content": "export async function checkIdempotency(scope: Scope, idempotencyKey: string) {"
+            },
+            {
+              "line": 76,
+              "name": "insertJournal",
+              "content": "export async function insertJournal(scope: Scope, input: JournalInput) {"
+            },
+            {
+              "line": 188,
+              "name": "getJournal",
+              "content": "export async function getJournal(scope: Scope, journalId: string) {"
+            },
+            {
+              "line": 231,
+              "name": "getAccountsInfo",
+              "content": "export async function getAccountsInfo("
+            },
+            {
+              "line": 278,
+              "name": "getAllAccountsInfo",
+              "content": "export async function getAllAccountsInfo(scope: Scope): Promise<AccountInfo[]> {"
+            },
+            {
+              "line": 315,
+              "name": "storeIdempotencyResult",
+              "content": "export async function storeIdempotencyResult("
+            },
+            {
+              "line": 395,
+              "name": "insertCustomer",
+              "content": "export async function insertCustomer(scope: Scope, input: CustomerInput) {"
+            },
+            {
+              "line": 450,
+              "name": "getCustomer",
+              "content": "export async function getCustomer(scope: Scope, customerId: string) {"
+            },
+            {
+              "line": 477,
+              "name": "getTaxCode",
+              "content": "export async function getTaxCode(scope: Scope, taxCodeString: string) {"
+            },
+            {
+              "line": 513,
+              "name": "getTaxCodes",
+              "content": "export async function getTaxCodes(scope: Scope, taxCodeStrings: string[]) {"
+            },
+            {
+              "line": 546,
+              "name": "insertInvoice",
+              "content": "export async function insertInvoice(scope: Scope, input: InvoiceInput) {"
+            },
+            {
+              "line": 702,
+              "name": "getInvoice",
+              "content": "export async function getInvoice(scope: Scope, invoiceId: string): Promise<InvoiceWithLines> {"
+            },
+            {
+              "line": 814,
+              "name": "updateInvoicePosting",
+              "content": "export async function updateInvoicePosting("
+            },
+            {
+              "line": 857,
+              "name": "listInvoices",
+              "content": "export async function listInvoices("
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { drizzle } from \"drizzle-orm/node-postgres\";"
+            },
+            {
+              "line": 2,
+              "content": "import { Pool } from \"pg\";"
+            },
+            {
+              "line": 3,
+              "content": "import {"
+            },
+            {
+              "line": 13,
+              "content": "import { eq, and, inArray, desc, asc, gte, lte, count } from \"drizzle-orm\";"
+            }
+          ],
+          "issues": []
+        },
+        "schema-attachments.ts": {
+          "exports": [
+            {
+              "line": 18,
+              "content": "export const attachments = pgTable(\"attachments\", {",
+              "type": "const"
+            },
+            {
+              "line": 58,
+              "content": "export const attachmentRelationships = pgTable(\"attachment_relationships\", {",
+              "type": "const"
+            },
+            {
+              "line": 81,
+              "content": "export const attachmentAccessLog = pgTable(\"attachment_access_log\", {",
+              "type": "const"
+            },
+            {
+              "line": 102,
+              "content": "export const attachmentsRelations = relations(attachments, ({ one, many }) => ({",
+              "type": "const"
+            },
+            {
+              "line": 119,
+              "content": "export const attachmentRelationshipsRelations = relations(attachmentRelationships, ({ one }) => ({",
+              "type": "const"
+            },
+            {
+              "line": 130,
+              "content": "export const attachmentAccessLogRelations = relations(attachmentAccessLog, ({ one }) => ({",
+              "type": "const"
+            },
+            {
+              "line": 142,
+              "content": "export type Attachment = typeof attachments.$inferSelect;",
+              "type": "type"
+            },
+            {
+              "line": 143,
+              "content": "export type NewAttachment = typeof attachments.$inferInsert;",
+              "type": "type"
+            },
+            {
+              "line": 144,
+              "content": "export type AttachmentRelationship = typeof attachmentRelationships.$inferSelect;",
+              "type": "type"
+            },
+            {
+              "line": 145,
+              "content": "export type NewAttachmentRelationship = typeof attachmentRelationships.$inferInsert;",
+              "type": "type"
+            },
+            {
+              "line": 146,
+              "content": "export type AttachmentAccessLog = typeof attachmentAccessLog.$inferSelect;",
+              "type": "type"
+            },
+            {
+              "line": 147,
+              "content": "export type NewAttachmentAccessLog = typeof attachmentAccessLog.$inferInsert;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 4,
+              "content": "import {"
+            },
+            {
+              "line": 14,
+              "content": "import { relations } from \"drizzle-orm\";"
+            },
+            {
+              "line": 15,
+              "content": "import { tenants, companies, users } from \"./schema\";"
+            }
+          ],
+          "issues": []
+        },
+        "schema-user-settings.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export const userSettings = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 23,
+              "content": "export const tenantInvitations = pgTable(",
+              "type": "const"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { pgTable, uuid, timestamp, index } from \"drizzle-orm/pg-core\";"
+            },
+            {
+              "line": 2,
+              "content": "import { users } from \"./schema\";"
+            },
+            {
+              "line": 3,
+              "content": "import { tenants } from \"./schema\";"
+            }
+          ],
+          "issues": []
+        },
+        "schema.ts": {
+          "exports": [
+            {
+              "line": 13,
+              "content": "export const tenants = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 35,
+              "content": "export const companies = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 61,
+              "content": "export const users = pgTable(\"users\", {",
+              "type": "const"
+            },
+            {
+              "line": 70,
+              "content": "export const memberships = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 92,
+              "content": "export const currencies = pgTable(\"currencies\", {",
+              "type": "const"
+            },
+            {
+              "line": 101,
+              "content": "export const fxRates = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 127,
+              "content": "export const chartOfAccounts = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 159,
+              "content": "export const chartOfAccountsRelations = {",
+              "type": "const"
+            },
+            {
+              "line": 164,
+              "content": "export const journals = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 199,
+              "content": "export const journalLines = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 224,
+              "content": "export const idempotencyKeys = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 243,
+              "content": "export const customers = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 282,
+              "content": "export const invoices = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 338,
+              "content": "export const invoiceLines = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 364,
+              "content": "export const taxCodes = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 395,
+              "content": "export const suppliers = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 435,
+              "content": "export const bills = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 492,
+              "content": "export const billLines = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 517,
+              "content": "export const bankAccounts = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 546,
+              "content": "export const bankTransactions = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 574,
+              "content": "export const payments = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 622,
+              "content": "export const paymentAllocations = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 640,
+              "content": "export const fiscalCalendars = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 671,
+              "content": "export const fiscalPeriods = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 711,
+              "content": "export const periodLocks = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 743,
+              "content": "export const reversingEntries = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 774,
+              "content": "export const reportCache = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 798,
+              "content": "export const reportDefinitions = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 830,
+              "content": "export const auditLogs = pgTable(",
+              "type": "const"
+            },
+            {
+              "line": 861,
+              "content": "export * from \"./schema-attachments\";",
+              "type": "other"
+            },
+            {
+              "line": 864,
+              "content": "export * from \"./schema-user-settings\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import {"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 73,
+      "totalClasses": 2,
+      "totalInterfaces": 8,
+      "totalFunctions": 14,
+      "issues": []
+    },
+    "auth": {
+      "name": "auth",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./types\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./sod\";",
+              "type": "other"
+            },
+            {
+              "line": 5,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 14,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 24,
+              "content": "export type { GovernancePack } from \"./governance-packs\";",
+              "type": "type"
+            },
+            {
+              "line": 28,
+              "content": "export const auth = {",
+              "type": "const"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "governance-packs.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export interface GovernancePack {",
+              "type": "interface"
+            },
+            {
+              "line": 17,
+              "content": "export const STARTER_PACK: GovernancePack = {",
+              "type": "const"
+            },
+            {
+              "line": 61,
+              "content": "export const BUSINESS_PACK: GovernancePack = {",
+              "type": "const"
+            },
+            {
+              "line": 123,
+              "content": "export const ENTERPRISE_PACK: GovernancePack = {",
+              "type": "const"
+            },
+            {
+              "line": 196,
+              "content": "export const REGULATED_FINANCE_PACK: GovernancePack = {",
+              "type": "const"
+            },
+            {
+              "line": 269,
+              "content": "export const FRANCHISE_PACK: GovernancePack = {",
+              "type": "const"
+            },
+            {
+              "line": 342,
+              "content": "export const GOVERNANCE_PACKS = {",
+              "type": "const"
+            },
+            {
+              "line": 351,
+              "content": "export function applyGovernancePack(packName: keyof typeof GOVERNANCE_PACKS): GovernancePack {",
+              "type": "function"
+            },
+            {
+              "line": 356,
+              "content": "export function getRecommendedPack(",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 6,
+              "name": "GovernancePack",
+              "content": "export interface GovernancePack {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 351,
+              "name": "applyGovernancePack",
+              "content": "export function applyGovernancePack(packName: keyof typeof GOVERNANCE_PACKS): GovernancePack {"
+            },
+            {
+              "line": 356,
+              "name": "getRecommendedPack",
+              "content": "export function getRecommendedPack("
+            }
+          ],
+          "imports": [
+            {
+              "line": 4,
+              "content": "import type { FeatureFlags, PolicySettings, MemberPermissions } from \"./sod\";"
+            }
+          ],
+          "issues": []
+        },
+        "sod.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface SoDRule {",
+              "type": "interface"
+            },
+            {
+              "line": 17,
+              "content": "export interface FeatureFlags {",
+              "type": "interface"
+            },
+            {
+              "line": 27,
+              "content": "export interface PolicySettings {",
+              "type": "interface"
+            },
+            {
+              "line": 35,
+              "content": "export interface MemberPermissions {",
+              "type": "interface"
+            },
+            {
+              "line": 45,
+              "content": "export interface UserContext {",
+              "type": "interface"
+            },
+            {
+              "line": 53,
+              "content": "export interface ActionContext {",
+              "type": "interface"
+            },
+            {
+              "line": 60,
+              "content": "export interface Decision {",
+              "type": "interface"
+            },
+            {
+              "line": 67,
+              "content": "export const SOD_MATRIX: Record<string, SoDRule> = {",
+              "type": "const"
+            },
+            {
+              "line": 208,
+              "content": "export function canPerformAction(",
+              "type": "function"
+            },
+            {
+              "line": 278,
+              "content": "export function isFeatureEnabled(",
+              "type": "function"
+            },
+            {
+              "line": 297,
+              "content": "export function checkSoDCompliance(",
+              "type": "function"
+            },
+            {
+              "line": 342,
+              "content": "export function getApproverRoles(action: string): string[] {",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "SoDRule",
+              "content": "export interface SoDRule {"
+            },
+            {
+              "line": 17,
+              "name": "FeatureFlags",
+              "content": "export interface FeatureFlags {"
+            },
+            {
+              "line": 27,
+              "name": "PolicySettings",
+              "content": "export interface PolicySettings {"
+            },
+            {
+              "line": 35,
+              "name": "MemberPermissions",
+              "content": "export interface MemberPermissions {"
+            },
+            {
+              "line": 45,
+              "name": "UserContext",
+              "content": "export interface UserContext {"
+            },
+            {
+              "line": 53,
+              "name": "ActionContext",
+              "content": "export interface ActionContext {"
+            },
+            {
+              "line": 60,
+              "name": "Decision",
+              "content": "export interface Decision {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 208,
+              "name": "canPerformAction",
+              "content": "export function canPerformAction("
+            },
+            {
+              "line": 278,
+              "name": "isFeatureEnabled",
+              "content": "export function isFeatureEnabled("
+            },
+            {
+              "line": 297,
+              "name": "checkSoDCompliance",
+              "content": "export function checkSoDCompliance("
+            },
+            {
+              "line": 342,
+              "name": "getApproverRoles",
+              "content": "export function getApproverRoles(action: string): string[] {"
+            }
+          ],
+          "imports": [],
+          "issues": []
+        },
+        "types.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface AuthUser {",
+              "type": "interface"
+            },
+            {
+              "line": 13,
+              "content": "export interface JWTClaims {",
+              "type": "interface"
+            },
+            {
+              "line": 23,
+              "content": "export type UserRole = \"admin\" | \"manager\" | \"accountant\" | \"clerk\" | \"viewer\" | \"system\";",
+              "type": "type"
+            },
+            {
+              "line": 25,
+              "content": "export interface AuthContext {",
+              "type": "interface"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "AuthUser",
+              "content": "export interface AuthUser {"
+            },
+            {
+              "line": 13,
+              "name": "JWTClaims",
+              "content": "export interface JWTClaims {"
+            },
+            {
+              "line": 25,
+              "name": "AuthContext",
+              "content": "export interface AuthContext {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 2,
+              "content": "import type { UserId, TenantId, CompanyId } from \"@aibos/contracts\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 31,
+      "totalClasses": 0,
+      "totalInterfaces": 11,
+      "totalFunctions": 6,
+      "issues": []
+    },
+    "security": {
+      "name": "security",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./auth\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./advanced-security\";",
+              "type": "other"
+            },
+            {
+              "line": 3,
+              "content": "export * from \"./encryption\";",
+              "type": "other"
+            },
+            {
+              "line": 4,
+              "content": "export * from \"./audit-logger\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "advanced-security.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export interface SecurityConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 22,
+              "content": "export interface SecurityEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 34,
+              "content": "export interface RateLimitInfo {",
+              "type": "interface"
+            },
+            {
+              "line": 42,
+              "content": "export class AdvancedSecurityManager extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 42,
+              "name": "AdvancedSecurityManager",
+              "content": "export class AdvancedSecurityManager extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 6,
+              "name": "SecurityConfig",
+              "content": "export interface SecurityConfig {"
+            },
+            {
+              "line": 22,
+              "name": "SecurityEvent",
+              "content": "export interface SecurityEvent {"
+            },
+            {
+              "line": 34,
+              "name": "RateLimitInfo",
+              "content": "export interface RateLimitInfo {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 3,
+              "content": "import { createHash, randomBytes } from \"crypto\";"
+            },
+            {
+              "line": 4,
+              "content": "import { EventEmitter } from \"events\";"
+            }
+          ],
+          "issues": []
+        },
+        "audit-logger.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface AuditEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 31,
+              "content": "export interface AuditConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 44,
+              "content": "export interface ComplianceRule {",
+              "type": "interface"
+            },
+            {
+              "line": 57,
+              "content": "export interface ComplianceCondition {",
+              "type": "interface"
+            },
+            {
+              "line": 72,
+              "content": "export interface ComplianceAction {",
+              "type": "interface"
+            },
+            {
+              "line": 78,
+              "content": "export class AuditLogger extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 78,
+              "name": "AuditLogger",
+              "content": "export class AuditLogger extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "AuditEvent",
+              "content": "export interface AuditEvent {"
+            },
+            {
+              "line": 31,
+              "name": "AuditConfig",
+              "content": "export interface AuditConfig {"
+            },
+            {
+              "line": 44,
+              "name": "ComplianceRule",
+              "content": "export interface ComplianceRule {"
+            },
+            {
+              "line": 57,
+              "name": "ComplianceCondition",
+              "content": "export interface ComplianceCondition {"
+            },
+            {
+              "line": 72,
+              "name": "ComplianceAction",
+              "content": "export interface ComplianceAction {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { createHash } from \"crypto\";"
+            }
+          ],
+          "issues": []
+        },
+        "auth.test.ts": {
+          "exports": [],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { describe, it, expect, vi, beforeEach } from \"vitest\";"
+            },
+            {
+              "line": 2,
+              "content": "import { verifyAccessToken, buildSecurityContext, toSecurityContext } from \"./auth\";"
+            }
+          ],
+          "issues": []
+        },
+        "auth.ts": {
+          "exports": [
+            {
+              "line": 3,
+              "content": "export type SecurityContext = {",
+              "type": "type"
+            },
+            {
+              "line": 28,
+              "content": "export async function verifyAccessToken(authorization?: string) {",
+              "type": "function"
+            },
+            {
+              "line": 83,
+              "content": "export function buildSecurityContext(",
+              "type": "function"
+            },
+            {
+              "line": 105,
+              "content": "export function toSecurityContext(",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 28,
+              "name": "verifyAccessToken",
+              "content": "export async function verifyAccessToken(authorization?: string) {"
+            },
+            {
+              "line": 83,
+              "name": "buildSecurityContext",
+              "content": "export function buildSecurityContext("
+            },
+            {
+              "line": 105,
+              "name": "toSecurityContext",
+              "content": "export function toSecurityContext("
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { jwtVerify, createRemoteJWKSet } from \"jose\";"
+            }
+          ],
+          "issues": []
+        },
+        "encryption.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export interface EncryptionConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 15,
+              "content": "export interface EncryptedData {",
+              "type": "interface"
+            },
+            {
+              "line": 23,
+              "content": "export interface KeyDerivationConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 30,
+              "content": "export class EncryptionManager {",
+              "type": "class"
+            },
+            {
+              "line": 338,
+              "content": "export class GDPRCompliance {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 30,
+              "name": "EncryptionManager",
+              "content": "export class EncryptionManager {"
+            },
+            {
+              "line": 338,
+              "name": "GDPRCompliance",
+              "content": "export class GDPRCompliance {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 6,
+              "name": "EncryptionConfig",
+              "content": "export interface EncryptionConfig {"
+            },
+            {
+              "line": 15,
+              "name": "EncryptedData",
+              "content": "export interface EncryptedData {"
+            },
+            {
+              "line": 23,
+              "name": "KeyDerivationConfig",
+              "content": "export interface KeyDerivationConfig {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { createCipheriv, createDecipheriv, createHash, randomBytes, scrypt } from \"crypto\";"
+            },
+            {
+              "line": 2,
+              "content": "import { promisify } from \"util\";"
+            }
+          ],
+          "issues": []
+        },
+        "types.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export interface SecurityContext {",
+              "type": "interface"
+            },
+            {
+              "line": 9,
+              "content": "export interface AuthUser {",
+              "type": "interface"
+            },
+            {
+              "line": 19,
+              "content": "export interface JWTClaims {",
+              "type": "interface"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 1,
+              "name": "SecurityContext",
+              "content": "export interface SecurityContext {"
+            },
+            {
+              "line": 9,
+              "name": "AuthUser",
+              "content": "export interface AuthUser {"
+            },
+            {
+              "line": 19,
+              "name": "JWTClaims",
+              "content": "export interface JWTClaims {"
+            }
+          ],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        }
+      },
+      "totalExports": 26,
+      "totalClasses": 4,
+      "totalInterfaces": 14,
+      "totalFunctions": 3,
+      "issues": []
+    },
+    "tokens": {
+      "name": "tokens",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 8,
+              "content": "export {",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "tokens.ts": {
+          "exports": [
+            {
+              "line": 20,
+              "content": "export const DESIGN_MODES = {",
+              "type": "const"
+            },
+            {
+              "line": 100,
+              "content": "export const SEMANTIC_TOKENS = {",
+              "type": "const"
+            },
+            {
+              "line": 244,
+              "content": "export const ACCESSIBILITY_CSS_VARS = {",
+              "type": "const"
+            },
+            {
+              "line": 307,
+              "content": "export function getModeCssVars(mode: \"aesthetic\" | \"accessibility\"): Record<string, string> {",
+              "type": "function"
+            },
+            {
+              "line": 314,
+              "content": "export function applyModeToDocument(mode: \"aesthetic\" | \"accessibility\"): void {",
+              "type": "function"
+            },
+            {
+              "line": 330,
+              "content": "export function isAccessibilityMode(): boolean {",
+              "type": "function"
+            },
+            {
+              "line": 340,
+              "content": "export function toggleAccessibilityMode(): \"aesthetic\" | \"accessibility\" {",
+              "type": "function"
+            },
+            {
+              "line": 360,
+              "content": "export function initializeDesignMode(",
+              "type": "function"
+            },
+            {
+              "line": 376,
+              "content": "export type DesignModes = typeof DESIGN_MODES;",
+              "type": "type"
+            },
+            {
+              "line": 377,
+              "content": "export type SemanticTokens = typeof SEMANTIC_TOKENS;",
+              "type": "type"
+            },
+            {
+              "line": 378,
+              "content": "export type AccessibilityCssVars = typeof ACCESSIBILITY_CSS_VARS;",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 307,
+              "name": "getModeCssVars",
+              "content": "export function getModeCssVars(mode: \"aesthetic\" | \"accessibility\"): Record<string, string> {"
+            },
+            {
+              "line": 314,
+              "name": "applyModeToDocument",
+              "content": "export function applyModeToDocument(mode: \"aesthetic\" | \"accessibility\"): void {"
+            },
+            {
+              "line": 330,
+              "name": "isAccessibilityMode",
+              "content": "export function isAccessibilityMode(): boolean {"
+            },
+            {
+              "line": 340,
+              "name": "toggleAccessibilityMode",
+              "content": "export function toggleAccessibilityMode(): \"aesthetic\" | \"accessibility\" {"
+            },
+            {
+              "line": 360,
+              "name": "initializeDesignMode",
+              "content": "export function initializeDesignMode("
+            }
+          ],
+          "imports": [],
+          "issues": []
+        }
+      },
+      "totalExports": 12,
+      "totalClasses": 0,
+      "totalInterfaces": 0,
+      "totalFunctions": 5,
+      "issues": []
+    },
+    "api-gateway": {
+      "name": "api-gateway",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 7,
+              "content": "export * from \"./gateway\";",
+              "type": "other"
+            },
+            {
+              "line": 8,
+              "content": "export * from \"./rate-limit\";",
+              "type": "other"
+            },
+            {
+              "line": 9,
+              "content": "export * from \"./logging\";",
+              "type": "other"
+            },
+            {
+              "line": 12,
+              "content": "export { APIGateway, defaultGatewayConfig, type GatewayConfig, type GatewayStats } from \"./gateway\";",
+              "type": "type"
+            },
+            {
+              "line": 14,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 23,
+              "content": "export { RequestLoggingService, type LogEntry, type LogStats } from \"./logging\";",
+              "type": "type"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "gateway.test.ts": {
+          "exports": [],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 5,
+              "content": "import { describe, it, expect, vi, beforeEach } from \"vitest\";"
+            },
+            {
+              "line": 6,
+              "content": "import request from \"supertest\";"
+            },
+            {
+              "line": 7,
+              "content": "import { APIGateway, defaultGatewayConfig } from \"./gateway\";"
+            }
+          ],
+          "issues": []
+        },
+        "gateway.ts": {
+          "exports": [
+            {
+              "line": 14,
+              "content": "export interface GatewayConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 22,
+              "content": "export interface GatewayStats {",
+              "type": "interface"
+            },
+            {
+              "line": 30,
+              "content": "export class APIGateway {",
+              "type": "class"
+            },
+            {
+              "line": 278,
+              "content": "export const defaultGatewayConfig: GatewayConfig = {",
+              "type": "const"
+            }
+          ],
+          "classes": [
+            {
+              "line": 30,
+              "name": "APIGateway",
+              "content": "export class APIGateway {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 14,
+              "name": "GatewayConfig",
+              "content": "export interface GatewayConfig {"
+            },
+            {
+              "line": 22,
+              "name": "GatewayStats",
+              "content": "export interface GatewayStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import express, { Express, Request, Response, NextFunction } from \"express\";"
+            },
+            {
+              "line": 8,
+              "content": "import cors from \"cors\";"
+            },
+            {
+              "line": 9,
+              "content": "import helmet from \"helmet\";"
+            },
+            {
+              "line": 10,
+              "content": "import { CacheService } from \"@aibos/cache\";"
+            },
+            {
+              "line": 11,
+              "content": "import { RateLimitService, RATE_LIMIT_CONFIGS } from \"./rate-limit\";"
+            },
+            {
+              "line": 12,
+              "content": "import { RequestLoggingService } from \"./logging\";"
+            }
+          ],
+          "issues": []
+        },
+        "logging.ts": {
+          "exports": [
+            {
+              "line": 10,
+              "content": "export interface LogEntry {",
+              "type": "interface"
+            },
+            {
+              "line": 27,
+              "content": "export interface LogStats {",
+              "type": "interface"
+            },
+            {
+              "line": 35,
+              "content": "export class RequestLoggingService {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 35,
+              "name": "RequestLoggingService",
+              "content": "export class RequestLoggingService {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 10,
+              "name": "LogEntry",
+              "content": "export interface LogEntry {"
+            },
+            {
+              "line": 27,
+              "name": "LogStats",
+              "content": "export interface LogStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { Request, Response, NextFunction } from \"express\";"
+            },
+            {
+              "line": 8,
+              "content": "import { CacheService } from \"@aibos/cache\";"
+            }
+          ],
+          "issues": []
+        },
+        "rate-limit.ts": {
+          "exports": [
+            {
+              "line": 10,
+              "content": "export interface RateLimitConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 19,
+              "content": "export interface RateLimitStats {",
+              "type": "interface"
+            },
+            {
+              "line": 26,
+              "content": "export class RateLimitService {",
+              "type": "class"
+            },
+            {
+              "line": 137,
+              "content": "export const RATE_LIMIT_CONFIGS = {",
+              "type": "const"
+            },
+            {
+              "line": 170,
+              "content": "export class TenantRateLimitService extends RateLimitService {",
+              "type": "class"
+            },
+            {
+              "line": 185,
+              "content": "export class UserRateLimitService extends RateLimitService {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 26,
+              "name": "RateLimitService",
+              "content": "export class RateLimitService {"
+            },
+            {
+              "line": 170,
+              "name": "TenantRateLimitService",
+              "content": "export class TenantRateLimitService extends RateLimitService {"
+            },
+            {
+              "line": 185,
+              "name": "UserRateLimitService",
+              "content": "export class UserRateLimitService extends RateLimitService {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 10,
+              "name": "RateLimitConfig",
+              "content": "export interface RateLimitConfig {"
+            },
+            {
+              "line": 19,
+              "name": "RateLimitStats",
+              "content": "export interface RateLimitStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { Request, Response, NextFunction } from \"express\";"
+            },
+            {
+              "line": 8,
+              "content": "import { CacheService } from \"@aibos/cache\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 19,
+      "totalClasses": 5,
+      "totalInterfaces": 6,
+      "totalFunctions": 0,
+      "issues": []
+    },
+    "deployment": {
+      "name": "deployment",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 7,
+              "content": "export * from \"./health-check\";",
+              "type": "other"
+            },
+            {
+              "line": 8,
+              "content": "export * from \"./deploy\";",
+              "type": "other"
+            },
+            {
+              "line": 11,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 19,
+              "content": "export {",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "deploy.ts": {
+          "exports": [
+            {
+              "line": 12,
+              "content": "export interface DeploymentConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 21,
+              "content": "export interface DeploymentResult {",
+              "type": "interface"
+            },
+            {
+              "line": 35,
+              "content": "export class ProductionDeployer {",
+              "type": "class"
+            },
+            {
+              "line": 234,
+              "content": "export const DEPLOYMENT_CONFIGS = {",
+              "type": "const"
+            },
+            {
+              "line": 254,
+              "content": "export async function deployStaging(): Promise<void> {",
+              "type": "function"
+            },
+            {
+              "line": 263,
+              "content": "export async function deployProduction(): Promise<void> {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 35,
+              "name": "ProductionDeployer",
+              "content": "export class ProductionDeployer {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 12,
+              "name": "DeploymentConfig",
+              "content": "export interface DeploymentConfig {"
+            },
+            {
+              "line": 21,
+              "name": "DeploymentResult",
+              "content": "export interface DeploymentResult {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 254,
+              "name": "deployStaging",
+              "content": "export async function deployStaging(): Promise<void> {"
+            },
+            {
+              "line": 263,
+              "name": "deployProduction",
+              "content": "export async function deployProduction(): Promise<void> {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { execSync } from \"child_process\";"
+            },
+            {
+              "line": 8,
+              "content": "import { existsSync } from \"fs\";"
+            },
+            {
+              "line": 9,
+              "content": "import chalk from \"chalk\";"
+            },
+            {
+              "line": 10,
+              "content": "import { ProductionHealthChecker } from \"./health-check\";"
+            }
+          ],
+          "issues": []
+        },
+        "health-check.ts": {
+          "exports": [
+            {
+              "line": 9,
+              "content": "export interface HealthCheckResult {",
+              "type": "interface"
+            },
+            {
+              "line": 16,
+              "content": "export interface DeploymentHealth {",
+              "type": "interface"
+            },
+            {
+              "line": 26,
+              "content": "export class ProductionHealthChecker {",
+              "type": "class"
+            },
+            {
+              "line": 275,
+              "content": "export async function runQuickHealthCheck(): Promise<void> {",
+              "type": "function"
+            },
+            {
+              "line": 293,
+              "content": "export async function runDetailedHealthCheck(): Promise<void> {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 26,
+              "name": "ProductionHealthChecker",
+              "content": "export class ProductionHealthChecker {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 9,
+              "name": "HealthCheckResult",
+              "content": "export interface HealthCheckResult {"
+            },
+            {
+              "line": 16,
+              "name": "DeploymentHealth",
+              "content": "export interface DeploymentHealth {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 275,
+              "name": "runQuickHealthCheck",
+              "content": "export async function runQuickHealthCheck(): Promise<void> {"
+            },
+            {
+              "line": 293,
+              "name": "runDetailedHealthCheck",
+              "content": "export async function runDetailedHealthCheck(): Promise<void> {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import chalk from \"chalk\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 15,
+      "totalClasses": 2,
+      "totalInterfaces": 4,
+      "totalFunctions": 4,
+      "issues": []
+    },
+    "utils": {
+      "name": "utils",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 13,
+              "content": "export * from \"./types\";",
+              "type": "other"
+            },
+            {
+              "line": 16,
+              "content": "export * from \"./type-guards\";",
+              "type": "other"
+            },
+            {
+              "line": 19,
+              "content": "export { makeLogger } from \"./logger\";",
+              "type": "other"
+            },
+            {
+              "line": 20,
+              "content": "export const utilsLogger = makeLogger(\"app\");",
+              "type": "const"
+            },
+            {
+              "line": 23,
+              "content": "export * from \"./email\";",
+              "type": "other"
+            },
+            {
+              "line": 26,
+              "content": "export * from \"./storage\";",
+              "type": "other"
+            },
+            {
+              "line": 33,
+              "content": "export * from \"./middleware\";",
+              "type": "other"
+            },
+            {
+              "line": 40,
+              "content": "export { createClient as createServerClient, createServiceClient } from \"./supabase/server\";",
+              "type": "other"
+            },
+            {
+              "line": 41,
+              "content": "export { createClient as createBrowserClient } from \"./supabase/client\";",
+              "type": "other"
+            },
+            {
+              "line": 42,
+              "content": "export { createClient as createMiddlewareClient } from \"./supabase/middleware\";",
+              "type": "other"
+            },
+            {
+              "line": 49,
+              "content": "export type { PDFOptions } from \"./pdf\";",
+              "type": "type"
+            },
+            {
+              "line": 59,
+              "content": "export * from \"./axiom\";",
+              "type": "other"
+            },
+            {
+              "line": 62,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 68,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 80,
+              "content": "export * from \"./middleware\";",
+              "type": "other"
+            },
+            {
+              "line": 83,
+              "content": "export * from \"./middleware/idempotency\";",
+              "type": "other"
+            },
+            {
+              "line": 90,
+              "content": "export * from \"./audit/service\";",
+              "type": "other"
+            },
+            {
+              "line": 93,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 97,
+              "content": "export type { AuditContext as V1AuditContext, AuditEvent } from \"./audit/audit-service\";",
+              "type": "type"
+            },
+            {
+              "line": 98,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 105,
+              "content": "export type { UserContext } from \"./context/request-context\";",
+              "type": "type"
+            },
+            {
+              "line": 112,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 121,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 129,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 136,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 149,
+              "content": "export * from \"./auth/enhanced-context\";",
+              "type": "other"
+            },
+            {
+              "line": 150,
+              "content": "export * from \"./auth/react-hooks\";",
+              "type": "other"
+            },
+            {
+              "line": 157,
+              "content": "export * from \"./api-client\";",
+              "type": "other"
+            },
+            {
+              "line": 158,
+              "content": "export * from \"./state-management\";",
+              "type": "other"
+            },
+            {
+              "line": 159,
+              "content": "export * from \"./server-api-client\";",
+              "type": "other"
+            },
+            {
+              "line": 160,
+              "content": "export * from \"./api-gateway\";",
+              "type": "other"
+            },
+            {
+              "line": 163,
+              "content": "export * from \"./cache\";",
+              "type": "other"
+            },
+            {
+              "line": 174,
+              "content": "export const logger = makeLogger(\"jobs\");",
+              "type": "const"
+            },
+            {
+              "line": 177,
+              "content": "export const sendEmail = async (params: {",
+              "type": "const"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 170,
+              "content": "import { makeLogger } from \"./logger\";"
+            },
+            {
+              "line": 171,
+              "content": "import { emailAdapter } from \"./email\";"
+            }
+          ],
+          "issues": []
+        },
+        "api-client.ts": {
+          "exports": [
+            {
+              "line": 9,
+              "content": "export interface Problem {",
+              "type": "interface"
+            },
+            {
+              "line": 19,
+              "content": "export interface EnvelopeBase {",
+              "type": "interface"
+            },
+            {
+              "line": 25,
+              "content": "export interface ApiSuccess<T> extends EnvelopeBase {",
+              "type": "interface"
+            },
+            {
+              "line": 35,
+              "content": "export interface ApiFailure extends EnvelopeBase {",
+              "type": "interface"
+            },
+            {
+              "line": 40,
+              "content": "export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;",
+              "type": "type"
+            },
+            {
+              "line": 42,
+              "content": "export const isSuccess = <T>(r: ApiResponse<T>): r is ApiSuccess<T> => r.success === true;",
+              "type": "const"
+            },
+            {
+              "line": 45,
+              "content": "export interface ApiClientConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 53,
+              "content": "export interface ApiRequestContext {",
+              "type": "interface"
+            },
+            {
+              "line": 62,
+              "content": "export class ApiClient {",
+              "type": "class"
+            },
+            {
+              "line": 275,
+              "content": "export const apiClient = new ApiClient({",
+              "type": "const"
+            },
+            {
+              "line": 281,
+              "content": "export function createApiRequestContext(",
+              "type": "function"
+            },
+            {
+              "line": 298,
+              "content": "export class ApiError extends Error {",
+              "type": "class"
+            },
+            {
+              "line": 321,
+              "content": "export function throwApiError(response: ApiFailure) {",
+              "type": "function"
+            },
+            {
+              "line": 326,
+              "content": "export function handleApiResponse<T>(response: ApiResponse<T>): T {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 62,
+              "name": "ApiClient",
+              "content": "export class ApiClient {"
+            },
+            {
+              "line": 298,
+              "name": "ApiError",
+              "content": "export class ApiError extends Error {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 9,
+              "name": "Problem",
+              "content": "export interface Problem {"
+            },
+            {
+              "line": 19,
+              "name": "EnvelopeBase",
+              "content": "export interface EnvelopeBase {"
+            },
+            {
+              "line": 25,
+              "name": "ApiSuccess",
+              "content": "export interface ApiSuccess<T> extends EnvelopeBase {"
+            },
+            {
+              "line": 35,
+              "name": "ApiFailure",
+              "content": "export interface ApiFailure extends EnvelopeBase {"
+            },
+            {
+              "line": 45,
+              "name": "ApiClientConfig",
+              "content": "export interface ApiClientConfig {"
+            },
+            {
+              "line": 53,
+              "name": "ApiRequestContext",
+              "content": "export interface ApiRequestContext {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 281,
+              "name": "createApiRequestContext",
+              "content": "export function createApiRequestContext("
+            },
+            {
+              "line": 321,
+              "name": "throwApiError",
+              "content": "export function throwApiError(response: ApiFailure) {"
+            },
+            {
+              "line": 326,
+              "name": "handleApiResponse",
+              "content": "export function handleApiResponse<T>(response: ApiResponse<T>): T {"
+            }
+          ],
+          "imports": [],
+          "issues": []
+        },
+        "axiom.ts": {
+          "exports": [
+            {
+              "line": 5,
+              "content": "export const axiom = new Axiom({",
+              "type": "const"
+            },
+            {
+              "line": 11,
+              "content": "export const AXIOM_DATASETS = {",
+              "type": "const"
+            },
+            {
+              "line": 20,
+              "content": "export type AxiomDataset = keyof typeof AXIOM_DATASETS;",
+              "type": "type"
+            },
+            {
+              "line": 23,
+              "content": "export interface AxiomEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 38,
+              "content": "export interface PerformanceMetrics {",
+              "type": "interface"
+            },
+            {
+              "line": 49,
+              "content": "export interface BusinessEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 65,
+              "content": "export interface ErrorEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 77,
+              "content": "export async function sendToAxiom(",
+              "type": "function"
+            },
+            {
+              "line": 104,
+              "content": "export async function logPerformanceEvent(",
+              "type": "function"
+            },
+            {
+              "line": 132,
+              "content": "export async function logBusinessEvent(",
+              "type": "function"
+            },
+            {
+              "line": 161,
+              "content": "export async function logErrorEvent(",
+              "type": "function"
+            },
+            {
+              "line": 190,
+              "content": "export class AxiomBatcher {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 190,
+              "name": "AxiomBatcher",
+              "content": "export class AxiomBatcher {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 23,
+              "name": "AxiomEvent",
+              "content": "export interface AxiomEvent {"
+            },
+            {
+              "line": 38,
+              "name": "PerformanceMetrics",
+              "content": "export interface PerformanceMetrics {"
+            },
+            {
+              "line": 49,
+              "name": "BusinessEvent",
+              "content": "export interface BusinessEvent {"
+            },
+            {
+              "line": 65,
+              "name": "ErrorEvent",
+              "content": "export interface ErrorEvent {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 77,
+              "name": "sendToAxiom",
+              "content": "export async function sendToAxiom("
+            },
+            {
+              "line": 104,
+              "name": "logPerformanceEvent",
+              "content": "export async function logPerformanceEvent("
+            },
+            {
+              "line": 132,
+              "name": "logBusinessEvent",
+              "content": "export async function logBusinessEvent("
+            },
+            {
+              "line": 161,
+              "name": "logErrorEvent",
+              "content": "export async function logErrorEvent("
+            }
+          ],
+          "imports": [
+            {
+              "line": 2,
+              "content": "import { Axiom } from \"@axiomhq/js\";"
+            }
+          ],
+          "issues": []
+        },
+        "email.ts": {
+          "exports": [
+            {
+              "line": 2,
+              "content": "export interface EmailPayload {",
+              "type": "interface"
+            },
+            {
+              "line": 9,
+              "content": "export interface EmailPort {",
+              "type": "interface"
+            },
+            {
+              "line": 21,
+              "content": "export const emailAdapter: EmailPort = {",
+              "type": "const"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 2,
+              "name": "EmailPayload",
+              "content": "export interface EmailPayload {"
+            },
+            {
+              "line": 9,
+              "name": "EmailPort",
+              "content": "export interface EmailPort {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { Resend } from \"resend\";"
+            }
+          ],
+          "issues": []
+        },
+        "logger.ts": {
+          "exports": [
+            {
+              "line": 17,
+              "content": "export function makeLogger(dataset: \"app\" | \"api\" | \"jobs\") {",
+              "type": "function"
+            },
+            {
+              "line": 53,
+              "content": "export function withCtx(",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 17,
+              "name": "makeLogger",
+              "content": "export function makeLogger(dataset: \"app\" | \"api\" | \"jobs\") {"
+            },
+            {
+              "line": 53,
+              "name": "withCtx",
+              "content": "export function withCtx("
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { createLogger, format, transports } from \"winston\";"
+            }
+          ],
+          "issues": []
+        },
+        "middleware.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export interface RequestContext {",
+              "type": "interface"
+            },
+            {
+              "line": 18,
+              "content": "export function createRequestContext(request: NextRequest): RequestContext {",
+              "type": "function"
+            },
+            {
+              "line": 40,
+              "content": "export function withRequestLogging(",
+              "type": "function"
+            },
+            {
+              "line": 98,
+              "content": "export function logPerformanceMetrics(",
+              "type": "function"
+            },
+            {
+              "line": 124,
+              "content": "export function logBusinessEventToLogger(",
+              "type": "function"
+            },
+            {
+              "line": 192,
+              "content": "export function extractUserContext(request: NextRequest): {",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 6,
+              "name": "RequestContext",
+              "content": "export interface RequestContext {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 18,
+              "name": "createRequestContext",
+              "content": "export function createRequestContext(request: NextRequest): RequestContext {"
+            },
+            {
+              "line": 40,
+              "name": "withRequestLogging",
+              "content": "export function withRequestLogging("
+            },
+            {
+              "line": 98,
+              "name": "logPerformanceMetrics",
+              "content": "export function logPerformanceMetrics("
+            },
+            {
+              "line": 124,
+              "name": "logBusinessEventToLogger",
+              "content": "export function logBusinessEventToLogger("
+            },
+            {
+              "line": 192,
+              "name": "extractUserContext",
+              "content": "export function extractUserContext(request: NextRequest): {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 2,
+              "content": "import { NextRequest, NextResponse } from \"next/server\";"
+            },
+            {
+              "line": 3,
+              "content": "import { makeLogger, withCtx } from \"./logger\";"
+            }
+          ],
+          "issues": []
+        },
+        "pdf.ts": {
+          "exports": [
+            {
+              "line": 8,
+              "content": "export interface PDFOptions {",
+              "type": "interface"
+            },
+            {
+              "line": 15,
+              "content": "export interface PdfInput extends PDFOptions {}",
+              "type": "interface"
+            },
+            {
+              "line": 16,
+              "content": "export async function renderPdf({",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 8,
+              "name": "PDFOptions",
+              "content": "export interface PDFOptions {"
+            },
+            {
+              "line": 15,
+              "name": "PdfInput",
+              "content": "export interface PdfInput extends PDFOptions {}"
+            }
+          ],
+          "functions": [
+            {
+              "line": 16,
+              "name": "renderPdf",
+              "content": "export async function renderPdf({"
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { chromium, Browser } from \"playwright\";"
+            }
+          ],
+          "issues": []
+        },
+        "server-api-client.ts": {
+          "exports": [
+            {
+              "line": 14,
+              "content": "export async function fetchInvoices(",
+              "type": "function"
+            },
+            {
+              "line": 52,
+              "content": "export async function fetchInvoice(context: ApiRequestContext, id: string) {",
+              "type": "function"
+            },
+            {
+              "line": 72,
+              "content": "export async function fetchCustomers(",
+              "type": "function"
+            },
+            {
+              "line": 106,
+              "content": "export async function fetchJournals(",
+              "type": "function"
+            },
+            {
+              "line": 142,
+              "content": "export async function fetchChartOfAccounts(",
+              "type": "function"
+            },
+            {
+              "line": 174,
+              "content": "export async function fetchTrialBalance(",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 14,
+              "name": "fetchInvoices",
+              "content": "export async function fetchInvoices("
+            },
+            {
+              "line": 52,
+              "name": "fetchInvoice",
+              "content": "export async function fetchInvoice(context: ApiRequestContext, id: string) {"
+            },
+            {
+              "line": 72,
+              "name": "fetchCustomers",
+              "content": "export async function fetchCustomers("
+            },
+            {
+              "line": 106,
+              "name": "fetchJournals",
+              "content": "export async function fetchJournals("
+            },
+            {
+              "line": 142,
+              "name": "fetchChartOfAccounts",
+              "content": "export async function fetchChartOfAccounts("
+            },
+            {
+              "line": 174,
+              "name": "fetchTrialBalance",
+              "content": "export async function fetchTrialBalance("
+            }
+          ],
+          "imports": [
+            {
+              "line": 8,
+              "content": "import { ApiRequestContext, apiClient, isSuccess } from \"./api-client\";"
+            }
+          ],
+          "issues": []
+        },
+        "server.ts": {
+          "exports": [
+            {
+              "line": 2,
+              "content": "export * from \"./pdf\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "state-management.ts": {
+          "exports": [
+            {
+              "line": 19,
+              "content": "export function useInvoices(",
+              "type": "function"
+            },
+            {
+              "line": 78,
+              "content": "export function useInvoice(",
+              "type": "function"
+            },
+            {
+              "line": 122,
+              "content": "export function useCreateInvoice(context: ApiRequestContext, options?: { enabled?: boolean }) {",
+              "type": "function"
+            },
+            {
+              "line": 162,
+              "content": "export function usePostInvoice(context: ApiRequestContext, options?: { enabled?: boolean }) {",
+              "type": "function"
+            },
+            {
+              "line": 202,
+              "content": "export function useCustomers(",
+              "type": "function"
+            },
+            {
+              "line": 257,
+              "content": "export function useCustomer(",
+              "type": "function"
+            },
+            {
+              "line": 301,
+              "content": "export function useCreateCustomer(context: ApiRequestContext, options?: { enabled?: boolean }) {",
+              "type": "function"
+            },
+            {
+              "line": 341,
+              "content": "export function useJournals(",
+              "type": "function"
+            },
+            {
+              "line": 398,
+              "content": "export function useJournal(",
+              "type": "function"
+            },
+            {
+              "line": 442,
+              "content": "export function useTrialBalance(",
+              "type": "function"
+            },
+            {
+              "line": 503,
+              "content": "export function useChartOfAccounts(",
+              "type": "function"
+            },
+            {
+              "line": 556,
+              "content": "export function useTaxCodes(context: ApiRequestContext, options?: { enabled?: boolean }) {",
+              "type": "function"
+            },
+            {
+              "line": 596,
+              "content": "export function useInvalidateQueries() {",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 19,
+              "name": "useInvoices",
+              "content": "export function useInvoices("
+            },
+            {
+              "line": 78,
+              "name": "useInvoice",
+              "content": "export function useInvoice("
+            },
+            {
+              "line": 122,
+              "name": "useCreateInvoice",
+              "content": "export function useCreateInvoice(context: ApiRequestContext, options?: { enabled?: boolean }) {"
+            },
+            {
+              "line": 162,
+              "name": "usePostInvoice",
+              "content": "export function usePostInvoice(context: ApiRequestContext, options?: { enabled?: boolean }) {"
+            },
+            {
+              "line": 202,
+              "name": "useCustomers",
+              "content": "export function useCustomers("
+            },
+            {
+              "line": 257,
+              "name": "useCustomer",
+              "content": "export function useCustomer("
+            },
+            {
+              "line": 301,
+              "name": "useCreateCustomer",
+              "content": "export function useCreateCustomer(context: ApiRequestContext, options?: { enabled?: boolean }) {"
+            },
+            {
+              "line": 341,
+              "name": "useJournals",
+              "content": "export function useJournals("
+            },
+            {
+              "line": 398,
+              "name": "useJournal",
+              "content": "export function useJournal("
+            },
+            {
+              "line": 442,
+              "name": "useTrialBalance",
+              "content": "export function useTrialBalance("
+            },
+            {
+              "line": 503,
+              "name": "useChartOfAccounts",
+              "content": "export function useChartOfAccounts("
+            },
+            {
+              "line": 556,
+              "name": "useTaxCodes",
+              "content": "export function useTaxCodes(context: ApiRequestContext, options?: { enabled?: boolean }) {"
+            },
+            {
+              "line": 596,
+              "name": "useInvalidateQueries",
+              "content": "export function useInvalidateQueries() {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 12,
+              "content": "import { useState, useEffect, useCallback } from \"react\";"
+            },
+            {
+              "line": 13,
+              "content": "import { ApiRequestContext, apiClient, isSuccess } from \"./api-client\";"
+            }
+          ],
+          "issues": []
+        },
+        "storage.ts": {
+          "exports": [
+            {
+              "line": 8,
+              "content": "export async function putPdf(opts: { tenantId: string; path: string; bytes: Buffer }) {",
+              "type": "function"
+            },
+            {
+              "line": 21,
+              "content": "export * from \"./storage/index\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 8,
+              "name": "putPdf",
+              "content": "export async function putPdf(opts: { tenantId: string; path: string; bytes: Buffer }) {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { createClient } from \"@supabase/supabase-js\";"
+            }
+          ],
+          "issues": []
+        },
+        "type-guards.ts": {
+          "exports": [
+            {
+              "line": 11,
+              "content": "export function toError(e: unknown): Error {",
+              "type": "function"
+            },
+            {
+              "line": 32,
+              "content": "export function isObject(value: unknown): value is Record<string, unknown> {",
+              "type": "function"
+            },
+            {
+              "line": 41,
+              "content": "export function isString(value: unknown): value is string {",
+              "type": "function"
+            },
+            {
+              "line": 50,
+              "content": "export function isNumber(value: unknown): value is number {",
+              "type": "function"
+            },
+            {
+              "line": 61,
+              "content": "export function safeGet<T>(",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 11,
+              "name": "toError",
+              "content": "export function toError(e: unknown): Error {"
+            },
+            {
+              "line": 32,
+              "name": "isObject",
+              "content": "export function isObject(value: unknown): value is Record<string, unknown> {"
+            },
+            {
+              "line": 41,
+              "name": "isString",
+              "content": "export function isString(value: unknown): value is string {"
+            },
+            {
+              "line": 50,
+              "name": "isNumber",
+              "content": "export function isNumber(value: unknown): value is number {"
+            },
+            {
+              "line": 61,
+              "name": "safeGet",
+              "content": "export function safeGet<T>("
+            }
+          ],
+          "imports": [],
+          "issues": []
+        },
+        "types.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export type {",
+              "type": "type"
+            },
+            {
+              "line": 15,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 25,
+              "content": "export type JsonPrimitive = string | number | boolean | null;",
+              "type": "type"
+            },
+            {
+              "line": 26,
+              "content": "export type JsonObject = { [key: string]: JsonValue };",
+              "type": "type"
+            },
+            {
+              "line": 27,
+              "content": "export type JsonArray = JsonValue[];",
+              "type": "type"
+            },
+            {
+              "line": 28,
+              "content": "export type JsonValue = JsonPrimitive | JsonObject | JsonArray;",
+              "type": "type"
+            },
+            {
+              "line": 31,
+              "content": "export function isJsonObject(value: JsonValue): value is JsonObject {",
+              "type": "function"
+            },
+            {
+              "line": 35,
+              "content": "export function isJsonArray(value: JsonValue): value is JsonArray {",
+              "type": "function"
+            },
+            {
+              "line": 40,
+              "content": "export function parseUnknownAsJson(data: unknown): JsonValue {",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [
+            {
+              "line": 31,
+              "name": "isJsonObject",
+              "content": "export function isJsonObject(value: JsonValue): value is JsonObject {"
+            },
+            {
+              "line": 35,
+              "name": "isJsonArray",
+              "content": "export function isJsonArray(value: JsonValue): value is JsonArray {"
+            },
+            {
+              "line": 40,
+              "name": "parseUnknownAsJson",
+              "content": "export function parseUnknownAsJson(data: unknown): JsonValue {"
+            }
+          ],
+          "imports": [],
+          "issues": []
+        }
+      },
+      "totalExports": 110,
+      "totalClasses": 3,
+      "totalInterfaces": 15,
+      "totalFunctions": 43,
+      "issues": []
+    },
+    "monitoring": {
+      "name": "monitoring",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 12,
+              "content": "export * from \"./metrics\";",
+              "type": "other"
+            },
+            {
+              "line": 15,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 27,
+              "content": "export { MetricsCollector as CompatMetricsCollector } from \"./compat/MetricsCollector\";",
+              "type": "other"
+            },
+            {
+              "line": 33,
+              "content": "export * from \"./health\";",
+              "type": "other"
+            },
+            {
+              "line": 35,
+              "content": "export { HealthChecker, getHealthChecker, type HealthCheck, type SystemHealth } from \"./health\";",
+              "type": "type"
+            },
+            {
+              "line": 42,
+              "content": "export * from \"./logger\";",
+              "type": "other"
+            },
+            {
+              "line": 48,
+              "content": "export * from \"./tracing\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "health.ts": {
+          "exports": [
+            {
+              "line": 9,
+              "content": "export interface HealthCheck {",
+              "type": "interface"
+            },
+            {
+              "line": 18,
+              "content": "export interface SystemHealth {",
+              "type": "interface"
+            },
+            {
+              "line": 31,
+              "content": "export class HealthChecker {",
+              "type": "class"
+            },
+            {
+              "line": 315,
+              "content": "export function getHealthChecker(cache?: CacheService): HealthChecker {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 31,
+              "name": "HealthChecker",
+              "content": "export class HealthChecker {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 9,
+              "name": "HealthCheck",
+              "content": "export interface HealthCheck {"
+            },
+            {
+              "line": 18,
+              "name": "SystemHealth",
+              "content": "export interface SystemHealth {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 315,
+              "name": "getHealthChecker",
+              "content": "export function getHealthChecker(cache?: CacheService): HealthChecker {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { CacheService } from \"@aibos/cache\";"
+            }
+          ],
+          "issues": []
+        },
+        "logger.ts": {
+          "exports": [
+            {
+              "line": 5,
+              "content": "export interface LogConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 23,
+              "content": "export interface LogEntry {",
+              "type": "interface"
+            },
+            {
+              "line": 51,
+              "content": "export interface LogQuery {",
+              "type": "interface"
+            },
+            {
+              "line": 65,
+              "content": "export class Logger extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 65,
+              "name": "Logger",
+              "content": "export class Logger extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 5,
+              "name": "LogConfig",
+              "content": "export interface LogConfig {"
+            },
+            {
+              "line": 23,
+              "name": "LogEntry",
+              "content": "export interface LogEntry {"
+            },
+            {
+              "line": 51,
+              "name": "LogQuery",
+              "content": "export interface LogQuery {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { createWriteStream, WriteStream } from \"fs\";"
+            },
+            {
+              "line": 3,
+              "content": "import { join } from \"path\";"
+            }
+          ],
+          "issues": []
+        },
+        "metrics-collector.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface MetricConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 16,
+              "content": "export interface MetricData {",
+              "type": "interface"
+            },
+            {
+              "line": 28,
+              "content": "export interface AggregatedMetric {",
+              "type": "interface"
+            },
+            {
+              "line": 43,
+              "content": "export interface SystemMetrics {",
+              "type": "interface"
+            },
+            {
+              "line": 86,
+              "content": "export interface ApplicationMetrics {",
+              "type": "interface"
+            },
+            {
+              "line": 124,
+              "content": "export class MetricsCollector extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 124,
+              "name": "MetricsCollector",
+              "content": "export class MetricsCollector extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "MetricConfig",
+              "content": "export interface MetricConfig {"
+            },
+            {
+              "line": 16,
+              "name": "MetricData",
+              "content": "export interface MetricData {"
+            },
+            {
+              "line": 28,
+              "name": "AggregatedMetric",
+              "content": "export interface AggregatedMetric {"
+            },
+            {
+              "line": 43,
+              "name": "SystemMetrics",
+              "content": "export interface SystemMetrics {"
+            },
+            {
+              "line": 86,
+              "name": "ApplicationMetrics",
+              "content": "export interface ApplicationMetrics {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { performance } from \"perf_hooks\";"
+            }
+          ],
+          "issues": []
+        },
+        "metrics.ts": {
+          "exports": [
+            {
+              "line": 10,
+              "content": "export interface MetricConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 18,
+              "content": "export interface PerformanceMetrics {",
+              "type": "interface"
+            },
+            {
+              "line": 55,
+              "content": "export class MetricsCollector {",
+              "type": "class"
+            },
+            {
+              "line": 432,
+              "content": "export function getMetricsCollector(cache?: CacheService): MetricsCollector {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 55,
+              "name": "MetricsCollector",
+              "content": "export class MetricsCollector {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 10,
+              "name": "MetricConfig",
+              "content": "export interface MetricConfig {"
+            },
+            {
+              "line": 18,
+              "name": "PerformanceMetrics",
+              "content": "export interface PerformanceMetrics {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 432,
+              "name": "getMetricsCollector",
+              "content": "export function getMetricsCollector(cache?: CacheService): MetricsCollector {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { register, collectDefaultMetrics, Counter, Histogram, Gauge, Summary } from \"prom-client\";"
+            },
+            {
+              "line": 8,
+              "content": "import { CacheService } from \"@aibos/cache\";"
+            }
+          ],
+          "issues": []
+        },
+        "monitoring.test.ts": {
+          "exports": [],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 5,
+              "content": "import { describe, it, expect, vi, beforeEach } from \"vitest\";"
+            },
+            {
+              "line": 6,
+              "content": "import { MetricsCollector } from \"./metrics\";"
+            },
+            {
+              "line": 7,
+              "content": "import { HealthChecker } from \"./health\";"
+            }
+          ],
+          "issues": []
+        },
+        "tracing.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface TraceConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 17,
+              "content": "export interface TraceSpan {",
+              "type": "interface"
+            },
+            {
+              "line": 37,
+              "content": "export interface TraceEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 43,
+              "content": "export interface TraceLink {",
+              "type": "interface"
+            },
+            {
+              "line": 49,
+              "content": "export interface TraceContext {",
+              "type": "interface"
+            },
+            {
+              "line": 58,
+              "content": "export interface TraceData {",
+              "type": "interface"
+            },
+            {
+              "line": 71,
+              "content": "export class TracingManager extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 71,
+              "name": "TracingManager",
+              "content": "export class TracingManager extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "TraceConfig",
+              "content": "export interface TraceConfig {"
+            },
+            {
+              "line": 17,
+              "name": "TraceSpan",
+              "content": "export interface TraceSpan {"
+            },
+            {
+              "line": 37,
+              "name": "TraceEvent",
+              "content": "export interface TraceEvent {"
+            },
+            {
+              "line": 43,
+              "name": "TraceLink",
+              "content": "export interface TraceLink {"
+            },
+            {
+              "line": 49,
+              "name": "TraceContext",
+              "content": "export interface TraceContext {"
+            },
+            {
+              "line": 58,
+              "name": "TraceData",
+              "content": "export interface TraceData {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { randomBytes } from \"crypto\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 32,
+      "totalClasses": 5,
+      "totalInterfaces": 18,
+      "totalFunctions": 2,
+      "issues": []
+    },
+    "realtime": {
+      "name": "realtime",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./websocket-manager\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./event-system\";",
+              "type": "other"
+            },
+            {
+              "line": 3,
+              "content": "export * from \"./presence-system\";",
+              "type": "other"
+            },
+            {
+              "line": 4,
+              "content": "export * from \"./notification-system\";",
+              "type": "other"
+            },
+            {
+              "line": 11,
+              "content": "export { WebSocketManager as CompatWebSocketManager } from \"./compat/WebSocketManager\";",
+              "type": "other"
+            },
+            {
+              "line": 14,
+              "content": "export { PresenceSystem as CompatPresenceSystem } from \"./compat/PresenceSystem\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "event-system.d.ts": {
+          "exports": [
+            {
+              "line": 3,
+              "content": "export interface RealtimeEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 14,
+              "content": "export interface EventSubscription {",
+              "type": "interface"
+            },
+            {
+              "line": 24,
+              "content": "export interface EventFilter {",
+              "type": "interface"
+            },
+            {
+              "line": 29,
+              "content": "export interface EventSystemConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 36,
+              "content": "export declare class RealtimeEventSystem extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 36,
+              "name": "RealtimeEventSystem",
+              "content": "export declare class RealtimeEventSystem extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 3,
+              "name": "RealtimeEvent",
+              "content": "export interface RealtimeEvent {"
+            },
+            {
+              "line": 14,
+              "name": "EventSubscription",
+              "content": "export interface EventSubscription {"
+            },
+            {
+              "line": 24,
+              "name": "EventFilter",
+              "content": "export interface EventFilter {"
+            },
+            {
+              "line": 29,
+              "name": "EventSystemConfig",
+              "content": "export interface EventSystemConfig {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { WebSocketManager } from \"./websocket-manager\";"
+            }
+          ],
+          "issues": []
+        },
+        "event-system.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface RealtimeEvent {",
+              "type": "interface"
+            },
+            {
+              "line": 16,
+              "content": "export interface EventSubscription {",
+              "type": "interface"
+            },
+            {
+              "line": 27,
+              "content": "export interface EventFilter {",
+              "type": "interface"
+            },
+            {
+              "line": 33,
+              "content": "export interface EventSystemConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 41,
+              "content": "export class RealtimeEventSystem extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 41,
+              "name": "RealtimeEventSystem",
+              "content": "export class RealtimeEventSystem extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "RealtimeEvent",
+              "content": "export interface RealtimeEvent {"
+            },
+            {
+              "line": 16,
+              "name": "EventSubscription",
+              "content": "export interface EventSubscription {"
+            },
+            {
+              "line": 27,
+              "name": "EventFilter",
+              "content": "export interface EventFilter {"
+            },
+            {
+              "line": 33,
+              "name": "EventSystemConfig",
+              "content": "export interface EventSystemConfig {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { WebSocketManager, WebSocketMessage } from \"./websocket-manager\";"
+            }
+          ],
+          "issues": []
+        },
+        "index.d.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./websocket-manager\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./event-system\";",
+              "type": "other"
+            },
+            {
+              "line": 3,
+              "content": "export * from \"./presence-system\";",
+              "type": "other"
+            },
+            {
+              "line": 4,
+              "content": "export * from \"./notification-system\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "notification-system.d.ts": {
+          "exports": [
+            {
+              "line": 5,
+              "content": "export interface Notification {",
+              "type": "interface"
+            },
+            {
+              "line": 26,
+              "content": "export interface NotificationAction {",
+              "type": "interface"
+            },
+            {
+              "line": 34,
+              "content": "export interface NotificationPreferences {",
+              "type": "interface"
+            },
+            {
+              "line": 59,
+              "content": "export interface NotificationStats {",
+              "type": "interface"
+            },
+            {
+              "line": 67,
+              "content": "export declare class NotificationSystem extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 67,
+              "name": "NotificationSystem",
+              "content": "export declare class NotificationSystem extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 5,
+              "name": "Notification",
+              "content": "export interface Notification {"
+            },
+            {
+              "line": 26,
+              "name": "NotificationAction",
+              "content": "export interface NotificationAction {"
+            },
+            {
+              "line": 34,
+              "name": "NotificationPreferences",
+              "content": "export interface NotificationPreferences {"
+            },
+            {
+              "line": 59,
+              "name": "NotificationStats",
+              "content": "export interface NotificationStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { WebSocketManager } from \"./websocket-manager\";"
+            },
+            {
+              "line": 3,
+              "content": "import { RealtimeEventSystem } from \"./event-system\";"
+            },
+            {
+              "line": 4,
+              "content": "import { PresenceSystem } from \"./presence-system\";"
+            }
+          ],
+          "issues": []
+        },
+        "notification-system.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export interface Notification {",
+              "type": "interface"
+            },
+            {
+              "line": 28,
+              "content": "export interface NotificationAction {",
+              "type": "interface"
+            },
+            {
+              "line": 37,
+              "content": "export interface NotificationPreferences {",
+              "type": "interface"
+            },
+            {
+              "line": 63,
+              "content": "export interface NotificationStats {",
+              "type": "interface"
+            },
+            {
+              "line": 72,
+              "content": "export class NotificationSystem extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 72,
+              "name": "NotificationSystem",
+              "content": "export class NotificationSystem extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 6,
+              "name": "Notification",
+              "content": "export interface Notification {"
+            },
+            {
+              "line": 28,
+              "name": "NotificationAction",
+              "content": "export interface NotificationAction {"
+            },
+            {
+              "line": 37,
+              "name": "NotificationPreferences",
+              "content": "export interface NotificationPreferences {"
+            },
+            {
+              "line": 63,
+              "name": "NotificationStats",
+              "content": "export interface NotificationStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { WebSocketManager } from \"./websocket-manager\";"
+            },
+            {
+              "line": 3,
+              "content": "import { RealtimeEventSystem } from \"./event-system\";"
+            },
+            {
+              "line": 4,
+              "content": "import { PresenceSystem } from \"./presence-system\";"
+            }
+          ],
+          "issues": []
+        },
+        "presence-system.d.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface PresenceInfo {",
+              "type": "interface"
+            },
+            {
+              "line": 17,
+              "content": "export interface PresenceUpdate {",
+              "type": "interface"
+            },
+            {
+              "line": 24,
+              "content": "export interface PresenceStats {",
+              "type": "interface"
+            },
+            {
+              "line": 33,
+              "content": "export declare class PresenceSystem extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 33,
+              "name": "PresenceSystem",
+              "content": "export declare class PresenceSystem extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "PresenceInfo",
+              "content": "export interface PresenceInfo {"
+            },
+            {
+              "line": 17,
+              "name": "PresenceUpdate",
+              "content": "export interface PresenceUpdate {"
+            },
+            {
+              "line": 24,
+              "name": "PresenceStats",
+              "content": "export interface PresenceStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { WebSocketManager } from \"./websocket-manager\";"
+            },
+            {
+              "line": 3,
+              "content": "import { RealtimeEventSystem } from \"./event-system\";"
+            }
+          ],
+          "issues": []
+        },
+        "presence-system.ts": {
+          "exports": [
+            {
+              "line": 5,
+              "content": "export interface PresenceInfo {",
+              "type": "interface"
+            },
+            {
+              "line": 19,
+              "content": "export interface PresenceUpdate {",
+              "type": "interface"
+            },
+            {
+              "line": 27,
+              "content": "export interface PresenceStats {",
+              "type": "interface"
+            },
+            {
+              "line": 37,
+              "content": "export class PresenceSystem extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 37,
+              "name": "PresenceSystem",
+              "content": "export class PresenceSystem extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 5,
+              "name": "PresenceInfo",
+              "content": "export interface PresenceInfo {"
+            },
+            {
+              "line": 19,
+              "name": "PresenceUpdate",
+              "content": "export interface PresenceUpdate {"
+            },
+            {
+              "line": 27,
+              "name": "PresenceStats",
+              "content": "export interface PresenceStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { EventEmitter } from \"events\";"
+            },
+            {
+              "line": 2,
+              "content": "import { WebSocketManager, ConnectionInfo } from \"./websocket-manager\";"
+            },
+            {
+              "line": 3,
+              "content": "import { RealtimeEventSystem, EventFilter } from \"./event-system\";"
+            }
+          ],
+          "issues": []
+        },
+        "websocket-manager.d.ts": {
+          "exports": [
+            {
+              "line": 3,
+              "content": "export interface WebSocketConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 12,
+              "content": "export interface ConnectionInfo {",
+              "type": "interface"
+            },
+            {
+              "line": 22,
+              "content": "export interface WebSocketMessage {",
+              "type": "interface"
+            },
+            {
+              "line": 30,
+              "content": "export interface WebSocketStats {",
+              "type": "interface"
+            },
+            {
+              "line": 39,
+              "content": "export declare class WebSocketManager extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 39,
+              "name": "WebSocketManager",
+              "content": "export declare class WebSocketManager extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 3,
+              "name": "WebSocketConfig",
+              "content": "export interface WebSocketConfig {"
+            },
+            {
+              "line": 12,
+              "name": "ConnectionInfo",
+              "content": "export interface ConnectionInfo {"
+            },
+            {
+              "line": 22,
+              "name": "WebSocketMessage",
+              "content": "export interface WebSocketMessage {"
+            },
+            {
+              "line": 30,
+              "name": "WebSocketStats",
+              "content": "export interface WebSocketStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { WebSocket } from \"ws\";"
+            },
+            {
+              "line": 2,
+              "content": "import { EventEmitter } from \"events\";"
+            }
+          ],
+          "issues": []
+        },
+        "websocket-manager.ts": {
+          "exports": [
+            {
+              "line": 5,
+              "content": "export interface WebSocketConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 15,
+              "content": "export interface ConnectionInfo {",
+              "type": "interface"
+            },
+            {
+              "line": 26,
+              "content": "export interface WebSocketMessage {",
+              "type": "interface"
+            },
+            {
+              "line": 35,
+              "content": "export interface EventMessage {",
+              "type": "interface"
+            },
+            {
+              "line": 42,
+              "content": "export interface SubscribeMessage {",
+              "type": "interface"
+            },
+            {
+              "line": 46,
+              "content": "export interface PresenceMessage {",
+              "type": "interface"
+            },
+            {
+              "line": 53,
+              "content": "export interface NotificationActionMessage {",
+              "type": "interface"
+            },
+            {
+              "line": 59,
+              "content": "export interface WebSocketStats {",
+              "type": "interface"
+            },
+            {
+              "line": 69,
+              "content": "export class WebSocketManager extends EventEmitter {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 69,
+              "name": "WebSocketManager",
+              "content": "export class WebSocketManager extends EventEmitter {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 5,
+              "name": "WebSocketConfig",
+              "content": "export interface WebSocketConfig {"
+            },
+            {
+              "line": 15,
+              "name": "ConnectionInfo",
+              "content": "export interface ConnectionInfo {"
+            },
+            {
+              "line": 26,
+              "name": "WebSocketMessage",
+              "content": "export interface WebSocketMessage {"
+            },
+            {
+              "line": 35,
+              "name": "EventMessage",
+              "content": "export interface EventMessage {"
+            },
+            {
+              "line": 42,
+              "name": "SubscribeMessage",
+              "content": "export interface SubscribeMessage {"
+            },
+            {
+              "line": 46,
+              "name": "PresenceMessage",
+              "content": "export interface PresenceMessage {"
+            },
+            {
+              "line": 53,
+              "name": "NotificationActionMessage",
+              "content": "export interface NotificationActionMessage {"
+            },
+            {
+              "line": 59,
+              "name": "WebSocketStats",
+              "content": "export interface WebSocketStats {"
+            }
+          ],
+          "functions": [],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { WebSocket, WebSocketServer } from \"ws\";"
+            },
+            {
+              "line": 2,
+              "content": "import { createHash } from \"crypto\";"
+            },
+            {
+              "line": 3,
+              "content": "import { EventEmitter } from \"events\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 52,
+      "totalClasses": 8,
+      "totalInterfaces": 34,
+      "totalFunctions": 0,
+      "issues": []
+    },
+    "cache": {
+      "name": "cache",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 12,
+              "content": "export * from \"./redis\";",
+              "type": "other"
+            },
+            {
+              "line": 15,
+              "content": "export { RedisClient, getRedisClient, initializeCache, defaultCacheConfig } from \"./redis\";",
+              "type": "other"
+            },
+            {
+              "line": 21,
+              "content": "export * from \"./cache\";",
+              "type": "other"
+            },
+            {
+              "line": 23,
+              "content": "export { CacheService, getCacheService, type CacheOptions, type CacheStats } from \"./cache\";",
+              "type": "type"
+            },
+            {
+              "line": 29,
+              "content": "export * from \"./cache-factory\";",
+              "type": "other"
+            },
+            {
+              "line": 31,
+              "content": "export { CacheFactory } from \"./cache-factory\";",
+              "type": "other"
+            },
+            {
+              "line": 37,
+              "content": "export * from \"./idempotency\";",
+              "type": "other"
+            },
+            {
+              "line": 39,
+              "content": "export {",
+              "type": "other"
+            },
+            {
+              "line": 51,
+              "content": "export { AdvancedCacheManager } from \"./compat/AdvancedCacheManager\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "cache-factory.ts": {
+          "exports": [
+            {
+              "line": 8,
+              "content": "export class CacheFactory {",
+              "type": "class"
+            }
+          ],
+          "classes": [
+            {
+              "line": 8,
+              "name": "CacheFactory",
+              "content": "export class CacheFactory {"
+            }
+          ],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 5,
+              "content": "import { CacheService } from \"./cache\";"
+            },
+            {
+              "line": 6,
+              "content": "import { RedisClient, getRedisClient } from \"./redis\";"
+            }
+          ],
+          "issues": []
+        },
+        "cache.test.ts": {
+          "exports": [],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [
+            {
+              "line": 5,
+              "content": "import { describe, it, expect, vi, beforeEach } from \"vitest\";"
+            },
+            {
+              "line": 6,
+              "content": "import { RedisClient } from \"./redis\";"
+            },
+            {
+              "line": 7,
+              "content": "import { CacheService } from \"./cache\";"
+            }
+          ],
+          "issues": []
+        },
+        "cache.ts": {
+          "exports": [
+            {
+              "line": 9,
+              "content": "export interface CacheOptions {",
+              "type": "interface"
+            },
+            {
+              "line": 15,
+              "content": "export interface CacheStats {",
+              "type": "interface"
+            },
+            {
+              "line": 23,
+              "content": "export class CacheService {",
+              "type": "class"
+            },
+            {
+              "line": 296,
+              "content": "export function getCacheService(redis?: RedisClient): CacheService {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 23,
+              "name": "CacheService",
+              "content": "export class CacheService {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 9,
+              "name": "CacheOptions",
+              "content": "export interface CacheOptions {"
+            },
+            {
+              "line": 15,
+              "name": "CacheStats",
+              "content": "export interface CacheStats {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 296,
+              "name": "getCacheService",
+              "content": "export function getCacheService(redis?: RedisClient): CacheService {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { RedisClient } from \"./redis\";"
+            }
+          ],
+          "issues": []
+        },
+        "idempotency.ts": {
+          "exports": [
+            {
+              "line": 10,
+              "content": "export interface IdempotencyOptions {",
+              "type": "interface"
+            },
+            {
+              "line": 15,
+              "content": "export interface IdempotencyResult<T = unknown> {",
+              "type": "interface"
+            },
+            {
+              "line": 21,
+              "content": "export class IdempotencyService {",
+              "type": "class"
+            },
+            {
+              "line": 173,
+              "content": "export function getIdempotencyService(cache?: CacheService): IdempotencyService {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 21,
+              "name": "IdempotencyService",
+              "content": "export class IdempotencyService {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 10,
+              "name": "IdempotencyOptions",
+              "content": "export interface IdempotencyOptions {"
+            },
+            {
+              "line": 15,
+              "name": "IdempotencyResult",
+              "content": "export interface IdempotencyResult<T = unknown> {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 173,
+              "name": "getIdempotencyService",
+              "content": "export function getIdempotencyService(cache?: CacheService): IdempotencyService {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { CacheService } from \"./cache\";"
+            },
+            {
+              "line": 8,
+              "content": "import { createHash } from \"crypto\";"
+            }
+          ],
+          "issues": []
+        },
+        "redis.ts": {
+          "exports": [
+            {
+              "line": 9,
+              "content": "export interface CacheConfig {",
+              "type": "interface"
+            },
+            {
+              "line": 20,
+              "content": "export class RedisClient {",
+              "type": "class"
+            },
+            {
+              "line": 120,
+              "content": "export const defaultCacheConfig: CacheConfig = {",
+              "type": "const"
+            },
+            {
+              "line": 130,
+              "content": "export function getRedisClient(config?: CacheConfig): RedisClient {",
+              "type": "function"
+            },
+            {
+              "line": 137,
+              "content": "export async function initializeCache(config?: CacheConfig): Promise<RedisClient> {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 20,
+              "name": "RedisClient",
+              "content": "export class RedisClient {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 9,
+              "name": "CacheConfig",
+              "content": "export interface CacheConfig {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 130,
+              "name": "getRedisClient",
+              "content": "export function getRedisClient(config?: CacheConfig): RedisClient {"
+            },
+            {
+              "line": 137,
+              "name": "initializeCache",
+              "content": "export async function initializeCache(config?: CacheConfig): Promise<RedisClient> {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 7,
+              "content": "import { Redis, RedisOptions } from \"ioredis\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 23,
+      "totalClasses": 4,
+      "totalInterfaces": 5,
+      "totalFunctions": 4,
+      "issues": []
+    },
+    "accounting": {
+      "name": "accounting",
+      "files": {
+        "index.ts": {
+          "exports": [
+            {
+              "line": 1,
+              "content": "export * from \"./posting\";",
+              "type": "other"
+            },
+            {
+              "line": 2,
+              "content": "export * from \"./fx/policy\";",
+              "type": "other"
+            },
+            {
+              "line": 3,
+              "content": "export * from \"./fx/ingest\";",
+              "type": "other"
+            },
+            {
+              "line": 4,
+              "content": "export * from \"./coa-validation\";",
+              "type": "other"
+            },
+            {
+              "line": 5,
+              "content": "export * from \"./ar/invoice-posting\";",
+              "type": "other"
+            },
+            {
+              "line": 6,
+              "content": "export * from \"./tax-calculations\";",
+              "type": "other"
+            },
+            {
+              "line": 9,
+              "content": "export { generateTrialBalance } from \"./reports/trial-balance\";",
+              "type": "other"
+            },
+            {
+              "line": 10,
+              "content": "export { generateBalanceSheet } from \"./reports/balance-sheet\";",
+              "type": "other"
+            },
+            {
+              "line": 11,
+              "content": "export { generateProfitLoss } from \"./reports/profit-loss\";",
+              "type": "other"
+            },
+            {
+              "line": 12,
+              "content": "export { generateCashFlow } from \"./reports/cash-flow\";",
+              "type": "other"
+            }
+          ],
+          "classes": [],
+          "interfaces": [],
+          "functions": [],
+          "imports": [],
+          "issues": []
+        },
+        "coa-validation.ts": {
+          "exports": [
+            {
+              "line": 5,
+              "content": "export const AccountTypeSchema = z.enum([\"ASSET\", \"LIABILITY\", \"EQUITY\", \"REVENUE\", \"EXPENSE\"]);",
+              "type": "const"
+            },
+            {
+              "line": 6,
+              "content": "export type AccountType = z.infer<typeof AccountTypeSchema>;",
+              "type": "type"
+            },
+            {
+              "line": 9,
+              "content": "export class COAValidationError extends Error {",
+              "type": "class"
+            },
+            {
+              "line": 32,
+              "content": "export function validateAccountsExist(",
+              "type": "function"
+            },
+            {
+              "line": 69,
+              "content": "export function validateCurrencyConsistency(",
+              "type": "function"
+            },
+            {
+              "line": 110,
+              "content": "export function validateNormalBalances(",
+              "type": "function"
+            },
+            {
+              "line": 163,
+              "content": "export function validateControlAccounts(",
+              "type": "function"
+            },
+            {
+              "line": 214,
+              "content": "export interface COAValidationResult {",
+              "type": "interface"
+            },
+            {
+              "line": 226,
+              "content": "export async function validateCOAFlags(",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 9,
+              "name": "COAValidationError",
+              "content": "export class COAValidationError extends Error {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 214,
+              "name": "COAValidationResult",
+              "content": "export interface COAValidationResult {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 32,
+              "name": "validateAccountsExist",
+              "content": "export function validateAccountsExist("
+            },
+            {
+              "line": 69,
+              "name": "validateCurrencyConsistency",
+              "content": "export function validateCurrencyConsistency("
+            },
+            {
+              "line": 110,
+              "name": "validateNormalBalances",
+              "content": "export function validateNormalBalances("
+            },
+            {
+              "line": 163,
+              "name": "validateControlAccounts",
+              "content": "export function validateControlAccounts("
+            },
+            {
+              "line": 226,
+              "name": "validateCOAFlags",
+              "content": "export async function validateCOAFlags("
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            },
+            {
+              "line": 2,
+              "content": "import { type AccountInfo } from \"@aibos/db\";"
+            }
+          ],
+          "issues": []
+        },
+        "posting.ts": {
+          "exports": [
+            {
+              "line": 6,
+              "content": "export const JournalLine = z.object({",
+              "type": "const"
+            },
+            {
+              "line": 14,
+              "content": "export interface PostingContext {",
+              "type": "interface"
+            },
+            {
+              "line": 21,
+              "content": "export interface JournalPostingInput {",
+              "type": "interface"
+            },
+            {
+              "line": 30,
+              "content": "export class PostingError extends Error {",
+              "type": "class"
+            },
+            {
+              "line": 41,
+              "content": "export function validateBalanced(lines: Array<z.infer<typeof JournalLine>>) {",
+              "type": "function"
+            },
+            {
+              "line": 54,
+              "content": "export function validateJournalLines(lines: Array<z.infer<typeof JournalLine>>) {",
+              "type": "function"
+            },
+            {
+              "line": 83,
+              "content": "export function validateSoDCompliance(context: PostingContext) {",
+              "type": "function"
+            },
+            {
+              "line": 97,
+              "content": "export async function validateJournalPosting(input: JournalPostingInput) {",
+              "type": "function"
+            },
+            {
+              "line": 156,
+              "content": "export async function postJournal(input: JournalPostingInput) {",
+              "type": "function"
+            }
+          ],
+          "classes": [
+            {
+              "line": 30,
+              "name": "PostingError",
+              "content": "export class PostingError extends Error {"
+            }
+          ],
+          "interfaces": [
+            {
+              "line": 14,
+              "name": "PostingContext",
+              "content": "export interface PostingContext {"
+            },
+            {
+              "line": 21,
+              "name": "JournalPostingInput",
+              "content": "export interface JournalPostingInput {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 41,
+              "name": "validateBalanced",
+              "content": "export function validateBalanced(lines: Array<z.infer<typeof JournalLine>>) {"
+            },
+            {
+              "line": 54,
+              "name": "validateJournalLines",
+              "content": "export function validateJournalLines(lines: Array<z.infer<typeof JournalLine>>) {"
+            },
+            {
+              "line": 83,
+              "name": "validateSoDCompliance",
+              "content": "export function validateSoDCompliance(context: PostingContext) {"
+            },
+            {
+              "line": 97,
+              "name": "validateJournalPosting",
+              "content": "export async function validateJournalPosting(input: JournalPostingInput) {"
+            },
+            {
+              "line": 156,
+              "name": "postJournal",
+              "content": "export async function postJournal(input: JournalPostingInput) {"
+            }
+          ],
+          "imports": [
+            {
+              "line": 1,
+              "content": "import { z } from \"zod\";"
+            },
+            {
+              "line": 2,
+              "content": "import { checkSoDCompliance } from \"@aibos/auth\";"
+            },
+            {
+              "line": 3,
+              "content": "import { validateCOAFlags, COAValidationError } from \"./coa-validation\";"
+            },
+            {
+              "line": 4,
+              "content": "import { getAccountsInfo, getAllAccountsInfo } from \"@aibos/db\";"
+            }
+          ],
+          "issues": []
+        },
+        "tax-calculations.ts": {
+          "exports": [
+            {
+              "line": 4,
+              "content": "export interface TaxCalculationInput {",
+              "type": "interface"
+            },
+            {
+              "line": 9,
+              "content": "export interface TaxCalculationResult {",
+              "type": "interface"
+            },
+            {
+              "line": 16,
+              "content": "export interface LineTaxCalculation {",
+              "type": "interface"
+            },
+            {
+              "line": 28,
+              "content": "export async function calculateLineTax(",
+              "type": "function"
+            },
+            {
+              "line": 72,
+              "content": "export async function calculateInvoiceTaxes(",
+              "type": "function"
+            },
+            {
+              "line": 130,
+              "content": "export function calculateTotalTax(lineTaxes: LineTaxCalculation[]): number {",
+              "type": "function"
+            },
+            {
+              "line": 137,
+              "content": "export function validateTaxCalculations(",
+              "type": "function"
+            },
+            {
+              "line": 168,
+              "content": "export function groupTaxesByCode(lineTaxes: LineTaxCalculation[]): Array<{",
+              "type": "function"
+            }
+          ],
+          "classes": [],
+          "interfaces": [
+            {
+              "line": 4,
+              "name": "TaxCalculationInput",
+              "content": "export interface TaxCalculationInput {"
+            },
+            {
+              "line": 9,
+              "name": "TaxCalculationResult",
+              "content": "export interface TaxCalculationResult {"
+            },
+            {
+              "line": 16,
+              "name": "LineTaxCalculation",
+              "content": "export interface LineTaxCalculation {"
+            }
+          ],
+          "functions": [
+            {
+              "line": 28,
+              "name": "calculateLineTax",
+              "content": "export async function calculateLineTax("
+            },
+            {
+              "line": 72,
+              "name": "calculateInvoiceTaxes",
+              "content": "export async function calculateInvoiceTaxes("
+            },
+            {
+              "line": 130,
+              "name": "calculateTotalTax",
+              "content": "export function calculateTotalTax(lineTaxes: LineTaxCalculation[]): number {"
+            },
+            {
+              "line": 137,
+              "name": "validateTaxCalculations",
+              "content": "export function validateTaxCalculations("
+            },
+            {
+              "line": 168,
+              "name": "groupTaxesByCode",
+              "content": "export function groupTaxesByCode(lineTaxes: LineTaxCalculation[]): Array<{"
+            }
+          ],
+          "imports": [
+            {
+              "line": 2,
+              "content": "import { getTaxCode, getTaxCodes, type Scope } from \"@aibos/db\";"
+            }
+          ],
+          "issues": []
+        }
+      },
+      "totalExports": 36,
+      "totalClasses": 2,
+      "totalInterfaces": 6,
+      "totalFunctions": 15,
+      "issues": []
+    }
+  },
+  "issues": []
+}

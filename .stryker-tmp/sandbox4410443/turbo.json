@@ -1,0 +1,94 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "pnpm-lock.yaml",
+    "package.json",
+    "tsconfig.base.json",
+    ".npmrc",
+    ".cursorrules.json",
+    "eslint.config.mjs",
+    "vitest.config.ts"
+  ],
+  "ui": "stream",
+  "tasks": {
+    "lint": {
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "typecheck": {
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "dist/**",
+        "build/**"
+      ],
+      "outputLogs": "full"
+    },
+    "test": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ],
+      "outputLogs": "full"
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "test:unit": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ],
+      "outputLogs": "full"
+    },
+    "test:coverage": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "outputLogs": "full"
+    },
+    "test:watch": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "e2e": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "test-results/**",
+        "playwright-report/**"
+      ],
+      "outputLogs": "full"
+    },
+    "format": {
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "format:check": {
+      "outputs": [],
+      "outputLogs": "full"
+    }
+  }
+}

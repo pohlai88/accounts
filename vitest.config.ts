@@ -18,6 +18,17 @@ export default mergeConfig(
             // Root-specific overrides for monorepo
             setupFiles: [resolve(__dirname, "./tests/setup.ts")],
 
+            // Load test environment variables
+            env: {
+                NODE_ENV: 'test',
+                DATABASE_URL: 'postgresql://postgres.dsjxvwhuvnefduvjbmgk:Weepohlai88!@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres'
+            },
+
+            // Shuffle test order to catch hidden coupling
+            sequence: {
+                shuffle: true
+            },
+
             // Monorepo-wide test patterns
             include: [
                 "packages/**/*.{test,spec}.{ts,tsx}",
@@ -43,6 +54,10 @@ export default mergeConfig(
                 "**/*.integration.test.{ts,tsx}",
                 "**/*.e2e.test.{ts,tsx}",
                 "**/*.performance.test.{ts,tsx}",
+                // Exclude Zod's internal tests and Stryker temp files
+                "**/node_modules/zod/src/v4/classic/tests/**",
+                "**/.stryker-tmp/**",
+                "**/packages/*/node_modules/**",
             ],
 
             // Root-level coverage configuration (extends SSOT)

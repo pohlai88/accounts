@@ -58,6 +58,41 @@ export const companies = pgTable(
   }),
 );
 
+// Company Settings for Default Accounts
+export const companySettings = pgTable(
+  "company_settings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    // Default GL Accounts
+    defaultArAccountId: uuid("default_ar_account_id")
+      .references(() => chartOfAccounts.id),
+    defaultApAccountId: uuid("default_ap_account_id")
+      .references(() => chartOfAccounts.id),
+    defaultBankAccountId: uuid("default_bank_account_id")
+      .references(() => chartOfAccounts.id),
+    defaultCashAccountId: uuid("default_cash_account_id")
+      .references(() => chartOfAccounts.id),
+    // Tax Settings
+    defaultTaxAccountId: uuid("default_tax_account_id")
+      .references(() => chartOfAccounts.id),
+    // Other Settings
+    autoPostInvoices: boolean("auto_post_invoices").notNull().default(false),
+    requireApprovalForPosting: boolean("require_approval_for_posting").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    tenantCompanyIdx: index("company_settings_tenant_company_idx").on(table.tenantId, table.companyId),
+    arAccountIdx: index("company_settings_ar_account_idx").on(table.defaultArAccountId),
+  }),
+);
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey(),
   email: text("email").notNull().unique(),
@@ -857,8 +892,285 @@ export const auditLogs = pgTable(
   }),
 );
 
+// Approval Workflow Tables
+export const approvalWorkflows = pgTable(
+  "approval_workflows",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    name: text("name").notNull(),
+    description: text("description"),
+    entityType: text("entity_type").notNull(), // "INVOICE", "BILL", "PAYMENT", "JOURNAL_ENTRY"
+    conditions: jsonb("conditions").notNull().default({}), // Approval conditions (amount thresholds, etc.)
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    tenantCompanyIdx: index("approval_workflows_tenant_company_idx").on(table.tenantId, table.companyId),
+    entityTypeIdx: index("approval_workflows_entity_type_idx").on(table.entityType),
+    activeIdx: index("approval_workflows_active_idx").on(table.isActive),
+  }),
+);
+
+export const approvalWorkflowSteps = pgTable(
+  "approval_workflow_steps",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workflowId: uuid("workflow_id")
+      .notNull()
+      .references(() => approvalWorkflows.id, { onDelete: "cascade" }),
+    stepOrder: numeric("step_order").notNull(),
+    stepName: text("step_name").notNull(),
+    approverType: text("approver_type").notNull(), // "USER", "ROLE", "MANAGER", "CUSTOM"
+    approverId: uuid("approver_id"), // User ID or Role ID
+    approverEmail: text("approver_email"), // For external approvers
+    isRequired: boolean("is_required").notNull().default(true),
+    timeoutHours: numeric("timeout_hours"), // Auto-approve after timeout
+    conditions: jsonb("conditions").notNull().default({}), // Step-specific conditions
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    workflowIdx: index("approval_workflow_steps_workflow_idx").on(table.workflowId),
+    stepOrderIdx: index("approval_workflow_steps_order_idx").on(table.workflowId, table.stepOrder),
+    approverIdx: index("approval_workflow_steps_approver_idx").on(table.approverId),
+  }),
+);
+
+export const approvalRequests = pgTable(
+  "approval_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    workflowId: uuid("workflow_id")
+      .notNull()
+      .references(() => approvalWorkflows.id),
+    entityType: text("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(), // ID of the invoice, bill, etc.
+    entityData: jsonb("entity_data").notNull(), // Snapshot of the entity data
+    requestedBy: uuid("requested_by").notNull(), // User who requested approval
+    status: text("status").notNull().default("PENDING"), // "PENDING", "APPROVED", "REJECTED", "CANCELLED", "EXPIRED"
+    currentStepId: uuid("current_step_id")
+      .references(() => approvalWorkflowSteps.id),
+    priority: text("priority").notNull().default("NORMAL"), // "LOW", "NORMAL", "HIGH", "URGENT"
+    dueDate: timestamp("due_date", { withTimezone: true }),
+    notes: text("notes"),
+    metadata: jsonb("metadata").notNull().default({}),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  table => ({
+    tenantCompanyIdx: index("approval_requests_tenant_company_idx").on(table.tenantId, table.companyId),
+    workflowIdx: index("approval_requests_workflow_idx").on(table.workflowId),
+    entityIdx: index("approval_requests_entity_idx").on(table.entityType, table.entityId),
+    statusIdx: index("approval_requests_status_idx").on(table.status),
+    requestedByIdx: index("approval_requests_requested_by_idx").on(table.requestedBy),
+    dueDateIdx: index("approval_requests_due_date_idx").on(table.dueDate),
+    createdAtIdx: index("approval_requests_created_at_idx").on(table.createdAt),
+  }),
+);
+
+export const approvalActions = pgTable(
+  "approval_actions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requestId: uuid("request_id")
+      .notNull()
+      .references(() => approvalRequests.id, { onDelete: "cascade" }),
+    stepId: uuid("step_id")
+      .notNull()
+      .references(() => approvalWorkflowSteps.id),
+    action: text("action").notNull(), // "APPROVE", "REJECT", "DELEGATE", "REQUEST_INFO"
+    performedBy: uuid("performed_by").notNull(), // User who performed the action
+    performedAt: timestamp("performed_at", { withTimezone: true }).defaultNow(),
+    comments: text("comments"),
+    metadata: jsonb("metadata").notNull().default({}),
+  },
+  table => ({
+    requestIdx: index("approval_actions_request_idx").on(table.requestId),
+    stepIdx: index("approval_actions_step_idx").on(table.stepId),
+    performedByIdx: index("approval_actions_performed_by_idx").on(table.performedBy),
+    performedAtIdx: index("approval_actions_performed_at_idx").on(table.performedAt),
+  }),
+);
+
+export const approvalDelegations = pgTable(
+  "approval_delegations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    delegatorId: uuid("delegator_id").notNull(), // User who is delegating
+    delegateId: uuid("delegate_id").notNull(), // User who will receive the delegation
+    entityTypes: jsonb("entity_types").notNull(), // Array of entity types this delegation applies to
+    conditions: jsonb("conditions").notNull().default({}), // Conditions for when delegation applies
+    isActive: boolean("is_active").notNull().default(true),
+    validFrom: timestamp("valid_from", { withTimezone: true }).notNull(),
+    validTo: timestamp("valid_to", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    tenantCompanyIdx: index("approval_delegations_tenant_company_idx").on(table.tenantId, table.companyId),
+    delegatorIdx: index("approval_delegations_delegator_idx").on(table.delegatorId),
+    delegateIdx: index("approval_delegations_delegate_idx").on(table.delegateId),
+    activeIdx: index("approval_delegations_active_idx").on(table.isActive),
+    validFromIdx: index("approval_delegations_valid_from_idx").on(table.validFrom),
+  }),
+);
+
+// Enhanced Payment Processing Tables
+
+export const advanceAccounts = pgTable(
+  "advance_accounts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => chartOfAccounts.id),
+    partyType: text("party_type")
+      .notNull()
+      .$type<"CUSTOMER" | "SUPPLIER">(),
+    partyId: uuid("party_id").notNull(),
+    currency: text("currency")
+      .notNull()
+      .references(() => currencies.code),
+    balanceAmount: numeric("balance_amount", { precision: 18, scale: 2 })
+      .notNull()
+      .default("0"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    tenantCompanyIdx: index("advance_accounts_tenant_company_idx").on(
+      table.tenantId,
+      table.companyId,
+    ),
+    partyIdx: index("advance_accounts_party_idx").on(
+      table.tenantId,
+      table.companyId,
+      table.partyType,
+      table.partyId,
+    ),
+    uniquePartyCurrency: index("advance_accounts_unique_party_currency").on(
+      table.tenantId,
+      table.companyId,
+      table.partyType,
+      table.partyId,
+      table.currency,
+    ),
+  }),
+);
+
+export const bankChargeConfigs = pgTable(
+  "bank_charge_configs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    bankAccountId: uuid("bank_account_id")
+      .notNull()
+      .references(() => bankAccounts.id),
+    chargeType: text("charge_type")
+      .notNull()
+      .$type<"FIXED" | "PERCENTAGE" | "TIERED">(),
+    fixedAmount: numeric("fixed_amount", { precision: 18, scale: 2 }),
+    percentageRate: numeric("percentage_rate", { precision: 5, scale: 4 }),
+    minAmount: numeric("min_amount", { precision: 18, scale: 2 })
+      .notNull()
+      .default("0"),
+    maxAmount: numeric("max_amount", { precision: 18, scale: 2 }),
+    expenseAccountId: uuid("expense_account_id")
+      .notNull()
+      .references(() => chartOfAccounts.id),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    tenantCompanyIdx: index("bank_charge_configs_tenant_company_idx").on(
+      table.tenantId,
+      table.companyId,
+    ),
+    bankAccountIdx: index("bank_charge_configs_bank_account_idx").on(
+      table.tenantId,
+      table.companyId,
+      table.bankAccountId,
+    ),
+  }),
+);
+
+export const withholdingTaxConfigs = pgTable(
+  "withholding_tax_configs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id),
+    taxCode: text("tax_code").notNull(),
+    taxName: text("tax_name").notNull(),
+    taxRate: numeric("tax_rate", { precision: 5, scale: 4 }).notNull(),
+    payableAccountId: uuid("payable_account_id")
+      .notNull()
+      .references(() => chartOfAccounts.id),
+    expenseAccountId: uuid("expense_account_id")
+      .notNull()
+      .references(() => chartOfAccounts.id),
+    applicableTo: text("applicable_to")
+      .notNull()
+      .$type<"SUPPLIERS" | "CUSTOMERS" | "BOTH">(),
+    minThreshold: numeric("min_threshold", { precision: 18, scale: 2 })
+      .notNull()
+      .default("0"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  table => ({
+    tenantCompanyIdx: index("withholding_tax_configs_tenant_company_idx").on(
+      table.tenantId,
+      table.companyId,
+    ),
+    taxCodeIdx: index("withholding_tax_configs_tax_code_idx").on(
+      table.tenantId,
+      table.companyId,
+      table.taxCode,
+    ),
+  }),
+);
+
 // Re-export attachment schema for V1 compliance
 export * from "./schema-attachments.js";
 
 // Re-export user settings schema for multi-tenant support
 export * from "./schema-user-settings.js";
+
+// Re-export subscription and usage tracking schemas
+export * from "./schema-subscriptions.js";

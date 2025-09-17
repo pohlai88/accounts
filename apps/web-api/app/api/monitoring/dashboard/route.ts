@@ -4,6 +4,9 @@ import { getSecurityContext } from "@aibos/web-api/_lib/request";
 import { ok, problem } from "@aibos/web-api/_lib/response";
 import { monitoring } from "../../../../lib/monitoring-integration";
 
+// Force dynamic rendering to avoid build-time header access
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     // Get security context

@@ -225,7 +225,7 @@ export class AdvancedSecurityManager extends EventEmitter {
   /**
    * Check rate limit for IP
    */
-  async checkRateLimit(ip: string, url: string): Promise<RateLimitInfo> {
+  async checkRateLimit(ip: string, _url: string): Promise<RateLimitInfo> {
     const now = Date.now();
     const minuteWindow = Math.floor(now / 60000);
     const hourWindow = Math.floor(now / 3600000);
@@ -300,7 +300,7 @@ export class AdvancedSecurityManager extends EventEmitter {
       /<meta[^>]*>.*?<\/meta>/gi,
     ];
 
-    for (const [key, value] of searchParams) {
+    for (const [, value] of searchParams) {
       for (const pattern of xssPatterns) {
         if (pattern.test(value)) {
           return { detected: true, payload: value };
@@ -417,7 +417,7 @@ export class AdvancedSecurityManager extends EventEmitter {
   private createSecurityResponse(
     status: number,
     message: string,
-    headers: Record<string, string> = {},
+    _headers: Record<string, string> = {},
   ): { status: number; message: string; headers?: Record<string, string> } {
     const response = {
       status,

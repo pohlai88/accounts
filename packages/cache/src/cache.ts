@@ -296,8 +296,26 @@ let cacheService: CacheService | null = null;
 export function getCacheService(redis?: RedisClient): CacheService {
   if (!cacheService) {
     if (!redis) {
+      // Try to create Redis client from environment
+      try {
+        // First try URL-based configuration
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { createRedisClientFromUrl } = require('./redis');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        redis = createRedisClientFromUrl();
+      } catch {
+        // Fallback to individual environment variables
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { getRedisClient } = require('./redis');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        redis = getRedisClient();
+      }
+    }
+
+    if (!redis) {
       throw new Error("Redis client required for cache service");
     }
+
     cacheService = new CacheService(redis);
   }
   return cacheService;

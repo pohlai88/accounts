@@ -5,13 +5,14 @@
  */
 
 import { CacheService } from "../cache";
+import type { RedisClient } from "../redis";
 
 export class AdvancedCacheManager {
     private cacheService: CacheService;
 
     constructor() {
         // Create a mock Redis client for compatibility layer
-        const mockRedis = {} as any;
+        const mockRedis = {} as unknown as RedisClient;
         this.cacheService = new CacheService(mockRedis);
     }
 

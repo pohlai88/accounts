@@ -5,8 +5,9 @@ import {
   calculateInvoiceTotals,
   validateInvoiceLines,
   calculateInvoiceTaxes,
+  validateInvoicePosting,
 } from "@aibos/accounting";
-import { insertInvoice, type InvoiceInput } from "@aibos/db";
+import { insertInvoice, insertJournal, updateInvoicePosting, type InvoiceInput, type JournalInput } from "@aibos/db";
 import { createRequestContext, extractUserContext, pick } from "@aibos/utils";
 import { getAuditService } from "@aibos/utils";
 import { createAuditContext } from "@aibos/utils/audit/service";
@@ -228,7 +229,132 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // 6. Insert invoice
     invoiceResult = await insertInvoice(scope, invoiceInput);
 
-    // 7. Log successful invoice creation
+    // 7. GL Posting Integration - Validate and create journal entry
+    try {
+      // Get customer name for posting
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const { data: customer } = await supabase
+        .from("customers")
+        .select("name")
+        .eq("id", body.customerId)
+        .eq("tenant_id", scope.tenantId)
+        .eq("company_id", scope.companyId)
+        .single();
+
+      // Get AR account ID from company settings or create default
+      const { getOrCreateDefaultArAccount } = await import("@aibos/db");
+      const arAccountId = await getOrCreateDefaultArAccount(scope);
+
+      // Validate invoice posting
+      const postingValidation = await validateInvoicePosting(
+        {
+          tenantId: scope.tenantId,
+          companyId: scope.companyId,
+          invoiceId: invoiceResult.id as string,
+          invoiceNumber: body.invoiceNumber,
+          customerId: body.customerId,
+          customerName: customer?.name || "Unknown Customer",
+          invoiceDate: body.invoiceDate,
+          currency: body.currency,
+          exchangeRate: body.exchangeRate,
+          arAccountId: arAccountId,
+          lines: lineTaxCalculations.map(calc => {
+            const originalLine = body.lines.find(l => l.lineNumber === calc.lineNumber);
+            return {
+              lineNumber: calc.lineNumber,
+              description: originalLine?.description || "",
+              quantity: originalLine?.quantity || 0,
+              unitPrice: originalLine?.unitPrice || 0,
+              lineAmount: calc.lineAmount,
+              revenueAccountId: originalLine?.revenueAccountId || "",
+              taxCode: calc.taxCode,
+              taxRate: calc.taxRate,
+              taxAmount: calc.taxAmount,
+            };
+          }),
+          description: body.description,
+        },
+        scope.userId,
+        scope.userRole,
+        "MYR" // Base currency - should come from company settings
+      );
+
+      if (!postingValidation.validated) {
+        // Log validation failure but don't fail the invoice creation
+        await auditService.logOperation({
+          scope,
+          action: "CREATE",
+          entityType: "INVOICE",
+          entityId: invoiceResult.id as string,
+          metadata: {
+            invoiceNumber: invoiceResult.invoiceNumber,
+            error: postingValidation.error,
+            code: (postingValidation as any).code,
+            status: "validation_failed",
+            postingType: "GL_POSTING",
+          },
+          context: auditContext,
+        });
+
+        console.warn(`Invoice posting validation failed for ${body.invoiceNumber}:`, postingValidation.error);
+      } else {
+        // Create journal entry
+        const journalInput: JournalInput = {
+          journalNumber: `INV-${body.invoiceNumber}`,
+          description: postingValidation.journalInput.description,
+          journalDate: postingValidation.journalInput.journalDate,
+          currency: postingValidation.journalInput.currency,
+          lines: postingValidation.journalInput.lines,
+          status: "posted",
+        };
+
+        const journalResult = await insertJournal(scope, journalInput);
+
+        // Update invoice with journal reference
+        await updateInvoicePosting(scope, invoiceResult.id as string, journalResult.id, "posted");
+
+        // Log successful GL posting
+        await auditService.logOperation({
+          scope,
+          action: "POST",
+          entityType: "JOURNAL",
+          entityId: journalResult.id,
+          metadata: {
+            journalNumber: journalResult.journalNumber,
+            invoiceId: invoiceResult.id,
+            invoiceNumber: invoiceResult.invoiceNumber,
+            totalDebit: journalResult.totalDebit,
+            totalCredit: journalResult.totalCredit,
+            status: "posted",
+          },
+          context: auditContext,
+        });
+
+        console.log(`Invoice ${body.invoiceNumber} successfully posted to GL with journal ${journalResult.journalNumber}`);
+      }
+    } catch (glError) {
+      // Log GL posting error but don't fail the invoice creation
+      await auditService.logOperation({
+        scope,
+        action: "CREATE",
+        entityType: "INVOICE",
+        entityId: invoiceResult.id as string,
+        metadata: {
+          invoiceNumber: invoiceResult.invoiceNumber,
+          error: glError instanceof Error ? glError.message : "Unknown GL posting error",
+          status: "gl_posting_failed",
+          postingType: "GL_POSTING",
+        },
+        context: auditContext,
+      });
+
+      console.error(`GL posting failed for invoice ${body.invoiceNumber}:`, glError);
+    }
+
+    // 8. Log successful invoice creation
     await auditService.logOperation({
       scope,
       action: "CREATE",
@@ -244,7 +370,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       context: auditContext,
     });
 
-    // 8. Build response
+    // 9. Build response
     const response = {
       id: invoiceResult.id,
       invoiceNumber: invoiceResult.invoiceNumber,
@@ -256,7 +382,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       subtotal: totals.subtotal,
       taxAmount: totals.taxAmount,
       totalAmount: totals.totalAmount,
-      status: "draft",
+      status: "draft", // Will be updated to "posted" if GL posting succeeds
       lines: (invoiceResult.lines as Array<Record<string, unknown>>).map(line => ({
         id: line.id,
         lineNumber: Number(line.lineNumber),
@@ -270,6 +396,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         revenueAccountId: line.revenueAccountId,
       })),
       createdAt: invoiceResult.createdAt,
+      // Add GL posting status
+      glPosting: {
+        status: "integrated", // Indicates GL posting integration is active
+        note: "Invoice will be automatically posted to GL if validation passes",
+      },
     };
 
     return NextResponse.json(response, { status: 201 });

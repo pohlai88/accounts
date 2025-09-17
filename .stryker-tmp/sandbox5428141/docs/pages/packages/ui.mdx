@@ -1,0 +1,96 @@
+# UI Components Package
+
+The `@aibos/ui` package provides a comprehensive React component library and design system.
+
+## Overview
+
+This package includes:
+
+- **Design System** - Consistent design tokens and components
+- **Form Components** - Inputs, selects, validation
+- **Data Display** - Tables, charts, cards
+- **Navigation** - Menus, breadcrumbs, pagination
+- **Layout** - Grids, containers, spacing
+- **Feedback** - Alerts, modals, notifications
+
+## Installation
+
+```bash
+pnpm add @aibos/ui
+```
+
+## Usage
+
+```typescript
+import {
+  Button,
+  Input,
+  Card,
+  DataTable,
+  Modal
+} from '@aibos/ui';
+
+function MyComponent() {
+  return (
+    <Card>
+      <Input placeholder="Enter amount" />
+      <Button variant="primary">Submit</Button>
+    </Card>
+  );
+}
+```
+
+## Design Tokens
+
+The UI package uses design tokens for consistent styling:
+
+```typescript
+import { colors, spacing, typography } from "@aibos/tokens";
+
+const styles = {
+  color: colors.primary[500],
+  padding: spacing.md,
+  fontSize: typography.sizes.body,
+};
+```
+
+## Component Categories
+
+### Form Components
+
+- `Input` - Text input fields
+- `Select` - Dropdown selections
+- `Checkbox` - Checkbox inputs
+- `Radio` - Radio button groups
+- `DatePicker` - Date selection
+
+### Data Display
+
+- `DataTable` - Sortable, filterable tables
+- `Card` - Content containers
+- `Badge` - Status indicators
+- `Avatar` - User profile images
+
+### Navigation
+
+- `Menu` - Navigation menus
+- `Breadcrumb` - Page navigation
+- `Pagination` - Page controls
+- `Tabs` - Tabbed content
+
+## Theming
+
+The UI package supports dark/light themes and custom theming:
+
+```typescript
+import { ThemeProvider } from '@aibos/ui';
+
+<ThemeProvider theme="dark">
+  <App />
+</ThemeProvider>
+```
+
+## Related
+
+- [Design Tokens Package](/packages/tokens) - Design system tokens
+- [Utils Package](/packages/utils) - Shared utilities

@@ -20,6 +20,5 @@
   },
   "files": [
     "index.ts"
-  ],
-  "type": "module"
+  ]
 }

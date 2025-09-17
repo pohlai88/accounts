@@ -1,0 +1,2 @@
+All accounting entries are consolidated / aggregated in GL Entry (General Ledger Entry) DocType. All
+reports are generated from this DocType.

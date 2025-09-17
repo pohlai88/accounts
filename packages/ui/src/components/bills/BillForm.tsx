@@ -11,6 +11,7 @@ import {
   Paperclip,
 } from "lucide-react";
 import { cn } from "@aibos/ui/utils";
+import { useVendors } from "../../store/index.js";
 
 export interface BillItem {
   id: string;
@@ -71,6 +72,9 @@ export const BillForm: React.FC<BillFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
+  // Use Zustand store for vendor data
+  const { vendors, loading: vendorsLoading, fetchVendors } = useVendors();
+
   const [formData, setFormData] = useState<BillFormData>({
     vendorId: "",
     vendorName: "",
@@ -96,6 +100,11 @@ export const BillForm: React.FC<BillFormProps> = ({
     approvalRequired: false,
     approvalThreshold: 1000,
   });
+
+  // Load vendors on component mount
+  useEffect(() => {
+    fetchVendors();
+  }, [fetchVendors]);
 
   // Initialize with provided data
   useEffect(() => {
@@ -246,16 +255,29 @@ export const BillForm: React.FC<BillFormProps> = ({
               Vendor
             </label>
             <div className="relative">
-              <input
-                id="vendor-search"
-                type="text"
-                placeholder="Search or select vendor..."
-                value={formData.vendorName}
-                onChange={e => setFormData(prev => ({ ...prev, vendorName: e.target.value }))}
+              <select
+                id="vendor-select"
+                value={formData.vendorId}
+                onChange={e => {
+                  const selectedVendor = vendors.find(v => v.id === e.target.value);
+                  setFormData(prev => ({
+                    ...prev,
+                    vendorId: e.target.value,
+                    vendorName: selectedVendor?.name || ""
+                  }));
+                }}
                 className="input w-full pl-10"
-                aria-label="Search and select vendor"
+                aria-label="Select vendor"
                 aria-describedby="vendor-help"
-              />
+                disabled={vendorsLoading}
+              >
+                <option value="">Select a vendor...</option>
+                {vendors.map(vendor => (
+                  <option key={vendor.id} value={vendor.id}>
+                    {vendor.name}
+                  </option>
+                ))}
+              </select>
               <User
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-sys-text-tertiary"
                 aria-hidden="true"

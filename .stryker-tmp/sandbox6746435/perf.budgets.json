@@ -1,0 +1,16 @@
+{
+  "routes": {
+    "/api/journals": {
+      "p95_ms": 500,
+      "error_rate_pct": 1
+    },
+    "/api/invoices/approve": {
+      "p95_ms": 500,
+      "error_rate_pct": 1
+    },
+    "/api/payments": {
+      "p95_ms": 500,
+      "error_rate_pct": 1
+    }
+  }
+}

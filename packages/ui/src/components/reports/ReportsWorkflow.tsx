@@ -13,7 +13,10 @@ import {
   Search,
   Plus,
   Save,
+  AlertCircle,
 } from "lucide-react";
+import { useInvoices, useBills, usePayments, useBankAccounts } from "../../store/index.js";
+import { apiClient } from "../../lib/api-client.js";
 
 // SSOT Compliant Reports Workflow Component
 // Master orchestrator for all reporting features and analytics
@@ -69,6 +72,36 @@ export const ReportsWorkflow: React.FC<ReportsWorkflowProps> = ({
   const [savedViews, setSavedViews] = React.useState<SavedView[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [showCustomBuilder, setShowCustomBuilder] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Use Zustand store for real data
+  const {
+    invoices,
+    loading: invoicesLoading,
+    error: invoicesError,
+    fetchInvoices,
+  } = useInvoices();
+
+  const {
+    bills,
+    loading: billsLoading,
+    error: billsError,
+    fetchBills,
+  } = useBills();
+
+  const {
+    payments,
+    loading: paymentsLoading,
+    error: paymentsError,
+    fetchPayments,
+  } = usePayments();
+
+  const {
+    bankAccounts,
+    loading: bankAccountsLoading,
+    error: bankAccountsError,
+    fetchBankAccounts,
+  } = useBankAccounts();
 
   // Import report components
   const ProfitLossReport = React.lazy(() =>
@@ -92,6 +125,25 @@ export const ReportsWorkflow: React.FC<ReportsWorkflowProps> = ({
   const CustomReportBuilder = React.lazy(() =>
     import("./CustomReportBuilder.js").then(m => ({ default: m.CustomReportBuilder })),
   );
+
+  // Load data on component mount
+  React.useEffect(() => {
+    const loadData = async () => {
+      try {
+        setError(null);
+        await Promise.all([
+          fetchInvoices(),
+          fetchBills(),
+          fetchPayments(),
+          fetchBankAccounts(),
+        ]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      }
+    };
+
+    loadData();
+  }, [fetchInvoices, fetchBills, fetchPayments, fetchBankAccounts]);
 
   const reportCategories: ReportCategory[] = [
     {
@@ -229,7 +281,34 @@ export const ReportsWorkflow: React.FC<ReportsWorkflowProps> = ({
     if (!report) return null;
 
     const Component = report.component;
-    return <Component />;
+
+    // Prepare data for different report types
+    const reportData = {
+      invoices,
+      bills,
+      payments,
+      bankAccounts,
+      loading: invoicesLoading || billsLoading || paymentsLoading || bankAccountsLoading,
+      error: error || invoicesError || billsError || paymentsError || bankAccountsError,
+    };
+
+    // Pass appropriate data based on report type
+    switch (reportId) {
+      case "profit-loss":
+        return <Component data={reportData} />;
+      case "balance-sheet":
+        return <Component data={reportData} />;
+      case "cash-flow":
+        return <Component data={reportData} />;
+      case "trial-balance":
+        return <Component data={reportData} />;
+      case "ar-aging":
+        return <Component data={reportData} />;
+      case "ap-aging":
+        return <Component data={reportData} />;
+      default:
+        return <Component data={reportData} />;
+    }
   };
 
   if (showCustomBuilder) {
@@ -303,6 +382,16 @@ export const ReportsWorkflow: React.FC<ReportsWorkflowProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <p className="text-red-700">{error}</p>
+          </div>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="bg-[var(--sys-bg-subtle)] border border-[var(--sys-border-hairline)] rounded-lg p-4">

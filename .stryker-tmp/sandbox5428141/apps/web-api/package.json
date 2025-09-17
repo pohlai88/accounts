@@ -1,0 +1,45 @@
+{
+  "name": "@aibos/web-api",
+  "version": "0.1.0",
+  "dependencies": {
+    "@aibos/accounting": "workspace:*",
+    "@aibos/auth": "workspace:*",
+    "@aibos/cache": "workspace:*",
+    "@aibos/contracts": "workspace:*",
+    "@aibos/db": "workspace:*",
+    "@aibos/monitoring": "workspace:*",
+    "@aibos/realtime": "workspace:*",
+    "@aibos/security": "workspace:*",
+    "@aibos/tokens": "workspace:*",
+    "@aibos/utils": "workspace:*",
+    "@supabase/supabase-js": "^2.45.4",
+    "inngest": "^3.22.12",
+    "next": "^14.2.32",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.3",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.2",
+    "@aibos/eslint-config": "workspace:*",
+    "@aibos/vitest-config": "workspace:*",
+    "@aibos/prettier-config": "workspace:*"
+  },
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "build:lib": "tsc -p tsconfig.build.json",
+    "dev": "next dev",
+    "start": "next start",
+    "typecheck": "tsc -p . --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json}\""
+  },
+  "type": "module"
+}

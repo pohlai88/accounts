@@ -1,0 +1,209 @@
+# SSOT Documentation Strategy
+
+This document defines the Single Source of Truth (SSOT) strategy for AI-BOS Accounts documentation
+to prevent drift and ensure consistency.
+
+## 🎯 SSOT Principles
+
+### 1. **Single Documentation System**
+
+- **Nextra** is the ONLY documentation system
+- No VitePress, TypeDoc, or other doc tools
+- All documentation lives in `/docs` directory
+
+### 2. **Hierarchical Documentation Structure**
+
+```
+docs/
+├── pages/
+│   ├── index.mdx              # Main landing page
+│   ├── packages/              # Package documentation
+│   │   ├── index.mdx          # Packages overview
+│   │   ├── accounting.mdx     # Accounting package
+│   │   ├── ui.mdx            # UI components
+│   │   └── ...               # Other packages
+│   ├── api/                   # API documentation
+│   │   ├── index.mdx          # API overview
+│   │   └── ...               # API endpoints
+│   └── guides/                # How-to guides
+│       ├── index.mdx          # Guides overview
+│       ├── ssot-documentation-strategy.mdx
+│       └── ...               # Other guides
+```
+
+### 3. **Package-Level README Strategy**
+
+Each package maintains a minimal README that points to the main documentation:
+
+````markdown
+# @aibos/package-name
+
+Brief description. For full documentation, see [Package Docs](/packages/package-name).
+
+## Quick Start
+
+```bash
+pnpm add @aibos/package-name
+```
+````
+
+## Documentation
+
+- [Full Documentation](/packages/package-name)
+- [API Reference](/api/package-name)
+- [Examples](/guides/package-name-examples)
+
+````
+
+### 4. **Monorepo README Strategy**
+
+The root README serves as the entry point:
+
+```markdown
+# AI-BOS Accounts
+
+Modern accounting system built with Next.js, TypeScript, and Supabase.
+
+## Quick Start
+
+```bash
+pnpm install
+pnpm dev
+````
+
+## Documentation
+
+- [Full Documentation](https://docs.aibos.com)
+- [API Reference](https://docs.aibos.com/api)
+- [Package Docs](https://docs.aibos.com/packages)
+
+## Development
+
+See [Development Guide](https://docs.aibos.com/guides/development) for setup.
+
+````
+
+## 📋 Documentation Standards
+
+### 1. **File Naming Convention**
+- Use kebab-case for file names
+- Use `.mdx` for all documentation files
+- Use descriptive names that match URLs
+
+### 2. **Content Structure**
+Each documentation page should follow this structure:
+
+```markdown
+# Page Title
+
+Brief description of what this page covers.
+
+## Overview
+
+What this section/package/feature provides.
+
+## Installation
+
+How to install (for packages).
+
+## Usage
+
+Code examples and basic usage.
+
+## API Reference
+
+Detailed API documentation.
+
+## Related
+
+Links to related documentation.
+````
+
+### 3. **Cross-References**
+
+- Always use relative links within documentation
+- Link to other packages, guides, and API docs
+- Use consistent link patterns
+
+## 🔄 Maintenance Strategy
+
+### 1. **Automated Updates**
+
+- Documentation is built with the main build process
+- No separate documentation deployment
+- Version controlled with the codebase
+
+### 2. **Review Process**
+
+- All documentation changes require PR review
+- Documentation must be updated when code changes
+- Regular documentation audits
+
+### 3. **Drift Prevention**
+
+- Single source of truth eliminates conflicts
+- Automated checks for broken links
+- Consistent formatting and structure
+
+## 🚀 Implementation
+
+### Phase 1: Core Documentation ✅
+
+- [x] Set up Nextra documentation system
+- [x] Create main landing page
+- [x] Create packages overview
+- [x] Create individual package docs
+
+### Phase 2: API Documentation
+
+- [ ] Generate API docs from TypeScript
+- [ ] Create API reference pages
+- [ ] Add interactive examples
+
+### Phase 3: Guides and Tutorials
+
+- [ ] Create getting started guide
+- [ ] Add development workflow guide
+- [ ] Create deployment guide
+
+### Phase 4: Advanced Features
+
+- [ ] Add search functionality
+- [ ] Create interactive examples
+- [ ] Add versioning support
+
+## 📊 Success Metrics
+
+- **Zero documentation drift** - All docs stay in sync
+- **Fast build times** - Documentation builds with main project
+- **High discoverability** - Easy to find information
+- **Consistent experience** - Uniform structure and styling
+
+## 🔧 Tools and Dependencies
+
+### Required Dependencies
+
+```json
+{
+  "nextra": "^2.13.0",
+  "nextra-theme-docs": "^2.13.0"
+}
+```
+
+### Removed Dependencies
+
+- `vitepress` - Replaced with Nextra
+- `typedoc` - Integrated into Nextra
+- `remark-*` - Handled by Nextra
+- `markdownlint-*` - Handled by Nextra
+
+## 📝 Best Practices
+
+1. **Keep it Simple** - One documentation system, one source of truth
+2. **Stay Current** - Update docs with every code change
+3. **Be Consistent** - Follow the established patterns
+4. **Link Everything** - Cross-reference related content
+5. **Test Links** - Ensure all links work and are relevant
+
+This SSOT strategy ensures that AI-BOS Accounts maintains high-quality, consistent, and up-to-date
+documentation that scales with the project.

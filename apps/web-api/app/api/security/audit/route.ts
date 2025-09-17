@@ -3,6 +3,9 @@ import { z } from "zod";
 import { getSecurityContext } from "@aibos/web-api/_lib/request";
 import { ok, problem } from "@aibos/web-api/_lib/response";
 
+// Force dynamic rendering to avoid build-time header access
+export const dynamic = 'force-dynamic';
+
 // Mock audit logger (in production, use real instance)
 const mockAuditEvents = [
   {

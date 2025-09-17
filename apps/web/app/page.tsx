@@ -60,7 +60,7 @@ export default function Home() {
   }
 
   const { session, login, logout, isLoading, error } = useAuth();
-  const { mode, toggleMode } = useAccessibility();
+  const { preferences, updatePreference } = useAccessibility();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -222,11 +222,11 @@ export default function Home() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={isClient ? toggleMode : undefined}
+                onClick={isClient ? () => updatePreference('colorScheme', preferences.colorScheme === 'light' ? 'dark' : 'light') : undefined}
                 className="text-[var(--sys-text-secondary)] hover:text-[var(--sys-text-primary)]"
                 disabled={!isClient}
               >
-                {mode === "aesthetic" ? "♿ Accessibility" : "🎨 Aesthetic"}
+                {preferences.colorScheme === "light" ? "🌙 Dark" : "☀️ Light"}
               </Button>
               <Badge variant="outline">{session.user.role}</Badge>
               <Button variant="outline" onClick={handleLogout}>

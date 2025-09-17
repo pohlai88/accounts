@@ -9,6 +9,7 @@ import { Redis, RedisOptions } from "ioredis";
 export interface CacheConfig {
   host: string;
   port: number;
+  username?: string;
   password?: string;
   db?: number;
   maxRetriesPerRequest?: number;
@@ -25,12 +26,20 @@ export class RedisClient {
     const redisOptions: RedisOptions = {
       host: config.host,
       port: config.port,
+      username: config.username,
       password: config.password,
       db: config.db || 0,
-      maxRetriesPerRequest: config.maxRetriesPerRequest || 3,
       lazyConnect: config.lazyConnect || true,
       connectTimeout: config.connectTimeout || 10000,
       commandTimeout: config.commandTimeout || 5000,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      // Enable auto-pipelining for better performance (35-50% improvement)
+      enableAutoPipelining: true,
+      // Better error handling for debugging
+      showFriendlyErrorStack: process.env.NODE_ENV === 'development',
+      // Retry configuration
+      maxRetriesPerRequest: config.maxRetriesPerRequest || 3,
     };
 
     this.client = new Redis(redisOptions);
@@ -39,6 +48,11 @@ export class RedisClient {
     this.client.on("connect", () => {
       this.isConnected = true;
       console.log("Redis client connected");
+    });
+
+    this.client.on("ready", () => {
+      this.isConnected = true;
+      console.log("Redis client ready");
     });
 
     this.client.on("error", error => {
@@ -50,17 +64,28 @@ export class RedisClient {
       this.isConnected = false;
       console.log("Redis client disconnected");
     });
+
+    this.client.on("end", () => {
+      this.isConnected = false;
+      console.log("Redis client ended");
+    });
   }
 
   async connect(): Promise<void> {
-    if (!this.isConnected) {
-      await this.client.connect();
+    // ioredis connects automatically, but we can trigger it with ping
+    try {
+      await this.client.ping();
+      this.isConnected = true;
+    } catch (error) {
+      this.isConnected = false;
+      throw error;
     }
   }
 
   async disconnect(): Promise<void> {
     if (this.isConnected) {
-      await this.client.disconnect();
+      await this.client.quit();
+      this.isConnected = false;
     }
   }
 
@@ -69,7 +94,7 @@ export class RedisClient {
   }
 
   isHealthy(): boolean {
-    return this.isConnected;
+    return this.isConnected && (this.client.status === 'ready' || this.client.status === 'connecting');
   }
 
   async ping(): Promise<string> {
@@ -120,6 +145,7 @@ export class RedisClient {
 export const defaultCacheConfig: CacheConfig = {
   host: process.env.REDIS_HOST || "localhost",
   port: parseInt(process.env.REDIS_PORT || "6379"),
+  username: process.env.REDIS_USERNAME,
   password: process.env.REDIS_PASSWORD,
   db: parseInt(process.env.REDIS_DB || "0"),
 };
@@ -138,4 +164,26 @@ export async function initializeCache(config?: CacheConfig): Promise<RedisClient
   const client = getRedisClient(config);
   await client.connect();
   return client;
+}
+
+// Helper function to create Redis client from URL
+export function createRedisClientFromUrl(url?: string): RedisClient {
+  const redisUrl = url || process.env.REDIS_URL;
+
+  if (!redisUrl) {
+    throw new Error("Redis URL not provided. Set REDIS_URL environment variable or pass url parameter.");
+  }
+
+  // Parse Redis URL: redis://username:password@host:port/db
+  const urlObj = new URL(redisUrl);
+
+  const config: CacheConfig = {
+    host: urlObj.hostname,
+    port: parseInt(urlObj.port),
+    username: urlObj.username || undefined,
+    password: urlObj.password || undefined,
+    db: urlObj.pathname ? parseInt(urlObj.pathname.slice(1)) : 0,
+  };
+
+  return new RedisClient(config);
 }

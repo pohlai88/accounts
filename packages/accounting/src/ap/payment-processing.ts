@@ -72,8 +72,25 @@ export async function validatePaymentProcessing(
     if (input.currency !== baseCurrency) {
       const fxResult = validateFxPolicy(baseCurrency, input.currency);
 
-      if (!fxResult.requiresFxRate) {
-        throw new Error(`FX rate required for currency conversion from ${baseCurrency} to ${input.currency}`);
+      if (fxResult.requiresFxRate) {
+        // Validate that exchange rate is provided and valid
+        if (input.exchangeRate === undefined || input.exchangeRate === null) {
+          return {
+            success: false,
+            error: `Exchange rate required for currency conversion from ${baseCurrency} to ${input.currency}`,
+            code: "EXCHANGE_RATE_REQUIRED",
+            details: { baseCurrency, transactionCurrency: input.currency }
+          };
+        }
+
+        if (input.exchangeRate <= 0) {
+          return {
+            success: false,
+            error: `Exchange rate must be positive for currency conversion from ${baseCurrency} to ${input.currency}`,
+            code: "INVALID_EXCHANGE_RATE",
+            details: { baseCurrency, transactionCurrency: input.currency, exchangeRate: input.exchangeRate }
+          };
+        }
       }
 
       // FX validation passed - we have the required rate info

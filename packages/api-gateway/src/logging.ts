@@ -12,9 +12,9 @@ export interface LogEntry {
   timestamp: string;
   method: string;
   path: string;
-  query: Record<string, any>;
-  headers: Record<string, string>;
-  body?: any;
+  query: Record<string, unknown>;
+  headers: Record<string, string | string[] | undefined>;
+  body?: unknown;
   responseStatus: number;
   responseTime: number;
   tenantId?: string;
@@ -64,7 +64,7 @@ export class RequestLoggingService {
           method: req.method,
           path: req.path,
           query: req.query,
-          headers: req.headers as Record<string, string>,
+          headers: req.headers as Record<string, string | string[] | undefined>,
           body: req.method !== "GET" ? req.body : undefined,
           responseStatus: res.statusCode,
           responseTime,
@@ -248,7 +248,7 @@ export class RequestLoggingService {
         this.logs.forEach(log => {
           const row = headers.map(header => {
             const value = log[header as keyof LogEntry];
-            return typeof value === "string" ? `"${value.replace(/"/g, '""')}"` : value;
+            return typeof value === "string" ? `"${value.replace(/"/g, '""')}"` : String(value ?? "");
           });
           csvRows.push(row.join(","));
         });
