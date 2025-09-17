@@ -1,533 +1,547 @@
-# Supabase — Database Configuration & Local Development
+# DOC-301: Documentation
 
-> **TL;DR**: Supabase configuration and local development setup for AI-BOS Accounts, including
-> database schema, authentication, storage, and test data seeding.  
-> **Owner**: @aibos/platform-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# Supabase Configuration
 
-**Does**:
+Supabase configuration and functions for the AI-BOS Accounting SaaS platform.
 
-- Provides Supabase configuration for local development
-- Manages database schema and migrations
-- Configures authentication and authorization
-- Sets up storage and file management
-- Provides test data seeding for development
-- Manages local development environment
+## Overview
 
-**Does NOT**:
+This directory contains the Supabase configuration, database migrations, and edge functions for the AI-BOS Accounting SaaS platform. Supabase serves as our primary database and backend-as-a-service provider, offering PostgreSQL database, authentication, real-time subscriptions, and edge functions.
 
-- Implement business logic (delegated to @aibos/accounting)
-- Handle UI components (delegated to @aibos/ui)
-- Manage database operations (delegated to @aibos/db)
-- Provide API endpoints (implemented by @aibos/web-api)
+## Structure
 
-**Consumers**: Local development, testing, CI/CD pipelines
-
-## 2) Quick Links
-
-- **Configuration**: `config.toml`
-- **Test Data**: `seed.sql`
-- **Local Setup**: `../scripts/setup-local-supabase.ps1` (Windows)
-- **Local Setup**: `../scripts/setup-local-supabase.sh` (Unix)
-- **Database Package**: `../packages/db/README.md`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-
-## 3) Getting Started
-
-```bash
-# Prerequisites
-# 1. Install Supabase CLI
-npm install -g supabase
-
-# 2. Start Docker Desktop
-
-# 3. Setup local Supabase (Windows)
-.\scripts\setup-local-supabase.ps1
-
-# 3. Setup local Supabase (Unix)
-./scripts/setup-local-supabase.sh
-
-# 4. Access Supabase Studio
-# Open http://localhost:54323 in your browser
+```
+supabase/
+├── config.toml          # Supabase configuration
+├── migrations/          # Database migrations
+├── functions/           # Edge functions
+├── seed.sql            # Seed data
+├── types/              # Generated TypeScript types
+└── README.md           # This file
 ```
 
-## 4) Configuration Overview
+## Core Features
 
-### **Project Configuration (`config.toml`)**
+- **PostgreSQL Database**: Robust relational database with advanced features
+- **Row Level Security**: Multi-tenant data isolation and security
+- **Authentication**: Built-in user management and JWT tokens
+- **Real-time**: Live data subscriptions and updates
+- **Edge Functions**: Serverless functions for business logic
+- **Storage**: File storage with CDN integration
+- **API Generation**: Auto-generated REST and GraphQL APIs
 
-**Project ID**: `aibos-accounts` **Database Version**: PostgreSQL 15 **API Port**: 54321 **Database
-Port**: 54322 **Studio Port**: 54323
+## Quick Start
 
-### **Service Configuration**
+### Prerequisites
 
-- **API**: Enabled with 1000 row limit
-- **Database**: PostgreSQL 15 with shadow database
-- **Realtime**: Enabled for live updates
-- **Studio**: Web interface for database management
-- **Storage**: 50MiB file size limit
-- **Auth**: JWT tokens with 1-hour expiry
-- **Email Testing**: Inbucket for email testing
+- Node.js 18+ and pnpm
+- Supabase CLI installed globally
+- Docker Desktop for local development
 
-## 5) Database Configuration
+### Local Development
 
-### **API Configuration**
+```bash
+# Start Supabase locally
+supabase start
+
+# Run migrations
+supabase db reset
+
+# Deploy functions
+supabase functions deploy
+
+# Generate TypeScript types
+supabase gen types typescript --local > types/database.types.ts
+
+# Stop Supabase
+supabase stop
+```
+
+### Database Management
+
+```bash
+# Generate migration from schema changes
+supabase db diff --file new_migration
+
+# Apply migration to remote database
+supabase db push
+
+# Reset local database
+supabase db reset
+
+# Open database studio
+supabase studio
+
+# View database logs
+supabase db logs
+```
+
+### Function Development
+
+```bash
+# Deploy specific function
+supabase functions deploy function-name
+
+# Test function locally
+supabase functions serve
+
+# View function logs
+supabase functions logs function-name
+
+# Delete function
+supabase functions delete function-name
+```
+
+## Configuration
+
+### Supabase Config (config.toml)
 
 ```toml
+# Supabase configuration
+project_id = "your-project-id"
+
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
+schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
-```
 
-**Features**:
-
-- RESTful API endpoints for all tables
-- GraphQL API support
-- Row-level security (RLS) enforcement
-- Automatic API documentation
-
-### **Database Configuration**
-
-```toml
 [db]
 port = 54322
 shadow_port = 54320
 major_version = 15
-```
 
-**Features**:
-
-- PostgreSQL 15 compatibility
-- Shadow database for migrations
-- Connection pooling support
-- Local development database
-
-### **Connection Pooler**
-
-```toml
-[db.pooler]
-enabled = false
-port = 54329
-pool_mode = "transaction"
-default_pool_size = 20
-max_client_conn = 100
-```
-
-**Features**:
-
-- Transaction-level connection pooling
-- Configurable pool sizes
-- Connection reuse optimization
-- Performance monitoring
-
-## 6) Authentication Configuration
-
-### **Auth Settings**
-
-```toml
-[auth]
-enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
-jwt_expiry = 3600
-enable_refresh_token_rotation = true
-refresh_token_reuse_interval = 10
-enable_signup = true
-```
-
-**Features**:
-
-- JWT token authentication
-- Refresh token rotation
-- Signup enabled for development
-- Localhost redirect support
-
-### **Email Authentication**
-
-```toml
-[auth.email]
-enable_signup = true
-double_confirm_changes = true
-enable_confirmations = false
-```
-
-**Features**:
-
-- Email-based authentication
-- Double confirmation for email changes
-- Email confirmations disabled for development
-- Custom email templates support
-
-### **SMS Authentication**
-
-```toml
-[auth.sms]
-enable_signup = true
-enable_confirmations = false
-```
-
-**Features**:
-
-- SMS-based authentication
-- Twilio integration support
-- Test OTP for development
-- Phone number confirmation
-
-## 7) Storage Configuration
-
-### **File Storage**
-
-```toml
-[storage]
-enabled = true
-file_size_limit = "50MiB"
-```
-
-**Features**:
-
-- File upload and storage
-- 50MiB file size limit
-- Bucket-based organization
-- CDN integration support
-
-### **Storage Buckets**
-
-- **Attachments**: Document and file attachments
-- **Exports**: Generated reports and exports
-- **Templates**: PDF and email templates
-- **Backups**: Database and system backups
-
-## 8) Development Services
-
-### **Supabase Studio**
-
-```toml
 [studio]
 enabled = true
 port = 54323
-api_url = "http://localhost:54321"
-```
 
-**Features**:
-
-- Web-based database management
-- Table editor and query interface
-- Authentication user management
-- Storage file browser
-- API documentation
-
-### **Email Testing (Inbucket)**
-
-```toml
 [inbucket]
 enabled = true
 port = 54324
-```
 
-**Features**:
-
-- Email testing without sending real emails
-- Web interface for viewing test emails
-- SMTP and POP3 testing ports
-- Email template testing
-
-### **Realtime**
-
-```toml
-[realtime]
+[storage]
 enabled = true
+file_size_limit = "50Mi"
+buckets = [
+  { name = "invoices", public = false },
+  { name = "bills", public = false },
+  { name = "attachments", public = false },
+  { name = "reports", public = false },
+  { name = "avatars", public = true }
+]
+
+[edge_functions]
+enabled = true
+port = 54325
+
+[auth]
+enabled = true
+port = 54324
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://your-domain.com"]
 ```
 
-**Features**:
+### Environment Variables
 
-- Real-time database updates
-- WebSocket connections
-- Live data synchronization
-- Event streaming
-
-## 9) Test Data Seeding
-
-### **Seed Data (`seed.sql`)**
-
-**Purpose**: Provides test data for local development and testing
-
-**Test Data Includes**:
-
-- Test tenant and company
-- Test user and membership
-- Sample currencies (MYR, USD, SGD)
-- Basic chart of accounts
-- Required reference data
-
-### **Test Entities**
-
-```sql
--- Test Tenant
-INSERT INTO tenants (id, name, slug) VALUES
-('tenant-123', 'Test Tenant', 'test-tenant');
-
--- Test Company
-INSERT INTO companies (id, tenant_id, name, code, base_currency) VALUES
-('company-456', 'tenant-123', 'Test Company', 'TEST', 'MYR');
-
--- Test User
-INSERT INTO users (id, email, first_name, last_name) VALUES
-('user-789', 'test@example.com', 'Test', 'User');
-
--- Test Membership
-INSERT INTO memberships (user_id, tenant_id, company_id, role) VALUES
-('user-789', 'tenant-123', 'company-456', 'manager');
-```
-
-### **Chart of Accounts**
-
-```sql
--- Basic Chart of Accounts
-INSERT INTO chart_of_accounts (id, tenant_id, company_id, code, name, account_type, currency) VALUES
-('00000000-0000-0000-0000-000000000001', 'tenant-123', 'company-456', '1000', 'Cash', 'ASSET', 'MYR'),
-('00000000-0000-0000-0000-000000000002', 'tenant-123', 'company-456', '2000', 'Accounts Payable', 'LIABILITY', 'MYR'),
-('00000000-0000-0000-0000-000000000003', 'tenant-123', 'company-456', '3000', 'Revenue', 'REVENUE', 'MYR'),
-('00000000-0000-0000-0000-000000000004', 'tenant-123', 'company-456', '4000', 'Expenses', 'EXPENSE', 'MYR');
-```
-
-## 10) Local Development Workflow
-
-### **Starting Local Supabase**
-
-```bash
-# Start all services
-supabase start
-
-# Check status
-supabase status
-
-# Stop services
-supabase stop
-```
-
-### **Database Management**
-
-```bash
-# Reset database with seed data
-supabase db reset
-
-# Apply migrations
-supabase db push
-
-# Generate migration from schema changes
-supabase db diff --schema public > migrations/new_migration.sql
-
-# Open database in psql
-supabase db connect
-```
-
-### **Schema Management**
-
-```bash
-# Generate TypeScript types
-supabase gen types typescript --local > packages/db/src/types.ts
-
-# Generate API types
-supabase gen types typescript --local --schema public > packages/contracts/src/database.ts
-```
-
-## 11) Environment Variables
-
-### **Required Environment Variables**
-
-```bash
+```env
 # Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_PROJECT_ID=your_project_id
 
 # Database Configuration
-DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
+DATABASE_URL=postgresql://postgres:password@localhost:54322/postgres
+DATABASE_POOL_SIZE=10
+DATABASE_TIMEOUT=30000
+DATABASE_SSL_MODE=require
 
-# Inngest Configuration
-INNGEST_EVENT_KEY=your_inngest_event_key
-INNGEST_SIGNING_KEY=your_inngest_signing_key
+# Storage Configuration
+STORAGE_URL=https://your-project.supabase.co/storage/v1
+STORAGE_BUCKET=invoices
+STORAGE_MAX_FILE_SIZE=52428800
+
+# Auth Configuration
+AUTH_JWT_SECRET=your_jwt_secret
+AUTH_JWT_EXPIRY=3600
 ```
 
-### **Getting Keys**
+## Database Schema
+
+### Core Tables
+
+#### Tenants
+
+Multi-tenant architecture with tenant isolation:
+
+```sql
+CREATE TABLE tenants (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  domain TEXT UNIQUE,
+  status TEXT NOT NULL DEFAULT 'active',
+  settings JSONB DEFAULT '{}',
+  subscription_plan TEXT DEFAULT 'free',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### Companies
+
+Business entities within tenants:
+
+```sql
+CREATE TABLE companies (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  settings JSONB DEFAULT '{}',
+  fiscal_year_start DATE DEFAULT '01-01',
+  currency TEXT DEFAULT 'USD',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### Users
+
+User management with role-based access:
+
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user',
+  status TEXT NOT NULL DEFAULT 'active',
+  last_login TIMESTAMP WITH TIME ZONE,
+  preferences JSONB DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Accounting Tables
+
+#### Chart of Accounts
+
+```sql
+CREATE TABLE accounts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  account_code TEXT NOT NULL,
+  account_name TEXT NOT NULL,
+  account_type TEXT NOT NULL,
+  parent_account_id UUID REFERENCES accounts(id) ON DELETE SET NULL,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  balance DECIMAL(15,2) DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### Invoices
+
+```sql
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  invoice_number TEXT NOT NULL,
+  invoice_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  total_amount DECIMAL(15,2) NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'USD',
+  status TEXT NOT NULL DEFAULT 'draft',
+  payment_terms INTEGER DEFAULT 30,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+## Edge Functions
+
+### Invoice Processing Function
+
+```typescript
+// functions/process-invoice/index.ts
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async req => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const { invoiceId, tenantId, companyId } = await req.json();
+
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: { Authorization: req.headers.get("Authorization")! },
+        },
+      },
+    );
+
+    // Process invoice
+    const { data: invoice, error: invoiceError } = await supabaseClient
+      .from("invoices")
+      .select("*")
+      .eq("id", invoiceId)
+      .eq("tenant_id", tenantId)
+      .eq("company_id", companyId)
+      .single();
+
+    if (invoiceError) {
+      throw invoiceError;
+    }
+
+    // Calculate totals
+    const { data: lines, error: linesError } = await supabaseClient
+      .from("invoice_lines")
+      .select("*")
+      .eq("invoice_id", invoiceId);
+
+    if (linesError) {
+      throw linesError;
+    }
+
+    const totalAmount = lines.reduce((sum, line) => sum + parseFloat(line.line_total), 0);
+
+    // Update invoice total
+    const { error: updateError } = await supabaseClient
+      .from("invoices")
+      .update({ total_amount: totalAmount })
+      .eq("id", invoiceId);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return new Response(JSON.stringify({ success: true, totalAmount }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 400,
+    });
+  }
+});
+```
+
+### Payment Processing Function
+
+```typescript
+// functions/process-payment/index.ts
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+serve(async req => {
+  try {
+    const { paymentId, allocations } = await req.json();
+
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
+
+    // Process payment allocations
+    for (const allocation of allocations) {
+      await supabaseClient.from("payment_allocations").insert({
+        payment_id: paymentId,
+        invoice_id: allocation.invoiceId,
+        allocated_amount: allocation.amount,
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+});
+```
+
+## Security
+
+### Row Level Security (RLS)
+
+All tables implement RLS policies for tenant isolation:
+
+```sql
+-- Enable RLS on all tables
+ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
+
+-- Tenant isolation policy
+CREATE POLICY "Users can only access their tenant data" ON users
+  FOR ALL USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
+
+-- Company isolation policy
+CREATE POLICY "Users can only access their company data" ON companies
+  FOR ALL USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
+```
+
+### Authentication
+
+- JWT-based authentication with Supabase Auth
+- Role-based access control (RBAC)
+- Session management with refresh tokens
+- Multi-factor authentication support
+
+### Data Protection
+
+- Data encryption at rest and in transit
+- Secure connections (SSL/TLS)
+- Input validation and sanitization
+- SQL injection prevention
+- GDPR compliance features
+
+## Monitoring and Observability
+
+### Database Monitoring
+
+- Query performance tracking
+- Connection pool monitoring
+- Error rate monitoring
+- Resource usage tracking
+- Slow query identification
+
+### Function Monitoring
+
+- Execution time tracking
+- Error rate monitoring
+- Memory usage tracking
+- Invocation counting
+- Cold start metrics
+
+### Health Checks
+
+```typescript
+// Health check endpoint
+export async function healthCheck() {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  try {
+    const { data, error } = await supabase.from("tenants").select("count").limit(1);
+
+    return {
+      status: error ? "unhealthy" : "healthy",
+      timestamp: new Date().toISOString(),
+      database: error ? "disconnected" : "connected",
+    };
+  } catch (error) {
+    return {
+      status: "unhealthy",
+      timestamp: new Date().toISOString(),
+      error: error.message,
+    };
+  }
+}
+```
+
+## Performance Optimization
+
+### Database Optimization
+
+- Proper indexing strategy
+- Query optimization
+- Connection pooling
+- Read replicas for scaling
+- Partitioning for large tables
+
+### Caching Strategy
+
+- Redis caching for frequently accessed data
+- Query result caching
+- Session caching
+- CDN integration for static assets
+
+## Backup and Recovery
+
+### Automated Backups
+
+- Daily automated backups
+- Point-in-time recovery
+- Cross-region backup replication
+- Backup encryption
+
+### Disaster Recovery
+
+- Multi-region deployment
+- Automated failover
+- Data replication
+- Recovery time objectives (RTO)
+
+## Contributing
+
+1. Follow the coding standards
+2. Add tests for new functions
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
+5. Ensure RLS policies are properly implemented
+6. Test with multiple tenants
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Connection Timeouts**: Check database pool size and timeout settings
+2. **RLS Policy Errors**: Verify tenant context is properly set
+3. **Function Deployment Failures**: Check function syntax and dependencies
+4. **Migration Conflicts**: Resolve schema conflicts before applying
+
+### Debug Commands
 
 ```bash
-# Get local Supabase keys
+# Check Supabase status
 supabase status
 
-# Copy the keys to your .env.local file
-# API URL: http://localhost:54321
-# anon key: (from supabase status output)
-# service_role key: (from supabase status output)
-```
-
-## 12) Service URLs
-
-### **Local Development URLs**
-
-- **API**: http://localhost:54321
-- **Database**: postgresql://postgres:postgres@localhost:54322/postgres
-- **Studio**: http://localhost:54323
-- **Email Testing**: http://localhost:54324
-- **Realtime**: ws://localhost:54321/realtime/v1/
-
-### **Service Endpoints**
-
-- **REST API**: http://localhost:54321/rest/v1/
-- **GraphQL**: http://localhost:54321/graphql/v1/
-- **Auth**: http://localhost:54321/auth/v1/
-- **Storage**: http://localhost:54321/storage/v1/
-
-## 13) Database Schema
-
-### **Core Tables**
-
-- **tenants**: Multi-tenant organization data
-- **companies**: Company entities within tenants
-- **users**: User accounts and profiles
-- **memberships**: User-tenant-company relationships
-- **currencies**: Supported currency codes
-- **chart_of_accounts**: Accounting chart of accounts
-
-### **Accounting Tables**
-
-- **journals**: Journal entries and transactions
-- **journal_lines**: Individual journal line items
-- **fx_rates**: Foreign exchange rates
-- **invoices**: Customer invoices (AR)
-- **bills**: Vendor bills (AP)
-- **payments**: Payment transactions
-
-### **System Tables**
-
-- **audit_logs**: System audit trail
-- **idempotency_keys**: Request deduplication
-- **attachments**: File attachments
-- **exports**: Export history and metadata
-
-## 14) Security Configuration
-
-### **Row Level Security (RLS)**
-
-- **Tenant Isolation**: All data scoped to tenant
-- **Company Isolation**: Data scoped to company within tenant
-- **User Access**: Role-based access control
-- **API Security**: JWT token validation
-
-### **Authentication Policies**
-
-- **User Registration**: Email-based signup
-- **Password Requirements**: Configurable complexity
-- **Session Management**: JWT with refresh tokens
-- **Multi-Factor**: SMS and email support
-
-### **Data Protection**
-
-- **Encryption**: Data encrypted at rest
-- **Backups**: Automated backup retention
-- **Audit Logging**: Complete operation tracking
-- **Compliance**: GDPR and data protection ready
-
-## 15) Troubleshooting
-
-**Common Issues**:
-
-- **Docker Not Running**: Start Docker Desktop before running Supabase
-- **Port Conflicts**: Check if ports 54321-54324 are available
-- **Database Connection**: Verify DATABASE_URL in environment
-- **Migration Failures**: Check schema compatibility and dependencies
-
-**Debug Mode**:
-
-```bash
-# Start with debug logging
-supabase start --debug
-
-# Check service logs
+# View logs
 supabase logs
 
-# Verify database connection
-supabase db connect
+# Test database connection
+supabase db ping
+
+# Validate migrations
+supabase db lint
 ```
 
-**Logs**:
+## License
 
-- Supabase service logs
-- Database query logs
-- Authentication logs
-- Storage operation logs
-
-## 16) Contributing
-
-**Code Style**:
-
-- Follow SQL best practices
-- Use consistent naming conventions
-- Document all schema changes
-- Maintain backward compatibility
-
-**Testing**:
-
-- Test all seed data
-- Validate schema migrations
-- Test authentication flows
-- Verify storage operations
-
-**Review Process**:
-
-- All changes must maintain data integrity
-- Breaking changes require migration scripts
-- New features need comprehensive testing
-- Documentation must be updated
-
----
-
-## 📚 **Additional Resources**
-
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Database Package](../packages/db/README.md)
-- [Setup Scripts](../scripts/README.md)
-- [Supabase Documentation](https://supabase.com/docs)
-
----
-
-## 🔗 **Configuration Principles**
-
-### **Development First**
-
-- Local development environment optimization
-- Easy setup and configuration
-- Comprehensive test data
-- Developer-friendly tooling
-
-### **Security by Default**
-
-- Row-level security enabled
-- Authentication required
-- Data encryption at rest
-- Audit logging enabled
-
-### **Performance Optimized**
-
-- Connection pooling configured
-- Query optimization
-- Caching strategies
-- Resource limits set
-
-### **Production Ready**
-
-- Scalable configuration
-- Monitoring and alerting
-- Backup and recovery
-- Compliance features
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+MIT License - see LICENSE file for details.

@@ -2,11 +2,11 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / EncryptionManager
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / EncryptionManager
 
 # Class: EncryptionManager
 
-Defined in: [packages/security/src/encryption.ts:30](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L30)
+Defined in: [packages/security/src/encryption.ts:7](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L7)
 
 ## Constructors
 
@@ -14,13 +14,13 @@ Defined in: [packages/security/src/encryption.ts:30](https://github.com/pohlai88
 
 > **new EncryptionManager**(`config`): `EncryptionManager`
 
-Defined in: [packages/security/src/encryption.ts:35](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L35)
+Defined in: [packages/security/src/encryption.ts:12](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L12)
 
 #### Parameters
 
 ##### config
 
-`Partial`\<[`EncryptionConfig`](../interfaces/EncryptionConfig.md)\> = `{}`
+`Partial`\<[`EncryptionConfig`](../types/interfaces/EncryptionConfig.md)\> = `{}`
 
 #### Returns
 
@@ -30,9 +30,9 @@ Defined in: [packages/security/src/encryption.ts:35](https://github.com/pohlai88
 
 ### decrypt()
 
-> **decrypt**(`encryptedData`, `password?`): `Promise`\<`any`\>
+> **decrypt**(`encryptedData`, `password?`): `Promise`\<`string` \| `Record`\<`string`, `unknown`\>\>
 
-Defined in: [packages/security/src/encryption.ts:105](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L105)
+Defined in: [packages/security/src/encryption.ts:82](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L82)
 
 Decrypt sensitive data
 
@@ -40,7 +40,7 @@ Decrypt sensitive data
 
 ##### encryptedData
 
-[`EncryptedData`](../interfaces/EncryptedData.md)
+[`EncryptedData`](../types/interfaces/EncryptedData.md)
 
 ##### password?
 
@@ -48,15 +48,15 @@ Decrypt sensitive data
 
 #### Returns
 
-`Promise`\<`any`\>
+`Promise`\<`string` \| `Record`\<`string`, `unknown`\>\>
 
 ***
 
 ### decryptPII()
 
-> **decryptPII**(`encryptedData`, `tenantId`): `Promise`\<`Record`\<`string`, `any`\>\>
+> **decryptPII**(`encryptedData`, `tenantId`): `Promise`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[]\>\>
 
-Defined in: [packages/security/src/encryption.ts:205](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L205)
+Defined in: [packages/security/src/encryption.ts:182](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L182)
 
 Decrypt PII data
 
@@ -72,15 +72,15 @@ Decrypt PII data
 
 #### Returns
 
-`Promise`\<`Record`\<`string`, `any`\>\>
+`Promise`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[]\>\>
 
 ***
 
 ### encrypt()
 
-> **encrypt**(`data`, `password?`): `Promise`\<[`EncryptedData`](../interfaces/EncryptedData.md)\>
+> **encrypt**(`data`, `password?`): `Promise`\<[`EncryptedData`](../types/interfaces/EncryptedData.md)\>
 
-Defined in: [packages/security/src/encryption.ts:68](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L68)
+Defined in: [packages/security/src/encryption.ts:45](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L45)
 
 Encrypt sensitive data
 
@@ -88,7 +88,7 @@ Encrypt sensitive data
 
 ##### data
 
-`any`
+`string` | `Buffer`\<`ArrayBufferLike`\> | `Record`\<`string`, `unknown`\>
 
 ##### password?
 
@@ -96,7 +96,7 @@ Encrypt sensitive data
 
 #### Returns
 
-`Promise`\<[`EncryptedData`](../interfaces/EncryptedData.md)\>
+`Promise`\<[`EncryptedData`](../types/interfaces/EncryptedData.md)\>
 
 ***
 
@@ -104,7 +104,7 @@ Encrypt sensitive data
 
 > **encryptPII**(`piiData`, `tenantId`): `Promise`\<`Record`\<`string`, `string`\>\>
 
-Defined in: [packages/security/src/encryption.ts:184](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L184)
+Defined in: [packages/security/src/encryption.ts:161](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L161)
 
 Encrypt PII data
 
@@ -112,7 +112,7 @@ Encrypt PII data
 
 ##### piiData
 
-`Record`\<`string`, `any`\>
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[]\>
 
 ##### tenantId
 
@@ -128,7 +128,7 @@ Encrypt PII data
 
 > **generateSecurePassword**(`length`): `string`
 
-Defined in: [packages/security/src/encryption.ts:169](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L169)
+Defined in: [packages/security/src/encryption.ts:146](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L146)
 
 Generate secure password
 
@@ -148,7 +148,7 @@ Generate secure password
 
 > **generateSecureRandom**(`length`): `string`
 
-Defined in: [packages/security/src/encryption.ts:162](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L162)
+Defined in: [packages/security/src/encryption.ts:139](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L139)
 
 Generate secure random string
 
@@ -168,7 +168,7 @@ Generate secure random string
 
 > **generateTenantKey**(`tenantId`): `Promise`\<`string`\>
 
-Defined in: [packages/security/src/encryption.ts:263](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L263)
+Defined in: [packages/security/src/encryption.ts:240](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L240)
 
 Generate data encryption key for tenant
 
@@ -188,7 +188,7 @@ Generate data encryption key for tenant
 
 > **hash**(`data`, `algorithm`): `string`
 
-Defined in: [packages/security/src/encryption.ts:146](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L146)
+Defined in: [packages/security/src/encryption.ts:123](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L123)
 
 Hash sensitive data (one-way)
 
@@ -212,7 +212,7 @@ Hash sensitive data (one-way)
 
 > **hashWithSalt**(`data`, `salt`, `algorithm`): `string`
 
-Defined in: [packages/security/src/encryption.ts:153](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L153)
+Defined in: [packages/security/src/encryption.ts:130](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L130)
 
 Hash with salt
 
@@ -238,9 +238,9 @@ Hash with salt
 
 ### maskSensitiveData()
 
-> **maskSensitiveData**(`data`, `fields`): `any`
+> **maskSensitiveData**(`data`, `fields`): `string` \| `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/security/src/encryption.ts:231](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L231)
+Defined in: [packages/security/src/encryption.ts:208](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L208)
 
 Mask sensitive data for logging
 
@@ -248,7 +248,7 @@ Mask sensitive data for logging
 
 ##### data
 
-`any`
+`string` | `Record`\<`string`, `unknown`\>
 
 ##### fields
 
@@ -256,7 +256,7 @@ Mask sensitive data for logging
 
 #### Returns
 
-`any`
+`string` \| `Record`\<`string`, `unknown`\>
 
 ***
 
@@ -264,7 +264,7 @@ Mask sensitive data for logging
 
 > **maskString**(`data`): `string`
 
-Defined in: [packages/security/src/encryption.ts:322](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L322)
+Defined in: [packages/security/src/encryption.ts:299](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L299)
 
 Mask string data
 
@@ -284,7 +284,7 @@ Mask string data
 
 > **setMasterKey**(`key`): `void`
 
-Defined in: [packages/security/src/encryption.ts:57](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L57)
+Defined in: [packages/security/src/encryption.ts:34](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L34)
 
 Set master encryption key
 
@@ -304,7 +304,7 @@ Set master encryption key
 
 > **verifyIntegrity**(`data`, `hash`, `algorithm`): `boolean`
 
-Defined in: [packages/security/src/encryption.ts:272](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L272)
+Defined in: [packages/security/src/encryption.ts:249](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L249)
 
 Verify data integrity
 

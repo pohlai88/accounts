@@ -1,0 +1,220 @@
+name: Documentation Management
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - "scripts/document-manager.js"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - "scripts/document-manager.js"
+  schedule:
+    # Run daily at 2 AM UTC to check for outdated documentation
+    - cron: "0 2 * * *"
+
+jobs:
+  documentation-quality:
+    name: Documentation Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run documentation quality checks
+        run: |
+          pnpm docs:quality
+          pnpm docs:validate
+          pnpm docs:stats
+
+      - name: Check documentation freshness
+        run: |
+          node scripts/document-manager.js validate
+          if [ $? -ne 0 ]; then
+            echo "Documentation quality issues found"
+            exit 1
+          fi
+
+      - name: Update documentation registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: pnpm docs:update-registry
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            try {
+              const stats = execSync('node scripts/document-manager.js stats', { encoding: 'utf8' });
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 📚 Documentation Quality Report\n\n\`\`\`\n${stats}\n\`\`\`\n\n✅ All documentation quality checks passed!`
+              });
+            } catch (error) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 📚 Documentation Quality Report\n\n❌ Documentation quality issues found:\n\n\`\`\`\n${error.stdout}\n\`\`\`\n\nPlease fix the issues before merging.`
+              });
+            }
+
+  documentation-deployment:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: documentation-quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build documentation
+        run: |
+          pnpm docs:build
+          pnpm docs:api
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/dist
+          cname: docs.aibos.com
+
+  documentation-notifications:
+    name: Documentation Notifications
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate documentation report
+        id: report
+        run: |
+          node scripts/document-manager.js stats > docs-report.txt
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          cat docs-report.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Notify on success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: |
+            📚 Documentation Quality Check Passed!
+
+            ${{ steps.report.outputs.report }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            ❌ Documentation Quality Check Failed!
+
+            Please check the workflow logs for details.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  documentation-sync:
+    name: Sync Documentation Registry
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Update documentation registry
+        run: pnpm docs:update-registry
+
+      - name: Check for outdated documentation
+        run: |
+          node scripts/document-manager.js validate
+          if [ $? -ne 0 ]; then
+            echo "Outdated documentation found"
+            # Create issue for outdated documentation
+            gh issue create --title "Outdated Documentation Detected" --body "The documentation quality check found outdated or incomplete documentation. Please review and update." --label "documentation,maintenance"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/MASTER_DOCUMENT_REGISTRY.md
+          git diff --staged --quiet || git commit -m "docs: update document registry [skip ci]"
+          git push

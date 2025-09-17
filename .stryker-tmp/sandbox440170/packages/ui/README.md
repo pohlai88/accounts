@@ -1,3 +1,14 @@
+# DOC-036: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # UI — Component Library & Design System
 
 > **TL;DR**: Steve Jobs-inspired React component library with dual-mode design system, comprehensive

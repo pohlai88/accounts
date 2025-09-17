@@ -1,369 +1,394 @@
-# Auth — Authentication & Authorization
+# DOC-285: Documentation
 
-> **TL;DR**: Comprehensive RBAC + ABAC + Feature Flag system with SoD compliance, governance packs,
-> and multi-tenant security. Implements V1 authentication requirements with enhanced permission
-> matrix.  
-> **Owner**: @aibos/security-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/auth
 
-**Does**:
+Authentication and user management for the AI-BOS Accounting SaaS platform.
 
-- Implements comprehensive Role-Based Access Control (RBAC)
-- Provides Attribute-Based Access Control (ABAC) with amount thresholds
-- Enforces Separation of Duties (SoD) compliance
-- Manages feature flags and policy settings
-- Offers pre-configured governance packs for different organization types
-- Handles multi-tenant user context and permissions
-- Validates user actions against business rules and security policies
-
-**Does NOT**:
-
-- Handle user authentication (login/logout) - delegated to Supabase
-- Manage user sessions - handled by session management layer
-- Store user data - uses external user management system
-- Handle password management - delegated to authentication provider
-
-**Consumers**: @aibos/accounting, @aibos/web-api, @aibos/web
-
-## 2) Quick Links
-
-- **Types & Interfaces**: `src/types.ts`
-- **SoD Matrix**: `src/sod.ts`
-- **Governance Packs**: `src/governance-packs.ts`
-- **Tests**: `tests/admin-permissions.test.ts`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the package
-pnpm build
-
-# Run tests
-pnpm test
-
-# Watch mode for development
-pnpm dev
+pnpm add @aibos/auth
 ```
 
-## 4) Architecture & Dependencies
+## Core Features
 
-**Dependencies**:
+- **Supabase Integration**: Authentication with Supabase Auth
+- **JWT Tokens**: Secure token-based authentication
+- **User Management**: User registration, login, and profile management
+- **Multi-tenant Support**: Tenant-based user isolation
+- **Session Management**: Secure session handling
+- **Password Management**: Password hashing and validation
+- **Email Verification**: Email verification workflows
+- **Password Reset**: Secure password reset functionality
 
-- `zod` - Schema validation and type safety
+## Quick Start
 
-**Dependents**:
+```typescript
+import { AuthManager, UserManager } from "@aibos/auth";
 
-- `@aibos/accounting` - SoD compliance for journal posting
-- `@aibos/web-api` - Permission validation for API endpoints
-- `@aibos/web` - UI permission checks and feature flags
+// Initialize auth manager
+const authManager = new AuthManager({
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_ANON_KEY
+});
 
-**Build Order**: No dependencies, can be built independently
-
-## 5) Development Workflow
-
-**Local Dev**:
-
-```bash
-# Build with watch mode
-pnpm dev
-
-# Run specific tests
-pnpm test admin-permissions.test.ts
+// Initialize user manager
+const userManager = new UserManager({
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+});
 ```
 
-**Testing**:
+## Authentication
+
+### User Registration
+
+```typescript
+import { AuthManager } from "@aibos/auth";
+
+const authManager = new AuthManager({
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_ANON_KEY
+});
+
+// Register new user
+const { user, error } = await authManager.register({
+  email: 'user@example.com',
+  password: 'password123',
+  name: 'John Doe',
+  tenantId: 'tenant_123'
+});
+
+if (error) {
+  console.error('Registration failed:', error.message);
+} else {
+  console.log('User registered:', user.id);
+}
+```
+
+### User Login
+
+```typescript
+// Login user
+const { user, session, error } = await authManager.login({
+  email: 'user@example.com',
+  password: 'password123'
+});
+
+if (error) {
+  console.error('Login failed:', error.message);
+} else {
+  console.log('User logged in:', user.id);
+  console.log('Session:', session.access_token);
+}
+```
+
+### Password Reset
+
+```typescript
+// Send password reset email
+const { error } = await authManager.sendPasswordResetEmail({
+  email: 'user@example.com',
+  redirectTo: 'https://app.example.com/reset-password'
+});
+
+if (error) {
+  console.error('Password reset failed:', error.message);
+} else {
+  console.log('Password reset email sent');
+}
+
+// Reset password
+const { error } = await authManager.resetPassword({
+  token: 'reset_token_here',
+  newPassword: 'newpassword123'
+});
+```
+
+## User Management
+
+### User Profile
+
+```typescript
+import { UserManager } from "@aibos/auth";
+
+const userManager = new UserManager({
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+});
+
+// Get user profile
+const user = await userManager.getUser('user_123');
+
+// Update user profile
+const updatedUser = await userManager.updateUser('user_123', {
+  name: 'John Smith',
+  avatar: 'https://example.com/avatar.jpg'
+});
+
+// Delete user
+await userManager.deleteUser('user_123');
+```
+
+### User Roles
+
+```typescript
+// Assign role to user
+await userManager.assignRole('user_123', 'admin');
+
+// Remove role from user
+await userManager.removeRole('user_123', 'admin');
+
+// Get user roles
+const roles = await userManager.getUserRoles('user_123');
+```
+
+## Multi-tenant Support
+
+### Tenant Management
+
+```typescript
+import { TenantManager } from "@aibos/auth";
+
+const tenantManager = new TenantManager({
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+});
+
+// Create tenant
+const tenant = await tenantManager.createTenant({
+  name: 'Acme Corp',
+  domain: 'acme.example.com',
+  settings: {
+    maxUsers: 100,
+    features: ['invoices', 'bills', 'reports']
+  }
+});
+
+// Get tenant
+const tenantData = await tenantManager.getTenant('tenant_123');
+
+// Update tenant
+await tenantManager.updateTenant('tenant_123', {
+  name: 'Acme Corporation',
+  settings: {
+    maxUsers: 200
+  }
+});
+```
+
+### User-Tenant Association
+
+```typescript
+// Add user to tenant
+await userManager.addUserToTenant('user_123', 'tenant_123', {
+  role: 'admin',
+  permissions: ['read', 'write', 'admin']
+});
+
+// Remove user from tenant
+await userManager.removeUserFromTenant('user_123', 'tenant_123');
+
+// Get user tenants
+const userTenants = await userManager.getUserTenants('user_123');
+```
+
+## Session Management
+
+### Session Handling
+
+```typescript
+import { SessionManager } from "@aibos/auth";
+
+const sessionManager = new SessionManager({
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_ANON_KEY
+});
+
+// Get current session
+const session = await sessionManager.getSession();
+
+// Refresh session
+const newSession = await sessionManager.refreshSession();
+
+// End session
+await sessionManager.endSession();
+```
+
+### Token Management
+
+```typescript
+// Verify access token
+const tokenData = await sessionManager.verifyToken(accessToken);
+
+// Generate new token
+const newToken = await sessionManager.generateToken({
+  userId: 'user_123',
+  tenantId: 'tenant_123',
+  roles: ['admin', 'user']
+});
+```
+
+## Configuration
+
+### Environment Variables
+
+```env
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=24h
+JWT_ISSUER=aibos-accounts
+
+# Email Configuration
+EMAIL_FROM=noreply@aibos.com
+EMAIL_TEMPLATES_PATH=./templates
+
+# Security Configuration
+PASSWORD_MIN_LENGTH=8
+PASSWORD_REQUIRE_UPPERCASE=true
+PASSWORD_REQUIRE_LOWERCASE=true
+PASSWORD_REQUIRE_NUMBERS=true
+PASSWORD_REQUIRE_SYMBOLS=true
+```
+
+### Auth Configuration
+
+```typescript
+const authConfig = {
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    anonKey: process.env.SUPABASE_ANON_KEY,
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+    issuer: process.env.JWT_ISSUER || 'aibos-accounts'
+  },
+  password: {
+    minLength: 8,
+    requireUppercase: true,
+    requireLowercase: true,
+    requireNumbers: true,
+    requireSymbols: true
+  },
+  email: {
+    from: process.env.EMAIL_FROM || 'noreply@aibos.com',
+    templatesPath: process.env.EMAIL_TEMPLATES_PATH || './templates'
+  }
+};
+```
+
+## Testing
 
 ```bash
-# Run all tests
+# Run auth tests
 pnpm test
 
-# Run with coverage
-pnpm test --coverage
+# Run tests with coverage
+pnpm test:coverage
 
 # Run specific test file
-pnpm test --grep "RBAC"
+pnpm test:auth:login
 ```
 
-**Linting**:
+## Dependencies
 
-```bash
-# Check for linting errors
-pnpm lint
+- **@supabase/supabase-js**: Supabase client
+- **jose**: JWT token handling
+- **bcrypt**: Password hashing
+- **zod**: Runtime validation
 
-# Auto-fix where possible
-pnpm lint --fix
+## Performance Considerations
+
+- **Token Caching**: JWT tokens are cached for 5 minutes
+- **Session Caching**: User sessions are cached in Redis
+- **Connection Pooling**: Database connections are pooled
+- **Batch Operations**: Bulk operations are batched
+
+## Security
+
+### Password Security
+
+```typescript
+import { PasswordValidator } from "@aibos/auth";
+
+const passwordValidator = new PasswordValidator({
+  minLength: 8,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumbers: true,
+  requireSymbols: true
+});
+
+// Validate password
+const validation = passwordValidator.validate('Password123!');
+
+if (!validation.isValid) {
+  console.error('Password validation failed:', validation.errors);
+}
 ```
 
-**Type Checking**:
+### Token Security
 
-```bash
-# TypeScript compilation check
-pnpm build
+```typescript
+import { TokenValidator } from "@aibos/auth";
+
+const tokenValidator = new TokenValidator({
+  secret: process.env.JWT_SECRET,
+  issuer: process.env.JWT_ISSUER
+});
+
+// Validate token
+const tokenData = await tokenValidator.validate(accessToken);
+
+if (!tokenData.isValid) {
+  console.error('Token validation failed:', tokenData.error);
+}
 ```
 
-## 6) API Surface
+## Error Handling
 
-**Exports**:
+```typescript
+import { AuthError, UserError, TenantError } from "@aibos/auth";
 
-- `canPerformAction()` - Main permission checking function
-- `isFeatureEnabled()` - Feature flag validation
-- `checkSoDCompliance()` - Legacy SoD compliance check
-- `SOD_MATRIX` - Complete SoD rule matrix
-- `GOVERNANCE_PACKS` - Pre-configured governance packs
-- `applyGovernancePack()` - Apply governance pack configuration
-- `getRecommendedPack()` - Get recommended pack based on org size
-
-**Public Types**:
-
-- `UserContext` - User context with roles and permissions
-- `ActionContext` - Action context with amount and module info
-- `Decision` - Permission decision result
-- `FeatureFlags` - Feature flag configuration
-- `PolicySettings` - Policy configuration
-- `GovernancePack` - Complete governance pack structure
-
-**Configuration**:
-
-- SoD matrix with business rules
-- Feature flag definitions
-- Policy settings and thresholds
-- Governance pack configurations
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <50KB for core auth logic
-- Optimized for tree-shaking
-- Minimal dependencies for fast loading
-
-**Performance Budget**:
-
-- Permission check: <1ms per request
-- Feature flag check: <0.1ms per check
-- Governance pack lookup: <0.5ms per lookup
-
-**Monitoring**:
-
-- Permission check metrics
-- SoD violation tracking
-- Feature flag usage analytics
-- Governance pack adoption metrics
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- Multi-layered permission system (RBAC + ABAC)
-- SoD compliance enforcement
-- Amount-based access control
-- Feature flag-based restrictions
-
-**Data Handling**:
-
-- No sensitive data storage
-- Immutable permission structures
-- Type-safe permission checking
-- Audit trail integration
-
-**Compliance**:
-
-- SoD compliance for accounting operations
-- SOX/MFRS compliance support
-- Multi-tenant security isolation
-- Role-based access control
-
-## 9) Core Modules
-
-### **SoD Matrix (`sod.ts`)**
-
-- `SOD_MATRIX` - Complete separation of duties rule matrix
-- `canPerformAction()` - Main permission checking function
-- `isFeatureEnabled()` - Feature flag validation
-- `checkSoDCompliance()` - Legacy compatibility function
-
-### **Governance Packs (`governance-packs.ts`)**
-
-- `STARTER_PACK` - Small teams (≤10 users)
-- `BUSINESS_PACK` - Growing companies (11-200 users)
-- `ENTERPRISE_PACK` - Large enterprises (200+ users)
-- `REGULATED_FINANCE_PACK` - SOX/MFRS compliance
-- `FRANCHISE_PACK` - Multi-brand operations
-
-### **Types (`types.ts`)**
-
-- `UserContext` - User context structure
-- `ActionContext` - Action context structure
-- `FeatureFlags` - Feature flag configuration
-- `PolicySettings` - Policy configuration
-- `AuthUser` - Authentication user structure
-
-## 10) Permission System
-
-### **RBAC (Role-Based Access Control)**
-
-- **Roles**: admin, manager, accountant, clerk, viewer, auditor
-- **Role Hierarchy**: admin > manager > accountant > clerk > viewer
-- **Module-based Access**: GL, AR, AP, REPORTS, ADMIN, ATTACHMENTS
-
-### **ABAC (Attribute-Based Access Control)**
-
-- **Amount Thresholds**: Configurable approval thresholds
-- **Module Restrictions**: Module-specific access control
-- **Creator Role Checks**: SoD violation prevention
-- **IP Allowlisting**: Network-based restrictions
-
-### **Feature Flags**
-
-- **Global Flags**: System-wide feature enablement
-- **Role-based Flags**: Role-specific feature access
-- **Module Flags**: Module-specific feature control
-- **Compliance Flags**: Regulatory compliance features
-
-### **SoD Compliance**
-
-- **Creator-Approver Separation**: Users cannot approve their own work
-- **Amount-based Approval**: High-value transactions require approval
-- **Module Isolation**: Separate access for different modules
-- **Audit Trail**: Complete permission decision logging
-
-## 11) Governance Packs
-
-### **Starter Pack**
-
-- **Use Case**: Small teams (≤10 users, single company)
-- **Features**: Basic AR, reports, attachments
-- **Roles**: owner, accountant, viewer
-- **Thresholds**: 50,000 RM approval threshold
-
-### **Business Pack**
-
-- **Use Case**: Growing companies (11-200 users, multi-dept)
-- **Features**: Full AR/AP, journal entries, reports
-- **Roles**: owner, admin, manager, accountant, clerk, viewer
-- **Thresholds**: 30,000 RM approval threshold
-
-### **Enterprise Pack**
-
-- **Use Case**: Large enterprises (200+ users, audit scrutiny)
-- **Features**: All features + regulated mode
-- **Roles**: owner, admin, manager, accountant, clerk, auditor, viewer
-- **Thresholds**: 10,000 RM approval threshold
-
-### **Regulated Finance Pack**
-
-- **Use Case**: Listed companies, IPO-track, external audit
-- **Features**: SOX/MFRS compliance, strict SoD
-- **Roles**: owner, cfo, controller, accountant, clerk, auditor, viewer
-- **Thresholds**: 5,000 RM approval threshold
-
-### **Franchise Pack**
-
-- **Use Case**: Multi-brand operations, delegated administration
-- **Features**: Multi-entity support, regional management
-- **Roles**: hq_admin, regional_manager, franchise_admin, store_manager, cashier, viewer
-- **Thresholds**: 20,000 RM approval threshold
-
-## 12) Troubleshooting
-
-**Common Issues**:
-
-- **Permission Denied**: Check user roles and feature flags
-- **SoD Violations**: Verify creator-approver separation
-- **Feature Disabled**: Check feature flag configuration
-- **Threshold Exceeded**: Verify amount thresholds and approver roles
-
-**Debug Mode**:
-
-```bash
-# Enable detailed permission logging
-LOG_LEVEL=debug pnpm test
-
-# Test specific permission scenarios
-pnpm test --grep "SoD violation"
+try {
+  const result = await authManager.login(credentials);
+} catch (error) {
+  if (error instanceof AuthError) {
+    // Handle authentication errors
+    console.error("Authentication failed:", error.message);
+  } else if (error instanceof UserError) {
+    // Handle user errors
+    console.error("User operation failed:", error.message);
+  } else if (error instanceof TenantError) {
+    // Handle tenant errors
+    console.error("Tenant operation failed:", error.message);
+  }
+}
 ```
 
-**Logs**:
+## Contributing
 
-- Permission decision details
-- SoD violation warnings
-- Feature flag check results
-- Governance pack application logs
+1. Follow the coding standards
+2. Add tests for new auth features
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
 
-## 13) Contributing
+## License
 
-**Code Style**:
-
-- Follow functional programming principles
-- Use immutable data structures
-- Implement comprehensive error handling
-- Maintain SoD compliance integrity
-
-**Testing**:
-
-- Write unit tests for all permission scenarios
-- Test SoD compliance edge cases
-- Validate governance pack configurations
-- Test multi-tenant isolation
-
-**Review Process**:
-
-- All changes must maintain SoD compliance
-- Security review required for permission changes
-- Governance pack changes need business validation
-- Performance impact must be considered
-
----
-
-## 📚 **Additional Resources**
-
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [Accounting Package](../packages/accounting/README.md)
-- [Web API Package](../apps/web-api/README.md)
-
----
-
-## 🔐 **Security Principles**
-
-### **Separation of Duties (SoD)**
-
-- Users cannot approve their own work
-- High-value transactions require approval
-- Different roles for different operations
-- Audit trail for all permission decisions
-
-### **Principle of Least Privilege**
-
-- Users get minimum required permissions
-- Feature flags control access granularity
-- Role-based access with explicit overrides
-- Regular permission audits and reviews
-
-### **Defense in Depth**
-
-- Multiple layers of permission checking
-- RBAC + ABAC + Feature Flags
-- Amount-based access control
-- Network and session restrictions
-
-### **Compliance by Design**
-
-- Built-in SOX/MFRS compliance
-- Configurable governance packs
-- Audit trail for all decisions
-- Multi-tenant security isolation
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+MIT License - see LICENSE file for details.

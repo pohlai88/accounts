@@ -1,3 +1,14 @@
+# DOC-239: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # AP — Accounts Payable Module
 
 > **TL;DR**: D3 Accounts Payable business logic for bill posting and payment processing with GL

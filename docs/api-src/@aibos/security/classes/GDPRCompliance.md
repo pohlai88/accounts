@@ -2,11 +2,11 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / GDPRCompliance
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / GDPRCompliance
 
 # Class: GDPRCompliance
 
-Defined in: [packages/security/src/encryption.ts:338](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L338)
+Defined in: [packages/security/src/encryption.ts:315](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L315)
 
 GDPR Compliance Utilities
 
@@ -16,7 +16,7 @@ GDPR Compliance Utilities
 
 > **new GDPRCompliance**(`encryptionManager`): `GDPRCompliance`
 
-Defined in: [packages/security/src/encryption.ts:341](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L341)
+Defined in: [packages/security/src/encryption.ts:318](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L318)
 
 #### Parameters
 
@@ -32,9 +32,9 @@ Defined in: [packages/security/src/encryption.ts:341](https://github.com/pohlai8
 
 ### anonymizePersonalData()
 
-> **anonymizePersonalData**(`data`): `Record`\<`string`, `any`\>
+> **anonymizePersonalData**(`data`): `Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[]\>
 
-Defined in: [packages/security/src/encryption.ts:348](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L348)
+Defined in: [packages/security/src/encryption.ts:325](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L325)
 
 Anonymize personal data
 
@@ -42,11 +42,11 @@ Anonymize personal data
 
 ##### data
 
-`Record`\<`string`, `any`\>
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[]\>
 
 #### Returns
 
-`Record`\<`string`, `any`\>
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[]\>
 
 ***
 
@@ -54,7 +54,7 @@ Anonymize personal data
 
 > **generateRetentionPolicy**(`dataType`): `object`
 
-Defined in: [packages/security/src/encryption.ts:365](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/encryption.ts#L365)
+Defined in: [packages/security/src/encryption.ts:342](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/encryption.ts#L342)
 
 Generate data retention policy
 

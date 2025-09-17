@@ -1,41 +1,109 @@
-# Web App — Frontend Application
+# DOC-280: Documentation
 
-> **TL;DR**: Next.js 14 frontend application with dark-first theme, SSOT-compliant design system,
-> and admin configuration interface.  
-> **Owner**: @aibos/frontend-team • **Status**: experimental • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/web
 
-**Does**:
+Next.js frontend application with React components for the AI-BOS Accounting SaaS platform.
 
-- Provides the main user interface for the AIBOS accounting platform
-- Implements dark-first theme with WCAG 2.2 AAA accessibility compliance
-- Serves admin configuration pages with feature flags and policy settings
-- Communicates with backend via BFF (web-api) using contract-first approach
-- Uses semantic tokens from @aibos/tokens for consistent styling
+## Overview
 
-**Does NOT**:
+This application provides the frontend interface for the AI-BOS Accounting SaaS platform, featuring a modern React-based UI with comprehensive accounting functionality.
 
-- Handle business logic (lives in @aibos/accounting package)
-- Manage authentication/authorization (lives in @aibos/auth package)
-- Store data directly (communicates via BFF to @aibos/db)
-- Process background jobs (handled by @aibos/worker service)
+## Core Features
 
-**Consumers**: End users, administrators, accounting professionals
+- **Modern UI**: React-based interface with Tailwind CSS
+- **Responsive Design**: Mobile-first responsive design
+- **Accessibility**: WCAG 2.2 AAA compliance
+- **Real-time Updates**: Live data synchronization
+- **Offline Support**: Offline-first capabilities
+- **Performance**: Optimized loading and smooth interactions
+- **Multi-tenant**: Tenant switching and isolation
+- **Dark Theme**: Dark-first theme implementation
 
-## 2) Quick Links
+## Technology Stack
 
-- **Contracts/Types**: `packages/contracts/src/`
-- **UI Components**: `packages/ui/src/components/`
-- **Design Tokens**: `packages/tokens/src/`
-- **Design Guidelines**: `packages/ui/DESIGN_GUIDELINES.md`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
+- **Next.js 14**: React framework with App Router
+- **React 18**: UI library with hooks and context
+- **Tailwind CSS**: Utility-first CSS framework
+- **TypeScript**: Type-safe development
+- **TanStack Query**: Data fetching and caching
+- **Zustand**: State management
+- **Zod**: Runtime validation
 
-## 3) Getting Started
+## Pages and Routes
+
+### Authentication
+- `/login` - User login
+- `/register` - User registration
+- `/forgot-password` - Password reset
+- `/reset-password` - Password reset confirmation
+
+### Dashboard
+- `/dashboard` - Main dashboard
+- `/dashboard/overview` - Overview metrics
+- `/dashboard/analytics` - Analytics and reports
+
+### Invoices
+- `/invoices` - Invoice list
+- `/invoices/create` - Create invoice
+- `/invoices/:id` - Invoice details
+- `/invoices/:id/edit` - Edit invoice
+
+### Bills
+- `/bills` - Bill list
+- `/bills/create` - Create bill
+- `/bills/:id` - Bill details
+- `/bills/:id/edit` - Edit bill
+
+### Payments
+- `/payments` - Payment list
+- `/payments/create` - Create payment
+- `/payments/:id` - Payment details
+
+### Reports
+- `/reports` - Reports dashboard
+- `/reports/trial-balance` - Trial Balance
+- `/reports/balance-sheet` - Balance Sheet
+- `/reports/profit-loss` - Profit & Loss
+- `/reports/cash-flow` - Cash Flow
+
+### Settings
+- `/settings` - General settings
+- `/settings/profile` - User profile
+- `/settings/company` - Company settings
+- `/settings/tenants` - Tenant management
+
+## Configuration
+
+### Environment Variables
+
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Feature Flags
+NEXT_PUBLIC_ENABLE_REALTIME=true
+NEXT_PUBLIC_ENABLE_OFFLINE=true
+NEXT_PUBLIC_ENABLE_ANALYTICS=true
+
+# Monitoring
+NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
+NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id
+```
+
+## Development
+
+### Local Development
 
 ```bash
 # Install dependencies
@@ -49,199 +117,208 @@ pnpm build
 
 # Start production server
 pnpm start
-
-# Run linting
-pnpm lint
 ```
 
-## 4) Architecture & Dependencies
-
-**Dependencies**:
-
-- `@aibos/ui` - Shared UI components and design system
-- `@aibos/utils` - Shared utility functions
-- `@aibos/auth` - Authentication and authorization
-- `@aibos/contracts` - API contracts and types
-- `@aibos/tokens` - Design tokens for theming
-- `next` - React framework
-- `react` & `react-dom` - UI library
-- `zod` - Schema validation
-
-**Dependents**: None (this is a leaf application)
-
-**Build Order**: Depends on all packages being built first (enforced by Turborepo)
-
-## 5) Development Workflow
-
-**Local Dev**:
+### Testing
 
 ```bash
-# Start with hot reload
-pnpm dev
-
-# Access at http://localhost:3000
-# Admin area at http://localhost:3000/admin
-```
-
-**Testing**:
-
-```bash
-# Run unit tests
+# Run component tests
 pnpm test
 
-# Run with coverage
+# Run tests with coverage
 pnpm test:coverage
 
 # Run E2E tests
 pnpm test:e2e
 ```
 
-**Linting**:
+## Styling
 
-```bash
-# Check for linting errors
-pnpm lint
+### Tailwind CSS Configuration
 
-# Auto-fix where possible
-pnpm lint --fix
+```typescript
+// tailwind.config.js
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // AI-BOS brand colors
+        ai: {
+          solid: '#0056CC',
+          muted: '#007AFF',
+          subtle: 'rgba(0, 122, 255, 0.1)',
+        },
+        // Semantic colors
+        bg: {
+          base: '#000000',
+          elevated: '#1A1A1A',
+          muted: '#2A2A2A',
+        },
+        fg: {
+          default: '#FFFFFF',
+          muted: '#8A8A8A',
+          subtle: '#6A8A8A',
+        },
+      },
+    },
+  },
+  plugins: [],
+};
 ```
 
-**Type Checking**:
+## Performance Optimization
 
-```bash
-# TypeScript compilation check
-pnpm typecheck
+### Code Splitting
+
+```typescript
+import { lazy, Suspense } from 'react';
+
+// Lazy load components
+const InvoiceForm = lazy(() => import('./InvoiceForm'));
+const BillWorkflow = lazy(() => import('./BillWorkflow'));
+
+// Use Suspense for loading states
+<Suspense fallback={<LoadingSpinner />}>
+  <InvoiceForm />
+</Suspense>
 ```
 
-## 6) API Surface
+### Image Optimization
 
-**Exports**:
+```typescript
+import Image from 'next/image';
 
-- Next.js App Router pages and layouts
-- Server Actions for form handling
-- Client components for interactive UI
-
-**Public Types**:
-
-- Page props and server action parameters
-- Form schemas using Zod validation
-- Component prop interfaces
-
-**Configuration**:
-
-- Next.js configuration in `next.config.mjs`
-- Tailwind CSS configuration
-- TypeScript configuration
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <350ms response time
-- Bundle size: ~716KB (as per Kernel-UI v2.0 standards)
-- Optimized with Next.js 14 App Router
-
-**Performance Budget**:
-
-- First Contentful Paint: <1.5s
-- Largest Contentful Paint: <2.5s
-- Cumulative Layout Shift: <0.1
-
-**Monitoring**:
-
-- Axiom integration for observability
-- Performance metrics via Next.js built-in analytics
-- Error tracking and user experience monitoring
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- Admin routes protected by authentication middleware
-- Feature flags control access to specific functionality
-- Row Level Security (RLS) enforced at database level
-
-**Data Handling**:
-
-- No direct database access (BFF pattern)
-- All data validated through Zod schemas
-- Server Actions for secure form processing
-
-**Compliance**:
-
-- WCAG 2.2 AAA accessibility compliance
-- Dark-first theme with high contrast support
-- Semantic HTML and ARIA labels throughout
-
-## 9) Troubleshooting
-
-**Common Issues**:
-
-- **Build failures**: Check that all workspace packages are built first
-- **Styling issues**: Verify semantic tokens are properly imported
-- **Type errors**: Ensure contracts package is up to date
-
-**Debug Mode**:
-
-```bash
-# Enable Next.js debug mode
-DEBUG=next:* pnpm dev
-
-# Enable React strict mode for development
-NODE_ENV=development pnpm dev
+// Optimized images
+<Image
+  src="/logo.png"
+  alt="AI-BOS Logo"
+  width={200}
+  height={50}
+  priority
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,..."
+/>
 ```
 
-**Logs**:
+## Accessibility
 
-- Development logs in terminal
-- Production logs via Axiom dashboard
-- Error boundaries capture React errors
+### WCAG 2.2 AAA Compliance
 
-## 10) Contributing
+```typescript
+// Accessible button component
+<button
+  type="button"
+  aria-label="Create new invoice"
+  aria-describedby="invoice-description"
+  className="bg-ai-solid text-fg-inverted px-4 py-2 rounded-md hover:bg-ai-muted focus:outline-none focus:ring-2 focus:ring-border-focus"
+>
+  Create Invoice
+</button>
+```
 
-**Code Style**:
+## Error Handling
 
-- Follow the design system guidelines in `packages/ui/DESIGN_GUIDELINES.md`
-- Use semantic tokens exclusively (no hardcoded values)
-- Implement both aesthetic and accessibility modes for components
-- Follow Steve Jobs-inspired design principles
+### Error Boundaries
 
-**Testing**:
+```typescript
+import { ErrorBoundary } from 'react-error-boundary';
 
-- Write unit tests for all components
-- Test both aesthetic and accessibility modes
-- Ensure WCAG 2.2 AAA compliance
-- Test with keyboard navigation and screen readers
+function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-fg-default">Something went wrong</h2>
+        <p className="mt-2 text-fg-muted">{error.message}</p>
+        <button
+          onClick={resetErrorBoundary}
+          className="mt-4 bg-ai-solid text-fg-inverted px-4 py-2 rounded-md hover:bg-ai-muted"
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  );
+}
 
-**Review Process**:
+// Wrap components with error boundary
+<ErrorBoundary FallbackComponent={ErrorFallback}>
+  <InvoiceForm />
+</ErrorBoundary>
+```
 
-- All changes must maintain SSOT compliance
-- Design system consistency is mandatory
-- Accessibility review required for UI changes
-- Performance impact must be considered
+## Testing
 
----
+### Component Testing
 
-## 📚 **Additional Resources**
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
+import { InvoiceForm } from './InvoiceForm';
 
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Design Guidelines](../packages/ui/DESIGN_GUIDELINES.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [UI Package Documentation](../packages/ui/README.md)
+describe('InvoiceForm', () => {
+  it('should render form fields', () => {
+    render(<InvoiceForm />);
+    
+    expect(screen.getByLabelText('Customer Name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Amount')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Create Invoice' })).toBeInTheDocument();
+  });
+});
+```
 
----
+## Deployment
 
-## 🎨 **Design System Integration**
+### Vercel Deployment
 
-This application serves as the primary implementation of the AIBOS design system, featuring:
+```json
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install",
+  "framework": "nextjs"
+}
+```
 
-- **Dual-Mode Design**: Both aesthetic and accessibility modes
-- **Semantic Tokens**: All styling uses `@aibos/tokens` package
-- **Dark-First Theme**: Optimized for dark mode with accessibility support
-- **WCAG 2.2 AAA**: Full compliance in accessibility mode
-- **Steve Jobs Philosophy**: Simplicity, clarity, and purposeful design
+## Dependencies
 
----
+- **@aibos/auth**: Authentication context
+- **@aibos/contracts**: TypeScript type definitions
+- **@aibos/tokens**: Design tokens
+- **@aibos/ui**: React component library
+- **@aibos/utils**: Shared utilities
+- **@tanstack/react-query**: Data fetching
+- **@tanstack/react-query-devtools**: Query devtools
+- **date-fns**: Date utilities
+- **next**: Next.js framework
+- **react**: React library
+- **zod**: Runtime validation
 
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+## Performance Considerations
+
+- **Code Splitting**: Components are code-split for optimal loading
+- **Image Optimization**: Images are optimized with Next.js Image
+- **Caching**: API responses are cached with TanStack Query
+- **Bundle Optimization**: Bundle size is optimized
+- **Lazy Loading**: Components are lazy-loaded when needed
+
+## Security Considerations
+
+- **Input Validation**: All inputs are validated with Zod
+- **XSS Protection**: User inputs are sanitized
+- **CSRF Protection**: Forms include CSRF tokens
+- **Content Security Policy**: Strict CSP headers
+- **Secure Headers**: Security headers are configured
+
+## Contributing
+
+1. Follow the coding standards
+2. Add tests for new components
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
+
+## License
+
+MIT License - see LICENSE file for details.

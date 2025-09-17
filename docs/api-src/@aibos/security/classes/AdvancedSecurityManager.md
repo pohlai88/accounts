@@ -2,11 +2,11 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / AdvancedSecurityManager
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / AdvancedSecurityManager
 
 # Class: AdvancedSecurityManager
 
-Defined in: [packages/security/src/advanced-security.ts:42](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L42)
+Defined in: [packages/security/src/advanced-security.ts:7](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L7)
 
 ## Extends
 
@@ -18,13 +18,13 @@ Defined in: [packages/security/src/advanced-security.ts:42](https://github.com/p
 
 > **new AdvancedSecurityManager**(`config`): `AdvancedSecurityManager`
 
-Defined in: [packages/security/src/advanced-security.ts:49](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L49)
+Defined in: [packages/security/src/advanced-security.ts:14](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L14)
 
 #### Parameters
 
 ##### config
 
-`Partial`\<[`SecurityConfig`](../interfaces/SecurityConfig.md)\> = `{}`
+`Partial`\<[`SecurityConfig`](../types/interfaces/SecurityConfig.md)\> = `{}`
 
 #### Returns
 
@@ -225,9 +225,9 @@ v0.1.26
 
 ### addSecurityHeaders()
 
-> **addSecurityHeaders**(`response`): `any`
+> **addSecurityHeaders**(`response`): `object`
 
-Defined in: [packages/security/src/advanced-security.ts:180](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L180)
+Defined in: [packages/security/src/advanced-security.ts:155](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L155)
 
 Add security headers to response
 
@@ -235,19 +235,25 @@ Add security headers to response
 
 ##### response
 
-`any`
+###### headers
+
+`Record`\<`string`, `string`\>
 
 #### Returns
 
-`any`
+`object`
+
+##### headers
+
+> **headers**: `Record`\<`string`, `string`\>
 
 ***
 
 ### applySecurity()
 
-> **applySecurity**(`req`): `Promise`\<`any`\>
+> **applySecurity**(`req`): `Promise`\<`null` \| \{ `headers?`: `Record`\<`string`, `string`\>; `message`: `string`; `status`: `number`; \}\>
 
-Defined in: [packages/security/src/advanced-security.ts:87](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L87)
+Defined in: [packages/security/src/advanced-security.ts:52](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L52)
 
 Apply comprehensive security middleware
 
@@ -255,19 +261,37 @@ Apply comprehensive security middleware
 
 ##### req
 
-`any`
+###### body?
+
+`unknown`
+
+###### headers
+
+\{ `get`: (`key`) => `null` \| `string`; \}
+
+###### headers.get
+
+(`key`) => `null` \| `string`
+
+###### method?
+
+`string`
+
+###### url?
+
+`string`
 
 #### Returns
 
-`Promise`\<`any`\>
+`Promise`\<`null` \| \{ `headers?`: `Record`\<`string`, `string`\>; `message`: `string`; `status`: `number`; \}\>
 
 ***
 
 ### checkRateLimit()
 
-> **checkRateLimit**(`ip`, `url`): `Promise`\<[`RateLimitInfo`](../interfaces/RateLimitInfo.md)\>
+> **checkRateLimit**(`ip`, `_url`): `Promise`\<[`RateLimitInfo`](../types/interfaces/RateLimitInfo.md)\>
 
-Defined in: [packages/security/src/advanced-security.ts:256](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L256)
+Defined in: [packages/security/src/advanced-security.ts:228](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L228)
 
 Check rate limit for IP
 
@@ -277,13 +301,13 @@ Check rate limit for IP
 
 `string`
 
-##### url
+##### \_url
 
 `string`
 
 #### Returns
 
-`Promise`\<[`RateLimitInfo`](../interfaces/RateLimitInfo.md)\>
+`Promise`\<[`RateLimitInfo`](../types/interfaces/RateLimitInfo.md)\>
 
 ***
 
@@ -291,7 +315,7 @@ Check rate limit for IP
 
 > **detectSuspiciousActivity**(`req`, `ip`): `object`
 
-Defined in: [packages/security/src/advanced-security.ts:345](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L345)
+Defined in: [packages/security/src/advanced-security.ts:317](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L317)
 
 Detect suspicious activity
 
@@ -299,7 +323,17 @@ Detect suspicious activity
 
 ##### req
 
-`any`
+###### headers
+
+\{ `get`: (`key`) => `null` \| `string`; \}
+
+###### headers.get
+
+(`key`) => `null` \| `string`
+
+###### url?
+
+`string`
 
 ##### ip
 
@@ -327,7 +361,7 @@ Detect suspicious activity
 
 > **detectXSSAttempt**(`req`): `object`
 
-Defined in: [packages/security/src/advanced-security.ts:316](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L316)
+Defined in: [packages/security/src/advanced-security.ts:288](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L288)
 
 Detect XSS attempts
 
@@ -335,7 +369,13 @@ Detect XSS attempts
 
 ##### req
 
-`any`
+###### body?
+
+`unknown`
+
+###### url?
+
+`string`
 
 #### Returns
 
@@ -466,7 +506,7 @@ v6.0.0
 
 > **generateCSRFToken**(`sessionId`): `string`
 
-Defined in: [packages/security/src/advanced-security.ts:214](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L214)
+Defined in: [packages/security/src/advanced-security.ts:186](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L186)
 
 Generate CSRF token
 
@@ -509,7 +549,7 @@ v1.0.0
 
 > **getSecurityStats**(): `object`
 
-Defined in: [packages/security/src/advanced-security.ts:485](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L485)
+Defined in: [packages/security/src/advanced-security.ts:458](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L458)
 
 Get security statistics
 
@@ -527,7 +567,7 @@ Get security statistics
 
 ##### recentEvents
 
-> **recentEvents**: [`SecurityEvent`](../interfaces/SecurityEvent.md)[]
+> **recentEvents**: [`SecurityEvent`](../types/interfaces/SecurityEvent.md)[]
 
 ##### topAttackingIPs
 
@@ -1146,7 +1186,7 @@ v0.3.5
 
 > **validateCSRFToken**(`req`): `Promise`\<\{ `reason?`: `string`; `valid`: `boolean`; \}\>
 
-Defined in: [packages/security/src/advanced-security.ts:225](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/advanced-security.ts#L225)
+Defined in: [packages/security/src/advanced-security.ts:197](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/advanced-security.ts#L197)
 
 Validate CSRF token
 
@@ -1154,7 +1194,17 @@ Validate CSRF token
 
 ##### req
 
-`any`
+###### body?
+
+`unknown`
+
+###### headers
+
+\{ `get`: (`key`) => `null` \| `string`; \}
+
+###### headers.get
+
+(`key`) => `null` \| `string`
 
 #### Returns
 

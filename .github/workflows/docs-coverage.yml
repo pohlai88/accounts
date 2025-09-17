@@ -1,0 +1,95 @@
+name: Documentation Coverage
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  docs-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history for baseline comparison
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.11"
+          cache: "npm"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm -w build
+
+      - name: Generate baseline (for PRs)
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin main --depth=1
+          git show origin/main:docs/api.json > docs/api.main.json || echo "{}" > docs/api.main.json
+
+      - name: Check documentation coverage
+        run: |
+          node scripts/doc-coverage.js --threshold 85 --baseline docs/api.main.json
+        env:
+          CI: true
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-coverage
+          path: |
+            docs/api.json
+            docs/api-coverage-summary.json
+          retention-days: 30
+
+      - name: Comment PR with coverage report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const coveragePath = 'docs/api-coverage-summary.json';
+
+            if (fs.existsSync(coveragePath)) {
+              const coverage = JSON.parse(fs.readFileSync(coveragePath, 'utf8'));
+              const status = coverage.passed ? '✅' : '❌';
+              const overall = coverage.overall.toFixed(1);
+              const threshold = coverage.threshold;
+
+              let comment = `## 📊 Documentation Coverage Report ${status}\n\n`;
+              comment += `**Overall Coverage:** ${overall}% (${coverage.documented}/${coverage.total})\n`;
+              comment += `**Threshold:** ${threshold}%\n\n`;
+
+              if (coverage.perPackage) {
+                comment += `### Per-Package Coverage:\n`;
+                for (const [name, p] of Object.entries(coverage.perPackage)) {
+                  const pct = p.total ? (p.documented / p.total) * 100 : 100;
+                  const status = pct >= (threshold - 10) ? '✅' : '❌';
+                  comment += `- ${status} **${name}:** ${pct.toFixed(1)}% (${p.documented}/${p.total})\n`;
+                }
+              }
+
+              if (coverage.missing && coverage.missing.length > 0) {
+                comment += `\n### Missing Documentation (Top 10):\n`;
+                coverage.missing.slice(0, 10).forEach(m => {
+                  comment += `- [${m.bucket}] ${m.name}\n`;
+                });
+              }
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }

@@ -2,13 +2,13 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/tokens](../README.md) / AccessibilityCssVars
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/tokens](../README.md) / [](../README.md) / AccessibilityCssVars
 
 # Type Alias: AccessibilityCssVars
 
 > **AccessibilityCssVars** = *typeof* [`ACCESSIBILITY_CSS_VARS`](../variables/ACCESSIBILITY_CSS_VARS.md)
 
-Defined in: [tokens.ts:378](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/tokens/src/tokens.ts#L378)
+Defined in: [tokens.ts:378](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/tokens/src/tokens.ts#L378)
 
 @aibos/tokens - Main export file
 

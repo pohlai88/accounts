@@ -1,3 +1,14 @@
+# DOC-238: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Accounting — Core Business Logic
 
 > **TL;DR**: Core accounting business logic with journal posting, financial reporting, FX handling,

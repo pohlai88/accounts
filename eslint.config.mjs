@@ -51,4 +51,26 @@ export default [
       "@typescript-eslint/no-explicit-any": "warn", // More lenient for root configs
     },
   },
+  {
+    // Special configuration for scripts directory - plain Node.js
+    files: ["scripts/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "script",
+      globals: {
+        require: "readonly",
+        module: "readonly",
+        exports: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        process: "readonly",
+        console: "readonly",
+        Buffer: "readonly",
+      },
+    },
+    rules: {
+      "no-console": "off", // Allow console in scripts
+      "no-unused-vars": "off", // Allow unused vars in scripts
+    },
+  },
 ];

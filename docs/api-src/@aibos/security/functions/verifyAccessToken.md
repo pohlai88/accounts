@@ -2,13 +2,13 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / verifyAccessToken
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / verifyAccessToken
 
 # Function: verifyAccessToken()
 
-> **verifyAccessToken**(`authorization?`): `Promise`\<`Record`\<`string`, `any`\>\>
+> **verifyAccessToken**(`authorization?`): `Promise`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `Record`\<`string`, `unknown`\>\>\>
 
-Defined in: [packages/security/src/auth.ts:28](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/auth.ts#L28)
+Defined in: [packages/security/src/auth.ts:13](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/auth.ts#L13)
 
 ## Parameters
 
@@ -18,4 +18,4 @@ Defined in: [packages/security/src/auth.ts:28](https://github.com/pohlai88/accou
 
 ## Returns
 
-`Promise`\<`Record`\<`string`, `any`\>\>
+`Promise`\<`Record`\<`string`, `string` \| `number` \| `boolean` \| `Record`\<`string`, `unknown`\>\>\>

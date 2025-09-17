@@ -1,3 +1,14 @@
+# DOC-035: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Tokens — Dual-Mode Design System
 
 > **TL;DR**: Single source of truth for design decisions with dual-mode architecture. Provides

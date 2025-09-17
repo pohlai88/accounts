@@ -2,13 +2,13 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / toSecurityContext
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / toSecurityContext
 
 # Function: toSecurityContext()
 
-> **toSecurityContext**(`authUser`, `requestId`): [`SecurityContext`](../type-aliases/SecurityContext.md)
+> **toSecurityContext**(`authUser`, `requestId`): [`SecurityContext`](../types/type-aliases/SecurityContext.md)
 
-Defined in: [packages/security/src/auth.ts:105](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/auth.ts#L105)
+Defined in: [packages/security/src/auth.ts:90](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/auth.ts#L90)
 
 ## Parameters
 
@@ -40,4 +40,4 @@ Defined in: [packages/security/src/auth.ts:105](https://github.com/pohlai88/acco
 
 ## Returns
 
-[`SecurityContext`](../type-aliases/SecurityContext.md)
+[`SecurityContext`](../types/type-aliases/SecurityContext.md)

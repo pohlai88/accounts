@@ -4,477 +4,468 @@
 
 [AI-BOS Accounts API Documentation (Source)](../../README.md) / @aibos/db
 
-# Database — Data Layer & Repository
+# DOC-289: Documentation
 
-> **TL;DR**: PostgreSQL database layer with Drizzle ORM, comprehensive accounting schema, and
-> repository pattern. Implements D2 AR invoices, D4 financial reporting, and V1 compliance
-> requirements.  
-> **Owner**: @aibos/data-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/db
 
-**Does**:
+Database layer with Drizzle ORM integration, PostgreSQL schema management, and multi-tenant support.
 
-- Provides PostgreSQL database schema and repository functions
-- Implements comprehensive accounting data model (AR, AP, GL, reporting)
-- Handles multi-tenant data isolation with RLS (Row Level Security)
-- Manages journal entries, invoices, customers, and financial reporting
-- Implements idempotency and audit logging for V1 compliance
-- Provides Drizzle ORM integration with type-safe queries
-- Handles currency and FX rate management
-- Manages fiscal periods and period locks
+## Overview
 
-**Does NOT**:
+This package provides the database abstraction layer for the AI-BOS Accounting SaaS platform, featuring Drizzle ORM, PostgreSQL integration, multi-tenant architecture, and comprehensive schema management.
 
-- Implement business logic (delegated to @aibos/accounting)
-- Handle API endpoints (implemented by @aibos/web-api)
-- Manage authentication (delegated to @aibos/auth)
-- Provide UI components (implemented by @aibos/ui)
-
-**Consumers**: @aibos/web-api, @aibos/accounting, @aibos/worker
-
-## 2) Quick Links
-
-- **Schema Definition**: `src/schema.ts`
-- **Repository Functions**: `src/repos.ts`
-- **Migrations**: `migrations/`
-- **Drizzle Config**: `drizzle.config.ts`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
+pnpm add @aibos/db
+```
 
-# Generate new migration
+## Core Features
+
+### Database Operations
+- Drizzle ORM integration
+- PostgreSQL connection management
+- Query optimization and performance monitoring
+- Transaction support
+- Connection pooling
+
+### Schema Management
+- Multi-tenant database structure
+- Row Level Security (RLS) policies
+- Migration management with Drizzle Kit
+- Schema validation and constraints
+- Index optimization
+
+### Multi-Tenant Support
+- Tenant isolation at database level
+- Company-level data segregation
+- User context management
+- Cross-tenant query prevention
+
+### Data Access Layer
+- Repository pattern implementation
+- Type-safe database operations
+- Query builders and helpers
+- Bulk operations support
+
+## API Reference
+
+### Database Connection
+
+```typescript
+import { db, getDb, ensureDb } from "@aibos/db";
+
+// Get database instance
+const database = getDb();
+
+// Ensure database connection
+const connectedDb = ensureDb();
+
+// Use with Drizzle ORM
+import { eq, and, or } from "drizzle-orm";
+```
+
+### Schema Access
+
+```typescript
+import { 
+  tenants, 
+  companies, 
+  users, 
+  invoices, 
+  bills, 
+  payments,
+  journalEntries,
+  accounts,
+  customers,
+  vendors
+} from "@aibos/db";
+
+// Query tenants
+const tenantList = await db.select().from(tenants);
+
+// Query with conditions
+const activeTenants = await db
+  .select()
+  .from(tenants)
+  .where(eq(tenants.status, "active"));
+```
+
+### Multi-Tenant Queries
+
+```typescript
+import { getDb } from "@aibos/db";
+
+// Query with tenant context
+async function getTenantInvoices(tenantId: string) {
+  const db = getDb();
+  
+  return await db
+    .select()
+    .from(invoices)
+    .where(eq(invoices.tenantId, tenantId));
+}
+
+// Query with company context
+async function getCompanyBills(tenantId: string, companyId: string) {
+  const db = getDb();
+  
+  return await db
+    .select()
+    .from(bills)
+    .where(
+      and(
+        eq(bills.tenantId, tenantId),
+        eq(bills.companyId, companyId)
+      )
+    );
+}
+```
+
+### Transactions
+
+```typescript
+import { db } from "@aibos/db";
+
+// Use transactions for data consistency
+await db.transaction(async (tx) => {
+  // Insert invoice
+  const [invoice] = await tx
+    .insert(invoices)
+    .values(invoiceData)
+    .returning();
+
+  // Insert invoice lines
+  await tx
+    .insert(invoiceLines)
+    .values(invoiceLinesData);
+
+  // Update customer balance
+  await tx
+    .update(customers)
+    .set({ balance: newBalance })
+    .where(eq(customers.id, customerId));
+});
+```
+
+### Bulk Operations
+
+```typescript
+import { db } from "@aibos/db";
+
+// Bulk insert
+await db
+  .insert(invoices)
+  .values([
+    invoiceData1,
+    invoiceData2,
+    invoiceData3
+  ]);
+
+// Bulk update
+await db
+  .update(invoices)
+  .set({ status: "paid" })
+  .where(
+    or(
+      eq(invoices.id, "inv_001"),
+      eq(invoices.id, "inv_002"),
+      eq(invoices.id, "inv_003")
+    )
+  );
+```
+
+## Schema Structure
+
+### Core Tables
+
+```typescript
+// Tenants table
+const tenants = pgTable("tenants", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
+// Companies table
+const companies = pgTable("companies", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id),
+  name: text("name").notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
+// Users table
+const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  role: text("role").notNull().default("user"),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+```
+
+### Accounting Tables
+
+```typescript
+// Invoices table
+const invoices = pgTable("invoices", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id),
+  companyId: text("company_id").notNull().references(() => companies.id),
+  customerId: text("customer_id").notNull().references(() => customers.id),
+  invoiceNumber: text("invoice_number").notNull(),
+  invoiceDate: date("invoice_date").notNull(),
+  dueDate: date("due_date").notNull(),
+  totalAmount: decimal("total_amount", { precision: 15, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("USD"),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
+// Bills table
+const bills = pgTable("bills", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().references(() => tenants.id),
+  companyId: text("company_id").notNull().references(() => companies.id),
+  vendorId: text("vendor_id").notNull().references(() => vendors.id),
+  billNumber: text("bill_number").notNull(),
+  billDate: date("bill_date").notNull(),
+  dueDate: date("due_date").notNull(),
+  totalAmount: decimal("total_amount", { precision: 15, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("USD"),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+```
+
+## Configuration
+
+### Environment Variables
+
+```env
+# Database Connection
+DATABASE_URL=postgresql://user:password@localhost:5432/accounts
+DATABASE_POOL_SIZE=10
+DATABASE_POOL_TIMEOUT=30000
+
+# Connection Pooling
+DB_CONNECTION_LIMIT=20
+DB_IDLE_TIMEOUT=30000
+DB_CONNECTION_TIMEOUT=2000
+
+# Performance
+DB_QUERY_TIMEOUT=30000
+DB_STATEMENT_TIMEOUT=30000
+```
+
+### Drizzle Configuration
+
+```typescript
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/schema/index.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+```
+
+## Database Management
+
+### Migrations
+
+```bash
+# Generate migration
 pnpm db:generate
 
 # Run migrations
 pnpm db:migrate
 
-# Push schema changes (dev only)
+# Push schema changes
 pnpm db:push
 
 # Open Drizzle Studio
 pnpm db:studio
-
-# Build the package
-pnpm build
 ```
 
-## 4) Architecture & Dependencies
+### Schema Validation
 
-**Dependencies**:
+```typescript
+import { validateSchema } from "@aibos/db";
 
-- `drizzle-orm` - Type-safe ORM for PostgreSQL
-- `pg` - PostgreSQL client for Node.js
+// Validate schema integrity
+const validation = await validateSchema();
 
-**Dependents**:
-
-- `@aibos/web-api` - API endpoint implementations
-- `@aibos/accounting` - Business logic layer
-- `@aibos/worker` - Background job processing
-
-**Build Order**: No dependencies, can be built independently
-
-## 5) Development Workflow
-
-**Local Dev**:
-
-```bash
-# Watch mode for development
-pnpm dev
-
-# Generate migration after schema changes
-pnpm db:generate
-
-# Apply migrations
-pnpm db:migrate
+if (!validation.isValid) {
+  console.error("Schema validation failed:", validation.errors);
+}
 ```
 
-**Testing**:
+## Performance Optimization
+
+### Query Optimization
+
+```typescript
+import { optimizeQuery } from "@aibos/db";
+
+// Optimize query performance
+const optimizedQuery = optimizeQuery(
+  db.select().from(invoices).where(eq(invoices.tenantId, tenantId))
+);
+
+// Use indexes for better performance
+const indexQuery = db
+  .select()
+  .from(invoices)
+  .where(
+    and(
+      eq(invoices.tenantId, tenantId),
+      eq(invoices.status, "paid")
+    )
+  );
+```
+
+### Connection Pooling
+
+```typescript
+import { createConnectionPool } from "@aibos/db";
+
+// Create optimized connection pool
+const pool = createConnectionPool({
+  max: 20,
+  min: 5,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+```
+
+## Security
+
+### Row Level Security (RLS)
+
+```sql
+-- Enable RLS on tenants table
+ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for tenant isolation
+CREATE POLICY tenant_isolation ON tenants
+  FOR ALL TO authenticated
+  USING (id = current_setting('app.current_tenant_id'));
+```
+
+### Data Encryption
+
+```typescript
+import { encryptSensitiveData, decryptSensitiveData } from "@aibos/db";
+
+// Encrypt sensitive data before storing
+const encryptedData = encryptSensitiveData(sensitiveData);
+
+// Decrypt sensitive data when retrieving
+const decryptedData = decryptSensitiveData(encryptedData);
+```
+
+## Testing
 
 ```bash
 # Run database tests
 pnpm test
 
-# Test specific repository function
-pnpm test --grep "insertJournal"
+# Run tests with test database
+pnpm test:database
+
+# Run migration tests
+pnpm test:migrations
 ```
 
-**Linting**:
+## Dependencies
 
-```bash
-# Check for linting errors
-pnpm lint
+- **drizzle-orm**: Type-safe ORM for PostgreSQL
+- **pg**: PostgreSQL client for Node.js
+- **drizzle-kit**: Database toolkit and migrations
 
-# Auto-fix where possible
-pnpm lint --fix
-```
-
-**Type Checking**:
-
-```bash
-# TypeScript compilation check
-pnpm build
-```
-
-## 6) API Surface
-
-**Exports**:
-
-- Database schema definitions (tables, relations, indexes)
-- Repository functions for CRUD operations
-- Type definitions for database entities
-- Database connection and configuration
-
-**Public Types**:
-
-- `Scope` - Multi-tenant context interface
-- `JournalInput` - Journal entry creation interface
-- `CustomerInput` - Customer creation interface
-- `InvoiceInput` - Invoice creation interface
-- `AccountInfo` - Chart of accounts information
-- `DatabaseError` - Custom error class
-
-**Configuration**:
-
-- Database connection string via `DATABASE_URL`
-- Drizzle ORM configuration
-- Migration settings and paths
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <200KB for database layer
-- Optimized for tree-shaking
-- Minimal dependencies for fast loading
-
-**Performance Budget**:
-
-- Query execution: <100ms for simple queries
-- Complex joins: <500ms for reporting queries
-- Migration time: <30s for schema changes
-
-**Monitoring**:
-
-- Query performance metrics
-- Connection pool utilization
-- Migration execution time
-- Database size and growth
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- Row Level Security (RLS) enforced at database level
-- Multi-tenant data isolation
-- JWT-based authentication context
-
-**Data Handling**:
-
-- Encrypted connections to database
-- Sensitive data properly typed
-- Audit logging for all changes
-
-**Compliance**:
-
-- V1 compliance with audit trails
-- Idempotency for critical operations
-- Data retention policies
-- GDPR-ready data handling
-
-## 9) Core Schema Modules
-
-### **Multi-Tenant Structure**
-
-- `tenants` - Tenant configuration and feature flags
-- `companies` - Company settings and policy configuration
-- `users` - User accounts and profiles
-- `memberships` - User-tenant-company relationships
-
-### **Chart of Accounts**
-
-- `chartOfAccounts` - Hierarchical account structure
-- `currencies` - Supported currencies
-- `fxRates` - Foreign exchange rates
-- `taxCodes` - Tax configuration
-
-### **Journal Management**
-
-- `journals` - General ledger journal entries
-- `journalLines` - Journal line items
-- `idempotencyKeys` - Idempotency tracking
-
-### **Accounts Receivable (D2)**
-
-- `customers` - Customer master data
-- `invoices` - AR invoice records
-- `invoiceLines` - Invoice line items
-
-### **Accounts Payable (D3)**
-
-- `suppliers` - Supplier master data
-- `bills` - AP bill records
-- `billLines` - Bill line items
-
-### **Banking & Payments**
-
-- `bankAccounts` - Bank account configuration
-- `bankTransactions` - Bank transaction records
-- `payments` - Payment records
-- `paymentAllocations` - Payment allocations
-
-### **Financial Reporting (D4)**
-
-- `fiscalCalendars` - Fiscal year configuration
-- `fiscalPeriods` - Period management
-- `periodLocks` - Period locking mechanism
-- `reversingEntries` - Journal reversals
-- `reportCache` - Report caching
-- `reportDefinitions` - Report configuration
-
-### **Audit & Compliance**
-
-- `auditLogs` - Comprehensive audit trail
-- `attachments` - Document management (from schema-attachments)
-
-## 10) Repository Functions
-
-### **Journal Operations**
-
-- `insertJournal()` - Create journal entries with validation
-- `getJournal()` - Retrieve journal with lines
-- `checkIdempotency()` - Idempotency validation
-- `storeIdempotencyResult()` - Store idempotency results
-
-### **Account Management**
-
-- `getAccountsInfo()` - Get account details for validation
-- `getAllAccountsInfo()` - Get all accounts for company
-
-### **Customer Management**
-
-- `insertCustomer()` - Create new customers
-- `getCustomer()` - Retrieve customer details
-
-### **Invoice Management**
-
-- `insertInvoice()` - Create invoices with lines
-- `getInvoice()` - Retrieve invoice with details
-- `updateInvoicePosting()` - Update after GL posting
-- `listInvoices()` - List with pagination and filtering
-
-### **Tax Management**
-
-- `getTaxCode()` - Get single tax code
-- `getTaxCodes()` - Get multiple tax codes
-
-## 11) Database Design Principles
-
-### **Multi-Tenancy**
-
-- Row Level Security (RLS) for data isolation
-- Tenant-scoped queries and operations
-- Company-level data segregation
-- User context validation
-
-### **Data Integrity**
-
-- Foreign key constraints
-- Check constraints for business rules
-- Unique constraints for business keys
-- Proper indexing for performance
-
-### **Audit Trail**
-
-- Comprehensive audit logging
-- Change tracking for all entities
-- User action attribution
-- Request correlation
-
-### **Performance**
-
-- Strategic indexing for common queries
-- Optimized for reporting operations
-- Connection pooling
-- Query optimization
-
-## 12) Usage Examples
-
-### **Journal Entry Creation**
+## Error Handling
 
 ```typescript
-import { insertJournal, Scope } from "@aibos/db";
+import { DatabaseError, ConnectionError } from "@aibos/db";
 
-const scope: Scope = {
-  tenantId: "uuid",
-  companyId: "uuid",
-  userId: "uuid",
-  userRole: "accountant",
-};
-
-const journal = await insertJournal(scope, {
-  journalNumber: "JE-001",
-  description: "Monthly adjustment",
-  journalDate: new Date("2024-01-01"),
-  currency: "MYR",
-  lines: [
-    { accountId: "uuid", debit: 100.0, credit: 0, description: "Debit entry" },
-    { accountId: "uuid", debit: 0, credit: 100.0, description: "Credit entry" },
-  ],
-  idempotencyKey: "unique-key",
-});
-```
-
-### **Invoice Creation**
-
-```typescript
-import { insertInvoice, insertCustomer } from "@aibos/db";
-
-// Create customer first
-const customer = await insertCustomer(scope, {
-  customerNumber: "CUST-001",
-  name: "Acme Corp",
-  email: "billing@acme.com",
-  currency: "MYR",
-  paymentTerms: "NET_30",
-});
-
-// Create invoice
-const invoice = await insertInvoice(scope, {
-  customerId: customer.id,
-  invoiceNumber: "INV-001",
-  invoiceDate: new Date("2024-01-01"),
-  dueDate: new Date("2024-01-31"),
-  currency: "MYR",
-  lines: [
-    {
-      lineNumber: 1,
-      description: "Product A",
-      quantity: 1,
-      unitPrice: 100.0,
-      lineAmount: 100.0,
-      revenueAccountId: "uuid",
-    },
-  ],
-});
-```
-
-### **Account Validation**
-
-```typescript
-import { getAccountsInfo } from "@aibos/db";
-
-// Validate accounts before journal posting
-const accountIds = ["uuid1", "uuid2", "uuid3"];
-const accounts = await getAccountsInfo(scope, accountIds);
-
-// Check if all accounts are active and valid
-for (const [id, account] of accounts) {
-  if (!account.isActive) {
-    throw new Error(`Account ${account.code} is not active`);
+try {
+  const result = await db.select().from(invoices);
+} catch (error) {
+  if (error instanceof ConnectionError) {
+    // Handle connection errors
+    console.error("Database connection failed:", error.message);
+  } else if (error instanceof DatabaseError) {
+    // Handle database errors
+    console.error("Database error:", error.message);
   }
 }
 ```
 
-## 13) Troubleshooting
+## Monitoring
 
-**Common Issues**:
+### Query Performance
 
-- **Connection Errors**: Check `DATABASE_URL` environment variable
-- **Migration Failures**: Verify database permissions and schema state
-- **RLS Errors**: Ensure proper tenant context in queries
-- **Constraint Violations**: Check foreign key relationships and unique constraints
+```typescript
+import { monitorQueryPerformance } from "@aibos/db";
 
-**Debug Mode**:
-
-```bash
-# Enable Drizzle debug logging
-DEBUG=drizzle pnpm dev
-
-# Check database connection
-pnpm db:studio
+// Monitor query performance
+const queryWithMonitoring = monitorQueryPerformance(
+  db.select().from(invoices),
+  "get_invoices"
+);
 ```
 
-**Logs**:
+### Connection Health
 
-- Database query logs
-- Migration execution logs
-- Connection pool metrics
-- RLS policy violations
+```typescript
+import { checkConnectionHealth } from "@aibos/db";
 
-## 14) Contributing
+// Check database connection health
+const health = await checkConnectionHealth();
 
-**Code Style**:
+if (!health.isHealthy) {
+  console.error("Database health check failed:", health.errors);
+}
+```
 
-- Follow Drizzle ORM best practices
-- Use descriptive table and column names
-- Include proper indexes for performance
-- Maintain backward compatibility
+## Contributing
 
-**Testing**:
+1. Follow the coding standards
+2. Add tests for new features
+3. Update schema documentation
+4. Run quality checks: `pnpm quality:check`
 
-- Write tests for all repository functions
-- Test error scenarios and edge cases
-- Validate RLS policies work correctly
-- Test migration scripts
+## License
 
-**Review Process**:
+MIT License - see LICENSE file for details.
 
-- All schema changes require migration
-- Breaking changes need major version bump
-- Performance impact must be assessed
-- Documentation must be updated
+## Modules
 
----
-
-## 📚 **Additional Resources**
-
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [Web API Package](../apps/web-api/README.md)
-- [Accounting Package](../packages/accounting/README.md)
-
----
-
-## 🔗 **Database Principles**
-
-### **Type Safety First**
-
-- Drizzle ORM provides compile-time type safety
-- All queries are type-checked
-- Schema changes automatically update types
-- Runtime validation through ORM
-
-### **Multi-Tenant Architecture**
-
-- Row Level Security for data isolation
-- Tenant-scoped operations
-- Company-level data segregation
-- User context validation
-
-### **Performance Optimization**
-
-- Strategic indexing for common queries
-- Optimized for reporting operations
-- Connection pooling
-- Query optimization
-
-### **Data Integrity**
-
-- Foreign key constraints
-- Business rule enforcement
-- Audit trail maintenance
-- Idempotency support
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+- [](README.md)
+- [adapter](adapter/README.md)
+- [schema](schema/README.md)
+- [types](types/README.md)

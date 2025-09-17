@@ -4,413 +4,586 @@
 
 [AI-BOS Accounts API Documentation (Source)](../../README.md) / @aibos/contracts
 
-# Contracts — API Contracts & Type Definitions
+# DOC-288: Documentation
 
-> **TL;DR**: Contract-first API definitions using Zod schemas for type safety, validation, and
-> documentation. Covers D2 AR invoices, D4 financial reports, journal entries, attachments, and
-> events.  
-> **Owner**: @aibos/contracts-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/contracts
 
-**Does**:
+TypeScript type definitions and contracts for the AI-BOS Accounting SaaS platform.
 
-- Defines API contracts using Zod schemas for type safety
-- Provides request/response type definitions for all API endpoints
-- Implements D2 AR invoice contracts with GL integration
-- Covers D4 financial reporting contracts (trial balance, balance sheet, P&L, cash flow)
-- Defines journal entry contracts with validation rules
-- Provides attachment system contracts with OCR and approval workflows
-- Includes event contracts for system integration
-- Exports TypeScript types for compile-time safety
-
-**Does NOT**:
-
-- Implement business logic (delegated to @aibos/accounting)
-- Handle database operations (delegated to @aibos/db)
-- Provide API endpoints (implemented by @aibos/web-api)
-- Manage authentication (delegated to @aibos/auth)
-
-**Consumers**: @aibos/web-api, @aibos/web, @aibos/accounting, @aibos/worker
-
-## 2) Quick Links
-
-- **Invoice Contracts**: `src/invoice.ts`
-- **Journal Contracts**: `src/journal.ts`
-- **Report Contracts**: `src/reports.ts`
-- **Attachment Contracts**: `src/attachments.ts`
-- **Event Contracts**: `src/events.ts`
-- **Enums**: `src/enums.ts`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the package
-pnpm build
-
-# Watch mode for development
-pnpm dev
-
-# Run linting
-pnpm lint
+pnpm add @aibos/contracts
 ```
 
-## 4) Architecture & Dependencies
+## Core Features
 
-**Dependencies**:
+- **Type Definitions**: Comprehensive TypeScript types
+- **API Contracts**: Request/response type definitions
+- **Database Schema**: Database table and column types
+- **Validation Schemas**: Zod validation schemas
+- **Shared Interfaces**: Common interfaces across packages
+- **Type Safety**: End-to-end type safety
+- **Documentation**: Self-documenting code with types
 
-- `zod` - Schema validation and type inference
-
-**Dependents**:
-
-- `@aibos/web-api` - API endpoint implementations
-- `@aibos/web` - Frontend type safety
-- `@aibos/accounting` - Business logic type safety
-- `@aibos/worker` - Background job type safety
-
-**Build Order**: No dependencies, can be built independently
-
-## 5) Development Workflow
-
-**Local Dev**:
-
-```bash
-# Build with watch mode
-pnpm dev
-
-# Check types
-pnpm build
-```
-
-**Testing**:
-
-```bash
-# Run contract validation tests
-pnpm test
-
-# Test specific contract
-pnpm test --grep "invoice"
-```
-
-**Linting**:
-
-```bash
-# Check for linting errors
-pnpm lint
-
-# Auto-fix where possible
-pnpm lint --fix
-```
-
-**Type Checking**:
-
-```bash
-# TypeScript compilation check
-pnpm build
-```
-
-## 6) API Surface
-
-**Exports**:
-
-- Zod schemas for all API contracts
-- TypeScript types inferred from schemas
-- Request/response validation functions
-- Enum definitions for constants
-
-**Public Types**:
-
-- Request types (e.g., `TCreateInvoiceReq`)
-- Response types (e.g., `TCreateInvoiceRes`)
-- Event types (e.g., `TInvoiceApprovedEvt`)
-- Enum types (e.g., `Currency`, `AttachmentCategory`)
-
-**Configuration**:
-
-- Schema validation rules
-- Type inference configuration
-- Export/import structure
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <100KB for all contracts
-- Optimized for tree-shaking
-- Minimal dependencies for fast loading
-
-**Performance Budget**:
-
-- Schema validation: <1ms per request
-- Type inference: <0.1ms per compilation
-- Bundle size: <100KB total
-
-**Monitoring**:
-
-- Schema validation performance
-- Type safety coverage
-- Contract usage analytics
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- No sensitive data in contracts
-- Input validation through schemas
-- Type safety for all operations
-
-**Data Handling**:
-
-- Immutable contract definitions
-- Schema-based validation
-- Type-safe data structures
-
-**Compliance**:
-
-- Contract versioning for API stability
-- Backward compatibility maintenance
-- Audit trail for contract changes
-
-## 9) Core Modules
-
-### **Invoice Contracts (`invoice.ts`)**
-
-- `CreateInvoiceReq/Res` - Invoice creation
-- `PostInvoiceReq/Res` - Invoice to GL posting
-- `GetInvoiceRes` - Invoice retrieval
-- `ListInvoicesReq/Res` - Invoice listing
-- `CreateCustomerReq/Res` - Customer management
-
-### **Journal Contracts (`journal.ts`)**
-
-- `PostJournalReq/Res` - Journal entry posting
-- `CreateJournalReq/Res` - Journal creation
-- `JournalLine` - Journal line item schema
-- `PostingErrorRes` - Error response schema
-
-### **Report Contracts (`reports.ts`)**
-
-- `TrialBalanceReq/Res` - Trial balance reports
-- `BalanceSheetReq/Res` - Balance sheet reports
-- `ProfitLossReq/Res` - P&L statements
-- `CashFlowReq/Res` - Cash flow statements
-- `ReportExportReq/Res` - Report export functionality
-
-### **Attachment Contracts (`attachments.ts`)**
-
-- `UploadAttachmentReq/Res` - File upload
-- `GetAttachmentReq/Res` - Attachment retrieval
-- `ListAttachmentsReq/Res` - Attachment listing
-- `ProcessOCRReq/Res` - OCR processing
-- `DocumentApprovalReq/Res` - Approval workflows
-- `RetentionPolicyReq/Res` - Document retention
-
-### **Event Contracts (`events.ts`)**
-
-- `InvoiceApprovedEvt` - Invoice approval events
-- Event schemas for system integration
-
-### **Enums (`enums.ts`)**
-
-- `CurrencyEnum` - Supported currencies
-- Currency type definitions
-
-## 10) Contract Design Principles
-
-### **Contract-First Development**
-
-- All APIs defined as contracts first
-- Implementation follows contract definitions
-- Type safety enforced at compile time
-- Runtime validation through Zod schemas
-
-### **Schema Validation**
-
-- All inputs validated through Zod schemas
-- Comprehensive error messages
-- Type inference for TypeScript
-- Runtime type safety
-
-### **Versioning Strategy**
-
-- Backward compatibility maintained
-- New fields added as optional
-- Breaking changes require major version bump
-- Deprecation notices for old contracts
-
-### **Documentation**
-
-- Self-documenting through Zod schemas
-- Type definitions serve as documentation
-- Examples in schema descriptions
-- Clear error messages for validation
-
-## 11) Usage Examples
-
-### **Invoice Creation**
+## Quick Start
 
 ```typescript
-import { CreateInvoiceReq, CreateInvoiceRes } from "@aibos/contracts";
+import { 
+  Invoice, 
+  Bill, 
+  Payment, 
+  User, 
+  Tenant,
+  CreateInvoiceRequest,
+  CreateInvoiceResponse
+} from "@aibos/contracts";
 
-// Validate request
-const request = CreateInvoiceReq.parse({
-  tenantId: "uuid",
-  companyId: "uuid",
-  customerId: "uuid",
+// Use types
+const invoice: Invoice = {
+  id: "inv_001",
+  tenantId: "tenant_123",
+  companyId: "company_123",
+  customerId: "customer_123",
+  invoiceNumber: "INV-001",
+  invoiceDate: new Date("2024-01-01"),
+  dueDate: new Date("2024-01-31"),
+  totalAmount: 1000,
+  currency: "USD",
+  status: "draft",
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
+// Use request/response types
+const createInvoiceRequest: CreateInvoiceRequest = {
+  tenantId: "tenant_123",
+  companyId: "company_123",
+  customerId: "customer_123",
   invoiceNumber: "INV-001",
   invoiceDate: "2024-01-01",
   dueDate: "2024-01-31",
-  currency: "MYR",
+  currency: "USD",
   lines: [
     {
-      lineNumber: 1,
-      description: "Product A",
+      accountId: "acc_001",
+      description: "Services rendered",
       quantity: 1,
-      unitPrice: 100.0,
-      revenueAccountId: "uuid",
-    },
-  ],
-});
-
-// Type-safe response
-const response: CreateInvoiceRes = {
-  id: "uuid",
-  invoiceNumber: "INV-001",
-  // ... other fields
+      unitPrice: 1000,
+      taxRate: 0.1
+    }
+  ]
 };
 ```
 
-### **Journal Posting**
+## Core Types
+
+### User Types
 
 ```typescript
-import { PostJournalReq, PostJournalRes } from "@aibos/contracts";
+import { User, UserRole, UserStatus } from "@aibos/contracts";
 
-const journalRequest = PostJournalReq.parse({
-  journalNumber: "JE-001",
-  description: "Monthly adjustment",
-  journalDate: "2024-01-01T00:00:00Z",
-  currency: "MYR",
-  lines: [
-    { accountId: "uuid", debit: 100.0, credit: 0 },
-    { accountId: "uuid", debit: 0, credit: 100.0 },
-  ],
-  idempotencyKey: "uuid",
+// User interface
+interface User {
+  id: string;
+  tenantId: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  status: UserStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// User enums
+enum UserRole {
+  ADMIN = "admin",
+  USER = "user",
+  VIEWER = "viewer"
+}
+
+enum UserStatus {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  SUSPENDED = "suspended"
+}
+```
+
+### Tenant Types
+
+```typescript
+import { Tenant, TenantStatus, TenantSettings } from "@aibos/contracts";
+
+// Tenant interface
+interface Tenant {
+  id: string;
+  name: string;
+  domain: string;
+  status: TenantStatus;
+  settings: TenantSettings;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Tenant settings
+interface TenantSettings {
+  maxUsers: number;
+  features: string[];
+  billing: {
+    plan: string;
+    status: string;
+  };
+}
+```
+
+### Accounting Types
+
+```typescript
+import { 
+  Invoice, 
+  InvoiceLine, 
+  InvoiceStatus,
+  Bill,
+  BillLine,
+  BillStatus,
+  Payment,
+  PaymentStatus
+} from "@aibos/contracts";
+
+// Invoice types
+interface Invoice {
+  id: string;
+  tenantId: string;
+  companyId: string;
+  customerId: string;
+  invoiceNumber: string;
+  invoiceDate: Date;
+  dueDate: Date;
+  totalAmount: number;
+  currency: string;
+  status: InvoiceStatus;
+  lines: InvoiceLine[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface InvoiceLine {
+  id: string;
+  accountId: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  taxRate: number;
+  lineTotal: number;
+}
+
+enum InvoiceStatus {
+  DRAFT = "draft",
+  SENT = "sent",
+  PAID = "paid",
+  OVERDUE = "overdue",
+  CANCELLED = "cancelled"
+}
+```
+
+## API Contracts
+
+### Request Types
+
+```typescript
+import { 
+  CreateInvoiceRequest,
+  UpdateInvoiceRequest,
+  CreateBillRequest,
+  UpdateBillRequest,
+  CreatePaymentRequest,
+  UpdatePaymentRequest
+} from "@aibos/contracts";
+
+// Create invoice request
+interface CreateInvoiceRequest {
+  tenantId: string;
+  companyId: string;
+  customerId: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  currency: string;
+  lines: CreateInvoiceLineRequest[];
+}
+
+interface CreateInvoiceLineRequest {
+  accountId: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  taxRate: number;
+}
+
+// Update invoice request
+interface UpdateInvoiceRequest {
+  invoiceNumber?: string;
+  invoiceDate?: string;
+  dueDate?: string;
+  currency?: string;
+  status?: InvoiceStatus;
+  lines?: UpdateInvoiceLineRequest[];
+}
+```
+
+### Response Types
+
+```typescript
+import { 
+  CreateInvoiceResponse,
+  GetInvoicesResponse,
+  GetInvoiceResponse,
+  UpdateInvoiceResponse,
+  DeleteInvoiceResponse
+} from "@aibos/contracts";
+
+// Create invoice response
+interface CreateInvoiceResponse {
+  success: boolean;
+  data: Invoice;
+  message: string;
+}
+
+// Get invoices response
+interface GetInvoicesResponse {
+  success: boolean;
+  data: Invoice[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// Get invoice response
+interface GetInvoiceResponse {
+  success: boolean;
+  data: Invoice;
+}
+```
+
+## Database Schema Types
+
+### Table Types
+
+```typescript
+import { 
+  TenantsTable,
+  CompaniesTable,
+  UsersTable,
+  InvoicesTable,
+  BillsTable,
+  PaymentsTable
+} from "@aibos/contracts";
+
+// Database table types
+interface TenantsTable {
+  id: string;
+  name: string;
+  domain: string;
+  status: string;
+  settings: any;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface InvoicesTable {
+  id: string;
+  tenant_id: string;
+  company_id: string;
+  customer_id: string;
+  invoice_number: string;
+  invoice_date: Date;
+  due_date: Date;
+  total_amount: number;
+  currency: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}
+```
+
+### Query Types
+
+```typescript
+import { 
+  QueryOptions,
+  PaginationOptions,
+  SortOptions,
+  FilterOptions
+} from "@aibos/contracts";
+
+// Query options
+interface QueryOptions {
+  pagination?: PaginationOptions;
+  sort?: SortOptions;
+  filters?: FilterOptions;
+}
+
+interface PaginationOptions {
+  page: number;
+  limit: number;
+}
+
+interface SortOptions {
+  field: string;
+  direction: "asc" | "desc";
+}
+
+interface FilterOptions {
+  [key: string]: any;
+}
+```
+
+## Validation Schemas
+
+### Zod Schemas
+
+```typescript
+import { 
+  invoiceSchema,
+  billSchema,
+  paymentSchema,
+  userSchema,
+  tenantSchema
+} from "@aibos/contracts";
+
+// Invoice validation schema
+const invoiceSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string().uuid(),
+  companyId: z.string().uuid(),
+  customerId: z.string().uuid(),
+  invoiceNumber: z.string().min(1).max(50),
+  invoiceDate: z.date(),
+  dueDate: z.date(),
+  totalAmount: z.number().positive(),
+  currency: z.string().length(3),
+  status: z.enum(["draft", "sent", "paid", "overdue", "cancelled"]),
+  lines: z.array(invoiceLineSchema),
+  createdAt: z.date(),
+  updatedAt: z.date()
+});
+
+// Create invoice request schema
+const createInvoiceRequestSchema = z.object({
+  tenantId: z.string().uuid(),
+  companyId: z.string().uuid(),
+  customerId: z.string().uuid(),
+  invoiceNumber: z.string().min(1).max(50),
+  invoiceDate: z.string().datetime(),
+  dueDate: z.string().datetime(),
+  currency: z.string().length(3),
+  lines: z.array(createInvoiceLineRequestSchema)
 });
 ```
 
-### **Report Generation**
+### Validation Functions
 
 ```typescript
-import { TrialBalanceReq, TrialBalanceRes } from "@aibos/contracts";
+import { 
+  validateInvoice,
+  validateBill,
+  validatePayment,
+  validateUser,
+  validateTenant
+} from "@aibos/contracts";
 
-const reportRequest = TrialBalanceReq.parse({
-  tenantId: "uuid",
-  companyId: "uuid",
-  asOfDate: "2024-01-01T00:00:00Z",
-  includePeriodActivity: true,
-  currency: "MYR",
-});
+// Validate invoice
+const validation = validateInvoice(invoiceData);
+
+if (!validation.success) {
+  console.error("Validation failed:", validation.errors);
+}
+
+// Validate create request
+const requestValidation = validateCreateInvoiceRequest(requestData);
+
+if (!requestValidation.success) {
+  console.error("Request validation failed:", requestValidation.errors);
+}
 ```
 
-## 12) Troubleshooting
+## Shared Interfaces
 
-**Common Issues**:
+### Common Interfaces
 
-- **Validation Errors**: Check schema requirements and data types
-- **Type Errors**: Ensure proper TypeScript types are imported
-- **Schema Mismatches**: Verify contract versions match implementation
-- **Missing Fields**: Check required vs optional fields in schemas
+```typescript
+import { 
+  BaseEntity,
+  TimestampedEntity,
+  TenantEntity,
+  AuditableEntity
+} from "@aibos/contracts";
 
-**Debug Mode**:
+// Base entity interface
+interface BaseEntity {
+  id: string;
+}
+
+// Timestamped entity interface
+interface TimestampedEntity extends BaseEntity {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Tenant entity interface
+interface TenantEntity extends TimestampedEntity {
+  tenantId: string;
+}
+
+// Auditable entity interface
+interface AuditableEntity extends TenantEntity {
+  createdBy: string;
+  updatedBy: string;
+}
+```
+
+### Error Interfaces
+
+```typescript
+import { 
+  ApiError,
+  ValidationError,
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError
+} from "@aibos/contracts";
+
+// API error interface
+interface ApiError {
+  code: string;
+  message: string;
+  details?: any;
+  timestamp: Date;
+}
+
+// Validation error interface
+interface ValidationError extends ApiError {
+  field: string;
+  value: any;
+  constraint: string;
+}
+
+// Authentication error interface
+interface AuthenticationError extends ApiError {
+  reason: "invalid_token" | "expired_token" | "missing_token";
+}
+```
+
+## Configuration
+
+### Type Configuration
+
+```typescript
+const typeConfig = {
+  strict: true,
+  noImplicitAny: true,
+  strictNullChecks: true,
+  strictFunctionTypes: true,
+  noImplicitReturns: true,
+  noFallthroughCasesInSwitch: true,
+  noUncheckedIndexedAccess: true
+};
+```
+
+### Validation Configuration
+
+```typescript
+const validationConfig = {
+  strict: true,
+  abortEarly: false,
+  allowUnknown: false,
+  stripUnknown: true
+};
+```
+
+## Testing
 
 ```bash
-# Enable detailed validation logging
-DEBUG=zod pnpm test
+# Run contract tests
+pnpm test
 
-# Test specific schema validation
-pnpm test --grep "CreateInvoiceReq"
+# Run tests with coverage
+pnpm test:coverage
+
+# Run type checking
+pnpm typecheck
 ```
 
-**Logs**:
+## Dependencies
 
-- Schema validation error details
-- Type inference warnings
-- Contract usage metrics
-- Validation performance metrics
+- **typescript**: TypeScript compiler
+- **zod**: Runtime validation
+- **@types/node**: Node.js types
 
-## 13) Contributing
+## Performance Considerations
 
-**Code Style**:
+- **Type Compilation**: Types are compiled for performance
+- **Tree Shaking**: Unused types are eliminated
+- **Bundle Size**: Minimal runtime impact
+- **Validation**: Efficient validation schemas
 
-- Follow Zod best practices
-- Use descriptive schema names
-- Include comprehensive validation rules
-- Maintain backward compatibility
+## Security
 
-**Testing**:
+- **Type Safety**: Prevents runtime type errors
+- **Input Validation**: Validates all inputs
+- **Schema Validation**: Ensures data integrity
+- **Type Guards**: Runtime type checking
 
-- Write validation tests for all schemas
-- Test edge cases and error scenarios
-- Validate type inference works correctly
-- Test backward compatibility
+## Error Handling
 
-**Review Process**:
+```typescript
+import { 
+  ContractError, 
+  ValidationError, 
+  TypeError 
+} from "@aibos/contracts";
 
-- All changes must maintain type safety
-- Breaking changes require major version bump
-- Schema changes need implementation updates
-- Documentation must be updated
+try {
+  const result = validateInvoice(invoiceData);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    // Handle validation errors
+    console.error("Validation failed:", error.details);
+  } else if (error instanceof TypeError) {
+    // Handle type errors
+    console.error("Type error:", error.message);
+  } else if (error instanceof ContractError) {
+    // Handle contract errors
+    console.error("Contract error:", error.message);
+  }
+}
+```
 
----
+## Contributing
 
-## 📚 **Additional Resources**
+1. Follow the coding standards
+2. Add tests for new types
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
 
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [Web API Package](../apps/web-api/README.md)
-- [Accounting Package](../packages/accounting/README.md)
+## License
 
----
+MIT License - see LICENSE file for details.
 
-## 🔗 **Contract Principles**
+## Modules
 
-### **Type Safety First**
-
-- All contracts use Zod for validation
-- TypeScript types inferred from schemas
-- Compile-time type checking
-- Runtime validation enforcement
-
-### **Contract Stability**
-
-- Backward compatibility maintained
-- Versioning strategy for changes
-- Deprecation notices for old contracts
-- Clear migration paths
-
-### **Documentation as Code**
-
-- Schemas serve as documentation
-- Self-documenting through types
-- Examples in schema descriptions
-- Clear error messages
-
-### **Validation & Error Handling**
-
-- Comprehensive input validation
-- Clear error messages
-- Type-safe error responses
-- Graceful degradation
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+- [](README.md)
+- [db/period](db/period/README.md)
+- [types](types/README.md)

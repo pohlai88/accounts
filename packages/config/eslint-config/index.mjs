@@ -7,7 +7,13 @@ export default [
   js.configs.recommended,
   {
     files: ["**/*.{js,ts,tsx}"],
-    ignores: ["**/*.config.*", "**/vitest.config.*", "**/jest.config.*", "**/playwright.config.*"],
+    ignores: [
+      "**/*.config.*",
+      "**/vitest.config.*",
+      "**/jest.config.*",
+      "**/playwright.config.*",
+      "scripts/**/*.js" // Exclude plain Node.js scripts from TypeScript parsing
+    ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

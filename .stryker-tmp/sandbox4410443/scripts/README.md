@@ -1,3 +1,14 @@
+# DOC-099: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Scripts Directory
 
 This directory contains all automation scripts organized by purpose for better maintainability and

@@ -1,3 +1,14 @@
+# DOC-244: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Reports — Financial Reporting Module
 
 > **TL;DR**: D4 Financial reporting engine generating Trial Balance, Balance Sheet, P&L, and Cash

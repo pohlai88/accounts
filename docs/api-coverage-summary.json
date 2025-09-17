@@ -1,0 +1,159 @@
+{
+  "overall": 22.51082251082251,
+  "documented": 156,
+  "total": 693,
+  "breakdown": {
+    "functions": {
+      "total": 356,
+      "documented": 136
+    },
+    "classes": {
+      "total": 40,
+      "documented": 4
+    },
+    "interfaces": {
+      "total": 201,
+      "documented": 3
+    },
+    "enums": {
+      "total": 1,
+      "documented": 0
+    },
+    "typeAliases": {
+      "total": 3,
+      "documented": 0
+    },
+    "variables": {
+      "total": 92,
+      "documented": 13
+    }
+  },
+  "missing": [
+    {
+      "name": "accounting/src :: BillPostingInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: BillLineInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: BillPostingResult",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: BillPostingError",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentProcessingInputEnhanced",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: BankChargeInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: WithholdingTaxInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentAllocationInputEnhanced",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentProcessingResultEnhanced",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentProcessingErrorEnhanced",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentProcessingInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentAllocationInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentProcessingResult",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: PaymentProcessingError",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: InvoicePostingInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: InvoiceLineInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: TaxLineInput",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: InvoicePostingResult",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: InvoicePostingError",
+      "bucket": "interfaces"
+    },
+    {
+      "name": "accounting/src :: MatchCandidate",
+      "bucket": "interfaces"
+    }
+  ],
+  "perPackage": {
+    "accounting/src": {
+      "documented": 43,
+      "total": 118
+    },
+    "auth/src": {
+      "documented": 0,
+      "total": 25
+    },
+    "cache/src": {
+      "documented": 0,
+      "total": 16
+    },
+    "db/src": {
+      "documented": 27,
+      "total": 96
+    },
+    "monitoring/src": {
+      "documented": 0,
+      "total": 24
+    },
+    "realtime/src": {
+      "documented": 2,
+      "total": 26
+    },
+    "security/src": {
+      "documented": 4,
+      "total": 25
+    },
+    "tokens/src": {
+      "documented": 5,
+      "total": 8
+    },
+    "ui/src": {
+      "documented": 1,
+      "total": 141
+    },
+    "utils/src": {
+      "documented": 74,
+      "total": 214
+    }
+  },
+  "threshold": 85,
+  "passed": false,
+  "timestamp": "2025-09-17T08:56:45.038Z",
+  "gitRevision": "48103fb36d28b2b9bfb33472b6de2f719773cde9"
+}

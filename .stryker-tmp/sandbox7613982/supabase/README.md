@@ -1,3 +1,14 @@
+# DOC-271: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Supabase — Database Configuration & Local Development
 
 > **TL;DR**: Supabase configuration and local development setup for AI-BOS Accounts, including

@@ -1,3 +1,14 @@
+# DOC-201: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Auth — Authentication & Authorization
 
 > **TL;DR**: Comprehensive RBAC + ABAC + Feature Flag system with SoD compliance, governance packs,

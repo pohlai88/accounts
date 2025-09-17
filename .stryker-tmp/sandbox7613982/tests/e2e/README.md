@@ -1,3 +1,14 @@
+# DOC-275: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # E2E Tests — End-to-End Testing Suite
 
 > **TL;DR**: Comprehensive end-to-end testing suite for D2 AR, D4 financial reporting, journal

@@ -1,502 +1,490 @@
-# UI — Component Library & Design System
+# DOC-295: Documentation
 
-> **TL;DR**: Steve Jobs-inspired React component library with dual-mode design system, comprehensive
-> accounting workflows, and WCAG 2.2 AAA accessibility compliance.  
-> **Owner**: @aibos/ui-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/ui
 
-**Does**:
+React component library with comprehensive design system and accessibility compliance for the AI-BOS Accounting SaaS platform.
 
-- Provides comprehensive React component library
-- Implements dual-mode design system (aesthetic + accessibility)
-- Delivers complete accounting workflow components (AR, AP, GL, reporting)
-- Enforces WCAG 2.2 AAA compliance in accessibility mode
-- Maintains Steve Jobs-inspired design philosophy
-- Uses semantic tokens for consistent styling
-- Provides mobile-first, responsive components
-
-**Does NOT**:
-
-- Implement business logic (delegated to @aibos/accounting)
-- Handle API calls (delegated to @aibos/web-api)
-- Manage authentication (delegated to @aibos/auth)
-- Store data (delegated to @aibos/db)
-
-**Consumers**: @aibos/web, @aibos/web-api, all frontend applications
-
-## 2) Quick Links
-
-- **Component Index**: `src/components/index.ts`
-- **Design Guidelines**: `DESIGN_GUIDELINES.md`
-- **Core Components**: `src/Button.tsx`, `src/Card.tsx`, `src/Input.tsx`
-- **Typography**: `src/components/typography/Typography.tsx`
-- **Theme System**: `src/components/theme/ThemeProvider.tsx`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the package
-pnpm build
-
-# Lint
-pnpm lint
+pnpm add @aibos/ui
 ```
 
-## 4) Architecture & Dependencies
+## Core Features
 
-**Dependencies**:
+- **Design System**: Semantic tokens, consistent API, theme support
+- **Accessibility**: WCAG 2.2 AAA compliance, screen reader support
+- **Business Components**: Invoice, bill, payment, and reporting components
+- **Performance**: Web Vitals integration, error boundaries, offline support
+- **Responsive**: Mobile-first design with breakpoint system
 
-- `react` - React framework
-- `@radix-ui/react-slot` - Radix UI primitives
-- `class-variance-authority` - Component variant management
-- `clsx` - Conditional class names
-- `tailwind-merge` - Tailwind class merging
-- `lucide-react` - Icon library
-- `@aibos/auth` - Authentication utilities
-- `@aibos/utils` - Shared utilities
-- `@aibos/tokens` - Design tokens
+## Quick Start
 
-**Dependents**:
+```typescript
+import { 
+  Button, 
+  Card, 
+  Input, 
+  InvoiceForm,
+  ErrorBoundary,
+  AccessibilityProvider
+} from "@aibos/ui";
 
-- `@aibos/web` - Frontend application
-- `@aibos/web-api` - API application
-- All frontend applications requiring UI components
+// Basic components
+<Button variant="primary">Create Invoice</Button>
+<Card>
+  <CardHeader>
+    <CardTitle>Invoice Details</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Input label="Customer Name" required />
+  </CardContent>
+</Card>
 
-**Build Order**: Depends on @aibos/tokens, @aibos/auth, @aibos/utils
+// Business components
+<InvoiceForm
+  onSubmit={handleSubmit}
+  onCancel={handleCancel}
+/>
 
-## 5) Development Workflow
+// Error handling
+<ErrorBoundary fallback={<ErrorFallback />}>
+  <YourComponent />
+</ErrorBoundary>
 
-**Local Dev**:
+// Accessibility
+<AccessibilityProvider>
+  <App />
+</AccessibilityProvider>
+```
+
+## Component Categories
+
+### Core Components
+- `Button`, `Card`, `Input`, `Badge`, `Alert`, `Label`
+- `Modal`, `Drawer`, `Toast`, `LoadingSpinner`
+- `Table`, `DataTable`, `Pagination`, `Tabs`
+
+### Business Components
+- `InvoiceForm`, `BillWorkflow`, `PaymentProcessing`
+- `ChartOfAccounts`, `TrialBalance`, `FinancialReports`
+- `UserManagement`, `TenantOnboarding`
+
+### Common Components
+- `ErrorBoundary`, `AccessibilityProvider`, `ResponsiveProvider`
+- `OfflineIndicator`, `PerformanceMonitor`
+
+## Hooks
+
+```typescript
+import { 
+  useAuth,
+  useAccessibility,
+  useResponsive,
+  useErrorHandler,
+  usePerformance
+} from "@aibos/ui";
+
+const { user, login, logout } = useAuth();
+const { preferences, updatePreference } = useAccessibility();
+const { breakpoint, isMobile } = useResponsive();
+```
+
+## Design System
+
+### Color Tokens
+
+```typescript
+import { colors } from "@aibos/ui";
+
+// Background colors
+colors.bg.base        // #000000 - Pure black
+colors.bg.elevated    // #1A1A1A - Cards, modals
+colors.bg.muted       // #2A2A2A - Subtle backgrounds
+
+// Text colors
+colors.fg.default     // #FFFFFF - Primary text
+colors.fg.muted       // #8A8A8A - Secondary text
+colors.fg.subtle      // #6A8A8A - Tertiary text
+
+// AI Brand colors
+colors.ai.solid       // #0056CC - Primary actions
+colors.ai.muted       // #007AFF - Secondary elements
+colors.ai.subtle      // rgba(0, 122, 255, 0.1) - Subtle backgrounds
+```
+
+### Typography Scale
+
+```typescript
+import { typography } from "@aibos/ui";
+
+// Font sizes
+typography.size.xl    // 2.25rem - Hero headings
+typography.size.lg    // 1.875rem - Section headers
+typography.size.md    // 1.5rem - Subsection headers
+typography.size.base  // 1rem - Standard body text
+typography.size.sm    // 0.875rem - Supporting information
+
+// Font weights
+typography.weight.normal   // 400 - Body text
+typography.weight.medium   // 500 - Emphasized text
+typography.weight.semibold // 600 - Headings
+typography.weight.bold     // 700 - Hero text
+```
+
+### Spacing System
+
+```typescript
+import { spacing } from "@aibos/ui";
+
+spacing.xs  // 0.25rem - 4px - minimal spacing
+spacing.sm  // 0.5rem - 8px - small spacing
+spacing.md  // 1rem - 16px - standard spacing
+spacing.lg  // 1.5rem - 24px - large spacing
+spacing.xl  // 2rem - 32px - extra large spacing
+```
+
+## Component Examples
+
+### Button Component
+
+```typescript
+import { Button } from "@aibos/ui";
+
+// Primary button
+<Button variant="primary" size="md">
+  Create Invoice
+</Button>
+
+// Secondary button
+<Button variant="secondary" size="sm">
+  Cancel
+</Button>
+
+// Destructive button
+<Button variant="destructive" size="lg">
+  Delete Invoice
+</Button>
+
+// Loading state
+<Button variant="primary" loading>
+  Processing...
+</Button>
+```
+
+### Card Component
+
+```typescript
+import { Card, CardHeader, CardContent, CardFooter } from "@aibos/ui";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Invoice Details</CardTitle>
+    <CardDescription>
+      Create a new invoice for your customer
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    <InvoiceForm onSubmit={handleSubmit} />
+  </CardContent>
+  <CardFooter>
+    <Button variant="primary">Save Invoice</Button>
+    <Button variant="secondary">Cancel</Button>
+  </CardFooter>
+</Card>
+```
+
+### Input Component
+
+```typescript
+import { Input, Label } from "@aibos/ui";
+
+<div className="space-y-2">
+  <Label htmlFor="customer-name">Customer Name</Label>
+  <Input
+    id="customer-name"
+    placeholder="Enter customer name"
+    required
+    error={errors.customerName}
+  />
+</div>
+```
+
+### DataTable Component
+
+```typescript
+import { DataTable } from "@aibos/ui";
+
+const columns = [
+  { key: "id", label: "ID" },
+  { key: "customer", label: "Customer" },
+  { key: "amount", label: "Amount" },
+  { key: "status", label: "Status" }
+];
+
+<DataTable
+  data={invoices}
+  columns={columns}
+  onRowClick={handleRowClick}
+  pagination={{
+    pageSize: 10,
+    total: invoices.length
+  }}
+/>
+```
+
+## Business Components
+
+### InvoiceForm
+
+```typescript
+import { InvoiceForm } from "@aibos/ui";
+
+<InvoiceForm
+  onSubmit={handleSubmit}
+  onCancel={handleCancel}
+  initialData={invoiceData}
+  validationSchema={invoiceSchema}
+  loading={isSubmitting}
+/>
+```
+
+### BillWorkflow
+
+```typescript
+import { BillWorkflow } from "@aibos/ui";
+
+<BillWorkflow
+  billId={billId}
+  onStatusChange={handleStatusChange}
+  onApproval={handleApproval}
+  onRejection={handleRejection}
+/>
+```
+
+### PaymentProcessing
+
+```typescript
+import { PaymentProcessing } from "@aibos/ui";
+
+<PaymentProcessing
+  paymentId={paymentId}
+  onAllocation={handleAllocation}
+  onCompletion={handleCompletion}
+/>
+```
+
+## Accessibility Features
+
+### Screen Reader Support
+
+```typescript
+import { AccessibilityProvider } from "@aibos/ui";
+
+<AccessibilityProvider
+  screenReader={true}
+  highContrast={false}
+  reducedMotion={false}
+>
+  <App />
+</AccessibilityProvider>
+```
+
+### Keyboard Navigation
+
+```typescript
+import { useKeyboardNavigation } from "@aibos/ui";
+
+const { navigate, focusNext, focusPrevious } = useKeyboardNavigation();
+
+// Handle keyboard navigation
+useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Tab") {
+      focusNext();
+    } else if (event.key === "Shift+Tab") {
+      focusPrevious();
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+  return () => document.removeEventListener("keydown", handleKeyDown);
+}, []);
+```
+
+## Performance Optimization
+
+### Error Boundaries
+
+```typescript
+import { ErrorBoundary } from "@aibos/ui";
+
+<ErrorBoundary
+  fallback={<ErrorFallback />}
+  onError={(error, errorInfo) => {
+    console.error("Component error:", error, errorInfo);
+  }}
+>
+  <YourComponent />
+</ErrorBoundary>
+```
+
+### Performance Monitoring
+
+```typescript
+import { PerformanceMonitor } from "@aibos/ui";
+
+<PerformanceMonitor
+  onMetric={(metric) => {
+    console.log("Performance metric:", metric);
+  }}
+>
+  <YourComponent />
+</PerformanceMonitor>
+```
+
+## Responsive Design
+
+### Breakpoint System
+
+```typescript
+import { useResponsive } from "@aibos/ui";
+
+const { breakpoint, isMobile, isTablet, isDesktop } = useResponsive();
+
+// Conditional rendering based on screen size
+{isMobile ? (
+  <MobileInvoiceForm />
+) : (
+  <DesktopInvoiceForm />
+)}
+```
+
+### Responsive Components
+
+```typescript
+import { ResponsiveProvider } from "@aibos/ui";
+
+<ResponsiveProvider
+  breakpoints={{
+    mobile: 768,
+    tablet: 1024,
+    desktop: 1280
+  }}
+>
+  <App />
+</ResponsiveProvider>
+```
+
+## Configuration
+
+### Theme Configuration
+
+```typescript
+import { ThemeProvider } from "@aibos/ui";
+
+<ThemeProvider
+  theme={{
+    colors: {
+      primary: "#007AFF",
+      secondary: "#0056CC"
+    },
+    spacing: {
+      base: 16
+    }
+  }}
+>
+  <App />
+</ThemeProvider>
+```
+
+### Feature Flags
+
+```typescript
+import { FeatureProvider } from "@aibos/ui";
+
+<FeatureProvider
+  features={{
+    darkMode: true,
+    animations: true,
+    offlineMode: false
+  }}
+>
+  <App />
+</FeatureProvider>
+```
+
+## Testing
 
 ```bash
-# Build with watch mode
-pnpm build --watch
+# Run component tests
+pnpm test
 
-# Type check
-pnpm typecheck
+# Run tests with coverage
+pnpm test:coverage
+
+# Run visual regression tests
+pnpm test:visual
 ```
 
-**Testing**:
+## Dependencies
 
-```bash
-# Lint checking
-pnpm lint
+- **@aibos/tokens**: Design tokens and theming
+- **@aibos/utils**: Shared utilities
+- **@aibos/auth**: Authentication context
+- **@heroicons/react**: Icon library
+- **@radix-ui/react-slot**: Primitive components
+- **class-variance-authority**: Component variants
+- **clsx**: Conditional class names
+- **lucide-react**: Additional icons
+- **tailwind-merge**: Tailwind class merging
+- **web-vitals**: Performance monitoring
+- **zustand**: State management
 
-# Type checking
-pnpm typecheck
+## Performance Considerations
+
+- **Code Splitting**: Components are code-split for optimal loading
+- **Tree Shaking**: Unused components are eliminated from bundles
+- **Memoization**: Expensive components use React.memo
+- **Virtual Scrolling**: Large lists use virtual scrolling
+- **Lazy Loading**: Images and heavy components are lazy-loaded
+
+## Security
+
+- **XSS Protection**: All user inputs are sanitized
+- **CSRF Protection**: Forms include CSRF tokens
+- **Content Security Policy**: Strict CSP headers
+- **Input Validation**: All inputs are validated with Zod
+
+## Error Handling
+
+```typescript
+import { ErrorHandler } from "@aibos/ui";
+
+const errorHandler = new ErrorHandler({
+  onError: (error, context) => {
+    console.error("UI Error:", error, context);
+  },
+  fallback: <ErrorFallback />
+});
 ```
 
-**Linting**:
+## Contributing
 
-```bash
-# Check for linting errors
-pnpm lint
+1. Follow the coding standards
+2. Add tests for new components
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
 
-# Auto-fix where possible
-pnpm lint --fix
-```
+## License
 
-**Type Checking**:
-
-```bash
-# TypeScript compilation check
-pnpm typecheck
-```
-
-## 6) API Surface
-
-**Exports**:
-
-- Core UI components (Button, Input, Card, Badge, Alert)
-- Typography components (H1-H6, Body, Caption, Link)
-- Theme system (ThemeProvider, ThemeToggle)
-- Workflow components (Invoice, Bill, Cash, Close, Reports)
-- Enterprise components (Multi-company, User roles, COA)
-- Mobile components (Offline, PWA, Background sync)
-- Performance components (Monitoring, Security, Backup)
-
-**Public Types**:
-
-- Component prop interfaces
-- Theme context types
-- Design mode types
-- Accessibility types
-
-**Configuration**:
-
-- Dual-mode design system
-- Semantic token integration
-- WCAG compliance settings
-- Mobile-first responsive design
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <500KB for UI library
-- Optimized for tree-shaking
-- Lazy loading for workflow components
-- Minimal dependencies for fast loading
-
-**Performance Budget**:
-
-- Component render: <16ms (60fps)
-- Theme switching: <5ms
-- Bundle size: <500KB total
-- Mobile performance: <100ms interaction
-
-**Monitoring**:
-
-- Component usage analytics
-- Theme switching performance
-- Accessibility compliance metrics
-- Mobile performance monitoring
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- No sensitive data in components
-- Props-based data handling
-- No authentication logic
-- Secure by default
-
-**Data Handling**:
-
-- Props-based data flow
-- No internal state for sensitive data
-- Controlled component patterns
-- Type-safe prop interfaces
-
-**Compliance**:
-
-- WCAG 2.2 AAA compliance in accessibility mode
-- Keyboard navigation support
-- Screen reader compatibility
-- Color contrast validation
-
-## 9) Design System Architecture
-
-### **Steve Jobs Design Philosophy**
-
-- **Simplicity is Sophistication**: Every pixel serves a purpose
-- **Form Follows Function**: Design for user tasks, not aesthetics
-- **Details Make the Design**: Typography, spacing, and color matter
-- **Make It Obvious**: Clear interactions and predictable hierarchy
-
-### **Dual-Mode Design System**
-
-- **Aesthetic Mode**: Beautiful, subtle, Apple-inspired design
-- **Accessibility Mode**: WCAG 2.2 AAA compliant, high contrast
-- **Seamless Switching**: Runtime mode switching without reload
-- **Consistent Experience**: Same functionality, different presentation
-
-### **Component Architecture**
-
-- **Atomic Design**: Atoms, molecules, organisms, templates
-- **Composition Pattern**: Small, composable components
-- **Variant System**: CVA-based component variants
-- **Semantic Tokens**: CSS variable-based theming
-
-## 10) Core Component Categories
-
-### **Foundation Components**
-
-- **Button**: Primary, secondary, ghost, destructive variants
-- **Input**: Text, email, password, number inputs
-- **Label**: Form labels with accessibility support
-- **Card**: Container with header, content, footer
-- **Badge**: Status indicators and labels
-- **Alert**: Success, warning, error notifications
-
-### **Typography Components**
-
-- **H1-H6**: Heading hierarchy with semantic tokens
-- **Body**: Paragraph text with proper line height
-- **Caption**: Small text for labels and descriptions
-- **Link**: Accessible link components
-
-### **Layout Components**
-
-- **AppShell**: Main application layout
-- **StatusBar**: Application status display
-- **Dock**: Navigation dock
-- **CommandPalette**: Universal command interface
-
-### **Workflow Components**
-
-- **Invoice Workflow**: Complete AR invoice management
-- **Bill Workflow**: Complete AP bill management
-- **Cash Workflow**: Banking and reconciliation
-- **Close Workflow**: Month-end closing process
-- **Reports Workflow**: Financial reporting suite
-
-## 11) Workflow Component Suites
-
-### **Invoice Management (AR)**
-
-- `InvoiceWorkflow` - Complete invoice management
-- `InvoiceForm` - Invoice creation and editing
-- `InvoiceList` - Invoice listing and filtering
-- `CustomerSelector` - Customer selection interface
-- `PaymentCapture` - Payment processing
-- `InvoiceSender` - Email and delivery
-- `PaymentReminders` - Automated reminders
-- `InvoiceStatusTimeline` - Status tracking
-
-### **Bill Management (AP)**
-
-- `BillWorkflow` - Complete bill management
-- `BillForm` - Bill creation and editing
-- `OCRDataExtractor` - Document processing
-- `ApprovalWorkflow` - Multi-level approvals
-- `PaymentProcessor` - Payment processing
-- `VendorManager` - Vendor management
-- `ExpenseCategorizer` - Expense categorization
-
-### **Cash Management**
-
-- `CashWorkflow` - Complete cash management
-- `BankConnection` - Bank account integration
-- `TransactionImport` - Bank feed import
-- `ReconciliationCanvas` - Bank reconciliation
-- `RuleEngine` - Automated categorization
-- `BankFeedManagement` - Feed configuration
-- `CashFlowAnalysis` - Cash flow reporting
-
-### **Month-End Close**
-
-- `CloseWorkflow` - Complete closing process
-- `CloseRoom` - Collaborative closing workspace
-- `CloseChecklist` - Closing task management
-- `LockStates` - Period locking controls
-- `AccrualHelpers` - Accrual entry tools
-- `AdjustingEntries` - Adjusting journal entries
-- `ExportPackBuilder` - Export package creation
-
-### **Financial Reporting**
-
-- `ReportsWorkflow` - Complete reporting suite
-- `ProfitLossReport` - P&L statement
-- `BalanceSheetReport` - Balance sheet
-- `CashFlowStatement` - Cash flow statement
-- `TrialBalance` - Trial balance report
-- `ARAgingReport` - AR aging analysis
-- `APAgingReport` - AP aging analysis
-- `CustomReportBuilder` - Custom report creation
-
-## 12) Enterprise Components
-
-### **Multi-Company Management**
-
-- `EnterpriseWorkflow` - Enterprise-level workflows
-- `MultiCompanyManager` - Multi-company administration
-- `UserRolesManager` - User role management
-- `ChartOfAccountsManager` - COA administration
-- `CompanySettingsManager` - Company configuration
-
-### **Performance & Security**
-
-- `PerformanceSecurityWorkflow` - Performance monitoring
-- `PerformanceMonitor` - Real-time performance metrics
-- `SecurityAudit` - Security compliance auditing
-- `DataEncryption` - Data encryption management
-- `BackupRecovery` - Backup and recovery tools
-- `MonitoringAlerting` - System monitoring
-- `LoadTesting` - Performance testing tools
-
-### **Mobile & Offline**
-
-- `MobileOfflineWorkflow` - Mobile offline capabilities
-- `OfflineManager` - Offline data management
-- `ConflictResolver` - Data conflict resolution
-- `BackgroundSync` - Background synchronization
-- `MobileWorkflows` - Mobile-optimized workflows
-- `ProgressiveWebApp` - PWA functionality
-
-## 13) Usage Examples
-
-### **Basic Component Usage**
-
-```tsx
-import { Button, Card, Input, Label } from "@aibos/ui";
-
-function MyComponent() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create Invoice</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="customer">Customer</Label>
-            <Input id="customer" placeholder="Select customer" />
-          </div>
-          <Button>Create Invoice</Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-### **Theme Integration**
-
-```tsx
-import { ThemeProvider, ThemeToggle } from "@aibos/ui";
-
-function App() {
-  return (
-    <ThemeProvider defaultMode="aesthetic">
-      <div className="min-h-screen bg-sys-bg-base">
-        <header className="flex justify-between items-center p-4">
-          <h1 className="text-sys-text-primary">AI-BOS</h1>
-          <ThemeToggle />
-        </header>
-        {/* App content */}
-      </div>
-    </ThemeProvider>
-  );
-}
-```
-
-### **Workflow Component Usage**
-
-```tsx
-import { InvoiceWorkflow, BillWorkflow, CashWorkflow } from "@aibos/ui";
-
-function AccountingDashboard() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <InvoiceWorkflow />
-      <BillWorkflow />
-      <CashWorkflow />
-    </div>
-  );
-}
-```
-
-### **Typography Usage**
-
-```tsx
-import { H1, H2, Body, Caption, Link } from "@aibos/ui";
-
-function Document() {
-  return (
-    <article>
-      <H1>Document Title</H1>
-      <H2>Section Heading</H2>
-      <Body>
-        This is the main content with proper typography.
-        <Link href="/more">Learn more</Link>
-      </Body>
-      <Caption>Last updated: September 13, 2025</Caption>
-    </article>
-  );
-}
-```
-
-## 14) Troubleshooting
-
-**Common Issues**:
-
-- **Components Not Styling**: Ensure ThemeProvider is wrapping your app
-- **Accessibility Mode Not Working**: Check data-accessibility-mode attribute
-- **TypeScript Errors**: Verify all required props are provided
-- **Theme Switching Issues**: Ensure tokens package is properly installed
-
-**Debug Mode**:
-
-```bash
-# Check component exports
-ls src/components/
-
-# Verify theme provider
-cat src/components/theme/ThemeProvider.tsx
-```
-
-**Logs**:
-
-- Component render logs
-- Theme switching events
-- Accessibility compliance warnings
-- Performance metrics
-
-## 15) Contributing
-
-**Code Style**:
-
-- Follow Steve Jobs design principles
-- Maintain dual-mode consistency
-- Use semantic tokens for styling
-- Document all component props
-
-**Testing**:
-
-- Test both design modes
-- Validate WCAG compliance
-- Test mobile responsiveness
-- Verify accessibility features
-
-**Review Process**:
-
-- All changes must maintain dual-mode support
-- Breaking changes require major version bump
-- Design changes need accessibility review
-- Documentation must be updated
-
----
-
-## 📚 **Additional Resources**
-
-- [Project README](../README.md)
-- [Design Guidelines](DESIGN_GUIDELINES.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [Tokens Package](../packages/tokens/README.md)
-
----
-
-## 🔗 **Design Principles**
-
-### **Steve Jobs Philosophy**
-
-- Simplicity is the ultimate sophistication
-- Form follows function
-- Details make the design
-- Make it obvious
-
-### **Dual-Mode Architecture**
-
-- Aesthetic mode for visual elegance
-- Accessibility mode for functional clarity
-- Seamless mode switching
-- Consistent user experience
-
-### **Component Composition**
-
-- Small, composable components
-- Variant-based styling
-- Semantic token integration
-- Mobile-first responsive design
-
-### **Accessibility First**
-
-- WCAG 2.2 AAA compliance
-- Keyboard navigation support
-- Screen reader compatibility
-- High contrast support
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+MIT License - see LICENSE file for details.

@@ -1,3 +1,14 @@
+# DOC-168: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Utils — Shared Utilities & Services
 
 > **TL;DR**: Comprehensive utility library providing shared services, V1 compliance tools, export

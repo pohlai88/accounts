@@ -1,3 +1,14 @@
+# DOC-133: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Web API — Backend for Frontend (BFF)
 
 > **TL;DR**: Next.js 14 API routes serving as BFF layer with contract-first design, comprehensive

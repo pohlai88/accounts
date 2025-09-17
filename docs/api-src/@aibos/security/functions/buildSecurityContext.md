@@ -2,19 +2,19 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / buildSecurityContext
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / buildSecurityContext
 
 # Function: buildSecurityContext()
 
-> **buildSecurityContext**(`payload`, `requestId`): [`SecurityContext`](../type-aliases/SecurityContext.md)
+> **buildSecurityContext**(`payload`, `requestId`): [`SecurityContext`](../types/type-aliases/SecurityContext.md)
 
-Defined in: [packages/security/src/auth.ts:83](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/auth.ts#L83)
+Defined in: [packages/security/src/auth.ts:68](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/auth.ts#L68)
 
 ## Parameters
 
 ### payload
 
-`Record`\<`string`, `any`\>
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `Record`\<`string`, `unknown`\>\>
 
 ### requestId
 
@@ -22,4 +22,4 @@ Defined in: [packages/security/src/auth.ts:83](https://github.com/pohlai88/accou
 
 ## Returns
 
-[`SecurityContext`](../type-aliases/SecurityContext.md)
+[`SecurityContext`](../types/type-aliases/SecurityContext.md)

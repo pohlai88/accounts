@@ -1,3 +1,14 @@
+# DOC-210: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Close — Month-End Close Management Components
 
 > **TL;DR**: Comprehensive month-end close management components for period closing, accrual

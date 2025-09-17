@@ -4,456 +4,535 @@
 
 [AI-BOS Accounts API Documentation (Source)](../../README.md) / @aibos/tokens
 
-# Tokens — Dual-Mode Design System
+# DOC-294: Documentation
 
-> **TL;DR**: Single source of truth for design decisions with dual-mode architecture. Provides
-> aesthetic mode for beautiful design and accessibility mode for WCAG 2.2 AAA compliance.  
-> **Owner**: @aibos/design-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/tokens
 
-**Does**:
+Design tokens and theming system for the AI-BOS Accounting SaaS platform.
 
-- Provides single source of truth for all design decisions
-- Implements dual-mode design system (aesthetic + accessibility)
-- Generates CSS variables for both design modes
-- Creates Tailwind CSS preset for easy consumption
-- Enforces WCAG 2.2 AAA compliance in accessibility mode
-- Maintains Apple-inspired design language with AI-BOS branding
-- Provides semantic tokens for consistent UI implementation
-
-**Does NOT**:
-
-- Implement UI components (delegated to @aibos/ui)
-- Handle theme switching logic (delegated to consuming apps)
-- Provide hardcoded color values (uses CSS variables)
-- Manage user preferences (delegated to consuming apps)
-
-**Consumers**: @aibos/ui, @aibos/web, @aibos/web-api, all frontend applications
-
-## 2) Quick Links
-
-- **Token Definitions**: `src/tokens.ts`
-- **Main Export**: `src/index.ts`
-- **Tailwind Preset**: `tailwind.preset.cjs`
-- **Build Script**: `scripts/build-preset.cjs`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the package
-pnpm build
-
-# Type check
-pnpm typecheck
-
-# Lint
-pnpm lint
+pnpm add @aibos/tokens
 ```
 
-## 4) Architecture & Dependencies
-
-**Dependencies**:
-
-- `tailwindcss` - CSS framework integration
-
-**Dependents**:
-
-- `@aibos/ui` - UI component library
-- `@aibos/web` - Frontend application
-- All frontend applications requiring design tokens
-
-**Build Order**: No dependencies, can be built independently
-
-## 5) Development Workflow
-
-**Local Dev**:
-
-```bash
-# Watch mode for development
-pnpm build --watch
-
-# Generate Tailwind preset
-pnpm build
-```
-
-**Testing**:
-
-```bash
-# Type checking
-pnpm typecheck
-
-# Lint checking
-pnpm lint
-```
-
-**Linting**:
-
-```bash
-# Check for linting errors
-pnpm lint
-
-# Auto-fix where possible
-pnpm lint --fix
-```
-
-**Type Checking**:
-
-```bash
-# TypeScript compilation check
-pnpm typecheck
-```
-
-## 6) API Surface
-
-**Exports**:
-
-- Design mode definitions (aesthetic + accessibility)
-- Semantic token definitions
-- CSS variable generators
-- Mode switching utilities
-- TypeScript type definitions
-
-**Public Types**:
-
-- `DesignModes` - Design mode configuration type
-- `SemanticTokens` - Semantic token definitions type
-- `AccessibilityCssVars` - CSS variables type
-
-**Configuration**:
-
-- Dual-mode color palettes
-- Semantic token mappings
-- CSS variable generation
-- Tailwind preset generation
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <50KB for tokens package
-- Optimized for tree-shaking
-- Minimal dependencies for fast loading
-
-**Performance Budget**:
-
-- CSS variable generation: <1ms
-- Mode switching: <5ms
-- Bundle size: <50KB total
-
-**Monitoring**:
-
-- CSS variable usage analytics
-- Mode switching performance
-- Token consumption metrics
-- Build time optimization
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- No sensitive data in tokens
-- Public design system values
-- No authentication required
-
-**Data Handling**:
-
-- Immutable design token definitions
-- CSS variable-based theming
-- No user data processing
-
-**Compliance**:
-
-- WCAG 2.2 AAA compliance in accessibility mode
-- Color contrast ratio validation
-- Accessibility-first design principles
-
-## 9) Design System Architecture
-
-### **Dual-Mode Design Philosophy**
-
-The design system implements two complete, optimized experiences:
-
-- **Aesthetic Mode**: Beautiful, subtle, modern design for users who appreciate visual elegance
-- **Accessibility Mode**: WCAG 2.2 AAA compliant design for users who need high contrast
-
-### **Design Modes**
-
-#### **Aesthetic Mode**
-
-- Apple-inspired neutral palette with subtle gradients
-- Glass materials and blur effects
-- Generous spacing and luxurious feel
-- AI-BOS brand colors (cyan primary, orange accent)
-
-#### **Accessibility Mode**
-
-- High contrast black and white palette
-- Solid materials with no transparency
-- Functional spacing for clarity
-- WCAG AAA compliant contrast ratios (7:1+)
-
-### **Semantic Token System**
-
-- **System Colors**: Platform-semantic roles (text, background, fill, border)
-- **Brand Colors**: AI-BOS signature colors (primary cyan, accent orange)
-- **Status Colors**: Success, warning, error states
-- **Materials**: Depth and elevation through opacity layers
-
-## 10) Core Token Categories
-
-### **Color Tokens**
-
-- **Primary Colors**: AI-BOS signature cyan (#00D4FF)
-- **Accent Colors**: AI-BOS accent orange (#FF6B35)
-- **Neutral Palette**: Apple-inspired grayscale system
-- **Status Colors**: Success, warning, error states
-- **System Colors**: Semantic roles for text, background, fill
-
-### **Typography Tokens**
-
-- **Font Families**: Inter (sans), JetBrains Mono (mono)
-- **Font Sizes**: 12px to 36px scale
-- **Font Weights**: 400, 500, 600, 700
-- **Line Heights**: Tight, normal, relaxed
-
-### **Spacing Tokens**
-
-- **Spacing Scale**: 4px to 80px (0.25rem to 5rem)
-- **Consistent Scale**: Based on 4px grid system
-- **Responsive Spacing**: Scales appropriately across breakpoints
-
-### **Border Radius Tokens**
-
-- **Radius Scale**: 2px to 16px
-- **Consistent Scale**: Based on 2px increments
-- **Full Radius**: 9999px for circular elements
-
-### **Z-Index Tokens**
-
-- **Layer System**: Dropdown (1000) to Toast (1070)
-- **Consistent Stacking**: Prevents z-index conflicts
-- **Semantic Naming**: Clear purpose for each layer
-
-## 11) CSS Variable System
-
-### **System Variables**
-
-- `--sys-text-*` - Text color roles
-- `--sys-bg-*` - Background color roles
-- `--sys-fill-*` - Fill color roles
-- `--sys-border-*` - Border color roles
-- `--sys-accent` - System accent color
-
-### **Brand Variables**
-
-- `--brand-primary` - AI-BOS primary color
-- `--brand-accent` - AI-BOS accent color
-- `--brand-primary-pressed` - Pressed state color
-
-### **Status Variables**
-
-- `--sys-status-success` - Success state color
-- `--sys-status-warning` - Warning state color
-- `--sys-status-error` - Error state color
-
-### **Material Variables**
-
-- `--sys-material-*` - Opacity-based material layers
-- Ultra-thin to thick opacity levels
-- Disabled in accessibility mode
-
-## 12) Usage Examples
-
-### **Basic Token Usage**
+## Core Features
+
+- **Design Tokens**: Semantic color, spacing, and typography tokens
+- **Theme Support**: Light and dark theme support
+- **CSS Variables**: CSS custom properties for theming
+- **TypeScript Types**: Type-safe token usage
+- **Tailwind Integration**: Seamless Tailwind CSS integration
+- **Accessibility**: WCAG 2.2 AAA compliant color contrast
+- **Consistency**: Consistent design system across all components
+
+## Quick Start
 
 ```typescript
-import { SEMANTIC_TOKENS, applyModeToDocument } from "@aibos/tokens";
+import { tokens, themes, createTheme } from "@aibos/tokens";
 
-// Use semantic tokens in CSS
-const styles = {
-  color: SEMANTIC_TOKENS.semantic.text.primary,
-  backgroundColor: SEMANTIC_TOKENS.semantic.bg.base,
-  borderColor: SEMANTIC_TOKENS.semantic.border.hairline,
+// Use design tokens
+const buttonStyle = {
+  backgroundColor: tokens.colors.ai.solid,
+  color: tokens.colors.fg.inverted,
+  padding: tokens.spacing.md,
+  borderRadius: tokens.radius.md
 };
 
-// Apply design mode to document
-applyModeToDocument("aesthetic");
+// Apply theme
+const theme = createTheme('dark');
+document.documentElement.style.setProperty('--color-bg-base', theme.colors.bg.base);
 ```
 
-### **Tailwind CSS Integration**
+## Design Tokens
+
+### Color Tokens
+
+```typescript
+import { tokens } from "@aibos/tokens";
+
+// Background colors
+tokens.colors.bg.base        // #000000 - Pure black
+tokens.colors.bg.elevated    // #1A1A1A - Cards, modals
+tokens.colors.bg.muted       // #2A2A2A - Subtle backgrounds
+
+// Text colors
+tokens.colors.fg.default     // #FFFFFF - Primary text
+tokens.colors.fg.muted       // #8A8A8A - Secondary text
+tokens.colors.fg.subtle      // #6A8A8A - Tertiary text
+tokens.colors.fg.inverted    // #000000 - Text on dark
+
+// AI Brand colors
+tokens.colors.ai.solid       // #0056CC - Primary actions
+tokens.colors.ai.muted       // #007AFF - Secondary elements
+tokens.colors.ai.subtle      // rgba(0, 122, 255, 0.1) - Subtle backgrounds
+
+// State colors
+tokens.colors.state.success  // #34C759 - Success states
+tokens.colors.state.warning  // #FF9500 - Warning states
+tokens.colors.state.danger   // #FF3B30 - Error states
+
+// Border colors
+tokens.colors.border.subtle  // #3A3A3A - Subtle borders
+tokens.colors.border.strong  // #4A4A4A - Strong borders
+tokens.colors.border.focus   // #007AFF - Focus rings
+```
+
+### Spacing Tokens
+
+```typescript
+import { tokens } from "@aibos/tokens";
+
+tokens.spacing.xs  // 0.25rem - 4px - minimal spacing
+tokens.spacing.sm  // 0.5rem - 8px - small spacing
+tokens.spacing.md  // 1rem - 16px - standard spacing
+tokens.spacing.lg  // 1.5rem - 24px - large spacing
+tokens.spacing.xl  // 2rem - 32px - extra large spacing
+tokens.spacing.2xl // 3rem - 48px - section spacing
+tokens.spacing.3xl // 4rem - 64px - page spacing
+```
+
+### Typography Tokens
+
+```typescript
+import { tokens } from "@aibos/tokens";
+
+// Font sizes
+tokens.typography.size.xs    // 0.75rem - 12px - captions
+tokens.typography.size.sm   // 0.875rem - 14px - supporting info
+tokens.typography.size.base  // 1rem - 16px - body text
+tokens.typography.size.lg   // 1.125rem - 18px - important text
+tokens.typography.size.xl   // 1.25rem - 20px - component titles
+tokens.typography.size.2xl  // 1.5rem - 24px - subsection headers
+tokens.typography.size.3xl  // 1.875rem - 30px - section headers
+tokens.typography.size.4xl  // 2.25rem - 36px - hero headings
+
+// Font weights
+tokens.typography.weight.normal   // 400 - body text
+tokens.typography.weight.medium   // 500 - emphasized text
+tokens.typography.weight.semibold // 600 - headings
+tokens.typography.weight.bold     // 700 - hero text
+
+// Line heights
+tokens.typography.lineHeight.tight   // 1.25 - tight line height
+tokens.typography.lineHeight.normal  // 1.5 - normal line height
+tokens.typography.lineHeight.relaxed // 1.75 - relaxed line height
+```
+
+### Border Radius Tokens
+
+```typescript
+import { tokens } from "@aibos/tokens";
+
+tokens.radius.sm  // 0.375rem - 6px - subtle rounding
+tokens.radius.md  // 0.5rem - 8px - standard rounding
+tokens.radius.lg  // 0.75rem - 12px - prominent rounding
+tokens.radius.xl  // 1rem - 16px - large rounding
+tokens.radius.full // 9999px - fully rounded
+```
+
+## Theme System
+
+### Theme Creation
+
+```typescript
+import { createTheme, themes } from "@aibos/tokens";
+
+// Use predefined theme
+const darkTheme = themes.dark;
+const lightTheme = themes.light;
+
+// Create custom theme
+const customTheme = createTheme({
+  colors: {
+    bg: {
+      base: '#000000',
+      elevated: '#1A1A1A',
+      muted: '#2A2A2A'
+    },
+    fg: {
+      default: '#FFFFFF',
+      muted: '#8A8A8A',
+      subtle: '#6A8A8A'
+    },
+    ai: {
+      solid: '#0056CC',
+      muted: '#007AFF',
+      subtle: 'rgba(0, 122, 255, 0.1)'
+    }
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem'
+  }
+});
+```
+
+### Theme Application
+
+```typescript
+import { applyTheme } from "@aibos/tokens";
+
+// Apply theme to document
+applyTheme(document.documentElement, 'dark');
+
+// Apply theme to specific element
+const element = document.getElementById('app');
+applyTheme(element, 'light');
+
+// Apply custom theme
+applyTheme(document.documentElement, customTheme);
+```
+
+## CSS Variables
+
+### CSS Custom Properties
+
+```css
+/* Background colors */
+--color-bg-base: #000000;
+--color-bg-elevated: #1A1A1A;
+--color-bg-muted: #2A2A2A;
+
+/* Text colors */
+--color-fg-default: #FFFFFF;
+--color-fg-muted: #8A8A8A;
+--color-fg-subtle: #6A8A8A;
+
+/* AI Brand colors */
+--color-ai-solid: #0056CC;
+--color-ai-muted: #007AFF;
+--color-ai-subtle: rgba(0, 122, 255, 0.1);
+
+/* Spacing */
+--spacing-xs: 0.25rem;
+--spacing-sm: 0.5rem;
+--spacing-md: 1rem;
+--spacing-lg: 1.5rem;
+--spacing-xl: 2rem;
+
+/* Typography */
+--font-size-xs: 0.75rem;
+--font-size-sm: 0.875rem;
+--font-size-base: 1rem;
+--font-size-lg: 1.125rem;
+--font-size-xl: 1.25rem;
+
+/* Border radius */
+--radius-sm: 0.375rem;
+--radius-md: 0.5rem;
+--radius-lg: 0.75rem;
+```
+
+### CSS Usage
+
+```css
+/* Use CSS variables */
+.button {
+  background-color: var(--color-ai-solid);
+  color: var(--color-fg-inverted);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+}
+
+.card {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+```
+
+## Tailwind Integration
+
+### Tailwind Configuration
 
 ```typescript
 // tailwind.config.js
+import { tokens } from "@aibos/tokens";
+
 module.exports = {
-  presets: [require("@aibos/tokens/tailwind.preset.cjs")],
-  // ... rest of config
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // AI-BOS brand colors
+        ai: {
+          solid: tokens.colors.ai.solid,
+          muted: tokens.colors.ai.muted,
+          subtle: tokens.colors.ai.subtle,
+        },
+        // Semantic colors
+        bg: {
+          base: tokens.colors.bg.base,
+          elevated: tokens.colors.bg.elevated,
+          muted: tokens.colors.bg.muted,
+        },
+        fg: {
+          default: tokens.colors.fg.default,
+          muted: tokens.colors.fg.muted,
+          subtle: tokens.colors.fg.subtle,
+        },
+        // State colors
+        success: tokens.colors.state.success,
+        warning: tokens.colors.state.warning,
+        danger: tokens.colors.state.danger,
+      },
+      spacing: {
+        xs: tokens.spacing.xs,
+        sm: tokens.spacing.sm,
+        md: tokens.spacing.md,
+        lg: tokens.spacing.lg,
+        xl: tokens.spacing.xl,
+      },
+      fontSize: {
+        xs: tokens.typography.size.xs,
+        sm: tokens.typography.size.sm,
+        base: tokens.typography.size.base,
+        lg: tokens.typography.size.lg,
+        xl: tokens.typography.size.xl,
+      },
+      borderRadius: {
+        sm: tokens.radius.sm,
+        md: tokens.radius.md,
+        lg: tokens.radius.lg,
+      },
+    },
+  },
+  plugins: [],
 };
 ```
 
-```html
-<!-- Use semantic classes -->
-<div class="bg-sys-bg-base text-sys-text-primary border-sys-border-hairline">
-  <h1 class="text-sys-text-primary font-semibold">Title</h1>
-  <p class="text-sys-text-secondary">Subtitle</p>
+### Tailwind Usage
+
+```typescript
+// Use Tailwind classes with tokens
+<button className="bg-ai-solid text-fg-inverted px-md py-sm rounded-md hover:bg-ai-muted">
+  Create Invoice
+</button>
+
+<div className="bg-bg-elevated border border-border-subtle rounded-lg p-lg">
+  <h2 className="text-xl font-semibold text-fg-default mb-md">Card Title</h2>
+  <p className="text-fg-muted">Card content with consistent spacing and colors.</p>
 </div>
 ```
 
-### **Mode Switching**
+## TypeScript Integration
+
+### Type Definitions
 
 ```typescript
-import { toggleAccessibilityMode, isAccessibilityMode } from "@aibos/tokens";
+import { TokenTypes } from "@aibos/tokens";
 
-// Toggle between modes
-const currentMode = toggleAccessibilityMode();
+// Type-safe token usage
+const buttonColor: TokenTypes.Color = tokens.colors.ai.solid;
+const buttonPadding: TokenTypes.Spacing = tokens.spacing.md;
+const buttonRadius: TokenTypes.Radius = tokens.radius.md;
 
-// Check current mode
-const isAccessibility = isAccessibilityMode();
-
-// Initialize with default mode
-initializeDesignMode("aesthetic");
+// Theme type
+const theme: TokenTypes.Theme = {
+  colors: {
+    bg: {
+      base: '#000000',
+      elevated: '#1A1A1A',
+      muted: '#2A2A2A'
+    },
+    fg: {
+      default: '#FFFFFF',
+      muted: '#8A8A8A',
+      subtle: '#6A8A8A'
+    }
+  }
+};
 ```
 
-### **CSS Variable Usage**
+### Token Validation
 
-```css
-/* Use CSS variables directly */
-.my-component {
-  color: var(--sys-text-primary);
-  background-color: var(--sys-bg-base);
-  border: 1px solid var(--sys-border-hairline);
+```typescript
+import { validateToken, TokenValidator } from "@aibos/tokens";
+
+// Validate token
+const isValid = validateToken('color', 'ai.solid');
+if (isValid) {
+  console.log('Valid token');
 }
 
-/* Brand colors */
-.brand-button {
-  background-color: var(--brand-primary);
-  color: var(--sys-text-primary);
-}
-
-.brand-button:hover {
-  background-color: var(--brand-primary-pressed);
+// Token validator
+const validator = new TokenValidator();
+const validation = validator.validateColor('ai.solid');
+if (validation.isValid) {
+  console.log('Color token is valid:', validation.value);
 }
 ```
 
-## 13) Troubleshooting
+## Accessibility
 
-**Common Issues**:
+### Color Contrast
 
-- **Missing CSS Variables**: Ensure design mode is initialized
-- **Mode Not Switching**: Check data-accessibility-mode attribute
-- **Tailwind Classes Not Working**: Verify preset is properly imported
-- **Color Contrast Issues**: Use accessibility mode for WCAG compliance
+```typescript
+import { getContrastRatio, isAccessible } from "@aibos/tokens";
 
-**Debug Mode**:
+// Check color contrast
+const contrastRatio = getContrastRatio(
+  tokens.colors.fg.default,
+  tokens.colors.bg.base
+);
+
+const isAccessibleContrast = isAccessible(
+  tokens.colors.fg.default,
+  tokens.colors.bg.base
+);
+
+if (isAccessibleContrast) {
+  console.log('Colors meet WCAG 2.2 AAA standards');
+}
+```
+
+### Accessibility Utilities
+
+```typescript
+import { getAccessibleColor, getHighContrastColor } from "@aibos/tokens";
+
+// Get accessible color variant
+const accessibleColor = getAccessibleColor(
+  tokens.colors.ai.solid,
+  tokens.colors.bg.base
+);
+
+// Get high contrast color
+const highContrastColor = getHighContrastColor(
+  tokens.colors.fg.default,
+  tokens.colors.bg.base
+);
+```
+
+## Configuration
+
+### Token Configuration
+
+```typescript
+const tokenConfig = {
+  colors: {
+    ai: {
+      solid: '#0056CC',
+      muted: '#007AFF',
+      subtle: 'rgba(0, 122, 255, 0.1)'
+    },
+    bg: {
+      base: '#000000',
+      elevated: '#1A1A1A',
+      muted: '#2A2A2A'
+    },
+    fg: {
+      default: '#FFFFFF',
+      muted: '#8A8A8A',
+      subtle: '#6A8A8A'
+    }
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem'
+  },
+  typography: {
+    sizes: {
+      xs: '0.75rem',
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem'
+    },
+    weights: {
+      normal: 400,
+      medium: 500,
+      semibold: 600,
+      bold: 700
+    }
+  }
+};
+```
+
+## Testing
 
 ```bash
-# Check if tokens are properly built
-ls dist/
+# Run token tests
+pnpm test
 
-# Verify Tailwind preset generation
-cat tailwind.preset.cjs
+# Run tests with coverage
+pnpm test:coverage
+
+# Run accessibility tests
+pnpm test:accessibility
 ```
 
-**Logs**:
+## Dependencies
 
-- CSS variable application logs
-- Mode switching events
-- Token usage analytics
-- Build process logs
+- **typescript**: Type definitions
+- **color-contrast**: Color contrast calculations
+- **css-vars**: CSS variable utilities
 
-## 14) Contributing
+## Performance Considerations
 
-**Code Style**:
+- **Token Caching**: Tokens are cached for performance
+- **CSS Variables**: Efficient CSS custom properties
+- **Tree Shaking**: Unused tokens are eliminated
+- **Bundle Size**: Minimal bundle size impact
 
-- Follow design system principles
-- Maintain dual-mode consistency
-- Use semantic naming conventions
-- Document all new tokens
+## Security
 
-**Testing**:
+- **Input Validation**: Token values are validated
+- **Type Safety**: TypeScript ensures type safety
+- **Accessibility**: WCAG 2.2 AAA compliance
+- **Contrast**: Automatic contrast validation
 
-- Test both design modes
-- Validate WCAG compliance
-- Test CSS variable generation
-- Verify Tailwind preset generation
+## Error Handling
 
-**Review Process**:
+```typescript
+import { TokenError, ValidationError } from "@aibos/tokens";
 
-- All changes must maintain dual-mode support
-- Breaking changes require major version bump
-- Design changes need accessibility review
-- Documentation must be updated
+try {
+  const token = tokens.colors.ai.solid;
+} catch (error) {
+  if (error instanceof TokenError) {
+    // Handle token errors
+    console.error("Token error:", error.message);
+  } else if (error instanceof ValidationError) {
+    // Handle validation errors
+    console.error("Validation error:", error.message);
+  }
+}
+```
 
----
+## Contributing
 
-## 📚 **Additional Resources**
+1. Follow the coding standards
+2. Add tests for new tokens
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
 
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [UI Package](../packages/ui/README.md)
-- [Web App](../apps/web/README.md)
+## License
 
----
+MIT License - see LICENSE file for details.
 
-## 🔗 **Design Principles**
+## Modules
 
-### **Accessibility First**
-
-- WCAG 2.2 AAA compliance in accessibility mode
-- High contrast ratios (7:1+)
-- No compromise on accessibility
-- Inclusive design for all users
-
-### **Dual-Mode Architecture**
-
-- Two complete, optimized experiences
-- Aesthetic mode for visual elegance
-- Accessibility mode for functional clarity
-- Seamless mode switching
-
-### **Semantic Token System**
-
-- Platform-semantic roles
-- No hardcoded color values
-- CSS variable-based theming
-- Consistent design language
-
-### **Apple-Inspired Design**
-
-- Clean, minimal aesthetic
-- Subtle materials and effects
-- Generous spacing
-- Premium feel and quality
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
-
-## Type Aliases
-
-- [AccessibilityCssVars](type-aliases/AccessibilityCssVars.md)
-- [DesignModes](type-aliases/DesignModes.md)
-- [SemanticTokens](type-aliases/SemanticTokens.md)
-
-## Variables
-
-- [ACCESSIBILITY\_CSS\_VARS](variables/ACCESSIBILITY_CSS_VARS.md)
-- [DESIGN\_MODES](variables/DESIGN_MODES.md)
-- [SEMANTIC\_TOKENS](variables/SEMANTIC_TOKENS.md)
-
-## Functions
-
-- [applyModeToDocument](functions/applyModeToDocument.md)
-- [getModeCssVars](functions/getModeCssVars.md)
-- [initializeDesignMode](functions/initializeDesignMode.md)
-- [isAccessibilityMode](functions/isAccessibilityMode.md)
-- [toggleAccessibilityMode](functions/toggleAccessibilityMode.md)
+- [](README.md)
+- [types](types/README.md)

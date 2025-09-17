@@ -1,3 +1,14 @@
+# DOC-029: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Periods — Period Management Module
 
 > **TL;DR**: D4 Period management system for fiscal period close/open with approval workflow and SoD

@@ -1,0 +1,337 @@
+{
+    "documentManagement": {
+        "version": "1.0",
+        "lastUpdated": "2025-09-17",
+        "registry": {
+            "path": "docs/MASTER_DOCUMENT_REGISTRY.md",
+            "autoUpdate": true,
+            "reviewInterval": "quarterly",
+            "nextReview": "2025-12-17"
+        },
+        "headers": {
+            "required": true,
+            "format": "DOC-{NUMBER}: {TITLE}",
+            "includeMetadata": true,
+            "metadataFields": [
+                "version",
+                "date",
+                "status",
+                "owner",
+                "lastUpdated",
+                "nextReview"
+            ]
+        },
+        "quality": {
+            "requiredSections": [
+                "Overview",
+                "Quick Start",
+                "Configuration"
+            ],
+            "minCodeExamples": 1,
+            "maxAge": 90,
+            "qualityThreshold": 80
+        },
+        "automation": {
+            "updateOnCommit": true,
+            "validateOnPR": true,
+            "notifyOnIssues": true,
+            "autoVersionBump": false
+        }
+    },
+    "tools": {
+        "markdownlint": {
+            "enabled": true,
+            "config": ".markdownlint.json",
+            "ignorePatterns": [
+                "node_modules/**",
+                "docs/api/**",
+                ".stryker-tmp/**"
+            ]
+        },
+        "spellCheck": {
+            "enabled": true,
+            "tool": "write-good",
+            "ignoreWords": [
+                "aibos",
+                "supabase",
+                "postgresql",
+                "typescript",
+                "javascript",
+                "json",
+                "yaml",
+                "toml",
+                "dockerfile",
+                "kubernetes",
+                "microservices",
+                "monorepo",
+                "turborepo",
+                "pnpm",
+                "vitest",
+                "playwright",
+                "stryker",
+                "axiom",
+                "inngest",
+                "resend",
+                "xlsx",
+                "uuid",
+                "jose",
+                "helmet",
+                "cors",
+                "express",
+                "redis",
+                "ioredis",
+                "pg",
+                "ws",
+                "node-cron",
+                "prom-client",
+                "chalk",
+                "commander",
+                "crypto-js",
+                "date-fns",
+                "tanstack",
+                "radix-ui",
+                "heroicons",
+                "lucide",
+                "clsx",
+                "tailwind-merge",
+                "class-variance-authority",
+                "drizzle",
+                "nextra",
+                "typedoc"
+            ]
+        },
+        "linkCheck": {
+            "enabled": true,
+            "tool": "markdown-link-check",
+            "timeout": 10000,
+            "retryCount": 3,
+            "ignorePatterns": [
+                "localhost",
+                "127.0.0.1",
+                "0.0.0.0"
+            ]
+        }
+    },
+    "workflows": {
+        "ci": {
+            "stages": [
+                "docs:quality",
+                "docs:validate",
+                "docs:update-registry"
+            ],
+            "onFailure": "notify"
+        },
+        "pr": {
+            "checks": [
+                "docs:lint",
+                "docs:spell-check",
+                "docs:link-check"
+            ],
+            "required": true
+        },
+        "release": {
+            "steps": [
+                "docs:full-update",
+                "docs:validate",
+                "docs:stats"
+            ],
+            "notify": true
+        }
+    },
+    "notifications": {
+        "channels": {
+            "slack": {
+                "enabled": false,
+                "webhook": "",
+                "channel": "#documentation"
+            },
+            "email": {
+                "enabled": false,
+                "recipients": [],
+                "smtp": {}
+            },
+            "github": {
+                "enabled": true,
+                "comments": true,
+                "statusChecks": true
+            }
+        },
+        "triggers": {
+            "qualityDrop": {
+                "threshold": 80,
+                "enabled": true
+            },
+            "brokenLinks": {
+                "enabled": true,
+                "severity": "warning"
+            },
+            "outdatedDocs": {
+                "threshold": 30,
+                "enabled": true
+            },
+            "reviewOverdue": {
+                "enabled": true,
+                "gracePeriod": 7
+            }
+        }
+    },
+    "analytics": {
+        "enabled": true,
+        "metrics": [
+            "documentAccess",
+            "searchQueries",
+            "userBehavior",
+            "qualityScores",
+            "updateFrequency"
+        ],
+        "retention": {
+            "data": "1y",
+            "logs": "6m"
+        }
+    },
+    "security": {
+        "accessControl": {
+            "enabled": true,
+            "roles": [
+                "admin",
+                "editor",
+                "reviewer",
+                "viewer"
+            ],
+            "permissions": {
+                "admin": [
+                    "read",
+                    "write",
+                    "delete",
+                    "approve"
+                ],
+                "editor": [
+                    "read",
+                    "write"
+                ],
+                "reviewer": [
+                    "read",
+                    "approve"
+                ],
+                "viewer": [
+                    "read"
+                ]
+            }
+        },
+        "encryption": {
+            "enabled": false,
+            "algorithm": "AES-256-GCM"
+        },
+        "audit": {
+            "enabled": true,
+            "logLevel": "info",
+            "retention": "1y"
+        }
+    },
+    "performance": {
+        "caching": {
+            "enabled": true,
+            "ttl": 3600,
+            "strategy": "redis"
+        },
+        "compression": {
+            "enabled": true,
+            "algorithm": "gzip",
+            "level": 6
+        },
+        "cdn": {
+            "enabled": false,
+            "provider": "cloudflare",
+            "cacheTtl": 86400
+        }
+    },
+    "integrations": {
+        "github": {
+            "enabled": true,
+            "webhooks": true,
+            "statusChecks": true,
+            "prComments": true
+        },
+        "jira": {
+            "enabled": false,
+            "project": "",
+            "issueType": "Documentation"
+        },
+        "confluence": {
+            "enabled": false,
+            "space": "",
+            "parentPage": ""
+        },
+        "notion": {
+            "enabled": false,
+            "database": "",
+            "apiKey": ""
+        }
+    },
+    "templates": {
+        "package": {
+            "path": "docs/templates/package-template.md",
+            "requiredSections": [
+                "Overview",
+                "Core Features",
+                "Quick Start",
+                "API Reference",
+                "Configuration",
+                "Development",
+                "Contributing",
+                "License"
+            ]
+        },
+        "application": {
+            "path": "docs/templates/application-template.md",
+            "requiredSections": [
+                "Overview",
+                "Key Features",
+                "Quick Start",
+                "Configuration",
+                "Architecture",
+                "API Endpoints",
+                "Contributing",
+                "License"
+            ]
+        },
+        "service": {
+            "path": "docs/templates/service-template.md",
+            "requiredSections": [
+                "Overview",
+                "Core Features",
+                "Quick Start",
+                "Configuration",
+                "Architecture",
+                "API",
+                "Monitoring",
+                "Contributing",
+                "License"
+            ]
+        }
+    },
+    "standards": {
+        "versioning": {
+            "scheme": "semantic",
+            "format": "Major.Minor.Patch",
+            "autoIncrement": false
+        },
+        "naming": {
+            "files": "DOC-{NUMBER}_{DESCRIPTION}.md",
+            "headers": "DOC-{NUMBER}: {TITLE}",
+            "consistent": true
+        },
+        "formatting": {
+            "markdown": "commonmark",
+            "lineLength": 100,
+            "tabs": false,
+            "indentSize": 2
+        },
+        "content": {
+            "minLength": 500,
+            "maxLength": 10000,
+            "codeExamples": true,
+            "diagrams": false
+        }
+    }
+}

@@ -4,487 +4,458 @@
 
 [AI-BOS Accounts API Documentation (Source)](../../README.md) / @aibos/utils
 
-# Utils — Shared Utilities & Services
+# DOC-296: Documentation
 
-> **TL;DR**: Comprehensive utility library providing shared services, V1 compliance tools, export
-> functionality, audit logging, and monitoring capabilities across the AI-BOS platform.  
-> **Owner**: @aibos/platform-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/utils
 
-**Does**:
+Shared utilities and helper functions for the AI-BOS Accounting SaaS platform.
 
-- Provides shared utility functions and services
-- Implements V1 compliance features (audit logging, export management)
-- Handles email, storage, and PDF generation services
-- Provides monitoring and performance tracking
-- Manages Supabase client configurations
-- Implements idempotency and middleware utilities
-- Provides type-safe branded ID helpers
-
-**Does NOT**:
-
-- Implement business logic (delegated to @aibos/accounting)
-- Handle UI components (delegated to @aibos/ui)
-- Manage database operations (delegated to @aibos/db)
-- Provide API endpoints (implemented by @aibos/web-api)
-
-**Consumers**: @aibos/web-api, @aibos/web, @aibos/accounting, @aibos/worker
-
-## 2) Quick Links
-
-- **Main Export**: `src/index.ts`
-- **Server Utils**: `src/server.ts`
-- **Type Definitions**: `src/types.ts`
-- **Logger**: `src/logger.ts`
-- **Export System**: `src/export/`
-- **Audit Service**: `src/audit/`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the package
-pnpm build
-
-# Run tests
-pnpm test
-
-# Lint
-pnpm lint
+pnpm add @aibos/utils
 ```
 
-## 4) Architecture & Dependencies
-
-**Dependencies**:
-
-- `@aibos/db` - Database utilities
-- `@aibos/auth` - Authentication utilities
-- `@axiomhq/winston` - Axiom logging transport
-- `@supabase/ssr` - Supabase SSR utilities
-- `@supabase/supabase-js` - Supabase client
-- `crypto-js` - Cryptographic utilities
-- `drizzle-orm` - Database ORM
-- `puppeteer` - PDF generation
-- `resend` - Email service
-- `uuid` - UUID generation
-- `winston` - Logging framework
-- `xlsx` - Excel export
-
-**Dependents**:
-
-- `@aibos/web-api` - API endpoint implementations
-- `@aibos/web` - Frontend application
-- `@aibos/accounting` - Business logic layer
-- `@aibos/worker` - Background job processing
-
-**Build Order**: Depends on @aibos/db, @aibos/auth
-
-## 5) Development Workflow
-
-**Local Dev**:
-
-```bash
-# Build with watch mode
-pnpm build --watch
-
-# Run tests
-pnpm test
-
-# Type check
-pnpm typecheck
-```
-
-**Testing**:
-
-```bash
-# Run all tests
-pnpm test
-
-# Run specific test
-pnpm test export
-
-# Run with coverage
-pnpm test --coverage
-```
-
-**Linting**:
-
-```bash
-# Check for linting errors
-pnpm lint
-
-# Auto-fix where possible
-pnpm lint --fix
-```
-
-**Type Checking**:
-
-```bash
-# TypeScript compilation check
-pnpm typecheck
-```
-
-## 6) API Surface
-
-**Exports**:
-
-- Type definitions and branded ID helpers
-- Logger and monitoring utilities
-- Email and storage services
-- Supabase client configurations
-- Export management and scheduling
-- Audit logging and compliance
-- Performance monitoring and error tracking
-
-**Public Types**:
-
-- `JsonValue`, `JsonObject`, `JsonArray` - JSON type definitions
-- `JournalId`, `InvoiceId`, `TenantId` - Branded ID types
-- `ExportFormat`, `ExportOptions` - Export configuration
-- `AuditContext`, `AuditEvent` - Audit logging types
-- `PerformanceMetrics`, `ErrorEvent` - Monitoring types
-
-**Configuration**:
-
-- Environment-based configuration
-- Service-specific settings
-- Export format options
-- Monitoring thresholds
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <300KB for utils package
-- Optimized for tree-shaking
-- Server-only utilities separated
-- Minimal dependencies for fast loading
-
-**Performance Budget**:
-
-- Export generation: <5s for large datasets
-- Email sending: <2s per message
-- PDF generation: <10s per document
-- Audit logging: <100ms per event
-
-**Monitoring**:
-
-- Performance metrics tracking
-- Error rate monitoring
-- Export success rates
-- Service health checks
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- Service role access for Supabase
-- Encrypted data handling
-- Secure file storage
-- Audit trail maintenance
-
-**Data Handling**:
-
-- Type-safe data processing
-- Encrypted sensitive data
-- Secure file operations
-- Audit logging for all operations
-
-**Compliance**:
-
-- V1 compliance with audit trails
-- Export management and tracking
-- Data retention policies
-- GDPR-ready data handling
-
-## 9) Core Utility Categories
-
-### **Type Safety & Branded IDs**
-
-- **Branded Types**: Type-safe ID helpers (JournalId, InvoiceId, etc.)
-- **JSON Types**: Type-safe JSON value definitions
-- **Type Guards**: Runtime type checking utilities
-- **Helper Functions**: ID creation and validation
-
-### **Logging & Monitoring**
-
-- **Winston Logger**: Structured logging with Axiom integration
-- **Performance Monitor**: Real-time performance tracking
-- **Error Tracker**: Comprehensive error monitoring
-- **Service Health**: Health check utilities
-
-### **Export Management**
-
-- **Export Service**: CSV, XLSX, JSONL export functionality
-- **Export Manager**: Export history and file management
-- **Export Scheduler**: Scheduled export processing
-- **Format Support**: Multiple export formats with styling
-
-### **Audit & Compliance**
-
-- **Audit Service**: V1 compliance audit logging
-- **Request Context**: User and session context tracking
-- **Audit Events**: Structured audit event definitions
-- **Compliance Tools**: V1 compliance utilities
-
-## 10) Service Modules
-
-### **Email Service**
-
-- **Resend Integration**: Email sending via Resend
-- **Template Support**: HTML and text email templates
-- **Attachment Support**: File attachment handling
-- **Delivery Tracking**: Email delivery status
-
-### **Storage Service**
-
-- **File Upload**: Secure file upload handling
-- **Attachment Management**: Document attachment processing
-- **File Validation**: File type and size validation
-- **Storage Cleanup**: Automated file cleanup
-
-### **PDF Generation**
-
-- **Puppeteer Integration**: Server-side PDF generation
-- **Template Support**: HTML to PDF conversion
-- **Custom Styling**: PDF styling and formatting
-- **Batch Processing**: Multiple PDF generation
-
-### **Supabase Integration**
-
-- **Client Management**: Browser, server, and middleware clients
-- **SSR Support**: Server-side rendering compatibility
-- **Service Role**: Administrative access for backend operations
-- **Middleware**: Request processing utilities
-
-## 11) Export System
-
-### **Export Formats**
-
-- **CSV**: Comma-separated values with enhanced formatting
-- **XLSX**: Excel workbooks with styling and charts
-- **JSONL**: JSON Lines for data processing
-- **Custom Formats**: Extensible format system
-
-### **Export Management**
-
-- **Export History**: Complete export tracking
-- **File Management**: Download URLs and expiration
-- **User Tracking**: Export usage analytics
-- **Cleanup Jobs**: Automated file cleanup
-
-### **Export Scheduling**
-
-- **Scheduled Exports**: Automated export generation
-- **Recurring Jobs**: Regular export processing
-- **Format Selection**: Multiple format support
-- **Notification**: Export completion notifications
-
-## 12) Audit & Compliance
-
-### **Audit Logging**
-
-- **Event Tracking**: Comprehensive event logging
-- **Context Capture**: User, session, and request context
-- **Entity Tracking**: Entity-level change tracking
-- **Compliance**: V1 compliance requirements
-
-### **Request Context**
-
-- **User Context**: User identification and roles
-- **Session Context**: Session tracking and management
-- **Request Context**: Request-level context capture
-- **Validation**: Context validation and sanitization
-
-### **Performance Monitoring**
-
-- **API Metrics**: API performance tracking
-- **UI Metrics**: Frontend performance monitoring
-- **Error Tracking**: Error rate and pattern analysis
-- **Health Checks**: Service health monitoring
-
-## 13) Usage Examples
-
-### **Basic Utilities**
+## Core Features
+
+- **HTTP Client**: Retry logic, error handling, request/response interceptors
+- **Email Service**: Multi-provider email integration
+- **File Storage**: Attachment handling and management
+- **Export Services**: CSV, Excel, JSON export functionality
+- **Performance Monitoring**: Metrics collection and error tracking
+- **Context Management**: Request context and user context handling
+- **State Management**: Zustand-based state management utilities
+
+## Quick Start
 
 ```typescript
-import { createJournalId, createInvoiceId, logger } from "@aibos/utils";
+import { 
+  createApiClient,
+  sendEmail,
+  exportToCsv,
+  performanceMonitor,
+  errorTracker,
+  createRequestContext
+} from "@aibos/utils";
 
-// Create branded IDs
-const journalId = createJournalId("uuid-string");
-const invoiceId = createInvoiceId("uuid-string");
+// HTTP Client
+const apiClient = createApiClient({
+  baseURL: 'https://api.example.com',
+  retries: 3
+});
 
-// Use logger
-logger.info("Operation completed", { journalId, invoiceId });
-```
+// Email Service
+await sendEmail({
+  to: 'user@example.com',
+  subject: 'Invoice Created',
+  html: '<h1>Your invoice has been created</h1>'
+});
 
-### **Export Management**
+// Export Services
+const csvData = await exportToCsv(data, {
+  filename: 'invoices.csv',
+  headers: ['id', 'amount', 'date']
+});
 
-```typescript
-import { createExportService, ExportFormat } from "@aibos/utils";
+// Performance Monitoring
+performanceMonitor.recordMetric('api.response_time', 150, 'milliseconds');
 
-const exportService = createExportService();
-
-// Export data to CSV
-const result = await exportService.exportToCsv({
-  data: reportData,
-  filename: "trial-balance.csv",
-  format: ExportFormat.CSV,
+// Error Tracking
+errorTracker.captureException(error, {
+  context: 'invoice-creation',
+  userId: 'user_123'
 });
 ```
 
-### **Audit Logging**
+## HTTP Client
 
 ```typescript
-import { V1AuditService, createV1AuditContext } from "@aibos/utils";
+import { createApiClient } from "@aibos/utils";
 
-const auditService = new V1AuditService();
+const client = createApiClient({
+  baseURL: process.env.API_URL,
+  timeout: 10000,
+  retries: 3,
+  retryDelay: 1000
+});
 
-// Log audit event
-await auditService.logEvent({
-  eventType: "INVOICE_CREATED",
-  entityType: "INVOICE",
-  entityId: invoiceId,
-  action: "CREATE",
-  details: { invoiceNumber: "INV-001" },
-  context: createV1AuditContext({
-    userId: "user-123",
-    tenantId: "tenant-456",
-    companyId: "company-789",
-  }),
+// GET request
+const invoices = await client.get('/invoices');
+
+// POST request
+const newInvoice = await client.post('/invoices', invoiceData);
+
+// Request with retry
+const result = await client.request({
+  method: 'POST',
+  url: '/invoices',
+  data: invoiceData,
+  retries: 5
 });
 ```
 
-### **Email Service**
+## Email Service
 
 ```typescript
 import { sendEmail } from "@aibos/utils";
 
-// Send email
+// Simple email
 await sendEmail({
-  to: "customer@example.com",
-  subject: "Invoice Created",
-  html: "<h1>Your invoice has been created</h1>",
-  text: "Your invoice has been created",
+  to: 'customer@example.com',
+  subject: 'Invoice Created',
+  html: '<h1>Your invoice has been created</h1>',
+  text: 'Your invoice has been created'
+});
+
+// Email with attachments
+await sendEmail({
+  to: 'customer@example.com',
+  subject: 'Invoice with Attachment',
+  html: '<h1>Please find your invoice attached</h1>',
+  attachments: [
+    {
+      filename: 'invoice.pdf',
+      content: pdfBuffer,
+      contentType: 'application/pdf'
+    }
+  ]
+});
+
+// Bulk email
+await sendEmail({
+  to: ['customer1@example.com', 'customer2@example.com'],
+  subject: 'Monthly Statement',
+  html: '<h1>Your monthly statement is ready</h1>'
 });
 ```
 
-### **Performance Monitoring**
+## Export Services
 
 ```typescript
-import { performanceMonitor, errorTracker } from "@aibos/utils";
+import { exportToCsv, exportToXlsx, exportToJson } from "@aibos/utils";
 
-// Track performance
-const metrics = performanceMonitor.startTimer("api-request");
-// ... perform operation
-metrics.endTimer();
+// CSV Export
+const csvData = await exportToCsv(invoices, {
+  filename: 'invoices.csv',
+  headers: ['id', 'customer', 'amount', 'date'],
+  delimiter: ','
+});
 
-// Track errors
-errorTracker.captureError(new Error("Something went wrong"), {
-  context: "invoice-creation",
-  userId: "user-123",
+// Excel Export
+const xlsxData = await exportToXlsx(invoices, {
+  filename: 'invoices.xlsx',
+  sheetName: 'Invoices',
+  headers: ['id', 'customer', 'amount', 'date']
+});
+
+// JSON Export
+const jsonData = await exportToJson(invoices, {
+  filename: 'invoices.json',
+  pretty: true
 });
 ```
 
-## 14) Troubleshooting
+## Performance Monitoring
 
-**Common Issues**:
+```typescript
+import { performanceMonitor } from "@aibos/utils";
 
-- **Export Failures**: Check file permissions and storage configuration
-- **Email Not Sending**: Verify Resend API key and configuration
-- **Audit Logging Issues**: Check Supabase connection and permissions
-- **PDF Generation Errors**: Ensure Puppeteer is properly installed
+// Record performance metrics
+performanceMonitor.recordMetric('api.response_time', 150, 'milliseconds');
+performanceMonitor.recordMetric('user.actions', 1, 'count');
 
-**Debug Mode**:
+// Record business metrics
+performanceMonitor.recordBusinessMetric('invoice.created', {
+  tenantId: 'tenant_123',
+  amount: 1000,
+  currency: 'USD'
+});
 
-```bash
-# Check logger configuration
-DEBUG=winston pnpm test
-
-# Verify export functionality
-pnpm test export
+// Record custom metrics
+performanceMonitor.recordCustomMetric('custom.metric', {
+  value: 42,
+  tags: ['environment:production', 'service:api']
+});
 ```
 
-**Logs**:
+## Error Tracking
 
-- Winston logger output
-- Export processing logs
-- Audit event logs
-- Performance metrics
+```typescript
+import { errorTracker } from "@aibos/utils";
 
-## 15) Contributing
+// Capture exceptions
+errorTracker.captureException(error, {
+  context: 'invoice-creation',
+  userId: 'user_123',
+  tenantId: 'tenant_123',
+  metadata: {
+    invoiceId: 'inv_001',
+    amount: 1000
+  }
+});
 
-**Code Style**:
+// Capture messages
+errorTracker.captureMessage('User action completed', {
+  level: 'info',
+  context: 'user-action',
+  userId: 'user_123'
+});
 
-- Follow TypeScript best practices
-- Use branded types for IDs
-- Maintain V1 compliance
-- Document all public APIs
+// Set user context
+errorTracker.setUserContext({
+  id: 'user_123',
+  email: 'user@example.com',
+  tenantId: 'tenant_123'
+});
+```
 
-**Testing**:
+## Context Management
 
-- Write tests for all utilities
-- Test error scenarios
-- Validate export functionality
-- Test audit logging
+```typescript
+import { createRequestContext, getRequestContext } from "@aibos/utils";
 
-**Review Process**:
+// Create request context
+const context = createRequestContext({
+  requestId: 'req_123',
+  userId: 'user_123',
+  tenantId: 'tenant_123',
+  correlationId: 'corr_123'
+});
 
-- All changes must maintain V1 compliance
-- Breaking changes require major version bump
-- Performance impact must be assessed
-- Documentation must be updated
+// Get current context
+const currentContext = getRequestContext();
 
----
+// Use context in async operations
+async function processInvoice(invoiceData: any) {
+  const context = getRequestContext();
+  
+  // All operations will include the context
+  const result = await apiClient.post('/invoices', invoiceData);
+  
+  return result;
+}
+```
 
-## 📚 **Additional Resources**
+## State Management
 
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [Web API Package](../apps/web-api/README.md)
-- [Database Package](../packages/db/README.md)
+```typescript
+import { createStore, useStore } from "@aibos/utils";
 
----
+// Create store
+const invoiceStore = createStore((set) => ({
+  invoices: [],
+  loading: false,
+  error: null,
+  
+  setInvoices: (invoices) => set({ invoices }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+  
+  fetchInvoices: async () => {
+    set({ loading: true, error: null });
+    try {
+      const invoices = await apiClient.get('/invoices');
+      set({ invoices, loading: false });
+    } catch (error) {
+      set({ error, loading: false });
+    }
+  }
+}));
 
-## 🔗 **Utility Principles**
+// Use store in component
+function InvoiceList() {
+  const { invoices, loading, fetchInvoices } = useStore(invoiceStore);
+  
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
+  
+  if (loading) return <LoadingSpinner />;
+  
+  return (
+    <div>
+      {invoices.map(invoice => (
+        <InvoiceCard key={invoice.id} invoice={invoice} />
+      ))}
+    </div>
+  );
+}
+```
 
-### **Type Safety First**
+## File Storage
 
-- Branded types for all IDs
-- Type-safe JSON handling
-- Runtime type validation
-- Compile-time type checking
+```typescript
+import { uploadFile, downloadFile, deleteFile } from "@aibos/utils";
 
-### **V1 Compliance**
+// Upload file
+const uploadResult = await uploadFile(file, {
+  bucket: 'invoices',
+  path: 'tenant_123/invoice_001.pdf',
+  metadata: {
+    tenantId: 'tenant_123',
+    invoiceId: 'inv_001'
+  }
+});
 
-- Comprehensive audit logging
-- Export management and tracking
-- Performance monitoring
-- Error tracking and reporting
+// Download file
+const fileData = await downloadFile('tenant_123/invoice_001.pdf');
 
-### **Service Integration**
+// Delete file
+await deleteFile('tenant_123/invoice_001.pdf');
+```
 
-- Supabase client management
-- Email service integration
-- Storage service handling
-- PDF generation capabilities
+## Validation Utilities
 
-### **Monitoring & Observability**
+```typescript
+import { validateEmail, validatePhone, validateCurrency } from "@aibos/utils";
 
-- Structured logging
-- Performance metrics
-- Error tracking
-- Health monitoring
+// Email validation
+const isValidEmail = validateEmail('user@example.com');
 
----
+// Phone validation
+const isValidPhone = validatePhone('+1234567890');
 
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+// Currency validation
+const isValidCurrency = validateCurrency('USD');
+```
+
+## Date Utilities
+
+```typescript
+import { formatDate, parseDate, addDays, isBusinessDay } from "@aibos/utils";
+
+// Format date
+const formattedDate = formatDate(new Date(), 'YYYY-MM-DD');
+
+// Parse date
+const parsedDate = parseDate('2024-01-01', 'YYYY-MM-DD');
+
+// Add days
+const futureDate = addDays(new Date(), 30);
+
+// Check business day
+const isBusiness = isBusinessDay(new Date());
+```
+
+## Configuration
+
+### Environment Variables
+
+```env
+# Email Service
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=your_resend_api_key
+
+# File Storage
+STORAGE_PROVIDER=supabase
+SUPABASE_STORAGE_URL=your_storage_url
+SUPABASE_STORAGE_KEY=your_storage_key
+
+# Performance Monitoring
+PERFORMANCE_MONITORING_ENABLED=true
+PERFORMANCE_SAMPLE_RATE=1.0
+
+# Error Tracking
+ERROR_TRACKING_ENABLED=true
+ERROR_TRACKING_DSN=your_error_tracking_dsn
+```
+
+### Feature Flags
+
+```typescript
+const utilsFeatures = {
+  emailService: true,
+  fileStorage: true,
+  performanceMonitoring: true,
+  errorTracking: true,
+  exportServices: true
+};
+```
+
+## Testing
+
+```bash
+# Run utility tests
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Run specific test file
+pnpm test:utils:http
+```
+
+## Dependencies
+
+- **axios**: HTTP client
+- **resend**: Email service
+- **xlsx**: Excel export
+- **csv-parser**: CSV parsing
+- **zustand**: State management
+- **date-fns**: Date utilities
+- **zod**: Validation
+
+## Performance Considerations
+
+- **Caching**: HTTP responses are cached for 5 minutes
+- **Retry Logic**: Failed requests are retried with exponential backoff
+- **Batch Operations**: Bulk operations are batched for efficiency
+- **Memory Management**: Large datasets are processed in chunks
+
+## Security
+
+- **Input Validation**: All inputs are validated with Zod schemas
+- **Sanitization**: User inputs are sanitized before processing
+- **Encryption**: Sensitive data is encrypted at rest
+- **Rate Limiting**: API calls are rate-limited to prevent abuse
+
+## Error Handling
+
+```typescript
+import { UtilsError, ValidationError } from "@aibos/utils";
+
+try {
+  const result = await createApiClient(config);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    // Handle validation errors
+    console.error("Validation failed:", error.details);
+  } else if (error instanceof UtilsError) {
+    // Handle utility errors
+    console.error("Utility error:", error.message);
+  }
+}
+```
+
+## Contributing
+
+1. Follow the coding standards
+2. Add tests for new utilities
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Modules
+
+- [](README.md)
+- [api-gateway](api-gateway/README.md)
+- [audit/service](audit/service/README.md)
+- [axiom](axiom/README.md)
+- [context/request-context](context/request-context/README.md)
+- [middleware](middleware/README.md)
+- [middleware/idempotency](middleware/idempotency/README.md)
+- [pdf](pdf/README.md)
+- [server](server/README.md)
+- [types](types/README.md)

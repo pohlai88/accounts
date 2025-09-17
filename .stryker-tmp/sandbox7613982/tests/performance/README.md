@@ -1,3 +1,14 @@
+# DOC-277: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Performance Tests — Load and Performance Testing Suite
 
 > **TL;DR**: K6-powered performance testing suite for D2 API, D4 reports, and journal API to ensure

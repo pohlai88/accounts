@@ -1,0 +1,45 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "plugin": [],
+    "readme": "none",
+    "hideGenerator": true,
+    "excludeInternal": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "entryPointStrategy": "resolve",
+    "entryPoints": [
+        "packages/accounting/src/index.ts",
+        "packages/auth/src/index.ts",
+        "packages/ui/src/index.ts",
+        "packages/utils/src/index.ts",
+        "packages/cache/src/index.ts",
+        "packages/db/src/index.ts",
+        "packages/monitoring/src/index.ts",
+        "packages/realtime/src/index.ts",
+        "packages/security/src/index.ts",
+        "packages/tokens/src/index.ts"
+    ],
+    "tsconfig": "tsconfig.typedoc.json",
+    "skipErrorChecking": true,
+    "validation": {
+        "invalidLink": true,
+        "notExported": true
+    },
+    "gitRevision": "48103fb36d28b2b9bfb33472b6de2f719773cde9",
+    "json": "docs/api.json",
+    "name": "AI-BOS Accounts API Documentation",
+    "includeVersion": true,
+    "excludeExternals": true,
+    "sort": [
+        "source-order"
+    ],
+    "exclude": [
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**",
+        "**/dist/**",
+        "**/node_modules/**"
+    ]
+}

@@ -2,11 +2,11 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / AuditLogger
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/security](../README.md) / [](../README.md) / AuditLogger
 
 # Class: AuditLogger
 
-Defined in: [packages/security/src/audit-logger.ts:78](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L78)
+Defined in: [packages/security/src/audit-logger.ts:12](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L12)
 
 ## Extends
 
@@ -18,17 +18,17 @@ Defined in: [packages/security/src/audit-logger.ts:78](https://github.com/pohlai
 
 > **new AuditLogger**(`config`, `encryptionManager?`): `AuditLogger`
 
-Defined in: [packages/security/src/audit-logger.ts:85](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L85)
+Defined in: [packages/security/src/audit-logger.ts:19](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L19)
 
 #### Parameters
 
 ##### config
 
-`Partial`\<[`AuditConfig`](../interfaces/AuditConfig.md)\> = `{}`
+`Partial`\<[`AuditConfig`](../types/interfaces/AuditConfig.md)\> = `{}`
 
 ##### encryptionManager?
 
-`any`
+[`EncryptionManager`](EncryptionManager.md)
 
 #### Returns
 
@@ -193,7 +193,7 @@ Defined in: node\_modules/.pnpm/@types+node@24.3.3/node\_modules/@types/node/eve
 
 > **addComplianceRule**(`rule`): `string`
 
-Defined in: [packages/security/src/audit-logger.ts:429](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L429)
+Defined in: [packages/security/src/audit-logger.ts:363](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L363)
 
 Add compliance rule
 
@@ -201,7 +201,7 @@ Add compliance rule
 
 ##### rule
 
-`Omit`\<[`ComplianceRule`](../interfaces/ComplianceRule.md), `"id"` \| `"createdAt"` \| `"updatedAt"`\>
+`Omit`\<[`ComplianceRule`](../types/interfaces/ComplianceRule.md), `"id"` \| `"createdAt"` \| `"updatedAt"`\>
 
 #### Returns
 
@@ -362,7 +362,7 @@ v6.0.0
 
 > **getAuditStats**(`tenantId?`): `object`
 
-Defined in: [packages/security/src/audit-logger.ts:343](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L343)
+Defined in: [packages/security/src/audit-logger.ts:277](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L277)
 
 Get audit statistics
 
@@ -416,9 +416,9 @@ Get audit statistics
 
 ### getEvents()
 
-> **getEvents**(`filters`): [`AuditEvent`](../interfaces/AuditEvent.md)[]
+> **getEvents**(`filters`): [`AuditLogEvent`](../types/interfaces/AuditLogEvent.md)[]
 
-Defined in: [packages/security/src/audit-logger.ts:287](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L287)
+Defined in: [packages/security/src/audit-logger.ts:221](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L221)
 
 Get audit events with filtering
 
@@ -464,7 +464,7 @@ Get audit events with filtering
 
 #### Returns
 
-[`AuditEvent`](../interfaces/AuditEvent.md)[]
+[`AuditLogEvent`](../types/interfaces/AuditLogEvent.md)[]
 
 ***
 
@@ -581,7 +581,7 @@ v0.1.26
 
 > **logAuthentication**(`tenantId`, `userId`, `action`, `details`, `outcome`): `Promise`\<`string`\>
 
-Defined in: [packages/security/src/audit-logger.ts:167](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L167)
+Defined in: [packages/security/src/audit-logger.ts:101](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L101)
 
 Log authentication event
 
@@ -601,7 +601,7 @@ Log authentication event
 
 ##### details
 
-`Record`\<`string`, `any`\> = `{}`
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[] \| `number`[]\> = `{}`
 
 ##### outcome
 
@@ -617,7 +617,7 @@ Log authentication event
 
 > **logDataAccess**(`tenantId`, `userId`, `resource`, `resourceId`, `action`, `details`): `Promise`\<`string`\>
 
-Defined in: [packages/security/src/audit-logger.ts:196](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L196)
+Defined in: [packages/security/src/audit-logger.ts:130](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L130)
 
 Log data access event
 
@@ -645,7 +645,7 @@ Log data access event
 
 ##### details
 
-`Record`\<`string`, `any`\> = `{}`
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[] \| `number`[]\> = `{}`
 
 #### Returns
 
@@ -657,7 +657,7 @@ Log data access event
 
 > **logDataModification**(`tenantId`, `userId`, `resource`, `resourceId`, `action`, `details`): `Promise`\<`string`\>
 
-Defined in: [packages/security/src/audit-logger.ts:228](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L228)
+Defined in: [packages/security/src/audit-logger.ts:162](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L162)
 
 Log data modification event
 
@@ -685,7 +685,7 @@ Log data modification event
 
 ##### details
 
-`Record`\<`string`, `any`\> = `{}`
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[] \| `number`[]\> = `{}`
 
 #### Returns
 
@@ -697,7 +697,7 @@ Log data modification event
 
 > **logEvent**(`event`): `Promise`\<`string`\>
 
-Defined in: [packages/security/src/audit-logger.ts:121](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L121)
+Defined in: [packages/security/src/audit-logger.ts:55](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L55)
 
 Log audit event
 
@@ -705,7 +705,7 @@ Log audit event
 
 ##### event
 
-`Omit`\<[`AuditEvent`](../interfaces/AuditEvent.md), `"id"` \| `"timestamp"` \| `"riskScore"` \| `"complianceFlags"`\>
+`Omit`\<[`AuditLogEvent`](../types/interfaces/AuditLogEvent.md), `"id"` \| `"timestamp"` \| `"riskScore"` \| `"complianceFlags"`\>
 
 #### Returns
 
@@ -717,7 +717,7 @@ Log audit event
 
 > **logSecurityEvent**(`tenantId`, `action`, `details`, `severity`): `Promise`\<`string`\>
 
-Defined in: [packages/security/src/audit-logger.ts:260](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L260)
+Defined in: [packages/security/src/audit-logger.ts:194](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L194)
 
 Log security event
 
@@ -733,7 +733,7 @@ Log security event
 
 ##### details
 
-`Record`\<`string`, `any`\> = `{}`
+`Record`\<`string`, `string` \| `number` \| `boolean` \| `string`[] \| `number`[]\> = `{}`
 
 ##### severity
 
@@ -1266,7 +1266,7 @@ v0.3.5
 
 > **updateComplianceRule**(`ruleId`, `updates`): `boolean`
 
-Defined in: [packages/security/src/audit-logger.ts:446](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/security/src/audit-logger.ts#L446)
+Defined in: [packages/security/src/audit-logger.ts:380](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/security/src/audit-logger.ts#L380)
 
 Update compliance rule
 
@@ -1278,7 +1278,7 @@ Update compliance rule
 
 ##### updates
 
-`Partial`\<[`ComplianceRule`](../interfaces/ComplianceRule.md)\>
+`Partial`\<[`ComplianceRule`](../types/interfaces/ComplianceRule.md)\>
 
 #### Returns
 

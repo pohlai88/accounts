@@ -1,3 +1,14 @@
+# DOC-132: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Web App — Frontend Application
 
 > **TL;DR**: Next.js 14 frontend application with dark-first theme, SSOT-compliant design system,

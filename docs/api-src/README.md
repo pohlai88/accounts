@@ -7,6 +7,7 @@
 ## Packages
 
 - [@aibos/accounting](@aibos/accounting/README.md)
+- [@aibos/api](@aibos/api/README.md)
 - [@aibos/api-gateway](@aibos/api-gateway/README.md)
 - [@aibos/auth](@aibos/auth/README.md)
 - [@aibos/cache](@aibos/cache/README.md)

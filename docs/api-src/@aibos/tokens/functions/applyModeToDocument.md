@@ -2,13 +2,13 @@
 
 ***
 
-[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/tokens](../README.md) / applyModeToDocument
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/tokens](../README.md) / [](../README.md) / applyModeToDocument
 
 # Function: applyModeToDocument()
 
 > **applyModeToDocument**(`mode`): `void`
 
-Defined in: [tokens.ts:314](https://github.com/pohlai88/accounts/blob/40016c553531e31c50d7dcad114ff9c2ce691261/packages/tokens/src/tokens.ts#L314)
+Defined in: [tokens.ts:314](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/tokens/src/tokens.ts#L314)
 
 Apply CSS variables to document root
 

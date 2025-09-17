@@ -1,3 +1,14 @@
+# DOC-096: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Supabase — Supabase Client Management Module
 
 > **TL;DR**: V1 compliance Supabase client management with server, browser, and middleware clients

@@ -1,0 +1,11 @@
+[**AI-BOS Accounts API Documentation**](../../../README.md)
+
+***
+
+[AI-BOS Accounts API Documentation](../../../README.md) / [@aibos/contracts](../README.md) / [](../README.md) / CreateInvoiceRes
+
+# Variable: CreateInvoiceRes
+
+> `const` **CreateInvoiceRes**: `ZodObject`\<\{ `createdAt`: `ZodString`; `currency`: `ZodString`; `customerId`: `ZodString`; `customerName`: `ZodString`; `dueDate`: `ZodString`; `id`: `ZodString`; `invoiceDate`: `ZodString`; `invoiceNumber`: `ZodString`; `lines`: `ZodArray`\<`ZodObject`\<\{ `description`: `ZodString`; `id`: `ZodString`; `lineAmount`: `ZodNumber`; `lineNumber`: `ZodNumber`; `quantity`: `ZodNumber`; `revenueAccountId`: `ZodString`; `taxAmount`: `ZodNumber`; `unitPrice`: `ZodNumber`; \}, `"strip"`, `ZodTypeAny`, \{ `description`: `string`; `id`: `string`; `lineAmount`: `number`; `lineNumber`: `number`; `quantity`: `number`; `revenueAccountId`: `string`; `taxAmount`: `number`; `unitPrice`: `number`; \}, \{ `description`: `string`; `id`: `string`; `lineAmount`: `number`; `lineNumber`: `number`; `quantity`: `number`; `revenueAccountId`: `string`; `taxAmount`: `number`; `unitPrice`: `number`; \}\>, `"many"`\>; `status`: `ZodEnum`\<\[`"draft"`, `"sent"`, `"paid"`, `"overdue"`, `"cancelled"`\]\>; `subtotal`: `ZodNumber`; `taxAmount`: `ZodNumber`; `totalAmount`: `ZodNumber`; \}, `"strip"`, `ZodTypeAny`, \{ `createdAt`: `string`; `currency`: `string`; `customerId`: `string`; `customerName`: `string`; `dueDate`: `string`; `id`: `string`; `invoiceDate`: `string`; `invoiceNumber`: `string`; `lines`: `object`[]; `status`: `"cancelled"` \| `"overdue"` \| `"draft"` \| `"sent"` \| `"paid"`; `subtotal`: `number`; `taxAmount`: `number`; `totalAmount`: `number`; \}, \{ `createdAt`: `string`; `currency`: `string`; `customerId`: `string`; `customerName`: `string`; `dueDate`: `string`; `id`: `string`; `invoiceDate`: `string`; `invoiceNumber`: `string`; `lines`: `object`[]; `status`: `"cancelled"` \| `"overdue"` \| `"draft"` \| `"sent"` \| `"paid"`; `subtotal`: `number`; `taxAmount`: `number`; `totalAmount`: `number`; \}\>
+
+Defined in: [packages/contracts/src/invoice.ts:73](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/contracts/src/invoice.ts#L73)

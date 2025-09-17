@@ -1,347 +1,309 @@
-# Accounting — Core Business Logic
+# DOC-282: Documentation
 
-> **TL;DR**: Core accounting business logic with journal posting, financial reporting, FX handling,
-> and COA validation. Implements D2 AR invoice posting and D4 financial reporting.  
-> **Owner**: @aibos/accounting-team • **Status**: stable • **Since**: 2024-12  
-> **Standards**: CommonMark • SemVer • Conventional Commits • Keep a Changelog
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
 
 ---
 
-## 1) Scope & Boundaries
+# @aibos/accounting
 
-**Does**:
+Core accounting business logic and calculations for the AI-BOS Accounting SaaS platform.
 
-- Implements core accounting business logic and calculations
-- Handles journal posting with SoD compliance and COA validation
-- Provides D2 AR invoice posting engine with GL integration
-- Generates D4 financial reports (trial balance, balance sheet, P&L, cash flow)
-- Manages FX policy validation and currency conversion
-- Validates chart of accounts rules and business constraints
-- Calculates tax amounts and invoice totals
-- Enforces accounting principles and business rules
+## Overview
 
-**Does NOT**:
+This package contains the fundamental accounting operations including Accounts Receivable (AR), Accounts Payable (AP), General Ledger (GL) posting, financial reporting, and multi-currency support.
 
-- Handle database operations (delegates to @aibos/db package)
-- Manage authentication/authorization (uses @aibos/auth package)
-- Provide API endpoints (used by @aibos/web-api package)
-- Handle file operations or UI rendering
-
-**Consumers**: @aibos/web-api, @aibos/worker, @aibos/web
-
-## 2) Quick Links
-
-- **Database Layer**: `packages/db/src/`
-- **Authentication**: `packages/auth/src/`
-- **API Contracts**: `packages/contracts/src/`
-- **Utilities**: `packages/utils/src/`
-- **Architecture Guide**: `../docs/ARCHITECTURE.md`
-- **Integration Strategy**: `../DRAFT_INTEGRATION STRATEGY.md`
-
-## 3) Getting Started
+## Installation
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build the package
-pnpm build
-
-# Run tests
-pnpm test
-
-# Watch mode for development
-pnpm dev
+pnpm add @aibos/accounting
 ```
 
-## 4) Architecture & Dependencies
+## Core Features
 
-**Dependencies**:
+### Accounts Receivable (AR)
+- Invoice posting and validation
+- Customer management
+- Payment tracking and allocation
+- Aging reports
 
-- `@aibos/auth` - SoD compliance and authorization
-- `@aibos/db` - Database operations and account information
-- `zod` - Schema validation and type safety
+### Accounts Payable (AP)
+- Bill processing and approval workflows
+- Vendor management
+- Payment processing with allocations
+- Bank charge handling
+- Withholding tax calculations
 
-**Dependents**:
+### General Ledger (GL)
+- Journal entry posting
+- Chart of accounts management
+- Account validation
+- Trial balance generation
 
-- `@aibos/web-api` - API endpoints
-- `@aibos/worker` - Background processing
-- `@aibos/web` - Frontend calculations
+### Financial Reporting
+- Trial Balance
+- Profit & Loss Statement
+- Balance Sheet
+- Cash Flow Statement
 
-**Build Order**: Depends on @aibos/auth and @aibos/db being built first
+### Multi-Currency Support
+- Foreign exchange rate management
+- Currency conversion
+- Multi-currency reporting
 
-## 5) Development Workflow
+### Period Management
+- Fiscal period opening/closing
+- Period locks and validation
+- Year-end procedures
 
-**Local Dev**:
+## API Reference
 
-```bash
-# Build with watch mode
-pnpm dev
+### Invoice Management
 
-# Run specific tests
-pnpm test posting.test.ts
+```typescript
+import { 
+  validateInvoicePosting, 
+  calculateInvoiceTotals,
+  validateInvoiceLines,
+  generateInvoiceDescription,
+  type InvoicePostingInput,
+  type InvoiceLineInput
+} from "@aibos/accounting";
+
+// Validate invoice before posting
+const validation = validateInvoicePosting({
+  customerId: "cust_123",
+  invoiceNumber: "INV-001",
+  invoiceDate: new Date(),
+  dueDate: new Date(),
+  currency: "USD",
+  lines: [
+    {
+      accountId: "acc_001",
+      description: "Services rendered",
+      quantity: 1,
+      unitPrice: 1000,
+      taxRate: 0.1
+    }
+  ]
+});
+
+// Calculate totals
+const totals = calculateInvoiceTotals(validation.invoice);
 ```
 
-**Testing**:
+### Bill Processing
+
+```typescript
+import { 
+  validateBillPosting, 
+  generateBillNumber,
+  processBillApproval,
+  type BillPostingInput
+} from "@aibos/accounting";
+
+// Validate bill before posting
+const billValidation = validateBillPosting({
+  vendorId: "vend_123",
+  billNumber: "BILL-001",
+  billDate: new Date(),
+  dueDate: new Date(),
+  currency: "USD",
+  lines: [
+    {
+      accountId: "acc_002",
+      description: "Office supplies",
+      quantity: 10,
+      unitPrice: 25,
+      taxRate: 0.08
+    }
+  ]
+});
+
+// Generate bill number
+const billNumber = generateBillNumber("BILL", "2024");
+```
+
+### Payment Processing
+
+```typescript
+import { 
+  validatePaymentProcessing,
+  calculatePaymentSummary,
+  allocatePaymentToInvoices,
+  type PaymentInput
+} from "@aibos/accounting";
+
+// Process payment
+const payment = validatePaymentProcessing({
+  customerId: "cust_123",
+  paymentAmount: 1000,
+  paymentDate: new Date(),
+  currency: "USD",
+  paymentMethod: "bank_transfer"
+});
+
+// Allocate payment to invoices
+const allocation = allocatePaymentToInvoices(payment, [
+  { invoiceId: "inv_001", amount: 600 },
+  { invoiceId: "inv_002", amount: 400 }
+]);
+```
+
+### Financial Reports
+
+```typescript
+import { 
+  generateTrialBalance,
+  generateBalanceSheet,
+  generateProfitLoss,
+  generateCashFlow
+} from "@aibos/accounting";
+
+// Generate Trial Balance
+const trialBalance = await generateTrialBalance({
+  tenantId: "tenant_123",
+  periodStart: new Date("2024-01-01"),
+  periodEnd: new Date("2024-12-31")
+});
+
+// Generate Balance Sheet
+const balanceSheet = await generateBalanceSheet({
+  tenantId: "tenant_123",
+  asOfDate: new Date("2024-12-31")
+});
+```
+
+### Multi-Currency Operations
+
+```typescript
+import { 
+  convertCurrency,
+  getExchangeRate,
+  validateCurrencyCode,
+  type CurrencyConversion
+} from "@aibos/accounting";
+
+// Convert currency
+const conversion = convertCurrency({
+  amount: 1000,
+  fromCurrency: "USD",
+  toCurrency: "EUR",
+  exchangeRate: 0.85
+});
+
+// Get exchange rate
+const rate = await getExchangeRate("USD", "EUR", new Date());
+```
+
+## Configuration
+
+### Environment Variables
+
+```env
+# Exchange Rate API
+EXCHANGE_RATE_API_KEY=your_api_key
+EXCHANGE_RATE_BASE_URL=https://api.exchangerate-api.com/v4
+
+# Tax Configuration
+DEFAULT_TAX_RATE=0.1
+WITHHOLDING_TAX_RATE=0.05
+
+# Reporting
+REPORT_CACHE_TTL=3600
+REPORT_MAX_ROWS=10000
+```
+
+### Feature Flags
+
+```typescript
+const accountingFeatures = {
+  multiCurrency: true,
+  taxCalculations: true,
+  periodManagement: true,
+  advancedReporting: false,
+  automatedPosting: false
+};
+```
+
+## Testing
 
 ```bash
-# Run all tests
+# Run unit tests
 pnpm test
 
-# Run with coverage
-pnpm test --coverage
+# Run tests with coverage
+pnpm test:coverage
 
 # Run specific test file
-pnpm test coa-validation.test.ts
+pnpm test:unit:acc:core
 ```
 
-**Linting**:
+## Dependencies
 
-```bash
-# Check for linting errors
-pnpm lint
+- **@aibos/db**: Database operations and schema
+- **@aibos/auth**: Authentication and user context
+- **zod**: Runtime type validation
 
-# Auto-fix where possible
-pnpm lint --fix
+## Performance Considerations
+
+- **Caching**: Report results are cached for 1 hour
+- **Batch Processing**: Bulk operations use batch processing
+- **Query Optimization**: Database queries are optimized for performance
+- **Memory Management**: Large datasets are processed in chunks
+
+## Security
+
+- **Input Validation**: All inputs are validated with Zod schemas
+- **Authorization**: User permissions are checked for all operations
+- **Audit Logging**: All accounting operations are logged
+- **Data Encryption**: Sensitive data is encrypted at rest
+
+## Error Handling
+
+```typescript
+import { AccountingError, ValidationError } from "@aibos/accounting";
+
+try {
+  const result = await validateInvoicePosting(invoiceData);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    // Handle validation errors
+    console.error("Validation failed:", error.details);
+  } else if (error instanceof AccountingError) {
+    // Handle accounting errors
+    console.error("Accounting error:", error.message);
+  }
+}
 ```
 
-**Type Checking**:
+## Migration Guide
 
-```bash
-# TypeScript compilation check
-pnpm build
+### From v0.0.x to v0.1.0
+
+- **Breaking Change**: `calculateTotals` renamed to `calculateInvoiceTotals`
+- **New Feature**: Multi-currency support added
+- **Deprecated**: `legacyPosting` function removed
+
+```typescript
+// Old way (deprecated)
+const totals = calculateTotals(invoice);
+
+// New way
+const totals = calculateInvoiceTotals(invoice);
 ```
 
-## 6) API Surface
+## Contributing
 
-**Exports**:
+1. Follow the coding standards
+2. Add tests for new features
+3. Update documentation
+4. Run quality checks: `pnpm quality:check`
 
-- Journal posting functions and validation
-- Invoice posting engine and calculations
-- Financial report generators
-- FX policy validation
-- COA validation and business rules
-- Tax calculation functions
+## License
 
-**Public Types**:
-
-- `JournalPostingInput` - Journal entry input structure
-- `InvoicePostingInput` - Invoice posting parameters
-- `TrialBalanceInput` - Trial balance generation parameters
-- `COAValidationResult` - Chart of accounts validation results
-- `FxValidationResult` - Foreign exchange validation results
-
-**Configuration**:
-
-- FX policy settings and currency validation
-- COA business rules and constraints
-- SoD compliance requirements
-
-## 7) Performance & Monitoring
-
-**Bundle Size**:
-
-- Target: <100KB for core business logic
-- Optimized for tree-shaking and minimal dependencies
-- Pure functions for better performance
-
-**Performance Budget**:
-
-- Journal validation: <10ms per entry
-- Trial balance generation: <500ms for 1000 accounts
-- Invoice calculations: <5ms per invoice
-
-**Monitoring**:
-
-- Performance metrics via @aibos/utils
-- Error tracking and validation logging
-- Business rule compliance monitoring
-
-## 8) Security & Compliance
-
-**Permissions**:
-
-- SoD (Separation of Duties) compliance validation
-- Role-based access control integration
-- Multi-tenant data isolation
-
-**Data Handling**:
-
-- All input validated through Zod schemas
-- Immutable data structures for calculations
-- No direct database access (read-only through @aibos/db)
-
-**Compliance**:
-
-- Accounting principles enforcement
-- COA business rules validation
-- Audit trail integration
-
-## 9) Core Modules
-
-### **Journal Posting (`posting.ts`)**
-
-- `validateJournalPosting()` - Comprehensive journal validation
-- `postJournal()` - Journal posting with business rules
-- `validateBalanced()` - Debit/credit balance validation
-- `validateSoDCompliance()` - Separation of duties checks
-
-### **Invoice Posting (`ar/invoice-posting.ts`)**
-
-- `validateInvoicePosting()` - AR invoice to GL validation
-- `calculateInvoiceTotals()` - Invoice amount calculations
-- `validateInvoiceLines()` - Line item validation
-- `generateInvoiceDescription()` - Description generation
-
-### **Financial Reports (`reports/`)**
-
-- `generateTrialBalance()` - Trial balance report engine
-- `generateBalanceSheet()` - Balance sheet generation
-- `generateProfitLoss()` - P&L statement generation
-- `generateCashFlow()` - Cash flow statement generation
-
-### **FX Management (`fx/`)**
-
-- `validateFxPolicy()` - Currency validation and FX requirements
-- `FxPolicy` - FX policy configuration
-- Currency code validation and conversion rules
-
-### **COA Validation (`coa-validation.ts`)**
-
-- `validateCOAFlags()` - Chart of accounts validation
-- `validateAccountsExist()` - Account existence checks
-- `validateNormalBalances()` - Normal balance rule validation
-- `validateControlAccounts()` - Control account restrictions
-
-### **Tax Calculations (`tax-calculations.ts`)**
-
-- Tax amount calculations
-- Tax code validation
-- Multi-currency tax handling
-
-## 10) Business Rules
-
-### **Journal Posting Rules**
-
-- All journals must be balanced (debits = credits)
-- Maximum 100 lines per journal entry
-- SoD compliance required for posting
-- Future-dated journals not allowed
-- Control accounts cannot be posted to directly
-
-### **Invoice Posting Rules**
-
-- AR amount must equal revenue + tax
-- All accounts must exist and be active
-- Revenue accounts must be REVENUE type
-- AR account must be ASSET type
-- Tax accounts must be LIABILITY type
-
-### **COA Validation Rules**
-
-- Account existence and active status validation
-- Currency consistency across journal entries
-- Normal balance rule warnings
-- Control account posting restrictions
-- Parent-child account hierarchy validation
-
-### **FX Policy Rules**
-
-- Valid ISO 4217 currency codes only
-- Exchange rate required for non-base currencies
-- Currency normalization and validation
-- Rounding policy enforcement
-
-## 11) Troubleshooting
-
-**Common Issues**:
-
-- **Validation errors**: Check input data against Zod schemas
-- **SoD violations**: Verify user roles and permissions
-- **COA errors**: Ensure accounts exist and are active
-- **Balance errors**: Verify debit/credit calculations
-
-**Debug Mode**:
-
-```bash
-# Enable detailed logging
-LOG_LEVEL=debug pnpm test
-
-# Run specific validation tests
-pnpm test --grep "COA validation"
-```
-
-**Logs**:
-
-- Validation error details with error codes
-- Business rule violation warnings
-- Performance metrics for calculations
-- SoD compliance check results
-
-## 12) Contributing
-
-**Code Style**:
-
-- Follow functional programming principles
-- Use pure functions where possible
-- Implement comprehensive error handling
-- Maintain business rule consistency
-
-**Testing**:
-
-- Write unit tests for all business logic
-- Test edge cases and error scenarios
-- Validate SoD compliance scenarios
-- Test multi-currency calculations
-
-**Review Process**:
-
-- All changes must maintain business rule integrity
-- Accounting principles must be preserved
-- Performance impact must be considered
-- SoD compliance must be maintained
-
----
-
-## 📚 **Additional Resources**
-
-- [Project README](../README.md)
-- [Architecture Guide](../docs/ARCHITECTURE.md)
-- [Integration Strategy](../DRAFT_INTEGRATION STRATEGY.md)
-- [Database Package](../packages/db/README.md)
-- [Auth Package](../packages/auth/README.md)
-
----
-
-## 🧮 **Accounting Principles**
-
-### **Double-Entry Bookkeeping**
-
-- Every transaction affects at least two accounts
-- Total debits must equal total credits
-- Assets = Liabilities + Equity
-
-### **Chart of Accounts Rules**
-
-- Hierarchical account structure
-- Control accounts cannot be posted to directly
-- Normal balance rules for each account type
-- Currency consistency within journals
-
-### **Separation of Duties**
-
-- Different roles for different operations
-- Approval workflows for sensitive transactions
-- Audit trail for all changes
-- Multi-level authorization
-
-### **Financial Reporting**
-
-- All reports derive from GL journal entries
-- Trial balance as foundation for all reports
-- Multi-currency consolidation support
-- Period-based reporting with fiscal year support
-
----
-
-**Last Updated**: 2025-09-13 • **Version**: 0.1.0
+MIT License - see LICENSE file for details.

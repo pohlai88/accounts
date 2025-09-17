@@ -1,3 +1,14 @@
+# DOC-253: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # Cash — Cash Management and Banking Components
 
 > **TL;DR**: Comprehensive cash management components for banking integration, cash flow analysis,

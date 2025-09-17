@@ -1,3 +1,14 @@
+# DOC-072: Documentation
+
+**Version**: 1.0  
+**Date**: 2025-09-17  
+**Status**: Active  
+**Owner**: Development Team  
+**Last Updated**: 2025-09-17  
+**Next Review**: 2025-12-17  
+
+---
+
 # FX — Foreign Exchange Module
 
 > **TL;DR**: D2 FX rate ingestion and policy management with multi-source fallback and staleness

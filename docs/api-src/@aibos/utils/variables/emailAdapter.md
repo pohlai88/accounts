@@ -1,0 +1,11 @@
+[**AI-BOS Accounts API Documentation (Source)**](../../../README.md)
+
+***
+
+[AI-BOS Accounts API Documentation (Source)](../../../README.md) / [@aibos/utils](../README.md) / [](../README.md) / emailAdapter
+
+# Variable: emailAdapter
+
+> `const` **emailAdapter**: [`EmailPort`](../interfaces/EmailPort.md)
+
+Defined in: [packages/utils/src/email.ts:21](https://github.com/pohlai88/accounts/blob/48103fb36d28b2b9bfb33472b6de2f719773cde9/packages/utils/src/email.ts#L21)
