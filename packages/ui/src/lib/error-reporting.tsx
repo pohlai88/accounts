@@ -143,9 +143,8 @@ export class ErrorReportingService {
             }
 
             this.isInitialized = true;
-            console.log("✅ Error reporting service initialized");
         } catch (error) {
-            console.error("Failed to initialize error reporting service:", error);
+            // Handle initialization error
         }
     }
 
@@ -453,9 +452,9 @@ export class ErrorReportingService {
                 throw new Error(`Error reporting failed: ${response.status} ${response.statusText}`);
             }
 
-            console.log(`✅ Error report sent: ${report.id}`);
+            // Error report sent successfully
         } catch (error) {
-            console.error("Failed to send error report:", error);
+            // Handle error report sending failure
 
             // Retry if enabled
             if (this.config.enableRetry) {

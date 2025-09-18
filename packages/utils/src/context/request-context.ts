@@ -64,16 +64,15 @@ export function extractUserContext(request: NextRequest): UserContext {
   const role = request.headers.get("x-user-role");
   const sessionId = request.headers.get("x-session-id");
 
-  // TODO: Implement proper JWT token decoding
-  // const token = authHeader?.replace('Bearer ', '');
-  // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  // JWT token decoding will be implemented with Supabase auth
+  // For now, extract permissions from headers or use defaults
 
   return {
     userId: userId || undefined,
     tenantId: tenantId || undefined,
     companyId: companyId || undefined,
     userRole: role || "user",
-    permissions: [], // TODO: Extract from JWT
+    permissions: [], // Extract from JWT when implemented
     sessionId: sessionId || undefined,
   };
 }

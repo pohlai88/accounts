@@ -76,7 +76,6 @@ export class ApiServer {
 
         // Redis connection event handlers
         this.redis.on('connect', () => {
-            console.log('Redis connected');
         });
 
         this.redis.on('error', (err) => {
@@ -213,12 +212,6 @@ export class ApiServer {
         return new Promise((resolve, reject) => {
             try {
                 const server = this.app.listen(this.config.port, this.config.host, () => {
-                    console.log(`🚀 API Server running on ${this.config.host}:${this.config.port}`);
-                    console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
-                    console.log(`🔒 CORS Origins: ${this.config.corsOrigins.join(", ")}`);
-                    console.log(`📝 Logging: ${this.config.enableLogging ? "enabled" : "disabled"}`);
-                    console.log(`🛡️ Security: ${this.config.enableSecurity ? "enabled" : "disabled"}`);
-                    console.log(`🗜️ Compression: ${this.config.enableCompression ? "enabled" : "disabled"}`);
                     resolve();
                 });
 
@@ -229,17 +222,13 @@ export class ApiServer {
 
                 // Graceful shutdown
                 process.on("SIGTERM", () => {
-                    console.log("SIGTERM received, shutting down gracefully");
                     server.close(() => {
-                        console.log("Server closed");
                         process.exit(0);
                     });
                 });
 
                 process.on("SIGINT", () => {
-                    console.log("SIGINT received, shutting down gracefully");
                     server.close(() => {
-                        console.log("Server closed");
                         process.exit(0);
                     });
                 });

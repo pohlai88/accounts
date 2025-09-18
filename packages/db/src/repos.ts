@@ -291,7 +291,7 @@ export async function getAccountsInfo(
     // Log account IDs request to monitoring service
     if ((process.env.NODE_ENV as string) === 'development') {
       // eslint-disable-next-line no-console
-      console.log('Requested account IDs:', accountIds);
+      
     }
     for (const accountId of accountIds) {
       const account = accountData.find(a => a.id === accountId);
@@ -309,13 +309,13 @@ export async function getAccountsInfo(
         // Log found account to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
           // eslint-disable-next-line no-console
-          console.log('Found account:', accountId);
+          
         }
       } else {
         // Log missing account to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
           // eslint-disable-next-line no-console
-          console.log('Missing account:', accountId);
+          
         }
       }
     }

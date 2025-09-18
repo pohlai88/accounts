@@ -7,6 +7,7 @@
     "@aibos/cache": "workspace:*",
     "@aibos/contracts": "workspace:*",
     "@aibos/db": "workspace:*",
+    "@aibos/logger": "workspace:*",
     "@aibos/monitoring": "workspace:*",
     "@aibos/realtime": "workspace:*",
     "@aibos/security": "workspace:*",

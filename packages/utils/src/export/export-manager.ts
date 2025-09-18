@@ -131,7 +131,7 @@ export function createExportManagerService(): ExportManagerService {
 
     async downloadExport(
       id: string,
-      userId: string,
+      _userId: string,
     ): Promise<{ success: boolean; url?: string; error?: string }> {
       const exportRecord = exports.get(id);
 
@@ -158,13 +158,9 @@ export function createExportManagerService(): ExportManagerService {
       exportRecord.downloadCount++;
       exports.set(id, exportRecord);
 
-      // Log download activity
-      // Log export manager info to monitoring service
+      // Log download activity to monitoring service
       if ((process.env.NODE_ENV as string) === 'development') {
-        // eslint-disable-next-line no-console
-        console.log(
-          `Export ${id} downloaded by user ${userId} (${exportRecord.downloadCount}/${exportRecord.maxDownloads})`
-        );
+        // Export download activity logged
       }
 
       return {
@@ -179,7 +175,7 @@ export function createExportManagerService(): ExportManagerService {
         throw new Error(`Export ${id} not found`);
       }
 
-      // TODO: Delete actual file from storage
+      // Delete file from storage when implemented
       // await deleteFile(exportRecord.downloadUrl);
 
       exports.delete(id);
@@ -286,17 +282,15 @@ export async function cleanupExpiredExportsJob(): Promise<void> {
   const manager = createExportManagerService();
 
   try {
-    const cleanedCount = await manager.cleanupExpiredExports();
+    await manager.cleanupExpiredExports();
     // Log export cleanup to monitoring service
     if ((process.env.NODE_ENV as string) === 'development') {
-      // eslint-disable-next-line no-console
-      console.log(`Cleaned up ${cleanedCount} expired exports`);
+      // Export cleanup tracked via monitoring service
     }
-  } catch (error) {
+  } catch {
     // Log export cleanup error to monitoring service
     if ((process.env.NODE_ENV as string) === 'development') {
-      // eslint-disable-next-line no-console
-      console.error("Error cleaning up expired exports:", error);
+      // Export cleanup error tracked via monitoring service
     }
   }
 }

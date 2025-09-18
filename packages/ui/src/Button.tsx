@@ -53,7 +53,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   mode?: DesignMode;
 }
@@ -63,7 +63,15 @@ export interface ButtonProps
 // ============================================================================
 
 export function Button({ className, variant, size, mode, asChild: _asChild = false, ...props }: ButtonProps) {
-  const { mode: currentMode } = useAccessibility();
+  // Handle SSR case where accessibility context might not be available
+  let currentMode: DesignMode = "aesthetic";
+  try {
+    const accessibility = useAccessibility();
+    currentMode = accessibility.mode;
+  } catch {
+    // Fallback for SSR or when context is not available
+    currentMode = "aesthetic";
+  }
   const effectiveMode = mode || currentMode;
 
   return (

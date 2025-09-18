@@ -334,7 +334,7 @@ export class QueryOptimizer {
       // eslint-disable-next-line no-console
       if (status.includes("ERROR")) { console.error("Query", payload); }
       else if (ms > 1000) { console.warn("Query", payload); }
-      else { console.log("Query", payload); }
+      else {  }
     }
   }
 

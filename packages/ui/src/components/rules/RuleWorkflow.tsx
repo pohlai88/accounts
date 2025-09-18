@@ -4,6 +4,8 @@ import { Button } from "@aibos/ui/Button";
 import { Badge } from "@aibos/ui/Badge";
 import { Alert } from "@aibos/ui/Alert";
 import { cn } from "@aibos/ui/utils";
+import { logger } from "@aibos/logger";
+import { monitoring } from "../../lib/monitoring.js";
 import {
   Activity,
   AlertTriangle,
@@ -58,6 +60,7 @@ interface Rule {
   successRate: number;
   averageExecutionTime: number;
   costPerExecution: number;
+  isActive: boolean;
 }
 
 interface TestDataSet {
@@ -74,6 +77,7 @@ interface TestResult {
   ruleId: string;
   testDataSetId: string;
   success: boolean;
+  status: "passed" | "failed" | "error";
   executionTime: number;
   cost: number;
   result: any;
@@ -157,7 +161,7 @@ interface RuleWorkflowProps {
 }
 
 export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
-  rules = [],
+  rules: initialRules = [],
   testDataSets = [],
   testResults = [],
   metrics = [],
@@ -168,6 +172,8 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
     "studio" | "testing" | "analytics" | "versioning"
   >("studio");
   const [isLoading, setIsLoading] = useState(false);
+  const [rules, setRules] = useState<Rule[]>(initialRules);
+  const [error, setError] = useState<string | null>(null);
 
   // Mock data for demonstration
   const mockRules: Rule[] =
@@ -212,6 +218,7 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
           successRate: 95.6,
           averageExecutionTime: 120,
           costPerExecution: 0.0025,
+          isActive: true,
         },
         {
           id: "rule_002",
@@ -248,6 +255,7 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
           successRate: 100,
           averageExecutionTime: 85,
           costPerExecution: 0.0018,
+          isActive: true,
         },
       ];
 
@@ -301,6 +309,7 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
           ruleId: "rule_001",
           testDataSetId: "test_001",
           success: true,
+          status: "passed",
           executionTime: 125,
           cost: 0.0025,
           result: { emailSent: true, taskCreated: true },
@@ -474,11 +483,20 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
   const handleSaveRule = useCallback(async (rule: Rule) => {
     setIsLoading(true);
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log("Rule saved:", rule);
+      const response = await fetch('/api/rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rule),
+      });
+      if (response.ok) {
+        await monitoring.recordEvent('rule_saved', { ruleId: rule.id });
+        // Refresh rules list
+        setRules(prev => [...prev.filter(r => r.id !== rule.id), rule]);
+      } else {
+        throw new Error('Failed to save rule');
+      }
     } catch (error) {
-      console.error("Failed to save rule:", error);
+      setError('Failed to save rule');
     } finally {
       setIsLoading(false);
     }
@@ -487,11 +505,17 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
   const handleDeleteRule = useCallback(async (ruleId: string) => {
     setIsLoading(true);
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log("Rule deleted:", ruleId);
+      const response = await fetch(`/api/rules/${ruleId}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        await monitoring.recordEvent('rule_deleted', { ruleId });
+        setRules(prev => prev.filter(r => r.id !== ruleId));
+      } else {
+        throw new Error('Failed to delete rule');
+      }
     } catch (error) {
-      console.error("Failed to delete rule:", error);
+      setError('Failed to delete rule');
     } finally {
       setIsLoading(false);
     }
@@ -500,27 +524,29 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
   const handleExecuteRule = useCallback(async (ruleId: string, testData?: any) => {
     setIsLoading(true);
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log("Rule executed:", ruleId, testData);
+      const response = await fetch(`/api/rules/${ruleId}/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testData }),
+      });
+      if (response.ok) {
+        const result = await response.json();
+        await monitoring.recordEvent('rule_executed', { ruleId, result });
+        return result;
+      } else {
+        throw new Error('Failed to execute rule');
+      }
     } catch (error) {
-      console.error("Failed to execute rule:", error);
+      setError('Failed to execute rule');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const handleToggleRule = useCallback(async (ruleId: string) => {
-    setIsLoading(true);
-    try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log("Rule toggled:", ruleId);
-    } catch (error) {
-      console.error("Failed to toggle rule:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleToggleRule = useCallback((ruleId: string) => {
+    setRules(prev => prev.map(r =>
+      r.id === ruleId ? { ...r, isActive: !r.isActive } : r
+    ));
   }, []);
 
   const handleTestRule = useCallback(async (rule: Rule, testData: any) => {
@@ -613,45 +639,219 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
           onToggleRule={handleToggleRule}
           onTestRule={handleTestRule}
           onExplainRule={handleExplainRule}
-          onSaveTestDataSet={async dataSet => console.log("Test data set saved:", dataSet)}
-          onDeleteTestDataSet={async id => console.log("Test data set deleted:", id)}
+          onViewRuleHistory={ruleId => logger.info("View rule history", { ruleId })}
+          onSaveTestDataSet={async dataSet => {
+            try {
+              const response = await fetch('/api/rules/test-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataSet),
+              });
+              if (response.ok) {
+                await monitoring.recordEvent('test_data_saved', { dataSetId: dataSet.id });
+              }
+            } catch (error) {
+              setError('Failed to save test data set');
+            }
+          }}
+          onDeleteTestDataSet={async id => {
+            try {
+              const response = await fetch(`/api/rules/test-data/${id}`, {
+                method: 'DELETE',
+              });
+              if (response.ok) {
+                await monitoring.recordEvent('test_data_deleted', { dataSetId: id });
+              }
+            } catch (error) {
+              setError('Failed to delete test data set');
+            }
+          }}
           onRunTest={async (ruleId, testDataSetId) => {
-            console.log("Test run:", ruleId, testDataSetId);
-            return (
-              mockTestResults[0] || {
-                id: "mock_result",
+            try {
+              const response = await fetch(`/api/rules/${ruleId}/test`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ testDataSetId }),
+              });
+              if (response.ok) {
+                const result = await response.json();
+                await monitoring.recordEvent('rule_test_run', { ruleId, testDataSetId, result });
+                return result;
+              } else {
+                throw new Error('Failed to run test');
+              }
+            } catch (error) {
+              setError('Failed to run test');
+              return {
+                id: "error_result",
                 ruleId,
                 testDataSetId,
-                success: true,
-                executionTime: 100,
-                cost: 0.001,
-                result: { message: "Mock test result" },
+                success: false,
+                executionTime: 0,
+                cost: 0,
+                result: { message: error instanceof Error ? error.message : 'Unknown error' },
                 executedAt: new Date(),
                 conditions: [],
                 actions: [],
-              }
-            );
+              };
+            }
           }}
           onRunAllTests={async ruleId => {
-            console.log("All tests run:", ruleId);
-            return mockTestResults; // Return mock results
+            try {
+              const response = await fetch(`/api/rules/${ruleId}/test/all`, {
+                method: 'POST',
+              });
+              if (response.ok) {
+                const results = await response.json();
+                await monitoring.recordEvent('rule_all_tests_run', { ruleId, resultCount: results.length });
+                return results;
+              } else {
+                throw new Error('Failed to run all tests');
+              }
+            } catch (error) {
+              setError('Failed to run all tests');
+              return [];
+            }
           }}
-          onExportTestResults={results => console.log("Export test results:", results)}
-          onImportTestData={data => console.log("Import test data:", data)}
+          onExportTestResults={async results => {
+            try {
+              const response = await fetch('/api/rules/export/test-results', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ results }),
+              });
+              if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'test-results.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                await monitoring.recordEvent('test_results_exported', { resultCount: results.length });
+              }
+            } catch (error) {
+              setError('Failed to export test results');
+            }
+          }}
+          onImportTestData={async data => {
+            try {
+              const response = await fetch('/api/rules/import/test-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+              });
+              if (response.ok) {
+                await monitoring.recordEvent('test_data_imported', { dataCount: data.length });
+              }
+            } catch (error) {
+              setError('Failed to import test data');
+            }
+          }}
           onExplainTestResult={result => {
-            console.log("Explain test result:", result);
-            return "Test explanation"; // Return string
+            // Mock explanation for now
+            return `Test result explanation for ${result.id}: ${result.status === 'passed' ? 'Test passed successfully' : 'Test failed'}`;
           }}
-          onRefreshMetrics={() => console.log("Refresh metrics")}
-          onExportMetrics={metrics => console.log("Export metrics:", metrics)}
-          onExportExecutions={executions => console.log("Export executions:", executions)}
-          onViewRuleDetails={ruleId => console.log("View rule details:", ruleId)}
-          onResolveAlert={alertId => console.log("Resolve alert:", alertId)}
-          onSetAlertThreshold={(ruleId, type, threshold) =>
-            console.log("Set alert threshold:", ruleId, type, threshold)
-          }
+          onRefreshMetrics={async () => {
+            try {
+              const response = await fetch('/api/rules/metrics');
+              if (response.ok) {
+                const metrics = await response.json();
+                await monitoring.recordEvent('metrics_refreshed', { metricCount: Object.keys(metrics).length });
+                return metrics;
+              }
+            } catch (error) {
+              setError('Failed to refresh metrics');
+            }
+          }}
+          onExportMetrics={async metrics => {
+            try {
+              const response = await fetch('/api/rules/export/metrics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(metrics),
+              });
+              if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'rule-metrics.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                await monitoring.recordEvent('metrics_exported', { metricCount: Object.keys(metrics).length });
+              }
+            } catch (error) {
+              setError('Failed to export metrics');
+            }
+          }}
+          onExportExecutions={async executions => {
+            try {
+              const response = await fetch('/api/rules/export/executions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(executions),
+              });
+              if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'rule-executions.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                await monitoring.recordEvent('executions_exported', { executionCount: executions.length });
+              }
+            } catch (error) {
+              setError('Failed to export executions');
+            }
+          }}
+          onViewRuleDetails={async ruleId => {
+            try {
+              const response = await fetch(`/api/rules/${ruleId}`);
+              if (response.ok) {
+                const rule = await response.json();
+                await monitoring.recordEvent('rule_details_viewed', { ruleId });
+                return rule;
+              }
+            } catch (error) {
+              setError('Failed to view rule details');
+            }
+          }}
+          onResolveAlert={async alertId => {
+            try {
+              const response = await fetch(`/api/rules/alerts/${alertId}/resolve`, {
+                method: 'POST',
+              });
+              if (response.ok) {
+                await monitoring.recordEvent('alert_resolved', { alertId });
+              }
+            } catch (error) {
+              setError('Failed to resolve alert');
+            }
+          }}
+          onSetAlertThreshold={async (ruleId, type, threshold) => {
+            try {
+              const response = await fetch(`/api/rules/${ruleId}/alert-threshold`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type, threshold }),
+              });
+              if (response.ok) {
+                await monitoring.recordEvent('alert_threshold_set', { ruleId, type, threshold });
+              }
+            } catch (error) {
+              setError('Failed to set alert threshold');
+            }
+          }}
           onCreateVersion={async (ruleId, changeLog) => {
-            console.log("Create version:", ruleId, changeLog);
+            logger.info("Create version", { ruleId, changeLog });
             return (
               mockVersions[0] || {
                 id: "mock_version",
@@ -675,51 +875,53 @@ export const RuleWorkflow: React.FC<RuleWorkflowProps> = ({
             );
           }}
           onActivateVersion={async versionId => {
-            console.log("Activate version:", versionId);
+            logger.info("Activating version", { versionId });
+            if (process.env.NODE_ENV === 'development') {
+              logger.info("Create version", { ruleId: "mock_rule_id", changeLog: "Mock change log" });
+            }
           }}
           onArchiveVersion={async versionId => {
-            console.log("Archive version:", versionId);
+            if (process.env.NODE_ENV === 'development') { logger.info("Archive version", { versionId }); }
           }}
           onDeleteVersion={async versionId => {
-            console.log("Delete version:", versionId);
+            if (process.env.NODE_ENV === 'development') { logger.info("Delete version", { versionId }); }
           }}
           onCompareVersions={async (version1Id, version2Id) => {
-            console.log("Compare versions:", version1Id, version2Id);
+            if (process.env.NODE_ENV === 'development') { logger.info("Compare versions", { version1Id, version2Id }); }
             return []; // Return empty diff array
           }}
           onExportVersion={async versionId => {
-            console.log("Export version:", versionId);
+            if (process.env.NODE_ENV === 'development') { logger.info("Export version", { versionId }); }
             return "exported data"; // Return string
           }}
           onImportVersion={async (ruleId, versionData) => {
-            console.log("Import version:", ruleId, versionData);
-            return (
-              mockVersions[0] || {
-                id: "mock_imported_version",
-                ruleId,
-                version: 1,
-                name: "Imported Version",
-                description: "Imported version description",
-                conditions: [],
-                actions: [],
-                status: "draft" as const,
-                createdAt: new Date(),
-                createdBy: "mock@example.com",
-                changeLog: "Imported from external source",
-                isActive: false,
-                executionCount: 0,
-                successRate: 0,
-                averageExecutionTime: 0,
-                costPerExecution: 0,
-                tags: [],
-              }
-            );
+            if (process.env.NODE_ENV === 'development') { logger.info("Import version", { ruleId, versionData }); }
+            return mockVersions[0] || {
+              id: "mock_imported_version",
+              ruleId: "mock_rule_id",
+              version: 1,
+              name: "Imported Version",
+              description: "Imported version description",
+              conditions: [],
+              actions: [],
+              status: "draft" as const,
+              createdAt: new Date(),
+              createdBy: "mock@example.com",
+              changeLog: "Imported from external source",
+              isActive: false,
+              executionCount: 0,
+              successRate: 0,
+              averageExecutionTime: 0,
+              costPerExecution: 0,
+              tags: [],
+            };
           }}
-          onTagVersion={async (versionId, tags) => console.log("Tag version:", versionId, tags)}
-          onViewRuleHistory={ruleId => console.log("View rule history:", ruleId)}
-          onViewVersionHistory={ruleId => console.log("View version history:", ruleId)}
-          onExportRule={ruleId => console.log("Export rule:", ruleId)}
-          onImportRule={ruleData => console.log("Import rule:", ruleData)}
+          onViewVersionHistory={ruleId => logger.info("View version history", { ruleId })}
+          onExportRule={ruleId => logger.info("Export rule", { ruleId })}
+          onImportRule={ruleData => logger.info("Import rule", { ruleData })}
+          onTagVersion={async (versionId, tag) => {
+            logger.info("Tag version", { versionId, tag });
+          }}
           executions={[]}
         />
       )}

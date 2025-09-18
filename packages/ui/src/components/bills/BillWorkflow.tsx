@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@aibos/ui/utils";
+import { logger } from "@aibos/logger";
 import { BillForm } from "./BillForm.js";
 import { OCRDataExtractor } from "./OCRDataExtractor.js";
 import { ApprovalWorkflow } from "./ApprovalWorkflow.js";
@@ -166,7 +167,7 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
           <OCRDataExtractor
             onDataExtracted={handleOCRDataExtracted}
             onProcessingComplete={result => {
-              console.log("OCR Processing Complete:", result);
+              logger.info("OCR Processing Complete", { result });
             }}
             isLoading={isLoading}
           />
@@ -182,15 +183,15 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
               approvalLimit: 5000,
             }}
             onApprove={(requestId, comments) => {
-              console.log("Approved:", requestId, comments);
+              logger.info("Approval request approved", { requestId, comments });
               handleApprovalComplete({ requestId, comments, status: "approved" });
             }}
             onReject={(requestId, reason) => {
-              console.log("Rejected:", requestId, reason);
+              logger.warn("Approval request rejected", { requestId, reason });
               handleApprovalComplete({ requestId, reason, status: "rejected" });
             }}
             onEscalate={(requestId, comments) => {
-              console.log("Escalated:", requestId, comments);
+              logger.warn("Approval request escalated", { requestId, comments });
               handleApprovalComplete({ requestId, comments, status: "escalated" });
             }}
             isLoading={isLoading}
@@ -205,11 +206,11 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
             amount={2500.0}
             dueDate="2024-02-15"
             onPaymentProcessed={paymentId => {
-              console.log("Payment Processed:", paymentId);
+              logger.info("Payment processed successfully", { paymentId });
               handlePaymentComplete({ paymentId, status: "processed" });
             }}
             onPaymentScheduled={schedule => {
-              console.log("Payment Scheduled:", schedule);
+              logger.info("Payment scheduled", { schedule });
               handlePaymentComplete({ schedule, status: "scheduled" });
             }}
             isLoading={isLoading}
@@ -220,13 +221,13 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
           <VendorManager
             onVendorSelect={handleVendorSelect}
             onVendorCreate={vendor => {
-              console.log("Vendor Created:", vendor);
+              logger.info("Vendor created", { vendor });
             }}
             onVendorUpdate={(vendorId, vendorData) => {
-              console.log("Vendor Updated:", vendorId, vendorData);
+              logger.info("Vendor updated", { vendorId, vendorData });
             }}
             onVendorDelete={vendorId => {
-              console.log("Vendor Deleted:", vendorId);
+              logger.info("Vendor deleted", { vendorId });
             }}
             isLoading={isLoading}
           />
@@ -235,25 +236,25 @@ export const BillWorkflow: React.FC<BillWorkflowProps> = ({
         return (
           <ExpenseCategorizer
             onCategoryCreate={category => {
-              console.log("Category Created:", category);
+              logger.info("Category created", { category });
             }}
             onCategoryUpdate={(categoryId, categoryData) => {
-              console.log("Category Updated:", categoryId, categoryData);
+              logger.info("Category updated", { categoryId, categoryData });
             }}
             onCategoryDelete={categoryId => {
-              console.log("Category Deleted:", categoryId);
+              logger.info("Category deleted", { categoryId });
             }}
             onRuleCreate={rule => {
-              console.log("Rule Created:", rule);
+              logger.info("Rule created", { rule });
             }}
             onRuleUpdate={(ruleId, ruleData) => {
-              console.log("Rule Updated:", ruleId, ruleData);
+              logger.info("Rule updated", { ruleId, ruleData });
             }}
             onRuleDelete={ruleId => {
-              console.log("Rule Deleted:", ruleId);
+              logger.info("Rule deleted", { ruleId });
             }}
             onCategorizeExpense={expenseData => {
-              console.log("Expense Categorized:", expenseData);
+              logger.info("Expense categorized", { expenseData });
               return "category_001";
             }}
             isLoading={isLoading}

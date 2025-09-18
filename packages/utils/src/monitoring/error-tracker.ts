@@ -1,6 +1,7 @@
 // Error tracking for V1 compliance
 // Comprehensive error monitoring with Axiom integration
 
+import { logger } from "@aibos/logger";
 import { axiom } from "@aibos/utils/axiom";
 
 export interface ErrorContext {
@@ -356,7 +357,7 @@ export class ErrorTracker {
         })),
       );
     } catch (error) {
-      console.error("Failed to flush errors to Axiom:", error);
+      logger.error("Failed to flush errors to Axiom", error instanceof Error ? error : new Error(String(error)));
       // Re-add errors to buffer for retry
       this.errorBuffer.unshift(...errorsToFlush);
     }
@@ -396,7 +397,7 @@ export class ErrorTracker {
         },
       ]);
     } catch (error) {
-      console.error("Failed to report error rate violation:", error);
+      logger.error("Failed to report error rate violation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 

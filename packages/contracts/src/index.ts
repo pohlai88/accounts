@@ -11,3 +11,7 @@ export * from "./types/api.js";
 export * from "./types/entities.js";
 export * from "./types/errors.js";
 export * from "./types/branded.js";
+
+// New consolidated schemas
+export * from "./api-schemas.js";
+export * from "./component-props.js";

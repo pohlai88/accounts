@@ -97,7 +97,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch invoices:", error);
     return NextResponse.json({
       success: false,
       error: {
@@ -307,7 +306,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           context: auditContext,
         });
 
-        console.warn(`Invoice posting validation failed for ${body.invoiceNumber}:`, postingValidation.error);
       } else {
         // Create journal entry
         const journalInput: JournalInput = {
@@ -341,7 +339,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           context: auditContext,
         });
 
-        console.log(`Invoice ${body.invoiceNumber} successfully posted to GL with journal ${journalResult.journalNumber}`);
+
       }
     } catch (glError) {
       // Log GL posting error but don't fail the invoice creation
@@ -359,7 +357,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         context: auditContext,
       });
 
-      console.error(`GL posting failed for invoice ${body.invoiceNumber}:`, glError);
     }
 
     // 8. Log successful invoice creation
@@ -442,10 +439,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         context: auditContext,
       });
     } catch (auditError) {
-      console.error("Audit logging failed during error handling:", auditError);
     }
 
-    console.error("Invoice creation error:", error);
 
     if (error instanceof Error && error.message.includes("already exists")) {
       return NextResponse.json({

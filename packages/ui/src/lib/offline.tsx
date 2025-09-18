@@ -360,12 +360,10 @@ export class OfflineManager {
 
         const handleOnline = () => {
             this.store.getState().setOnline(true);
-            console.log("🌐 Connection restored");
         };
 
         const handleOffline = () => {
             this.store.getState().setOnline(false);
-            console.log("📴 Connection lost");
         };
 
         window.addEventListener("online", handleOnline);
@@ -410,9 +408,9 @@ export class OfflineManager {
             const registration = await navigator.serviceWorker.register("/sw.js");
             this.serviceWorker = registration.active || registration.waiting || registration.installing;
 
-            console.log("✅ Service Worker registered");
+            // Service Worker registered successfully
         } catch (error) {
-            console.error("❌ Service Worker registration failed:", error);
+            // Handle Service Worker registration error
         }
     }
 

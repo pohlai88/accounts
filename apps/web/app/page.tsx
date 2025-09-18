@@ -11,8 +11,8 @@ import {
   Badge,
   Alert,
   AlertDescription,
-  useAccessibility,
 } from "@aibos/ui";
+import { ClientOnlyAccessibility } from "./components/ClientOnlyAccessibility";
 import { useInvoices, useCustomers, useTrialBalance, useInvalidateQueries } from "@aibos/utils";
 import { useState, useEffect } from "react";
 
@@ -60,7 +60,6 @@ export default function Home() {
   }
 
   const { session, login, logout, isLoading, error } = useAuth();
-  const { preferences, updatePreference } = useAccessibility();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -219,15 +218,19 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={isClient ? () => updatePreference('colorScheme', preferences.colorScheme === 'light' ? 'dark' : 'light') : undefined}
-                className="text-[var(--sys-text-secondary)] hover:text-[var(--sys-text-primary)]"
-                disabled={!isClient}
-              >
-                {preferences.colorScheme === "light" ? "🌙 Dark" : "☀️ Light"}
-              </Button>
+              <ClientOnlyAccessibility>
+                {({ preferences, updatePreference }) => (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={isClient ? () => updatePreference('colorScheme', preferences.colorScheme === 'light' ? 'dark' : 'light') : undefined}
+                    className="text-[var(--sys-text-secondary)] hover:text-[var(--sys-text-primary)]"
+                    disabled={!isClient}
+                  >
+                    {preferences.colorScheme === "light" ? "🌙 Dark" : "☀️ Light"}
+                  </Button>
+                )}
+              </ClientOnlyAccessibility>
               <Badge variant="outline">{session.user.role}</Badge>
               <Button variant="outline" onClick={handleLogout}>
                 Sign Out

@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { execSync } from "child_process";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
+import { logger } from "@aibos/logger";
 import { monitoring } from "../../../apps/web-api/lib/monitoring";
 
 // ============================================================================
@@ -107,7 +108,6 @@ export class BackupManager {
       // Log backup start to monitoring service
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.log(`🔄 Starting backup: ${backupId}`);
       }
 
       // Create backup directory
@@ -124,7 +124,6 @@ export class BackupManager {
           // Log table backup success to monitoring service
           if (process.env.NODE_ENV === 'development') {
             // eslint-disable-next-line no-console
-            console.log(`✅ Backed up table: ${table} (${tableResult.rowCount} rows)`);
           }
         } catch (error) {
           const errorMsg = `Failed to backup table ${table}: ${error}`;
@@ -132,7 +131,7 @@ export class BackupManager {
           // Log table backup error to monitoring service
           if (process.env.NODE_ENV === 'development') {
             // eslint-disable-next-line no-console
-            console.error(`❌ ${errorMsg}`);
+            logger.error("Backup error", new Error(errorMsg));
           }
         }
       }
@@ -172,7 +171,6 @@ export class BackupManager {
       // Log backup completion to monitoring service
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.log(`✅ Backup completed: ${backupId} (${result.duration}ms, ${this.formatBytes(result.size)})`);
       }
       return result;
 
@@ -181,7 +179,7 @@ export class BackupManager {
       result.duration = Date.now() - startTime;
       result.errors.push(`Backup failed: ${error}`);
 
-      console.error(`❌ Backup failed: ${error}`);
+      logger.error("Backup failed", error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -199,7 +197,6 @@ export class BackupManager {
     };
 
     try {
-      console.log(`🔄 Starting restore: ${config.backupId}`);
 
       // Verify backup exists
       if (!existsSync(backupPath)) {
@@ -228,11 +225,10 @@ export class BackupManager {
         try {
           await this.restoreTable(tableName, backupPath, config);
           result.restoredTables.push(tableName);
-          console.log(`✅ Restored table: ${tableName}`);
         } catch (error) {
           const errorMsg = `Failed to restore table ${tableName}: ${error}`;
           result.errors.push(errorMsg);
-          console.error(`❌ ${errorMsg}`);
+          logger.error("Restore error", new Error(errorMsg));
         }
       }
 
@@ -251,7 +247,6 @@ export class BackupManager {
         })
       );
 
-      console.log(`✅ Restore completed: ${config.backupId} (${result.duration}ms)`);
       return result;
 
     } catch (error) {
@@ -259,7 +254,7 @@ export class BackupManager {
       result.duration = Date.now() - startTime;
       result.errors.push(`Restore failed: ${error}`);
 
-      console.error(`❌ Restore failed: ${error}`);
+      logger.error("Restore failed", error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -294,7 +289,7 @@ export class BackupManager {
 
       return backups.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     } catch (error) {
-      console.error("Failed to list backups:", error);
+      logger.error("Failed to list backups", error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }
@@ -310,14 +305,12 @@ export class BackupManager {
         if (backup.timestamp < cutoffDate) {
           await this.deleteBackup(backup.id);
           deletedCount++;
-          console.log(`🗑️ Deleted old backup: ${backup.id}`);
         }
       }
 
-      console.log(`✅ Cleaned up ${deletedCount} old backups`);
       return deletedCount;
     } catch (error) {
-      console.error("Failed to cleanup old backups:", error);
+      logger.error("Failed to cleanup old backups", error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
   }
@@ -348,7 +341,7 @@ export class BackupManager {
 
       return tableNames;
     } catch (error) {
-      console.error("Failed to get tables:", error);
+      logger.error("Failed to get tables", error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }
@@ -405,7 +398,6 @@ export class BackupManager {
       const data = JSON.parse(fs.readFileSync(tableFile, "utf8"));
 
       if (data.length === 0) {
-        console.log(`⚠️ No data to restore for table: ${tableName}`);
         return;
       }
 
@@ -497,7 +489,6 @@ export class BackupManager {
       const fs = await import("fs/promises");
       await fs.rm(backupPath, { recursive: true, force: true });
 
-      console.log(`✅ Backup compressed: ${backupPath}.tar.gz`);
     } catch (error) {
       throw new Error(`Failed to compress backup: ${error}`);
     }
@@ -515,7 +506,6 @@ export class BackupManager {
       const tarCommand = `tar -xzf ${tarFile} -C ${backupPath}`;
       execSync(tarCommand);
 
-      console.log(`✅ Backup decompressed: ${backupPath}`);
     } catch (error) {
       throw new Error(`Failed to decompress backup: ${error}`);
     }
@@ -543,7 +533,6 @@ export class BackupManager {
         output.on("error", reject);
       });
 
-      console.log(`✅ Backup encrypted: ${backupPath}.enc`);
     } catch (error) {
       throw new Error(`Failed to encrypt backup: ${error}`);
     }
@@ -571,7 +560,6 @@ export class BackupManager {
         output.on("error", reject);
       });
 
-      console.log(`✅ Backup decrypted: ${backupPath}`);
     } catch (error) {
       throw new Error(`Failed to decrypt backup: ${error}`);
     }
@@ -604,7 +592,7 @@ export class BackupManager {
 
       return calculateDirSize(backupPath);
     } catch (error) {
-      console.error("Failed to calculate backup size:", error);
+      logger.error("Failed to calculate backup size", error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
   }
@@ -650,11 +638,10 @@ export async function createBackup(): Promise<void> {
   const result = await backupManager.createBackup();
 
   if (!result.success) {
-    console.error("Backup failed:", result.errors);
+    logger.error("Backup failed", new Error(JSON.stringify(result.errors)));
     process.exit(1);
   }
 
-  console.log("✅ Backup created successfully");
 }
 
 export async function restoreBackup(backupId: string, environment: "staging" | "production" = "staging"): Promise<void> {
@@ -668,18 +655,16 @@ export async function restoreBackup(backupId: string, environment: "staging" | "
   });
 
   if (!result.success) {
-    console.error("Restore failed:", result.errors);
+    logger.error("Restore failed", new Error(JSON.stringify(result.errors)));
     process.exit(1);
   }
 
-  console.log("✅ Backup restored successfully");
 }
 
 export async function listBackups(): Promise<void> {
   const backupManager = new BackupManager();
   const backups = await backupManager.listBackups();
 
-  console.log("📋 Available Backups:");
   console.table(backups);
 }
 
@@ -687,7 +672,6 @@ export async function cleanupBackups(): Promise<void> {
   const backupManager = new BackupManager();
   const deletedCount = await backupManager.cleanupOldBackups();
 
-  console.log(`✅ Cleaned up ${deletedCount} old backups`);
 }
 
 // ============================================================================
@@ -704,23 +688,20 @@ export class ScheduledBackupService {
 
   startSchedule(): void {
     if (!this.backupManager["config"].scheduleEnabled) {
-      console.log("⚠️ Backup scheduling is disabled");
       return;
     }
 
     // Default to daily backups at 2 AM
     const cronExpression = this.backupManager["config"].scheduleCron || "0 2 * * *";
 
-    console.log(`🕐 Starting scheduled backups: ${cronExpression}`);
 
     // For now, use a simple interval (in production, use a proper cron library)
     this.intervalId = setInterval(async () => {
       try {
-        console.log("🔄 Running scheduled backup...");
         await this.backupManager.createBackup();
         await this.backupManager.cleanupOldBackups();
       } catch (error) {
-        console.error("❌ Scheduled backup failed:", error);
+        logger.error("Scheduled backup failed", error instanceof Error ? error : new Error(String(error)));
       }
     }, 24 * 60 * 60 * 1000); // 24 hours
   }
@@ -729,7 +710,6 @@ export class ScheduledBackupService {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
-      console.log("⏹️ Stopped scheduled backups");
     }
   }
 }

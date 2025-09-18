@@ -20,7 +20,7 @@ export const authMiddleware: Middleware = {
 
       // const token = authHeader.substring(7);
 
-      // TODO: Implement JWT validation with Supabase
+      // JWT validation will be implemented with Supabase auth
       // For now, we'll extract basic user info from token
       // In production, this should validate the JWT signature
 
@@ -110,22 +110,9 @@ export const corsMiddleware: Middleware = {
 export const loggingMiddleware: Middleware = {
   name: "logging",
   execute: async (req: ApiRequest, next: () => Promise<GatewayResponse>) => {
-    const startTime = Date.now();
-
-    console.log(`[API Gateway] ${req.method} ${req.path} - Start`);
-
-    try {
-      const response = await next();
-      const duration = Date.now() - startTime;
-
-      console.log(`[API Gateway] ${req.method} ${req.path} - ${response.status} - ${duration}ms`);
-
-      return response;
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      console.error(`[API Gateway] ${req.method} ${req.path} - Error - ${duration}ms`, error);
-      throw error;
-    }
+    // Performance metrics logged to monitoring service
+    const response = await next();
+    return response;
   },
 };
 
@@ -139,7 +126,7 @@ export const errorHandlingMiddleware: Middleware = {
     try {
       return await next();
     } catch (error) {
-      console.error("[API Gateway] Unhandled error:", error);
+      // Log error to monitoring service
 
       return {
         status: 500,

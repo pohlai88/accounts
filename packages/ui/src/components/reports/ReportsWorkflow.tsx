@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useInvoices, useBills, usePayments, useBankAccounts } from "../../store/index.js";
 import { apiClient } from "../../lib/api-client.js";
+import { monitoring } from "../../lib/monitoring.js";
 import type { ReportTemplate } from "./CustomReportBuilder.js";
 
 // SSOT Compliant Reports Workflow Component
@@ -331,37 +332,57 @@ export const ReportsWorkflow: React.FC<ReportsWorkflowProps> = ({
             templates={[]}
             availableFields={[]}
             onSave={async (report: ReportTemplate) => {
-              // Log report save to monitoring service
-              if (process.env.NODE_ENV === 'development') {
-                // eslint-disable-next-line no-console
-                // Log report save to monitoring service
-                if ((process.env.NODE_ENV as string) === 'development') {
-                  // eslint-disable-next-line no-console
-                  console.log("Save report:", report);
+              try {
+                const response = await fetch('/api/reports/templates', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(report),
+                });
+                if (response.ok) {
+                  await monitoring.recordEvent('report_template_saved', { reportId: report.id });
                 }
+              } catch (error) {
+                setError('Failed to save report template');
               }
             }}
             onLoad={async (id: string) => null as unknown as ReportTemplate}
             onExport={async (report: ReportTemplate, format: "pdf" | "excel" | "csv") => {
-              // Log report export to monitoring service
-              if (process.env.NODE_ENV === 'development') {
-                // eslint-disable-next-line no-console
-                // Log report export to monitoring service
-                if ((process.env.NODE_ENV as string) === 'development') {
-                  // eslint-disable-next-line no-console
-                  console.log("Export report:", report, format);
+              try {
+                const response = await fetch(`/api/reports/export`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ reportId: report.id, format }),
+                });
+                if (response.ok) {
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `report-${report.id}.${format}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  document.body.removeChild(a);
+                  await monitoring.recordEvent('report_exported', { reportId: report.id, format });
                 }
+              } catch (error) {
+                setError('Failed to export report');
               }
             }}
-            onPreview={(report: ReportTemplate) => {
-              // Log report preview to monitoring service
-              if (process.env.NODE_ENV === 'development') {
-                // eslint-disable-next-line no-console
-                // Log report preview to monitoring service
-                if ((process.env.NODE_ENV as string) === 'development') {
-                  // eslint-disable-next-line no-console
-                  console.log("Preview report:", report);
+            onPreview={async (report: ReportTemplate) => {
+              try {
+                const response = await fetch(`/api/reports/preview`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ reportId: report.id }),
+                });
+                if (response.ok) {
+                  const previewData = await response.json();
+                  await monitoring.recordEvent('report_previewed', { reportId: report.id });
+                  return previewData;
                 }
+              } catch (error) {
+                setError('Failed to preview report');
               }
             }}
           />

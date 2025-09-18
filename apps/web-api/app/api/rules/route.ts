@@ -78,7 +78,7 @@ async function getRulesHandler(req: NextRequest) {
     try {
       const cachedRules = await cache.get(`${tenantId}:rules_list`) as any[];
       if (cachedRules && Array.isArray(cachedRules)) {
-        console.log(`Cache hit for rules in tenant ${tenantId}`);
+        
         return ok(
           {
             rules: cachedRules,
@@ -94,7 +94,7 @@ async function getRulesHandler(req: NextRequest) {
     }
 
     // Cache miss - fetch from database
-    console.log(`Cache miss for rules in tenant ${tenantId}`);
+    
 
     // Return mock rules data with tenant context (in production, this would be a real DB query)
     const rules = [
@@ -115,7 +115,7 @@ async function getRulesHandler(req: NextRequest) {
     // Cache the result
     try {
       await cache.set(`${tenantId}:rules_list`, rules, 300); // 5 minutes TTL
-      console.log(`Cached rules for tenant ${tenantId}`);
+      
     } catch (cacheError) {
       console.warn("Cache write error:", cacheError);
     }
@@ -228,7 +228,7 @@ async function postRulesHandler(req: NextRequest) {
     // Invalidate cache for this tenant
     try {
       await cache.invalidatePattern(`${tenantId}:rules_*`);
-      console.log(`Cache invalidated for tenant ${tenantId}`);
+      
     } catch (cacheError) {
       console.warn("Cache invalidation error:", cacheError);
     }
@@ -236,7 +236,7 @@ async function postRulesHandler(req: NextRequest) {
     // Trigger real-time event
     // try {
     //     webSocketServer.triggerRuleCreated(tenantId, newRule);
-    //     console.log(`Real-time event triggered for rule creation in tenant ${tenantId}`);
+    //     
     // } catch (eventError) {
     //     console.warn('Real-time event error:', eventError);
     // }

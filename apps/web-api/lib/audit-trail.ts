@@ -148,7 +148,7 @@ export class AuditTrailManager {
             this.setupCleanup();
 
             this.isInitialized = true;
-            console.log("✅ Audit trail manager initialized");
+            
         } catch (error) {
             console.error("Failed to initialize audit trail manager:", error);
             throw error;
@@ -349,7 +349,7 @@ export class AuditTrailManager {
                 throw error;
             }
 
-            console.log(`Cleaned up audit records older than ${this.config.retentionPeriod} days`);
+            
         } catch (error) {
             console.error("Failed to cleanup old audit records:", error);
         }
@@ -539,7 +539,7 @@ export class AuditTrailManager {
         await this.flushBuffer();
 
         this.isInitialized = false;
-        console.log("Audit trail manager shutdown complete");
+        
     }
 }
 

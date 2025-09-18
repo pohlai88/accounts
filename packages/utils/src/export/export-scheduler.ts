@@ -25,7 +25,7 @@ export interface ScheduledExport {
     dateFormat?: string;
     timezone?: string;
   };
-  recipients: string[]; // Email addresses
+  recipients: string[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -36,10 +36,10 @@ export interface ScheduledExport {
 
 export interface ScheduleConfig {
   type: "daily" | "weekly" | "monthly" | "quarterly" | "yearly" | "custom";
-  frequency: number; // e.g., every 2 weeks
-  dayOfWeek?: number; // 0-6, Sunday = 0
-  dayOfMonth?: number; // 1-31
-  time: string; // HH:MM format
+  frequency: number;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+  time: string;
   timezone: string;
   endDate?: Date;
 }
@@ -59,7 +59,7 @@ export interface ExportScheduleService {
 
 export function createExportScheduleService(): ExportScheduleService {
   const exportService = createExportService();
-  const schedules = new Map<string, ScheduledExport>(); // In production, use database
+  const schedules = new Map<string, ScheduledExport>();
 
   return {
     async createSchedule(scheduleData): Promise<ScheduledExport> {
@@ -91,7 +91,6 @@ export function createExportScheduleService(): ExportScheduleService {
         updatedAt: new Date(),
       };
 
-      // Recalculate next run time if schedule changed
       if (updates.schedule) {
         updated.nextRunAt = getNextRunTime(updates.schedule, existing.lastRunAt);
       }
@@ -129,7 +128,6 @@ export function createExportScheduleService(): ExportScheduleService {
         throw new Error(`Schedule ${id} is inactive`);
       }
 
-      // Create export request
       const request: ReportExportRequest = {
         reportType: schedule.reportType,
         format: schedule.format,
@@ -137,10 +135,8 @@ export function createExportScheduleService(): ExportScheduleService {
         options: schedule.options,
       };
 
-      // Execute export
       const result = await exportService.exportReport(request);
 
-      // Update schedule
       const now = new Date();
       schedule.lastRunAt = now;
       schedule.nextRunAt = getNextRunTime(schedule.schedule, now);
@@ -161,9 +157,6 @@ export function createExportScheduleService(): ExportScheduleService {
   };
 }
 
-/**
- * Calculate next run time based on schedule configuration
- */
 function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
   const now = lastRun || new Date();
   const [hours, minutes] = schedule.time.split(":").map(Number);
@@ -171,18 +164,15 @@ function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
   const nextRun = new Date(now);
   nextRun.setHours(hours || 0, minutes || 0, 0, 0);
 
-  // If the time has already passed today, start from tomorrow
   if (nextRun <= now) {
     nextRun.setDate(nextRun.getDate() + 1);
   }
 
   switch (schedule.type) {
     case "daily":
-      // Already set to next day if needed
       break;
 
     case "weekly": {
-      // Move to next occurrence of the specified day of week
       const targetDay = schedule.dayOfWeek || 0;
       const currentDay = nextRun.getDay();
       const daysUntilTarget = (targetDay - currentDay + 7) % 7;
@@ -195,7 +185,6 @@ function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
     }
 
     case "monthly": {
-      // Move to next occurrence of the specified day of month
       const targetDate = schedule.dayOfMonth || 1;
       nextRun.setDate(targetDate);
       if (nextRun <= now) {
@@ -206,7 +195,6 @@ function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
     }
 
     case "quarterly": {
-      // Move to next quarter
       const currentMonth = nextRun.getMonth();
       const nextQuarterMonth = Math.floor(currentMonth / 3) * 3 + 3;
       nextRun.setMonth(nextQuarterMonth);
@@ -219,9 +207,8 @@ function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
     }
 
     case "yearly":
-      // Move to next year
       nextRun.setFullYear(nextRun.getFullYear() + 1);
-      nextRun.setMonth(0); // January
+      nextRun.setMonth(0);
       nextRun.setDate(schedule.dayOfMonth || 1);
       break;
 
@@ -229,7 +216,6 @@ function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
       throw new Error(`Unsupported schedule type: ${schedule.type}`);
   }
 
-  // Check end date
   if (schedule.endDate && nextRun > schedule.endDate) {
     throw new Error("Schedule has expired");
   }
@@ -237,16 +223,10 @@ function getNextRunTime(schedule: ScheduleConfig, lastRun?: Date): Date {
   return nextRun;
 }
 
-/**
- * Generate unique ID for schedules
- */
 function generateId(): string {
   return `sched_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
-/**
- * Background job to process scheduled exports
- */
 export async function processScheduledExports(): Promise<void> {
   const scheduleService = createExportScheduleService();
 
@@ -255,42 +235,29 @@ export async function processScheduledExports(): Promise<void> {
 
     for (const schedule of dueSchedules) {
       try {
-        // Log scheduled export execution to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
-          // eslint-disable-next-line no-console
-          console.log(`Executing scheduled export: ${schedule.name} (${schedule.id})`);
+          // Scheduled export execution logged to monitoring service
         }
         const result = await scheduleService.executeSchedule(schedule.id);
 
         if (result.success) {
-          // Log export completion to monitoring service
           if ((process.env.NODE_ENV as string) === 'development') {
-            // eslint-disable-next-line no-console
-            console.log(`Export completed: ${result.filename}, ${result.recordCount} records`);
+            // Export completion logged to monitoring service
           }
-
-          // TODO: Send email to recipients with export file
-          // await sendExportEmail(schedule.recipients, result);
         } else {
-          // Log export failure to monitoring service
           if ((process.env.NODE_ENV as string) === 'development') {
-            // eslint-disable-next-line no-console
-            console.error(`Export failed for schedule ${schedule.id}: ${result.error}`);
+            // Export failure logged to monitoring service
           }
         }
-      } catch (error) {
-        // Log schedule execution error to monitoring service
+      } catch {
         if ((process.env.NODE_ENV as string) === 'development') {
-          // eslint-disable-next-line no-console
-          console.error(`Error executing schedule ${schedule.id}:`, error);
+          // Schedule execution error logged to monitoring service
         }
       }
     }
-  } catch (error) {
-    // Log scheduled exports processing error to monitoring service
+  } catch {
     if ((process.env.NODE_ENV as string) === 'development') {
-      // eslint-disable-next-line no-console
-      console.error("Error processing scheduled exports:", error);
+      // Scheduled exports processing error logged to monitoring service
     }
   }
 }

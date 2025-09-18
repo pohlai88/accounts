@@ -1,5 +1,6 @@
 // Redis Cache Adapter
 import { CacheAdapter, CacheConfig, CacheOptions, CacheStats, CacheItem } from "./types.js";
+import { logger } from "@aibos/logger";
 
 export class RedisCacheAdapter implements CacheAdapter {
   private client: unknown;
@@ -36,14 +37,14 @@ export class RedisCacheAdapter implements CacheAdapter {
       (this.client as { on: (event: string, callback: (err: Error) => void) => void }).on(
         "error",
         (err: Error) => {
-          console.error("Redis Client Error:", err);
+          logger.error("Redis Client Error", err instanceof Error ? err : new Error(String(err)));
         },
       );
 
       await (this.client as { connect: () => Promise<void> }).connect();
-      console.log("Redis cache connected successfully");
+
     } catch (error) {
-      console.error("Failed to connect to Redis:", error);
+      logger.error("Failed to connect to Redis", error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -92,7 +93,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       this.updateHitRate();
       return item.value;
     } catch (error) {
-      console.error("Cache get error:", error);
+      logger.error("Cache get error", error instanceof Error ? error : new Error(String(error)));
       this.cacheStats.misses++;
       this.updateHitRate();
       return null;
@@ -139,7 +140,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       this.cacheStats.sets++;
       return true;
     } catch (error) {
-      console.error("Cache set error:", error);
+      logger.error("Cache set error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -162,7 +163,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       this.cacheStats.deletes++;
       return result > 0;
     } catch (error) {
-      console.error("Cache delete error:", error);
+      logger.error("Cache delete error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -189,7 +190,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       this.cacheStats.deletes += result;
       return result;
     } catch (error) {
-      console.error("Cache delete pattern error:", error);
+      logger.error("Cache delete pattern error", error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
   }
@@ -225,7 +226,7 @@ export class RedisCacheAdapter implements CacheAdapter {
 
       return deletedCount;
     } catch (error) {
-      console.error("Cache delete by tags error:", error);
+      logger.error("Cache delete by tags error", error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
   }
@@ -245,7 +246,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       );
       return result === 1;
     } catch (error) {
-      console.error("Cache exists error:", error);
+      logger.error("Cache exists error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -262,7 +263,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       const fullKey = this.buildKey(key);
       return await (this.client as { ttl: (key: string) => Promise<number> }).ttl(fullKey);
     } catch (error) {
-      console.error("Cache TTL error:", error);
+      logger.error("Cache TTL error", error instanceof Error ? error : new Error(String(error)));
       return -1;
     }
   }
@@ -282,7 +283,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       ).expire(fullKey, ttl);
       return result === 1;
     } catch (error) {
-      console.error("Cache expire error:", error);
+      logger.error("Cache expire error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -315,7 +316,7 @@ export class RedisCacheAdapter implements CacheAdapter {
 
       return true;
     } catch (error) {
-      console.error("Cache flush error:", error);
+      logger.error("Cache flush error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -339,7 +340,7 @@ export class RedisCacheAdapter implements CacheAdapter {
       const result = await (this.client as { ping: () => Promise<string> }).ping();
       return result === "PONG";
     } catch (error) {
-      console.error("Cache ping error:", error);
+      logger.error("Cache ping error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }

@@ -566,7 +566,7 @@ export class Logger extends EventEmitter {
         // Log debug message to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
           // eslint-disable-next-line no-console
-          console.log(logMessage);
+          
         }
     }
   }

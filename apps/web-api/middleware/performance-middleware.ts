@@ -76,7 +76,7 @@ export class PerformanceMiddleware {
 
     // Detailed logging in development
     if (this.config.enableDetailedLogging) {
-      console.log("Performance metrics:", metrics);
+      
     }
   }
 

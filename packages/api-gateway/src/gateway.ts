@@ -273,7 +273,6 @@ export class APIGateway {
         // Log startup to monitoring service instead of console
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.log(`API Gateway running on port ${this.config.port}`);
         }
         resolve();
       });
@@ -284,7 +283,6 @@ export class APIGateway {
     // Graceful shutdown logic would go here
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.log("API Gateway stopped");
     }
   }
 }

@@ -220,7 +220,7 @@ export class ComprehensiveMonitoringSystem extends EventEmitter {
                 },
             });
 
-            console.log("✅ Comprehensive monitoring system initialized");
+            
         } catch (error) {
             console.error("Failed to initialize comprehensive monitoring system:", error);
             throw error;

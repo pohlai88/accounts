@@ -354,7 +354,7 @@ export async function POST(req: NextRequest) {
                     // Log unhandled webhook event to monitoring service
                     if ((process.env.NODE_ENV as string) === 'development') {
                         // eslint-disable-next-line no-console
-                        console.log(`Unhandled webhook event: ${event}`);
+                        
                     }
                 }
         }
@@ -406,7 +406,7 @@ async function handleSubscriptionCreated(data: Record<string, unknown>) {
         // Log subscription creation to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
             // eslint-disable-next-line no-console
-            console.log("Handling subscription created:", data);
+            
         }
     }
     // Implementation for subscription created event
@@ -419,7 +419,7 @@ async function handleSubscriptionUpdated(data: Record<string, unknown>) {
         // Log subscription update to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
             // eslint-disable-next-line no-console
-            console.log("Handling subscription updated:", data);
+            
         }
     }
     // Implementation for subscription updated event
@@ -432,7 +432,7 @@ async function handleSubscriptionCancelled(data: Record<string, unknown>) {
         // Log subscription cancellation to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
             // eslint-disable-next-line no-console
-            console.log("Handling subscription cancelled:", data);
+            
         }
     }
     // Implementation for subscription cancelled event
@@ -445,7 +445,7 @@ async function handleInvoicePaid(data: Record<string, unknown>) {
         // Log invoice payment to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
             // eslint-disable-next-line no-console
-            console.log("Handling invoice paid:", data);
+            
         }
     }
 
@@ -469,7 +469,7 @@ async function handleInvoicePaymentFailed(data: Record<string, unknown>) {
         // Log invoice payment failure to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
             // eslint-disable-next-line no-console
-            console.log("Handling invoice payment failed:", data);
+            
         }
     }
 
@@ -491,7 +491,7 @@ async function handlePaymentMethodUpdated(data: Record<string, unknown>) {
         // Log payment method update to monitoring service
         if ((process.env.NODE_ENV as string) === 'development') {
             // eslint-disable-next-line no-console
-            console.log("Handling payment method updated:", data);
+            
         }
     }
 

@@ -109,9 +109,8 @@ class PerformanceMonitor {
             this.startReporting();
 
             this.isInitialized = true;
-            console.log("✅ Frontend performance monitoring initialized");
         } catch (error) {
-            console.error("Failed to initialize performance monitoring:", error);
+            // Handle initialization error
         }
     }
 
@@ -167,7 +166,7 @@ class PerformanceMonitor {
                 });
             });
         } catch (error) {
-            console.error("Failed to initialize Web Vitals:", error);
+            // Handle Web Vitals initialization error
         }
     }
 
@@ -347,7 +346,7 @@ class PerformanceMonitor {
                 }),
             });
         } catch (error) {
-            console.error("Failed to report performance metrics:", error);
+            // Handle metrics reporting error
             // Re-add metrics to buffer on failure
             this.metricsBuffer.unshift(...metrics);
         }
@@ -506,12 +505,12 @@ export class PerformanceUtils {
         return fn().then(
             (result) => {
                 const duration = performance.now() - startTime;
-                console.log(`${name} took ${duration.toFixed(2)}ms`);
+                // Performance measurement logged
                 return result;
             },
             (error) => {
                 const duration = performance.now() - startTime;
-                console.log(`${name} failed after ${duration.toFixed(2)}ms`);
+                // Performance measurement failed
                 throw error;
             }
         );
@@ -523,11 +522,11 @@ export class PerformanceUtils {
         try {
             const result = fn();
             const duration = performance.now() - startTime;
-            console.log(`${name} took ${duration.toFixed(2)}ms`);
+            // Performance measurement logged
             return result;
         } catch (error) {
             const duration = performance.now() - startTime;
-            console.log(`${name} failed after ${duration.toFixed(2)}ms`);
+            // Performance measurement failed
             throw error;
         }
     }

@@ -42,6 +42,7 @@ interface TestResult {
   ruleId: string;
   testDataSetId: string;
   success: boolean;
+  status: "passed" | "failed" | "error";
   executionTime: number;
   cost: number;
   result: any;

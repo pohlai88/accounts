@@ -29,7 +29,7 @@ export class ProductionWebSocketServer extends EventEmitter {
       // Log WebSocket server status to monitoring service
       if ((process.env.NODE_ENV as string) === 'development') {
         // eslint-disable-next-line no-console
-        console.log("WebSocket server already running");
+
       }
       return;
     }
@@ -61,15 +61,14 @@ export class ProductionWebSocketServer extends EventEmitter {
       // Log WebSocket server startup to monitoring service
       if ((process.env.NODE_ENV as string) === 'development') {
         // eslint-disable-next-line no-console
-        console.log(`🚀 Production WebSocket server started on port ${port}`);
+
         // eslint-disable-next-line no-console
-        console.log(`📊 Real-time features: Presence, Events, Notifications`);
+
       }
     } catch (error) {
       // Log WebSocket server startup error to monitoring service
       if ((process.env.NODE_ENV as string) === 'development') {
         // eslint-disable-next-line no-console
-        console.error("Failed to start WebSocket server:", error);
       }
       throw error;
     }
@@ -88,13 +87,12 @@ export class ProductionWebSocketServer extends EventEmitter {
       // Log WebSocket server stop to monitoring service
       if ((process.env.NODE_ENV as string) === 'development') {
         // eslint-disable-next-line no-console
-        console.log("WebSocket server stopped");
+
       }
     } catch (error) {
       // Log WebSocket server stop error to monitoring service
       if ((process.env.NODE_ENV as string) === 'development') {
         // eslint-disable-next-line no-console
-        console.error("Error stopping WebSocket server:", error);
       }
     }
   }
@@ -113,7 +111,7 @@ export class ProductionWebSocketServer extends EventEmitter {
     // Log business logic integration to monitoring service
     if ((process.env.NODE_ENV as string) === 'development') {
       // eslint-disable-next-line no-console
-      console.log("✅ Business logic integration configured");
+
     }
   }
 
@@ -122,7 +120,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // Journal entry events
     eventSystem.subscribe("system", ["journal.created"], data => {
-      console.log("📝 Journal entry created:", data);
+
       const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "journal.created",
@@ -133,7 +131,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // Invoice events
     eventSystem.subscribe("system", ["invoice.updated"], data => {
-      console.log("🧾 Invoice updated:", data);
+
       const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "invoice.updated",
@@ -144,7 +142,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // Rule events
     eventSystem.subscribe("system", ["rule.created"], data => {
-      console.log("📋 Rule created:", data);
+
       const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "rule.created",
@@ -159,7 +157,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // User presence events
     presenceSystem.on("presence.changed", update => {
-      console.log("👤 User presence changed:", update);
+
       this.broadcastToTenant(update.tenantId, {
         type: "presence.changed",
         data: update,
@@ -173,7 +171,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // Tenant switching events
     eventSystem.subscribe("system", ["tenant.switched"], data => {
-      console.log("🏢 Tenant switched:", data);
+
       const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToUser(eventData.userId, {
         type: "tenant.switched",
@@ -184,7 +182,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // Member invitation events
     eventSystem.subscribe("system", ["member.invited"], data => {
-      console.log("👥 Member invited:", data);
+
       const eventData = data.data as { tenantId: string; userId: string;[key: string]: unknown };
       this.broadcastToTenant(eventData.tenantId, {
         type: "member.invited",
@@ -199,7 +197,7 @@ export class ProductionWebSocketServer extends EventEmitter {
 
     // System notifications
     notificationSystem.on("notification.created", notification => {
-      console.log("🔔 Notification created:", notification);
+
       this.broadcastToUser(notification.userId, {
         type: "notification.created",
         data: notification,
@@ -227,7 +225,6 @@ export class ProductionWebSocketServer extends EventEmitter {
           };
           wsManager?.sendMessage(connection.id, convertedMessage);
         } else {
-          console.error("Invalid WebSocket message:", wsMessage.error);
         }
       } catch (error) {
         console.error("Error broadcasting to tenant:", error);
@@ -254,7 +251,6 @@ export class ProductionWebSocketServer extends EventEmitter {
           };
           wsManager?.sendMessage(connection.id, convertedMessage);
         } else {
-          console.error("Invalid WebSocket message:", wsMessage.error);
         }
       } catch (error) {
         console.error("Error broadcasting to user:", error);

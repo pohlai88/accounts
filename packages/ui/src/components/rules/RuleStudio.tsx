@@ -39,14 +39,14 @@ interface RuleCondition {
   id: string;
   field: string;
   operator:
-    | "equals"
-    | "not_equals"
-    | "greater_than"
-    | "less_than"
-    | "contains"
-    | "not_contains"
-    | "is_empty"
-    | "is_not_empty";
+  | "equals"
+  | "not_equals"
+  | "greater_than"
+  | "less_than"
+  | "contains"
+  | "not_contains"
+  | "is_empty"
+  | "is_not_empty";
   value: string | number | boolean;
   logicalOperator?: "AND" | "OR";
 }
@@ -54,12 +54,12 @@ interface RuleCondition {
 interface RuleAction {
   id: string;
   type:
-    | "send_email"
-    | "create_task"
-    | "update_field"
-    | "send_webhook"
-    | "assign_user"
-    | "create_alert";
+  | "send_email"
+  | "create_task"
+  | "update_field"
+  | "send_webhook"
+  | "assign_user"
+  | "create_alert";
   config: Record<string, any>;
   order: number;
 }
@@ -80,6 +80,7 @@ interface Rule {
   successRate: number;
   averageExecutionTime: number;
   costPerExecution: number;
+  isActive: boolean;
 }
 
 interface RuleStudioProps {

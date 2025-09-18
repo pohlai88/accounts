@@ -1,0 +1,50 @@
+{
+  "name": "@aibos/logger",
+  "version": "1.0.0",
+  "description": "Unified logging solution for AI-BOS monorepo - SSOT for all logging patterns",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3"
+  },
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./bind": {
+      "import": "./dist/bind.mjs",
+      "require": "./dist/bind.js",
+      "types": "./dist/bind.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config.mjs",
+      "require": "./dist/config.js",
+      "types": "./dist/config.d.ts"
+    }
+  },
+  "keywords": [
+    "logging",
+    "pino",
+    "structured-logging",
+    "observability",
+    "ssot"
+  ],
+  "author": "AI-BOS Team",
+  "license": "MIT"
+}

@@ -29,7 +29,6 @@ export class ProductionHealthChecker {
   }
 
   async runFullHealthCheck(): Promise<DeploymentHealth> {
-    console.log(chalk.blue("🔍 Running Production Health Check...\n"));
 
     const results: HealthCheckResult[] = [];
 
@@ -238,8 +237,6 @@ export class ProductionHealthChecker {
   }
 
   displayResults(health: DeploymentHealth): void {
-    console.log(chalk.blue("\n📊 Health Check Results:"));
-    console.log(chalk.blue("=".repeat(50)));
 
     health.results.forEach(result => {
       const icon = result.status === "PASS" ? "✅" : result.status === "WARN" ? "⚠️" : "❌";
@@ -250,16 +247,10 @@ export class ProductionHealthChecker {
             ? chalk.yellow
             : chalk.red;
 
-      console.log(`${icon} ${color(result.component)}: ${result.message}`);
       if (result.details) {
-        console.log(chalk.gray(`   Details: ${JSON.stringify(result.details, null, 2)}`));
       }
     });
 
-    console.log(chalk.blue("\n📈 Summary:"));
-    console.log(chalk.green(`✅ Passed: ${health.summary.passed}`));
-    console.log(chalk.yellow(`⚠️  Warnings: ${health.summary.warnings}`));
-    console.log(chalk.red(`❌ Failed: ${health.summary.failed}`));
 
     const overallColor =
       health.overall === "PASS"
@@ -267,7 +258,6 @@ export class ProductionHealthChecker {
         : health.overall === "WARN"
           ? chalk.yellow
           : chalk.red;
-    console.log(chalk.blue("\n🎯 Overall Status:"), overallColor(health.overall));
   }
 }
 
@@ -278,10 +268,8 @@ export async function runQuickHealthCheck(): Promise<void> {
     const health = await checker.runFullHealthCheck();
 
     if (health.overall === "PASS") {
-      console.log(chalk.green("✅ Quick health check passed"));
       process.exit(0);
     } else {
-      console.log(chalk.red("❌ Quick health check failed"));
       process.exit(1);
     }
   } catch (error) {

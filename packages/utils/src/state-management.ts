@@ -596,16 +596,16 @@ export function useTaxCodes(context: ApiRequestContext, options?: { enabled?: bo
 export function useInvalidateQueries() {
   return {
     invalidateAll: () => {
-      console.log("Invalidating all queries");
+      
     },
     invalidateInvoices: (context: ApiRequestContext) => {
-      console.log("Invalidating invoices for context:", context);
+      
     },
     invalidateCustomers: (context: ApiRequestContext) => {
-      console.log("Invalidating customers for context:", context);
+      
     },
     invalidateJournals: (context: ApiRequestContext) => {
-      console.log("Invalidating journals for context:", context);
+      
     },
   };
 }

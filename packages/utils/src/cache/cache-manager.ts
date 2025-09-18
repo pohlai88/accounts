@@ -2,6 +2,7 @@
 import { CacheAdapter, CacheConfig, CacheOptions, CacheStats } from "./types.js";
 import { RedisCacheAdapter } from "./redis-adapter.js";
 import { MemoryCacheAdapter } from "./memory-adapter.js";
+import { logger } from "@aibos/logger";
 
 export class CacheManager {
   private adapter: CacheAdapter;
@@ -28,13 +29,13 @@ export class CacheManager {
         await (this.adapter as { connect: () => Promise<void> }).connect();
       }
       this.isConnected = true;
-      console.log("Cache manager connected successfully");
+
     } catch (error) {
-      console.error("Failed to connect to cache:", error);
+      logger.error("Failed to connect to cache", error instanceof Error ? error : new Error(String(error)));
       // Fallback to memory cache
       this.adapter = new MemoryCacheAdapter(this.config);
       this.isConnected = true;
-      console.log("Fell back to memory cache");
+
     }
   }
 
@@ -47,9 +48,9 @@ export class CacheManager {
         await (this.adapter as { disconnect: () => Promise<void> }).disconnect();
       }
       this.isConnected = false;
-      console.log("Cache manager disconnected");
+
     } catch (error) {
-      console.error("Error disconnecting from cache:", error);
+      logger.error("Error disconnecting from cache", error instanceof Error ? error : new Error(String(error)));
     }
   }
 

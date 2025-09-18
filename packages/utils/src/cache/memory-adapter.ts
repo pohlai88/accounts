@@ -1,5 +1,6 @@
 // Memory Cache Adapter (Fallback)
 import { CacheAdapter, CacheConfig, CacheOptions, CacheStats, CacheItem } from "./types.js";
+import { logger } from "@aibos/logger";
 
 export class MemoryCacheAdapter implements CacheAdapter {
   private cache = new Map<string, CacheItem>();
@@ -47,7 +48,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       this.updateHitRate();
       return item.value as T;
     } catch (error) {
-      console.error("Memory cache get error:", error);
+      logger.error("Memory cache get error", error instanceof Error ? error : new Error(String(error)));
       this.cacheStats.misses++;
       this.updateHitRate();
       return null;
@@ -73,7 +74,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       this.cacheStats.sets++;
       return true;
     } catch (error) {
-      console.error("Memory cache set error:", error);
+      logger.error("Memory cache set error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -88,7 +89,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       this.cacheStats.deletes++;
       return result;
     } catch (error) {
-      console.error("Memory cache delete error:", error);
+      logger.error("Memory cache delete error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -112,7 +113,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       this.cacheStats.deletes += deletedCount;
       return deletedCount;
     } catch (error) {
-      console.error("Memory cache delete pattern error:", error);
+      logger.error("Memory cache delete pattern error", error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
   }
@@ -134,7 +135,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       this.cacheStats.deletes += deletedCount;
       return deletedCount;
     } catch (error) {
-      console.error("Memory cache delete by tags error:", error);
+      logger.error("Memory cache delete by tags error", error instanceof Error ? error : new Error(String(error)));
       return 0;
     }
   }
@@ -147,7 +148,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       const fullKey = this.buildKey(key);
       return this.cache.has(fullKey);
     } catch (error) {
-      console.error("Memory cache exists error:", error);
+      logger.error("Memory cache exists error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -174,7 +175,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
 
       return remaining;
     } catch (error) {
-      console.error("Memory cache TTL error:", error);
+      logger.error("Memory cache TTL error", error instanceof Error ? error : new Error(String(error)));
       return -1;
     }
   }
@@ -195,7 +196,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       this.cache.set(fullKey, item);
       return true;
     } catch (error) {
-      console.error("Memory cache expire error:", error);
+      logger.error("Memory cache expire error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -215,7 +216,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
       };
       return true;
     } catch (error) {
-      console.error("Memory cache flush error:", error);
+      logger.error("Memory cache flush error", error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -277,7 +278,7 @@ export class MemoryCacheAdapter implements CacheAdapter {
     }
 
     if (cleanedCount > 0) {
-      console.log(`Memory cache: cleaned up ${cleanedCount} expired items`);
+
     }
   }
 }

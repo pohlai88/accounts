@@ -1,5 +1,6 @@
 // Audit Service - V1 Compliance
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { logger } from "@aibos/logger";
 
 interface AuditLogRow {
   id: string;
@@ -62,10 +63,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log report generation audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log report generation:", error);
-      }
+      logger.error("Failed to log report generation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -94,10 +92,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log security violation audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log security violation:", error);
-      }
+      logger.error("Failed to log security violation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -124,10 +119,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log period operation audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log period operation:", error);
-      }
+      logger.error("Failed to log period operation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -154,10 +146,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log journal posting audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log journal posting:", error);
-      }
+      logger.error("Failed to log journal posting", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -186,10 +175,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log error audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log error:", error);
-      }
+      logger.error("Failed to log error", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -215,10 +201,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log authentication audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log authentication:", error);
-      }
+      logger.error("Failed to log authentication", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -266,10 +249,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log SoD compliance audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log SoD compliance:", error);
-      }
+      logger.error("Failed to log SoD compliance", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -317,10 +297,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log COA validation audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log COA validation:", error);
-      }
+      logger.error("Failed to log COA validation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -350,10 +327,7 @@ export class AuditService {
       await this.storeAuditEvent(event);
     } catch (error) {
       // Log operation audit failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to log operation:", error);
-      }
+      logger.error("Failed to log operation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -379,17 +353,11 @@ export class AuditService {
 
       if (error) {
         // Log audit event storage failure to monitoring service
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.error("Failed to store audit event:", error);
-        }
+        logger.error("Failed to store audit event", error instanceof Error ? error : new Error(String(error)));
       }
     } catch (error) {
       // Log audit event storage failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to store audit event:", error);
-      }
+      logger.error("Failed to store audit event", error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -441,10 +409,7 @@ export class AuditService {
 
       if (error) {
         // Log audit events query failure to monitoring service
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.error("Failed to query audit events:", error);
-        }
+        logger.error("Failed to query audit events", error instanceof Error ? error : new Error(String(error)));
         return [];
       }
 
@@ -468,10 +433,7 @@ export class AuditService {
       }));
     } catch (error) {
       // Log audit events query failure to monitoring service
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.error("Failed to query audit events:", error);
-      }
+      logger.error("Failed to query audit events", error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@aibos/auth": "workspace:*",
+    "@aibos/logger": "workspace:*",
     "@aibos/tokens": "workspace:*",
     "@aibos/utils": "workspace:*",
     "@heroicons/react": "^2.1.1",
@@ -11,6 +12,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.2",
     "web-vitals": "^5.1.0",
     "zustand": "^5.0.8"
@@ -18,11 +20,11 @@
   "devDependencies": {
     "@aibos/eslint-config": "workspace:*",
     "@aibos/prettier-config": "workspace:*",
-
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
     "typescript": "^5.6.2",
     "vitest": "^3.2.4"
   },
@@ -82,8 +84,6 @@
     "typecheck": "tsc -p . --noEmit",
     "lint": "eslint .",
     "dev": "tsc -p . --watch",
-
-
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\""
   },

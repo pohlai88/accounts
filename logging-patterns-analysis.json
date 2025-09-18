@@ -1,0 +1,3266 @@
+{
+  "summary": {
+    "totalConsole": 323,
+    "totalLogger": 297,
+    "competingSystems": 11,
+    "filesWithConsole": 134,
+    "filesWithLogger": 27
+  },
+  "patterns": {
+    "console": {
+      "log": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web\\app\\admin\\settings\\page.tsx",
+          "line": 49,
+          "content": "console.log(\"Settings saved:\", { featureFlags, policySettings });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web\\app\\invoices\\page.tsx",
+          "line": 153,
+          "content": "void invoice; // Prevent console.log violation"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web\\app\\invoices\\page.tsx",
+          "line": 157,
+          "content": "void invoice; // Prevent console.log violation"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\.eslintrc.js",
+          "line": 11,
+          "content": "message: 'Use @aibos/logger instead of console.log'"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 206,
+          "content": "description: 'Raw console.log, console.info, console.warn, console.error',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 209,
+          "content": "console.log('User logged in');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 151,
+          "content": "// console.log('User logged in'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 219,
+          "content": "// Before: console.log('User logged in');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 28,
+          "content": "* Migrate a console.log statement"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 36,
+          "content": "// Pattern 1: Simple console.log with string"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 46,
+          "content": "// Pattern 2: console.log with template literal"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 64,
+          "content": "// Pattern 3: console.log with object"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 312,
+          "content": "before: `console.log('User logged in');`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 61,
+          "content": "console.log(`WebSocket server started on port ${this.config.port}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 79,
+          "content": "console.log(\"WebSocket server stopped\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 139,
+          "content": "console.log(`New connection: ${connectionId} (tenant: ${tenantId}, user: ${userId})`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 262,
+          "content": "console.log(`Connection closed: ${connectionId} (code: ${code}, reason: ${reason})`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\app-shell\\AppShell.tsx",
+          "line": 58,
+          "content": "console.log(\"Company switch clicked\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\app-shell\\AppShell.tsx",
+          "line": 66,
+          "content": "console.log(\"User menu clicked\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\app-shell\\AppShell.tsx",
+          "line": 101,
+          "content": "console.log(`Inbox action: ${action} on ${itemId}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\app-shell\\AppShell.tsx",
+          "line": 104,
+          "content": "console.log(\"Inbox filters changed:\", filters);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\app-shell\\AppShell.tsx",
+          "line": 113,
+          "content": "console.log(\"Timeline item clicked:\", item);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\app-shell\\AppShell.tsx",
+          "line": 116,
+          "content": "console.log(\"Timeline filters changed:\", filters);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\common\\ErrorBoundary.tsx",
+          "line": 141,
+          "content": "console.log(`Error reported: ${report.id}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\features\\FeatureFlags.tsx",
+          "line": 604,
+          "content": "console.log(\"Feature evaluation results:\", results);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\invoices\\InvoiceWorkflow.tsx",
+          "line": 248,
+          "content": "console.log(\"Download invoice:\", invoice);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\invoices\\InvoiceWorkflow.tsx",
+          "line": 407,
+          "content": "console.log(\"Send invoice:\", method, data);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\invoices\\InvoiceWorkflow.tsx",
+          "line": 433,
+          "content": "console.log(\"Timeline event clicked:\", event);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 17,
+          "content": "console.log(\"Running attachment table migration...\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 30,
+          "content": "console.log(\"Migration completed successfully!\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 42,
+          "content": "console.log(\"✅ Attachments table created successfully!\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 44,
+          "content": "console.log(\"❌ Attachments table not found\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\index.ts",
+          "line": 52,
+          "content": "console.log("
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\tests\\setup\\database-setup.ts",
+          "line": 144,
+          "content": "console.log(\"🗄️ Setting up test database\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\tests\\setup\\database-setup.ts",
+          "line": 149,
+          "content": "console.log(\"🧹 Cleaning up test database\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\tests\\setup\\global-setup.ts",
+          "line": 32,
+          "content": "console.log(\"🧪 Test environment configured\");"
+        }
+      ],
+      "error": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web\\app\\admin\\settings\\page.tsx",
+          "line": 55,
+          "content": "console.error(\"Failed to save settings:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web\\app\\page.tsx",
+          "line": 117,
+          "content": "console.error(\"Login failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web\\app\\page.tsx",
+          "line": 128,
+          "content": "console.error(\"Logout failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\accounts\\route.ts",
+          "line": 124,
+          "content": "console.error(\"Failed to fetch accounts:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\accounts\\route.ts",
+          "line": 266,
+          "content": "console.error(\"Account creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\admin\\settings\\route.ts",
+          "line": 64,
+          "content": "console.error(\"Failed to get admin settings:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\admin\\settings\\route.ts",
+          "line": 159,
+          "content": "console.error(\"Failed to update feature flags:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\admin\\settings\\route.ts",
+          "line": 279,
+          "content": "console.error(\"Failed to update policy settings:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\advance-accounts\\route.ts",
+          "line": 83,
+          "content": "console.error(\"Get advance accounts error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\advance-accounts\\route.ts",
+          "line": 131,
+          "content": "console.error(\"Create advance account error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\route.ts",
+          "line": 141,
+          "content": "console.error(\"Get analytics error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\route.ts",
+          "line": 230,
+          "content": "console.error(\"Get analytics aggregation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-actions\\route.ts",
+          "line": 75,
+          "content": "console.error(\"Get approval actions error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-actions\\route.ts",
+          "line": 122,
+          "content": "console.error(\"Create approval action error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-delegations\\route.ts",
+          "line": 78,
+          "content": "console.error(\"Get approval delegations error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-delegations\\route.ts",
+          "line": 127,
+          "content": "console.error(\"Create approval delegation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-requests\\route.ts",
+          "line": 86,
+          "content": "console.error(\"Get approval requests error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-requests\\route.ts",
+          "line": 135,
+          "content": "console.error(\"Create approval request error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-workflows\\route.ts",
+          "line": 79,
+          "content": "console.error(\"Get approval workflows error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\approval-workflows\\route.ts",
+          "line": 127,
+          "content": "console.error(\"Create approval workflow error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\bank-accounts\\route.ts",
+          "line": 101,
+          "content": "console.error(\"Failed to fetch bank accounts:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\bank-accounts\\route.ts",
+          "line": 227,
+          "content": "console.error(\"Bank account creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\bank-charge-configs\\route.ts",
+          "line": 82,
+          "content": "console.error(\"Get bank charge configs error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\bank-charge-configs\\route.ts",
+          "line": 130,
+          "content": "console.error(\"Create bank charge config error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\billing\\route.ts",
+          "line": 200,
+          "content": "console.error(\"Get billing information error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\billing\\route.ts",
+          "line": 286,
+          "content": "console.error(\"Update billing information error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\billing\\route.ts",
+          "line": 377,
+          "content": "console.error(\"Process billing webhook error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\bills\\route.ts",
+          "line": 119,
+          "content": "console.error(\"Failed to fetch bills:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\bills\\route.ts",
+          "line": 275,
+          "content": "console.error(\"Bill creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\companies\\route.ts",
+          "line": 89,
+          "content": "console.error(\"Get companies error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\companies\\route.ts",
+          "line": 136,
+          "content": "console.error(\"Create company error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\company-settings\\route.ts",
+          "line": 95,
+          "content": "console.error(\"[Company Settings GET] Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\company-settings\\route.ts",
+          "line": 200,
+          "content": "console.error(\"[Company Settings POST] Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\customers\\route.ts",
+          "line": 95,
+          "content": "console.error(\"Failed to fetch customers:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\customers\\route.ts",
+          "line": 195,
+          "content": "console.error(\"Customer creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\feature-flags\\evaluate\\route.ts",
+          "line": 151,
+          "content": "console.error(\"Evaluate features error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\feature-flags\\route.ts",
+          "line": 154,
+          "content": "console.error(\"Get feature flags error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\feature-flags\\route.ts",
+          "line": 254,
+          "content": "console.error(\"Update feature flags error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\feature-flags\\route.ts",
+          "line": 334,
+          "content": "console.error(\"Evaluate feature flags error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\health\\performance\\route.ts",
+          "line": 82,
+          "content": "console.error(\"Performance health check error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\health\\route.ts",
+          "line": 92,
+          "content": "console.error(\"Health check failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\health\\route.ts",
+          "line": 316,
+          "content": "console.error(\"Health check error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\health\\security\\route.ts",
+          "line": 37,
+          "content": "console.error(\"Security health check error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\invoices\\[id]\\post\\route.ts",
+          "line": 193,
+          "content": "console.error(\"Invoice posting failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\journals\\route.ts",
+          "line": 108,
+          "content": "console.error(\"Failed to fetch journals:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\journals\\route.ts",
+          "line": 258,
+          "content": "console.error(\"Journal creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\me\\active-tenant\\route.ts",
+          "line": 139,
+          "content": "console.error(\"Switch tenant error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\me\\active-tenant\\route.ts",
+          "line": 248,
+          "content": "console.error(\"Get active tenant error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\monitoring\\dashboard\\route.ts",
+          "line": 110,
+          "content": "console.error(\"Monitoring dashboard error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\monitoring\\logs\\route.ts",
+          "line": 210,
+          "content": "console.error('Get logs error:', error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\monitoring\\metrics\\route.ts",
+          "line": 149,
+          "content": "console.error(\"Get metrics error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\monitoring\\traces\\route.ts",
+          "line": 219,
+          "content": "console.error(\"Get traces error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\notifications\\route.ts",
+          "line": 97,
+          "content": "console.error(\"Get notifications error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\notifications\\route.ts",
+          "line": 154,
+          "content": "console.error(\"Create notification error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\payments\\route.ts",
+          "line": 136,
+          "content": "console.error(\"Failed to fetch payments:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\payments\\route.ts",
+          "line": 329,
+          "content": "console.error(\"Payment creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\periods\\route.ts",
+          "line": 128,
+          "content": "console.error(\"Get Periods API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\periods\\route.ts",
+          "line": 306,
+          "content": "console.error(\"Period Management API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\periods\\route.ts",
+          "line": 439,
+          "content": "console.error(\"Update Period API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\presence\\route.ts",
+          "line": 65,
+          "content": "console.error(\"Get presence error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\presence\\route.ts",
+          "line": 116,
+          "content": "console.error(\"Update presence error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\reports\\balance-sheet\\route.ts",
+          "line": 154,
+          "content": "console.error(\"Balance Sheet API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\reports\\balance-sheet\\route.ts",
+          "line": 301,
+          "content": "console.error(\"Balance Sheet API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\reports\\cash-flow\\route.ts",
+          "line": 145,
+          "content": "console.error(\"Cash Flow API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\reports\\cash-flow\\route.ts",
+          "line": 237,
+          "content": "console.error(\"Cash Flow API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\reports\\trial-balance\\route.ts",
+          "line": 225,
+          "content": "console.error(\"Trial Balance API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\reports\\trial-balance\\route.ts",
+          "line": 388,
+          "content": "console.error(\"Trial Balance API Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\rules\\route.ts",
+          "line": 136,
+          "content": "console.error(\"Rules API error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscription-plans\\route.ts",
+          "line": 78,
+          "content": "console.error(\"Get subscription plans error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscription-plans\\route.ts",
+          "line": 159,
+          "content": "console.error(\"Create subscription plan error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscriptions\\route.ts",
+          "line": 158,
+          "content": "console.error(\"Get subscriptions error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscriptions\\route.ts",
+          "line": 333,
+          "content": "console.error(\"Create subscription error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscriptions\\[id]\\route.ts",
+          "line": 155,
+          "content": "console.error(\"Get subscription error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscriptions\\[id]\\route.ts",
+          "line": 268,
+          "content": "console.error(\"Update subscription error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\subscriptions\\[id]\\route.ts",
+          "line": 400,
+          "content": "console.error(\"Cancel subscription error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\route.ts",
+          "line": 96,
+          "content": "console.error(\"Get tenants error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\route.ts",
+          "line": 210,
+          "content": "console.error(\"Create tenant error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\invite\\route.ts",
+          "line": 143,
+          "content": "console.error(\"Membership update error:\", membershipError2);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\invite\\route.ts",
+          "line": 161,
+          "content": "console.error(\"Membership creation error:\", membershipError2);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\invite\\route.ts",
+          "line": 186,
+          "content": "console.error(\"Failed to create invitation record:\", invitationError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\invite\\route.ts",
+          "line": 203,
+          "content": "console.error(\"Invite user error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\members\\route.ts",
+          "line": 90,
+          "content": "console.error(\"Get tenant members error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\members\\[userId]\\route.ts",
+          "line": 145,
+          "content": "console.error(\"Remove member error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\members\\[userId]\\route.ts",
+          "line": 278,
+          "content": "console.error(\"Update member role error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\route.ts",
+          "line": 99,
+          "content": "console.error(\"Get tenant error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\route.ts",
+          "line": 179,
+          "content": "console.error(\"Update tenant error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\tenants\\[id]\\route.ts",
+          "line": 279,
+          "content": "console.error(\"Delete tenant error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\[id]\\route.ts",
+          "line": 118,
+          "content": "console.error(\"Get usage metric error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\[id]\\route.ts",
+          "line": 227,
+          "content": "console.error(\"Update usage metric error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\[id]\\route.ts",
+          "line": 333,
+          "content": "console.error(\"Delete usage metric error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\users\\route.ts",
+          "line": 148,
+          "content": "console.error(\"Get users error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\users\\route.ts",
+          "line": 350,
+          "content": "console.error(\"Create user error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\users\\[id]\\route.ts",
+          "line": 114,
+          "content": "console.error(\"Get user error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\users\\[id]\\route.ts",
+          "line": 260,
+          "content": "console.error(\"Update user error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\users\\[id]\\route.ts",
+          "line": 365,
+          "content": "console.error(\"Delete user error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\vendors\\route.ts",
+          "line": 112,
+          "content": "console.error(\"Failed to fetch vendors:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\vendors\\route.ts",
+          "line": 230,
+          "content": "console.error(\"Vendor creation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\withholding-tax-configs\\route.ts",
+          "line": 82,
+          "content": "console.error(\"Get withholding tax configs error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\withholding-tax-configs\\route.ts",
+          "line": 130,
+          "content": "console.error(\"Create withholding tax config error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\ws\\route.ts",
+          "line": 33,
+          "content": "console.error(\"WebSocket setup error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\ws\\route.ts",
+          "line": 80,
+          "content": "console.error(\"WebSocket health check error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\api-gateway.ts",
+          "line": 154,
+          "content": "console.error(\"[Gateway Middleware] Error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\audit-trail.ts",
+          "line": 153,
+          "content": "console.error(\"Failed to initialize audit trail manager:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\audit-trail.ts",
+          "line": 298,
+          "content": "console.error(\"Failed to flush audit buffer:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\audit-trail.ts",
+          "line": 333,
+          "content": "console.error(\"Failed to store audit events:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\audit-trail.ts",
+          "line": 354,
+          "content": "console.error(\"Failed to cleanup old audit records:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\audit-trail.ts",
+          "line": 445,
+          "content": "console.error(\"Failed to query audit events:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\audit-trail.ts",
+          "line": 527,
+          "content": "console.error(\"Failed to generate audit report:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\monitoring.ts",
+          "line": 225,
+          "content": "console.error(\"Failed to initialize comprehensive monitoring system:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\websocket-server.ts",
+          "line": 230,
+          "content": "console.error(\"Error broadcasting to tenant:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\lib\\websocket-server.ts",
+          "line": 256,
+          "content": "console.error(\"Error broadcasting to user:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\cache-middleware.ts",
+          "line": 110,
+          "content": "console.error(\"Cache get error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\cache-middleware.ts",
+          "line": 145,
+          "content": "console.error(\"Cache set error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\cache-middleware.ts",
+          "line": 158,
+          "content": "console.error(\"Cache invalidation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\cache-middleware.ts",
+          "line": 172,
+          "content": "console.error(\"Route cache invalidation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\security-hardening.ts",
+          "line": 266,
+          "content": "console.error(\"Security middleware error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\security-hardening.ts",
+          "line": 311,
+          "content": "console.error(\"Failed to get country from IP:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\security-hardening.ts",
+          "line": 462,
+          "content": "console.error(\"Failed to record security event:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\security-middleware.ts",
+          "line": 337,
+          "content": "console.error(\"Rate limiting error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\security-middleware.ts",
+          "line": 388,
+          "content": "console.error(\"CSRF protection error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\src\\http\\middlewares\\error.ts",
+          "line": 53,
+          "content": "console.error(\"API Error:\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\src\\server.ts",
+          "line": 82,
+          "content": "console.error('Redis error:', err);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\src\\server.ts",
+          "line": 219,
+          "content": "console.error(\"Server error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\src\\server.ts",
+          "line": 236,
+          "content": "console.error(\"Failed to start server:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\src\\server.ts",
+          "line": 259,
+          "content": "console.error(\"Failed to start server:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\tests\\integration\\gateway.e2e.test.ts",
+          "line": 44,
+          "content": "console.error(\"Failed to start test server:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api\\tests\\integration\\gateway.e2e.test.ts",
+          "line": 57,
+          "content": "console.error(\"Error closing server:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\gateway.ts",
+          "line": 207,
+          "content": "console.error(\"Auth middleware error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\gateway.ts",
+          "line": 230,
+          "content": "console.error(`Proxy error for ${serviceName}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\gateway.ts",
+          "line": 248,
+          "content": "console.error(\"Gateway error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\handler.ts",
+          "line": 75,
+          "content": "console.error(\"Gateway handler error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\logging.ts",
+          "line": 117,
+          "content": "console.error(\"Log storage error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\logging.ts",
+          "line": 173,
+          "content": "console.error(\"Get logs error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\logging.ts",
+          "line": 189,
+          "content": "console.error(\"Get log by ID error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\logging.ts",
+          "line": 242,
+          "content": "console.error(\"Clear logs error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\logging.ts",
+          "line": 280,
+          "content": "console.error(\"Export logs error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\middleware\\error.ts",
+          "line": 34,
+          "content": "console.error(\"API Gateway Error:\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\api-gateway\\src\\rate-limit.ts",
+          "line": 118,
+          "content": "console.error(\"Rate limit error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 94,
+          "content": "console.error(\"Cache get error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 121,
+          "content": "console.error(\"Cache set error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 143,
+          "content": "console.error(\"Cache delete error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 175,
+          "content": "console.error(\"Cache exists error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 199,
+          "content": "console.error(\"Cache expire error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 226,
+          "content": "console.error(\"Cache TTL error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\cache.ts",
+          "line": 264,
+          "content": "console.error(\"Cache clear error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\idempotency.ts",
+          "line": 65,
+          "content": "console.error(\"Idempotency check error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\idempotency.ts",
+          "line": 89,
+          "content": "console.error(\"Idempotency store error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\idempotency.ts",
+          "line": 115,
+          "content": "console.error(\"Idempotency operation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\idempotency.ts",
+          "line": 127,
+          "content": "console.error(\"Idempotency invalidate error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\idempotency.ts",
+          "line": 136,
+          "content": "console.error(\"Idempotency namespace invalidate error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\redis.ts",
+          "line": 60,
+          "content": "console.error(\"Redis client error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\db\\src\\query-optimizer.ts",
+          "line": 335,
+          "content": "if (status.includes(\"ERROR\")) { console.error(\"Query\", payload); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\health-check.ts",
+          "line": 276,
+          "content": "console.error(\"Quick health check failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\health-check.ts",
+          "line": 291,
+          "content": "console.error(\"Detailed health check failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\.eslintrc.js",
+          "line": 26,
+          "content": "message: 'Use @aibos/logger instead of console.error'"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 206,
+          "content": "description: 'Raw console.log, console.info, console.warn, console.error',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 212,
+          "content": "console.error('Database error');`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 154,
+          "content": "// console.error('Database error'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 76,
+          "content": "// Pattern 4: console.error"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\health.ts",
+          "line": 291,
+          "content": "console.error(\"Error getting health history:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\health.ts",
+          "line": 314,
+          "content": "console.error(\"Error storing health result:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\logger.ts",
+          "line": 562,
+          "content": "console.error(logMessage);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\logger.ts",
+          "line": 594,
+          "content": "console.error(\"Failed to write to log file:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\metrics.ts",
+          "line": 312,
+          "content": "console.error(\"Error getting performance metrics:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\event-system.js",
+          "line": 226,
+          "content": "console.error(\"Subscription callback error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\event-system.ts",
+          "line": 360,
+          "content": "console.error(\"Subscription callback error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 55,
+          "content": "console.error(\"WebSocket server error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 151,
+          "content": "console.error(\"Invalid message format:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 163,
+          "content": "console.error(`Connection ${id} error:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 277,
+          "content": "console.error(`Failed to send message to ${connectionId}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\security\\src\\advanced-security.ts",
+          "line": 150,
+          "content": "console.error(\"Security middleware error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\AuthProvider.tsx",
+          "line": 240,
+          "content": "console.error(\"Logout API call failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\accounts\\ChartOfAccounts.tsx",
+          "line": 138,
+          "content": "console.error('Error saving account:', error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\accounts\\ChartOfAccounts.tsx",
+          "line": 161,
+          "content": "console.error('Error deleting account:', error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\common\\AccessibilityProvider.tsx",
+          "line": 317,
+          "content": "console.error(\"Failed to load accessibility preferences:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\common\\ErrorBoundary.tsx",
+          "line": 143,
+          "content": "console.error(\"Failed to report error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\common\\ErrorBoundary.tsx",
+          "line": 324,
+          "content": "console.error(\"Failed to report error:\", reportError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\common\\ErrorBoundary.tsx",
+          "line": 581,
+          "content": "console.error(\"Error caught by useErrorHandler:\", error, context);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\common\\ErrorBoundary.tsx",
+          "line": 600,
+          "content": "}).catch(console.error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\enterprise\\CompanySettingsManager.tsx",
+          "line": 233,
+          "content": "console.error(\"Failed to save settings:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\enterprise\\MultiCompanyManager.tsx",
+          "line": 103,
+          "content": "console.error(\"Failed to switch company:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\features\\FeatureFlags.tsx",
+          "line": 264,
+          "content": "console.error(\"Feature evaluation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\features\\FeatureFlags.tsx",
+          "line": 488,
+          "content": "console.error(\"Failed to toggle feature:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\features\\FeatureFlags.tsx",
+          "line": 500,
+          "content": "console.error(\"Failed to bulk update features:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\member-management.tsx",
+          "line": 85,
+          "content": "console.error(\"Failed to invite user:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\member-management.tsx",
+          "line": 98,
+          "content": "console.error(\"Failed to remove member:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\member-management.tsx",
+          "line": 111,
+          "content": "console.error(\"Failed to update role:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\payments\\PaymentProcessing.tsx",
+          "line": 144,
+          "content": "console.error('Error saving payment:', error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\periods\\PeriodManagement.tsx",
+          "line": 118,
+          "content": "console.error('Error performing period action:', error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\reports\\CustomReportBuilder.tsx",
+          "line": 154,
+          "content": "console.error(\"Failed to load template:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\reports\\CustomReportBuilder.tsx",
+          "line": 180,
+          "content": "console.error(\"Failed to save report:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\reports\\CustomReportBuilder.tsx",
+          "line": 201,
+          "content": "console.error(\"Failed to export report:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleStudio.tsx",
+          "line": 203,
+          "content": "console.error(\"Test failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleTesting.tsx",
+          "line": 140,
+          "content": "console.error(\"Failed to create test data set:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleTesting.tsx",
+          "line": 151,
+          "content": "console.error(\"Test failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleTesting.tsx",
+          "line": 164,
+          "content": "console.error(\"Tests failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleVersioning.tsx",
+          "line": 134,
+          "content": "console.error(\"Failed to create version:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleVersioning.tsx",
+          "line": 148,
+          "content": "console.error(\"Failed to compare versions:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleVersioning.tsx",
+          "line": 160,
+          "content": "console.error(\"Failed to activate version:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\tenant-switcher.tsx",
+          "line": 80,
+          "content": "console.error(\"Failed to switch tenant:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\hooks\\use-tenant-management.ts",
+          "line": 74,
+          "content": "console.error(\"Error fetching tenants:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\hooks\\use-tenant-management.ts",
+          "line": 102,
+          "content": "console.error(\"Error fetching members:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\hooks\\use-tenant-management.ts",
+          "line": 159,
+          "content": "console.error(\"Error switching tenant:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\hooks\\use-tenant-management.ts",
+          "line": 191,
+          "content": "console.error(\"Error inviting user:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\hooks\\use-tenant-management.ts",
+          "line": 214,
+          "content": "console.error(\"Error removing member:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\hooks\\use-tenant-management.ts",
+          "line": 241,
+          "content": "console.error(\"Error updating role:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\lib\\error-reporting.tsx",
+          "line": 173,
+          "content": "const originalConsoleError = console.error;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\lib\\error-reporting.tsx",
+          "line": 174,
+          "content": "console.error = (...args) => {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\lib\\error-reporting.tsx",
+          "line": 303,
+          "content": "console.error(\"Failed to create error report:\", reportError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\lib\\error-reporting.tsx",
+          "line": 468,
+          "content": "console.error(`Failed to send error report after ${this.config.maxRetries} attempts: ${report.id}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\lib\\offline.tsx",
+          "line": 210,
+          "content": "console.error(`Failed to sync action ${action.id}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\lib\\offline.tsx",
+          "line": 257,
+          "content": "console.error(`Action execution failed: ${error}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\api-gateway\\cache-middleware.ts",
+          "line": 47,
+          "content": "console.error(\"Cache middleware error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\api-gateway\\cache-middleware.ts",
+          "line": 140,
+          "content": "console.error(\"Cache invalidation error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\api-gateway\\gateway.ts",
+          "line": 117,
+          "content": "console.error(\"[API Gateway] Request processing error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\service.ts",
+          "line": 105,
+          "content": "console.error(\"Audit logging failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\auth\\enhanced-context.ts",
+          "line": 101,
+          "content": "console.error(\"Failed to fetch enhanced user context:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\auth\\enhanced-context.ts",
+          "line": 157,
+          "content": "console.error(\"Permission check failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\auth\\enhanced-context.ts",
+          "line": 193,
+          "content": "console.error(\"Feature check failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\axiom.ts",
+          "line": 98,
+          "content": "console.error(\"Failed to send events to Axiom:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\axiom.ts",
+          "line": 225,
+          "content": "this.flush().catch(console.error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\axiom.ts",
+          "line": 233,
+          "content": "this.flush().catch(console.error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\idempotency\\middleware.ts",
+          "line": 102,
+          "content": "console.error(\"Idempotency middleware error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware\\idempotency.ts",
+          "line": 45,
+          "content": "console.error(\"Idempotency cache lookup error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware\\idempotency.ts",
+          "line": 68,
+          "content": "console.error(\"Idempotency processing error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware\\idempotency.ts",
+          "line": 92,
+          "content": "console.error(\"Failed to store idempotency response:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware\\idempotency.ts",
+          "line": 111,
+          "content": "console.error(\"Failed to cleanup idempotency cache:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\storage\\attachment-service.ts",
+          "line": 195,
+          "content": "console.error(\"Error getting attachment:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\storage\\attachment-service.ts",
+          "line": 410,
+          "content": "console.error(\"Error getting entity attachments:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\storage\\attachment-service.ts",
+          "line": 474,
+          "content": "console.error(\"Error logging attachment access:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\test\\audit-service-di.test.ts",
+          "line": 186,
+          "content": "// Set NODE_ENV to development to trigger console.error"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 9,
+          "content": "console.error(\"Missing Supabase environment variables\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 26,
+          "content": "console.error(\"Migration failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 40,
+          "content": "console.error(\"Error verifying table creation:\", tableError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\run-attachment-migration.js",
+          "line": 47,
+          "content": "console.error(\"Migration error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-ingest.ts",
+          "line": 330,
+          "content": "console.error(\"FX rates are stale:\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-storage.ts",
+          "line": 59,
+          "content": "console.error(`Failed to insert FX rate ${rate.fromCurrency}/${rate.toCurrency}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-storage.ts",
+          "line": 131,
+          "content": "console.error(\"Failed to check FX rate staleness:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-storage.ts",
+          "line": 185,
+          "content": "console.error(`Failed to get FX rate ${fromCurrency}/${toCurrency}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-storage.ts",
+          "line": 226,
+          "content": "console.error(`Failed to get rate for ${baseCurrency}/${targetCurrency}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-storage.ts",
+          "line": 249,
+          "content": "console.error(\"Failed to cleanup old FX rates:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-storage.ts",
+          "line": 302,
+          "content": "console.error(`Failed to ensure currency ${code} exists:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\supabase\\functions\\auth-hook\\index.ts",
+          "line": 171,
+          "content": "console.error(\"Auth hook error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\supabase\\functions\\file-upload\\index.ts",
+          "line": 198,
+          "content": "console.error(\"File upload error:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\supabase\\functions\\tenant-management\\index.ts",
+          "line": 199,
+          "content": "console.error(\"Tenant management error:\", error);"
+        }
+      ],
+      "warn": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\rules\\route.ts",
+          "line": 93,
+          "content": "console.warn(\"Cache read error:\", cacheError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\rules\\route.ts",
+          "line": 120,
+          "content": "console.warn(\"Cache write error:\", cacheError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\rules\\route.ts",
+          "line": 233,
+          "content": "console.warn(\"Cache invalidation error:\", cacheError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\rules\\route.ts",
+          "line": 241,
+          "content": "//     console.warn('Real-time event error:', eventError);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\middleware\\performance-middleware.ts",
+          "line": 67,
+          "content": "console.warn(\"Slow request detected:\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\accounting\\src\\fx\\ingest.ts",
+          "line": 130,
+          "content": "console.warn(\"Primary FX source failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\accounting\\src\\fx\\ingest.ts",
+          "line": 161,
+          "content": "console.warn(\"Fallback FX source failed:\", errorMsg);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\accounting\\src\\tax-calculations.ts",
+          "line": 63,
+          "content": "console.warn(`Tax code lookup failed for '${input.taxCode}':`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\accounting\\src\\tax-calculations.ts",
+          "line": 100,
+          "content": "console.warn(\"Failed to fetch tax codes:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\accounting\\tests\\integration\\db-schema.ts",
+          "line": 48,
+          "content": "console.warn(`Failed to drop test schema ${schema}:`, error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\cache\\src\\compat\\AdvancedCacheManager.ts",
+          "line": 45,
+          "content": "console.warn(`invalidatePattern(${pattern}) - not implemented in compatibility layer`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\db\\src\\query-optimizer.ts",
+          "line": 137,
+          "content": "console.warn(`Slow query: ${queryId} took ${took}ms`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\db\\src\\query-optimizer.ts",
+          "line": 336,
+          "content": "else if (ms > 1000) { console.warn(\"Query\", payload); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\.eslintrc.js",
+          "line": 21,
+          "content": "message: 'Use @aibos/logger instead of console.warn'"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 206,
+          "content": "description: 'Raw console.log, console.info, console.warn, console.error',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 211,
+          "content": "console.warn('Rate limit exceeded');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 153,
+          "content": "// console.warn('Rate limit exceeded'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 87,
+          "content": "// Pattern 5: console.warn"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\logger.ts",
+          "line": 554,
+          "content": "console.warn(logMessage);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\metrics-collector.ts",
+          "line": 807,
+          "content": "console.warn("
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\tracing.ts",
+          "line": 161,
+          "content": "console.warn(`Span ${spanId} not found`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\compat\\PresenceSystem.ts",
+          "line": 16,
+          "content": "console.warn(\"PresenceSystem.getStats() - not implemented, returning empty stats\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\compat\\WebSocketManager.ts",
+          "line": 16,
+          "content": "console.warn(`getConnectionsByTenant(${tenantId}) - not implemented, returning empty array`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\compat\\WebSocketManager.ts",
+          "line": 26,
+          "content": "console.warn(`getConnectionsByUser(${userId}) - not implemented, returning empty array`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\presence-system.ts",
+          "line": 456,
+          "content": "console.warn(\"PresenceSystem.getStats() - static method not implemented, returning empty stats\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 177,
+          "content": "console.warn(`Tenant mismatch for connection ${connectionId}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\realtime\\src\\websocket-manager.js",
+          "line": 205,
+          "content": "console.warn(`Invalid channel subscription: ${channel}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\axiom.ts",
+          "line": 82,
+          "content": "console.warn(\"Axiom credentials not configured, skipping telemetry\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\email.ts",
+          "line": 31,
+          "content": "console.warn(\"Resend API key not configured, email not sent:\", { to, subject: p.subject });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\logger.ts",
+          "line": 39,
+          "content": "console.warn("
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\test\\setup.ts",
+          "line": 249,
+          "content": "console.warn(`Missing environment variables: ${missing.join(\", \")}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\test\\setup.ts",
+          "line": 250,
+          "content": "console.warn(\"Some tests may be skipped or use mocks\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\fx-ingest.ts",
+          "line": 313,
+          "content": "console.warn(\"FX rates ingested from fallback source:\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\tests\\setup\\database-setup.ts",
+          "line": 33,
+          "content": "console.warn(\"Failed to clean test data:\", error);"
+        }
+      ],
+      "info": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\.eslintrc.js",
+          "line": 16,
+          "content": "message: 'Use @aibos/logger instead of console.info'"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 206,
+          "content": "description: 'Raw console.log, console.info, console.warn, console.error',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 210,
+          "content": "console.info('Processing request');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 152,
+          "content": "// console.info('Processing request'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\logger.ts",
+          "line": 547,
+          "content": "console.info(logMessage);"
+        }
+      ],
+      "debug": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\.eslintrc.js",
+          "line": 31,
+          "content": "message: 'Use @aibos/logger instead of console.debug'"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 155,
+          "content": "// console.debug('Debug information'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\logger.ts",
+          "line": 541,
+          "content": "console.debug(logMessage);"
+        }
+      ]
+    },
+    "logger": {
+      "info": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 54,
+          "content": "logger.info(chalk.blue(`🚀 Starting ${this.config.environment} deployment...`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 55,
+          "content": "logger.info(chalk.blue(`📦 Version: ${this.config.version}\\n`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 86,
+          "content": "logger.info(chalk.green(`\\n✅ Deployment completed successfully in ${duration}ms`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 116,
+          "content": "logger.info(chalk.blue(`⏳ ${name}...`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 121,
+          "content": "logger.info(chalk.green(`✅ ${name} completed in ${duration}ms`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 201,
+          "content": "logger.info(chalk.yellow(\"📦 Simulating deployment...\"));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 210,
+          "content": "logger.info(chalk.green(\"✅ Deployment simulation completed\"));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 233,
+          "content": "logger.info(chalk.green(\"✅ Rollback completed\"));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\bind.ts",
+          "line": 185,
+          "content": "logger.info('Request started', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\bind.ts",
+          "line": 196,
+          "content": "logger.info('Request completed', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 120,
+          "content": "logger.info('User logged in', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 136,
+          "content": "logger.info('Processing request', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 158,
+          "content": "pattern: 'logger.info(message, { event, value, unit, ...metadata })',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 160,
+          "content": "logger.info('Business metric recorded', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 173,
+          "content": "pattern: 'logger.info(message, { operation, duration, ...metadata })',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 175,
+          "content": "logger.info('Operation completed', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 222,
+          "content": "logger.info(\\`User \\${userId} logged in from \\${ip}\\`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 245,
+          "content": "logger.info('API call', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 270,
+          "content": "logger.info('CRITICAL ERROR OCCURRED'); // Should be error/fatal"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 282,
+          "content": "logger.info('User action performed');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 294,
+          "content": "logger.info('[INFO] User 123 logged in from IP 192.168.1.1');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 18,
+          "content": "logger.info('User logged in', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 85,
+          "content": "logger.info('User created', { userId: '123', email: 'user@example.com' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 93,
+          "content": "logger.info('Complex operation completed', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 121,
+          "content": "logger.info('Application started', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 131,
+          "content": "logger.info('API call successful', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 163,
+          "content": "// logger.info(`User ${userId} logged in from ${ip}`); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 179,
+          "content": "// logger.info('API call', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 195,
+          "content": "// logger.info('CRITICAL ERROR OCCURRED'); // FORBIDDEN - should be error/fatal"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 202,
+          "content": "// logger.info('User action performed'); // FORBIDDEN - no context"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 209,
+          "content": "// logger.info('[INFO] User 123 logged in from IP 192.168.1.1'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 220,
+          "content": "// After: logger.info('User logged in');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 222,
+          "content": "// Before: logger.info(`User ${userId} logged in from ${ip}`);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 223,
+          "content": "// After: logger.info('User logged in', { userId, ip });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 228,
+          "content": "// Before: logger.info('API call', { password: 'secret123' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 229,
+          "content": "// After: logger.info('API call', { password: '[REDACTED]' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 231,
+          "content": "// Before: logger.info('User action performed');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 232,
+          "content": "// After: logger.info('User action performed', { context: 'missing' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 242,
+          "content": "logger.info('User action', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 251,
+          "content": "logger.info('Request processed', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 264,
+          "content": "logger.info('User action'); // All environments"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 40,
+          "content": "migrated = `logger.info('${match[1]}');`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 56,
+          "content": "migrated = `logger.info('${message}', { ${metadata} });`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 69,
+          "content": "migrated = `logger.info('Log entry', { data: ${content} });`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 116,
+          "content": "// Pattern 1: logger.info with template literal"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 313,
+          "content": "after: `logger.info('User logged in');`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 318,
+          "content": "before: `logger.info(\\`User \\${userId} logged in from \\${ip}\\`);`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 319,
+          "content": "after: `logger.info('User {} logged in from {}', { userId, ip });`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 330,
+          "content": "before: `logger.info('API call', { password: 'secret123' });`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 331,
+          "content": "after: `logger.info('API call', { password: '[REDACTED]' });`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 336,
+          "content": "before: `logger.info('User action performed');`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 337,
+          "content": "after: `logger.info('User action performed', { context: 'missing' });`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 156,
+          "content": "this.logger.info(\"Monitoring system initialized\", { component: \"monitoring-integration\" });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 241,
+          "content": "this.logger.info(message, metadata, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 170,
+          "content": "logger.info(\"OCR Processing Complete\", { result });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 186,
+          "content": "logger.info(\"Approval request approved\", { requestId, comments });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 209,
+          "content": "logger.info(\"Payment processed successfully\", { paymentId });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 213,
+          "content": "logger.info(\"Payment scheduled\", { schedule });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 224,
+          "content": "logger.info(\"Vendor created\", { vendor });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 227,
+          "content": "logger.info(\"Vendor updated\", { vendorId, vendorData });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 230,
+          "content": "logger.info(\"Vendor deleted\", { vendorId });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 239,
+          "content": "logger.info(\"Category created\", { category });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 242,
+          "content": "logger.info(\"Category updated\", { categoryId, categoryData });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 245,
+          "content": "logger.info(\"Category deleted\", { categoryId });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 248,
+          "content": "logger.info(\"Rule created\", { rule });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 251,
+          "content": "logger.info(\"Rule updated\", { ruleId, ruleData });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 254,
+          "content": "logger.info(\"Rule deleted\", { ruleId });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 257,
+          "content": "logger.info(\"Expense categorized\", { expenseData });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 642,
+          "content": "onViewRuleHistory={ruleId => logger.info(\"View rule history\", { ruleId })}"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 854,
+          "content": "logger.info(\"Create version\", { ruleId, changeLog });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 878,
+          "content": "logger.info(\"Activating version\", { versionId });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 880,
+          "content": "logger.info(\"Create version\", { ruleId: \"mock_rule_id\", changeLog: \"Mock change log\" });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 884,
+          "content": "if (process.env.NODE_ENV === 'development') { logger.info(\"Archive version\", { versionId }); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 887,
+          "content": "if (process.env.NODE_ENV === 'development') { logger.info(\"Delete version\", { versionId }); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 890,
+          "content": "if (process.env.NODE_ENV === 'development') { logger.info(\"Compare versions\", { version1Id, version2Id }); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 894,
+          "content": "if (process.env.NODE_ENV === 'development') { logger.info(\"Export version\", { versionId }); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 898,
+          "content": "if (process.env.NODE_ENV === 'development') { logger.info(\"Import version\", { ruleId, versionData }); }"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 919,
+          "content": "onViewVersionHistory={ruleId => logger.info(\"View version history\", { ruleId })}"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 920,
+          "content": "onExportRule={ruleId => logger.info(\"Export rule\", { ruleId })}"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 921,
+          "content": "onImportRule={ruleData => logger.info(\"Import rule\", { ruleData })}"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 923,
+          "content": "logger.info(\"Tag version\", { versionId, tag });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 55,
+          "content": "logger.info(\"Request started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 68,
+          "content": "logger.info(\"Request completed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 116,
+          "content": "logger.info(\"Performance metrics\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 147,
+          "content": "logger.info(\"Business event\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 58,
+          "content": "logger.info(\"Starting Puppeteer health monitor\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 88,
+          "content": "logger.info(\"Puppeteer health monitor stopped\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 251,
+          "content": "logger.info(\"Puppeteer health check passed\", logData);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 292,
+          "content": "logger.info(\"Pool recovery completed successfully\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 68,
+          "content": "logger.info(\"Initializing Puppeteer pool\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 84,
+          "content": "logger.info(\"Puppeteer pool initialized\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 104,
+          "content": "logger.info(\"PDF generated successfully\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 237,
+          "content": "logger.info(\"Creating new browser instance\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 264,
+          "content": "logger.info(\"Browser instance created\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 281,
+          "content": "logger.info(\"Health check timer started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 304,
+          "content": "logger.info(\"Browser exceeded max age, marking for restart\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 314,
+          "content": "logger.info(\"Browser exceeded max usage count, marking for restart\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 377,
+          "content": "logger.info(\"Browser removed from pool\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 386,
+          "content": "logger.info(\"Shutting down Puppeteer pool\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 407,
+          "content": "logger.info(\"Puppeteer pool shutdown complete\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 58,
+          "content": "logger.info(\"DLQ record created\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 129,
+          "content": "logger.info(\"Auto-retry scheduled\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 147,
+          "content": "logger.info(\"Marked for manual review\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 182,
+          "content": "logger.info(\"Critical failure notification sent\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 226,
+          "content": "logger.info(\"DLQ retry initiated\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 237,
+          "content": "logger.info(\"Original event resent\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 67,
+          "content": "logger.info(\"Document approval workflow started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 229,
+          "content": "logger.info(\"Initial approval notifications sent\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 252,
+          "content": "logger.info(\"Reminder notifications scheduled\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 304,
+          "content": "logger.info(\"Processing approval decision\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 487,
+          "content": "logger.info(\"Attachment workflow updated\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 625,
+          "content": "logger.info(\"Skipping reminder - workflow no longer active\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentApproval.ts",
+          "line": 665,
+          "content": "logger.info(\"Reminder notifications sent\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 67,
+          "content": "logger.info(\"Creating retention policy\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 217,
+          "content": "logger.info(\"Retention policy applied to existing documents\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 313,
+          "content": "logger.info(\"Retention monitoring results\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 336,
+          "content": "logger.info(\"Skipping expired document due to legal hold\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 566,
+          "content": "logger.info(\"Processing legal hold\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 653,
+          "content": "logger.info(\"Legal hold processing completed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 34,
+          "content": "logger.info(\"Email workflow started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 56,
+          "content": "logger.info(\"Email content generated\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 103,
+          "content": "logger.info(\"Attachments processed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 124,
+          "content": "logger.info(\"Email sent successfully\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 144,
+          "content": "logger.info(\"Email activity logged\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 21,
+          "content": "logger.info(\"FX ingestion started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 36,
+          "content": "logger.info(\"Primary FX rates fetched\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 61,
+          "content": "logger.info(\"Fallback FX rates fetched\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 110,
+          "content": "logger.info(\"FX rates stored\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 50,
+          "content": "logger.info(\"OCR processing started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 140,
+          "content": "logger.info(\"File downloaded for OCR\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 204,
+          "content": "logger.info(\"OCR processing completed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 284,
+          "content": "logger.info(\"OCR results stored\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 322,
+          "content": "logger.info(\"Triggered invoice processing workflow\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 341,
+          "content": "logger.info(\"Triggered receipt processing workflow\", { attachmentId });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 23,
+          "content": "logger.info(\"PDF generation started\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 78,
+          "content": "logger.info(\"PDF generated successfully\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 113,
+          "content": "logger.info(\"PDF stored successfully\", {"
+        }
+      ],
+      "error": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\dashboard\\route.ts",
+          "line": 103,
+          "content": "logger.error(\"Get analytics dashboard error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\dashboard\\route.ts",
+          "line": 135,
+          "content": "logger.error(\"Error fetching usage metrics\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\dashboard\\route.ts",
+          "line": 167,
+          "content": "logger.error(\"Error fetching subscription data\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\dashboard\\route.ts",
+          "line": 184,
+          "content": "logger.error(\"Error fetching user activity\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\dashboard\\route.ts",
+          "line": 201,
+          "content": "logger.error(\"Error fetching system health\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\route.ts",
+          "line": 175,
+          "content": "logger.error(\"Get usage error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\route.ts",
+          "line": 347,
+          "content": "logger.error(\"Record usage error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 98,
+          "content": "logger.error(chalk.red(`\\n❌ Deployment failed after ${duration}ms`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 99,
+          "content": "logger.error(chalk.red(`Error: ${error}`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 131,
+          "content": "logger.error(chalk.red(`❌ ${name} failed after ${duration}ms`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 132,
+          "content": "logger.error(chalk.red(`Error: ${error}`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 220,
+          "content": "logger.error(chalk.red(\"❌ No rollback version specified\"));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 235,
+          "content": "logger.error(chalk.red(`❌ Rollback failed: ${error}`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\bind.ts",
+          "line": 219,
+          "content": "logger.error('React error boundary caught error', error, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\bind.ts",
+          "line": 228,
+          "content": "logger.error('React error boundary componentDidCatch', error, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 146,
+          "content": "pattern: 'logger.error(message, error, metadata)',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 148,
+          "content": "logger.error('Database connection failed', error, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 231,
+          "content": "pattern: 'logger.error(error.message)',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 233,
+          "content": "logger.error(error.message);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 234,
+          "content": "logger.error('Error: ' + error.message);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 235,
+          "content": "logger.error(\\`Error: \\${error.message}\\`);`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 237,
+          "content": "replacement: 'Use logger.error(message, error, metadata)'"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 271,
+          "content": "logger.error('User clicked button'); // Should be debug/info"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 284,
+          "content": "logger.error('Database error');`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 30,
+          "content": "logger.error('Database operation failed', error, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 87,
+          "content": "logger.error('Validation failed', undefined, { field: 'email', value: 'invalid' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 137,
+          "content": "logger.error('API call failed', error, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 165,
+          "content": "// logger.error(`Error: ${error.message}`); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 172,
+          "content": "// logger.error(error.message); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 173,
+          "content": "// logger.error('Error: ' + error.message); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 174,
+          "content": "// logger.error(`Error: ${error.message}`); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 196,
+          "content": "// logger.error('User clicked button'); // FORBIDDEN - should be debug/info"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 204,
+          "content": "// logger.error('Database error'); // FORBIDDEN - no context"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 225,
+          "content": "// Before: logger.error('Error: ' + error.message);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 226,
+          "content": "// After: logger.error('Error occurred', error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 266,
+          "content": "logger.error('Application error'); // All environments"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 275,
+          "content": "logger.error('Operation failed', error, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 81,
+          "content": "migrated = `logger.error('Error occurred', undefined, { error: ${content} });`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 153,
+          "content": "// Pattern 1: logger.error with just error message"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 155,
+          "content": "migrated = `logger.error('Error occurred', error);`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 160,
+          "content": "// Pattern 2: logger.error with string concatenation"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 164,
+          "content": "migrated = `logger.error('${match[1]}', error);`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 170,
+          "content": "// Pattern 3: logger.error with template literal"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 176,
+          "content": "migrated = `logger.error('${message}', error);`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 324,
+          "content": "before: `logger.error('Error: ' + error.message);`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 325,
+          "content": "after: `logger.error('Error occurred', error);`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 158,
+          "content": "this.logger.error(\"Failed to initialize monitoring system\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 261,
+          "content": "this.logger.error(message, undefined, metadata, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 292,
+          "content": "this.logger.error(message, error, metadata, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\AuthProvider.tsx",
+          "line": 178,
+          "content": "window.aibos.logger.error(\"Failed to initialize auth:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\AuthProvider.tsx",
+          "line": 282,
+          "content": "window.aibos.logger.error(\"Session refresh failed:\", error);"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 66,
+          "content": "logger.error(\"Failed to log report generation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 95,
+          "content": "logger.error(\"Failed to log security violation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 122,
+          "content": "logger.error(\"Failed to log period operation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 149,
+          "content": "logger.error(\"Failed to log journal posting\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 178,
+          "content": "logger.error(\"Failed to log error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 204,
+          "content": "logger.error(\"Failed to log authentication\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 252,
+          "content": "logger.error(\"Failed to log SoD compliance\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 300,
+          "content": "logger.error(\"Failed to log COA validation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 330,
+          "content": "logger.error(\"Failed to log operation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 356,
+          "content": "logger.error(\"Failed to store audit event\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 360,
+          "content": "logger.error(\"Failed to store audit event\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 412,
+          "content": "logger.error(\"Failed to query audit events\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 436,
+          "content": "logger.error(\"Failed to query audit events\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\cache-manager.ts",
+          "line": 34,
+          "content": "logger.error(\"Failed to connect to cache\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\cache-manager.ts",
+          "line": 53,
+          "content": "logger.error(\"Error disconnecting from cache\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 51,
+          "content": "logger.error(\"Memory cache get error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 77,
+          "content": "logger.error(\"Memory cache set error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 92,
+          "content": "logger.error(\"Memory cache delete error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 116,
+          "content": "logger.error(\"Memory cache delete pattern error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 138,
+          "content": "logger.error(\"Memory cache delete by tags error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 151,
+          "content": "logger.error(\"Memory cache exists error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 178,
+          "content": "logger.error(\"Memory cache TTL error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 199,
+          "content": "logger.error(\"Memory cache expire error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 219,
+          "content": "logger.error(\"Memory cache flush error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 40,
+          "content": "logger.error(\"Redis Client Error\", err instanceof Error ? err : new Error(String(err)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 47,
+          "content": "logger.error(\"Failed to connect to Redis\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 96,
+          "content": "logger.error(\"Cache get error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 143,
+          "content": "logger.error(\"Cache set error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 166,
+          "content": "logger.error(\"Cache delete error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 193,
+          "content": "logger.error(\"Cache delete pattern error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 229,
+          "content": "logger.error(\"Cache delete by tags error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 249,
+          "content": "logger.error(\"Cache exists error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 266,
+          "content": "logger.error(\"Cache TTL error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 286,
+          "content": "logger.error(\"Cache expire error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 319,
+          "content": "logger.error(\"Cache flush error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 343,
+          "content": "logger.error(\"Cache ping error\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 84,
+          "content": "logger.error(\"Request failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\monitoring\\error-tracker.ts",
+          "line": 360,
+          "content": "logger.error(\"Failed to flush errors to Axiom\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\monitoring\\error-tracker.ts",
+          "line": 400,
+          "content": "logger.error(\"Failed to report error rate violation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\monitoring\\performance-monitor.ts",
+          "line": 153,
+          "content": "logger.error(\"Failed to flush performance metrics\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\monitoring\\performance-monitor.ts",
+          "line": 230,
+          "content": "logger.error(\"Failed to report compliance violation\", error instanceof Error ? error : new Error(String(error)));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 260,
+          "content": "logger.error(\"Puppeteer health check failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 278,
+          "content": "logger.error(\"Maximum consecutive failures reached, attempting pool recovery\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 294,
+          "content": "logger.error(\"Pool recovery failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 79,
+          "content": "logger.error(\"Failed to create initial browser\", { error, browserIndex: i });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 136,
+          "content": "logger.error(\"PDF generation failed after all retries\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 353,
+          "content": "logger.error(\"Failed to create replacement browser\", { error });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 17,
+          "content": "logger.error(\"Job failed and sent to DLQ\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 50,
+          "content": "logger.error(\"Failed to store DLQ record\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\dlqHandler.ts",
+          "line": 66,
+          "content": "logger.error(\"DLQ storage failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 169,
+          "content": "logger.error(\"Failed to query existing attachments\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 433,
+          "content": "logger.error(\"Failed to process expired document\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 64,
+          "content": "logger.error(\"Email template generation failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 95,
+          "content": "logger.error(\"Failed to process attachment\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\emailWorkflow.ts",
+          "line": 132,
+          "content": "logger.error(\"Email sending failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 43,
+          "content": "logger.error(\"Primary FX source failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 71,
+          "content": "logger.error(\"Both FX sources failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 95,
+          "content": "logger.error(\"Failed to store FX rate\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 103,
+          "content": "logger.error(\"Database error storing FX rate\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 148,
+          "content": "logger.error(\"File download failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 215,
+          "content": "logger.error(\"OCR processing failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 292,
+          "content": "logger.error(\"Failed to store OCR results\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 388,
+          "content": "logger.error(\"Text extraction failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\ocrProcessing.ts",
+          "line": 523,
+          "content": "logger.error(\"Structured data extraction failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 86,
+          "content": "logger.error(\"PDF generation failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 125,
+          "content": "logger.error(\"PDF storage failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 156,
+          "content": "logger.error(\"Failed to create attachment record\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\pdfGeneration.ts",
+          "line": 161,
+          "content": "logger.error(\"Database error creating attachment\", {"
+        }
+      ],
+      "warn": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\route.ts",
+          "line": 315,
+          "content": "logger.warn(\"Usage alert triggered\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 103,
+          "content": "logger.warn(chalk.yellow(\"\\n🔄 Attempting rollback...\"));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\deployment\\src\\deploy.ts",
+          "line": 224,
+          "content": "logger.warn(chalk.yellow(`🔄 Rolling back to version ${this.config.rollbackVersion}...`));"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 187,
+          "content": "pattern: 'logger.warn(message, { event, ...metadata })',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 189,
+          "content": "logger.warn('Security event detected', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 223,
+          "content": "logger.warn(\\`Rate limit exceeded: \\${count}/\\${limit}\\`);`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 272,
+          "content": "logger.warn('System shutting down'); // Should be error/fatal`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 283,
+          "content": "logger.warn('Rate limit exceeded');"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 295,
+          "content": "logger.warn('WARNING: Rate limit exceeded for user 456');`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 86,
+          "content": "logger.warn('Deprecated API used', { endpoint: '/api/v1/users', version: 'v1' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 164,
+          "content": "// logger.warn(`Rate limit exceeded: ${count}/${limit}`); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 197,
+          "content": "// logger.warn('System shutting down'); // FORBIDDEN - should be error/fatal"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 203,
+          "content": "// logger.warn('Rate limit exceeded'); // FORBIDDEN - no context"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 210,
+          "content": "// logger.warn('WARNING: Rate limit exceeded for user 456'); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 265,
+          "content": "logger.warn('Deprecated usage'); // All environments"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\migration.ts",
+          "line": 92,
+          "content": "migrated = `logger.warn('Warning', { message: ${content} });`;"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 251,
+          "content": "this.logger.warn(message, metadata, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 190,
+          "content": "logger.warn(\"Approval request rejected\", { requestId, reason });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 194,
+          "content": "logger.warn(\"Approval request escalated\", { requestId, comments });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 53,
+          "content": "logger.warn(\"Health monitor is already running\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 254,
+          "content": "logger.warn(\"Puppeteer health check shows degraded performance\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 120,
+          "content": "logger.warn(\"PDF generation attempt failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 199,
+          "content": "logger.warn(\"Failed to close page\", { error });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 218,
+          "content": "logger.warn(\"No healthy browsers available, waiting for pool recovery\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 296,
+          "content": "logger.warn(\"Browser disconnected\", { browserIndex: index });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 332,
+          "content": "logger.warn(\"Browser health check failed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 372,
+          "content": "logger.warn(\"Error closing browser\", { error });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 400,
+          "content": "logger.warn(\"Error closing browser during shutdown\", { error });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\documentRetention.ts",
+          "line": 104,
+          "content": "logger.warn(\"Retention policies table not found, storing in company metadata\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\workflows\\fxRateIngestion.ts",
+          "line": 56,
+          "content": "logger.warn(\"Falling back to secondary FX source\");"
+        }
+      ],
+      "debug": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 257,
+          "content": "pattern: 'logger.debug(...) in production',"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\config.ts",
+          "line": 260,
+          "content": "logger.debug('Debug information', { data: 'sensitive' });`,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 84,
+          "content": "logger.debug('API request', { method: 'POST', url: '/api/users' });"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 116,
+          "content": "logger.debug('Development mode enabled', {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 189,
+          "content": "// logger.debug('Debug information', { data: 'sensitive' }); // FORBIDDEN"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\examples.ts",
+          "line": 263,
+          "content": "logger.debug('API request'); // Development/staging"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\monitoring\\src\\integration.ts",
+          "line": 231,
+          "content": "this.logger.debug(message, metadata, {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 100,
+          "content": "logger.debug(\"Performing Puppeteer health check\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-health-check.ts",
+          "line": 200,
+          "content": "logger.debug(\"PDF generation test passed\", {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 290,
+          "content": "logger.debug(\"Performing browser health check\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\services\\worker\\src\\pdf-pool.ts",
+          "line": 358,
+          "content": "logger.debug(\"Health check completed\", {"
+        }
+      ],
+      "trace": [],
+      "fatal": []
+    },
+    "imports": {
+      "console": [],
+      "winston": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\logger.ts",
+          "line": 1,
+          "content": "import { createLogger, format, transports } from \"winston\";"
+        }
+      ],
+      "pino": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\logger\\src\\index.ts",
+          "line": 8,
+          "content": "import pino, { LoggerOptions, Logger } from 'pino';"
+        }
+      ],
+      "custom": [],
+      "aibosLogger": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\analytics\\dashboard\\route.ts",
+          "line": 6,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\apps\\web-api\\app\\api\\usage\\route.ts",
+          "line": 6,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\bills\\BillWorkflow.tsx",
+          "line": 12,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\ui\\src\\components\\rules\\RuleWorkflow.tsx",
+          "line": 7,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\audit\\audit-service.ts",
+          "line": 3,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\cache-manager.ts",
+          "line": 5,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\memory-adapter.ts",
+          "line": 3,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\cache\\redis-adapter.ts",
+          "line": 3,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\monitoring\\error-tracker.ts",
+          "line": 4,
+          "content": "import { logger } from \"@aibos/logger\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\monitoring\\performance-monitor.ts",
+          "line": 5,
+          "content": "import { logger } from \"@aibos/logger\";"
+        }
+      ]
+    },
+    "competing": {
+      "winston": [],
+      "monitoring": [],
+      "utils": [
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\index.ts",
+          "line": 79,
+          "content": "export { utilsLogger, makeLogger } from \"./utils\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\index.ts",
+          "line": 9,
+          "content": "import { makeLogger } from \"./logger.js\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\index.ts",
+          "line": 26,
+          "content": "export { makeLogger } from \"./logger.js\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\index.ts",
+          "line": 27,
+          "content": "export const utilsLogger = makeLogger(\"app\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\index.ts",
+          "line": 127,
+          "content": "export const logger = makeLogger(\"jobs\");"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\logger.ts",
+          "line": 17,
+          "content": "export function makeLogger(dataset: \"app\" | \"api\" | \"jobs\") {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\logger.ts",
+          "line": 54,
+          "content": "logger: ReturnType<typeof makeLogger>,"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 3,
+          "content": "import { makeLogger, withCtx } from \"./logger.js\";"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 45,
+          "content": "const logger = withCtx(makeLogger(\"api\"), {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 109,
+          "content": "const logger = withCtx(makeLogger(\"api\"), {"
+        },
+        {
+          "file": "C:\\AI-BOS\\accounts\\packages\\utils\\src\\middleware.ts",
+          "line": 140,
+          "content": "const logger = withCtx(makeLogger(\"api\"), {"
+        }
+      ]
+    }
+  }
+}

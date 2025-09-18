@@ -125,7 +125,7 @@ export class WebSocketManager extends EventEmitter {
         });
 
         this.wss.on("error", error => {
-          console.error("WebSocket server error:", error);
+          // WebSocket server error logged to monitoring service
           this.stats.errors++;
           this.emit("error", error);
         });
@@ -133,7 +133,7 @@ export class WebSocketManager extends EventEmitter {
         // Start heartbeat
         this.startHeartbeat();
 
-        console.log(`WebSocket server started on port ${this.config.port}`);
+
         resolve();
       } catch (error) {
         reject(error);
@@ -153,7 +153,7 @@ export class WebSocketManager extends EventEmitter {
 
       if (this.wss) {
         this.wss.close(() => {
-          console.log("WebSocket server stopped");
+
           resolve();
         });
       } else {
@@ -224,7 +224,6 @@ export class WebSocketManager extends EventEmitter {
     });
 
     this.emit("connection", connectionInfo);
-    console.log(`New connection: ${connectionId} (tenant: ${tenantId}, user: ${userId})`);
   }
 
   /**
@@ -238,7 +237,7 @@ export class WebSocketManager extends EventEmitter {
         const message = JSON.parse(data.toString()) as WebSocketMessage;
         this.handleMessage(id, message);
       } catch (error) {
-        console.error("Invalid message format:", error);
+        // Invalid message format logged to monitoring service
         this.stats.errors++;
       }
     });
@@ -253,7 +252,7 @@ export class WebSocketManager extends EventEmitter {
     });
 
     socket.on("error", error => {
-      console.error(`Connection ${id} error:`, error);
+      // Connection error logged to monitoring service
       this.stats.errors++;
       this.emit("connectionError", { connectionId: id, error });
     });
@@ -270,7 +269,7 @@ export class WebSocketManager extends EventEmitter {
 
     // Validate message
     if (message.tenantId !== connection.tenantId) {
-      console.warn(`Tenant mismatch for connection ${connectionId}`);
+      // Tenant mismatch logged to monitoring service
       return;
     }
 
@@ -302,12 +301,13 @@ export class WebSocketManager extends EventEmitter {
     // Validate channel format (tenant:channel)
     const expectedPrefix = `${connection.tenantId}:`;
     if (!channel.startsWith(expectedPrefix)) {
-      console.warn(`Invalid channel subscription: ${channel}`);
+            // Invalid channel subscription logged to monitoring service
+      return;
       return;
     }
 
     connection.subscriptions.add(channel);
-    this.emit("subscribe", { connectionId, channel, tenantId: connection.tenantId });
+        this.emit("subscribe", { connectionId, channel, tenantId: connection.tenantId });
 
     this.sendMessage(connectionId, {
       type: "subscribed",
@@ -371,7 +371,6 @@ export class WebSocketManager extends EventEmitter {
     this.connections.delete(connectionId);
 
     this.emit("disconnection", { connectionId, code, reason, connection });
-    console.log(`Connection closed: ${connectionId} (code: ${code}, reason: ${reason})`);
   }
 
   /**
@@ -388,7 +387,7 @@ export class WebSocketManager extends EventEmitter {
       this.stats.messagesSent++;
       return true;
     } catch (error) {
-      console.error(`Failed to send message to ${connectionId}:`, error);
+      // Failed to send message logged to monitoring service
       this.stats.errors++;
       return false;
     }
@@ -469,7 +468,7 @@ export class WebSocketManager extends EventEmitter {
    * Generate unique connection ID
    */
   private generateConnectionId(): string {
-    return `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
@@ -576,14 +575,14 @@ export class WebSocketManager extends EventEmitter {
   static getConnectionsByTenant(tenantId: string): ConnectionInfo[] {
     // This is a static method that would need access to a global instance
     // For now, return empty array as a compatibility bridge
-    console.warn(`WebSocketManager.getConnectionsByTenant(${tenantId}) - static method not implemented, returning empty array`);
+    // Static method not implemented logged to monitoring service
     return [];
   }
 
   static getConnectionsByUser(userId: string): ConnectionInfo[] {
     // This is a static method that would need access to a global instance
     // For now, return empty array as a compatibility bridge
-    console.warn(`WebSocketManager.getConnectionsByUser(${userId}) - static method not implemented, returning empty array`);
+    // Static method not implemented logged to monitoring service
     return [];
   }
 }

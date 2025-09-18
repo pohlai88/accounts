@@ -47,12 +47,12 @@ export class RedisClient {
     // Event handlers
     this.client.on("connect", () => {
       this.isConnected = true;
-      console.log("Redis client connected");
+      
     });
 
     this.client.on("ready", () => {
       this.isConnected = true;
-      console.log("Redis client ready");
+      
     });
 
     this.client.on("error", error => {
@@ -62,12 +62,12 @@ export class RedisClient {
 
     this.client.on("close", () => {
       this.isConnected = false;
-      console.log("Redis client disconnected");
+      
     });
 
     this.client.on("end", () => {
       this.isConnected = false;
-      console.log("Redis client ended");
+      
     });
   }
 

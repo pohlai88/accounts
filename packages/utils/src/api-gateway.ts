@@ -90,7 +90,7 @@ class ApiGatewayImpl implements ApiGateway {
 
     build(): void {
         // In a real implementation, this would register the routes with the framework
-        console.log(`API Gateway built with ${this.routes.length} routes`);
+        
     }
 
     async processRequest(request: any): Promise<any> {

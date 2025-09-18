@@ -2,6 +2,7 @@
 // Tracks API P95 ≤ 500ms, UI TTFB ≤ 200ms, Error rate ≤ 1%
 
 import { performance } from "perf_hooks";
+import { logger } from "@aibos/logger";
 import { axiom } from "@aibos/utils/axiom";
 
 export interface PerformanceMetrics {
@@ -149,7 +150,7 @@ export class PerformanceMonitor {
         })),
       );
     } catch (error) {
-      console.error("Failed to flush performance metrics:", error);
+      logger.error("Failed to flush performance metrics", error instanceof Error ? error : new Error(String(error)));
       // Re-add metrics to buffer for retry
       this.metricsBuffer.unshift(...metricsToFlush);
     }
@@ -226,7 +227,7 @@ export class PerformanceMonitor {
         },
       ]);
     } catch (error) {
-      console.error("Failed to report compliance violation:", error);
+      logger.error("Failed to report compliance violation", error instanceof Error ? error : new Error(String(error)));
     }
   }
 

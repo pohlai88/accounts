@@ -360,9 +360,9 @@ export async function POST(request: NextRequest) {
           query = query.ilike(`metadata->${key}`, `%${value}%`);
         } else if (typeof value === "object" && value !== null) {
           // Handle complex metadata queries
-          if ("gte" in value) {query = query.gte(`metadata->${key}`, value.gte);}
-          if ("lte" in value) {query = query.lte(`metadata->${key}`, value.lte);}
-          if ("eq" in value) {query = query.eq(`metadata->${key}`, value.eq);}
+          if ("gte" in value) { query = query.gte(`metadata->${key}`, value.gte); }
+          if ("lte" in value) { query = query.lte(`metadata->${key}`, value.lte); }
+          if ("eq" in value) { query = query.eq(`metadata->${key}`, value.eq); }
         }
       }
     }
